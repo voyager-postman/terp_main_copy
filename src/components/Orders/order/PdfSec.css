@@ -1,0 +1,422 @@
+.table-strip tr:nth-child(even) {
+  background-color: #00000012;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+input:focus {
+  outline: unset;
+}
+
+td {
+  font-size: 13px;
+  color: #4d4f75;
+}
+
+.tableBorder tr:nth-child(even) {
+  background: #ffffff;
+}
+
+.tableBorder tr:nth-child(odd) {
+  background: #eeeded;
+}
+
+.tableBorder td {
+  font-size: 13px;
+  border-collapse: collapse;
+  border: 1px solid rgba(112, 111, 111, 0.671) !important;
+}
+
+.tableBorder th {
+  font-size: 13px;
+  border-collapse: collapse;
+  border: 1px solid rgba(112, 111, 111, 0.671) !important;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+p {
+  margin: 0px;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #203764;
+  color: #fff;
+}
+
+.packList {
+  margin-top: 20px;
+  width: 100%;
+  background: #ffffff;
+  border-top: 4px solid #203764;
+  border-bottom: 4px solid #203764;
+}
+
+.packList td {
+  padding: unset;
+  position: relative;
+  top: -3px;
+  color: #203764 !important;
+  padding-bottom: 10px;
+}
+
+.awb td {
+  position: relative;
+  padding: 0px;
+}
+
+table.barton td {
+  position: relative;
+
+  padding-bottom: 10px !important;
+}
+
+.darkTh th {
+  padding: 0px;
+}
+
+.darkTh th {
+  padding: 0px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.darkTh p {
+  position: relative;
+  top: -3px;
+}
+
+.itemData td p {
+  padding: 0px;
+  position: relative;
+  top: -2px;
+  font-weight: 600;
+}
+
+.itemData td {
+  padding: 0px 5px;
+  padding-bottom: 10px;
+}
+
+.thbT strong {
+  position: relative;
+  top: -2px;
+}
+
+/* invoice order */
+.tableInvoiceFirst td p {
+  font-weight: 600;
+  position: relative;
+  top: -3px;
+}
+
+.tableInvoiceFirst th {
+  padding: 0px 5px 10px 5px;
+  text-align: center;
+}
+
+.tableInvoiceFirst td {
+  padding: 0px 5px 10px 5px;
+}
+
+/* sec invoice */
+
+.packingParent h5 {
+  text-align: center;
+  font-size: 16px;
+  position: relative;
+  color: rgb(255, 255, 255);
+  top: -3px;
+  padding-bottom: 12px;
+}
+
+/* .packingParent h5:first-child {
+  width: 230px;
+} */
+
+.ShipToParent div {
+  background: rgb(32, 55, 100);
+  padding-top: 0px;
+  width: 50%;
+
+}
+
+.ShipToParent div:nth-child(1) {
+  margin-right: 5px;
+}
+
+.ShipToParent h5 {
+  text-align: center;
+  font-size: 16px;
+  position: relative;
+  color: rgb(255, 255, 255);
+  top: -3px;
+  padding-bottom: 13px;
+}
+
+.retazParent {
+  display: flex;
+  justify-content: space-between;
+}
+
+.retazParent div {
+  margin-right: 5px;
+  width: 50%;
+}
+
+.retazParent div:nth-child(2) {
+  margin-left: 5px;
+}
+
+.retazParent p {
+  font-size: 13px;
+  white-space: normal;
+  line-height: 17px;
+  text-align: left;
+}
+
+.orderInvoiceTab td {
+  padding: "0px 20px 15px 0px";
+  padding: 0px 10px 3px 0px !important;
+  position: relative;
+  top: 0px;
+}
+
+.orderInvoiceTab {
+  margin-bottom: 10px;
+}
+
+.addressPara p {
+  line-height: 16px;
+  margin-top: unset !important;
+}
+
+.addressPara h5 {
+  line-height: 16px;
+  font-size: 15px !important;
+  margin: 0;
+}
+
+/* 5/6/2024 */
+.secLorem p {
+  position: relative;
+  top: -3px;
+  text-align: left;
+  margin-bottom: 7px;
+}
+
+.billTo td {
+  width: 50%;
+  padding: unset;
+  position: relative;
+  top: -3px;
+  /* padding-bottom: 10px;  */
+}
+
+.billTo {
+  width: 100%;
+  /* border-top: 4px solid #203764; border-top: 4px solid #203764;  */
+  /* margin-top: 4px; */
+  /* border-bottom: 4px solid #203764;  */
+  position: relative;
+  top: -5px;
+}
+
+.barton {
+  border-top: 4px solid #203764;
+}
+
+.logoArea {
+  position: relative;
+  top: 3px;
+}
+
+@media print {
+  .headerPdf {
+    page-break-after: always;
+  }
+}
+
+.totalSpaceBot p {
+  line-height: 13px;
+  font-size: 13px;
+}
+
+.thbBottomOrder td {
+  position: relative;
+  top: -5px;
+}
+
+.totalSpaceBot>div {
+  position: relative;
+  top: 0px;
+  line-height: 14px;
+}
+
+.barton p:nth-child(1) {
+  font-size: 15px;
+  line-height: 16px;
+}
+
+.barton p {
+  font-size: 13px;
+  white-space: normal;
+  padding-right: 20px;
+  line-height: 16px;
+  position: relative;
+  top: -3px;
+}
+
+.retazParent p:nth-child(1) {
+  font-size: 15px;
+}
+
+.retazParent {
+  display: flex;
+  width: 100%;
+  padding-bottom: 7px;
+  position: relative;
+  top: -6px;
+}
+
+/* 13/6/2024 */
+.retazParent div {
+  margin-left: 10px;
+}
+
+.orderPdfViewWidth {
+  width: 900px;
+}
+
+.tableorderFirst td p {
+  word-wrap: normal !important;
+}
+
+.thbT {
+  background: #fff !important;
+  color: #203764 !important;
+  border-bottom: 3px solid #203764;
+  padding: 0px 10px 4px 10px;
+  font-size: 13px !important;
+  text-transform: capitalize;
+}
+
+.quoTable tr:nth-child(even) {
+  background: #ffffff;
+}
+
+.quoTable tr:nth-child(odd) {
+  background: #eeeded;
+}
+
+.quoTable td,
+.quoTable th {
+  font-size: 13px;
+  border-collapse: collapse;
+}
+
+.quoImg {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.quoImg img {
+  width: 200px;
+  border-radius: 5px;
+  height: 200px;
+}
+
+/* .quoImg {
+  width: 160px;
+  border-radius: 5px;
+  height: 100px;
+}
+.quoImg img {
+  width: 100%;
+  border-radius: 5px;
+  height: 100%;
+  object-fit: cover;
+} */
+.quoTabl>.darkTh .invoiceFirst {
+  border: 1px solid #000;
+}
+
+.quoTable {
+  border: 1px solid #203764;
+}
+
+.borderBot {
+  border-bottom: 1px solid #203764;
+}
+
+.borderBot:last-child {
+  border-bottom: unset !important;
+}
+
+.toatalThbTwo div:nth-child(1) strong {
+  color: #203764;
+  font-weight: 800;
+  margin-right: 20px;
+  display: inline-block;
+}
+
+.toatalThbTwo div:nth-child(2) p {
+  position: relative;
+  top: -1px;
+  font-weight: 800;
+}
+
+.unsetAll td {
+  padding: unset !important;
+}
+
+.proformaTable {
+  width: 100%;
+  padding: 5px 20px;
+  background: rgb(255, 255, 255);
+  display: block;
+}
+
+.toatalThbTwo div:nth-child(1) {
+  width: 140px;
+}
+
+.toatalThbTwo {
+  display: flex;
+  border-bottom: 3px solid #203764;
+  padding-bottom: 5px;
+  width: 220px;
+  justify-content: space-between;
+}
+
+.quoTotal div:nth-child(1) {
+  width: 100% !important;
+}
+
+.noteMessage {
+  text-align: center;
+  font-weight: 700;
+}
+
+.proformaTable.quotationPdf tbody {
+  width: 100% !important;
+  display: inline-block;
+}
+
+.totalBox.proformaBottom tr {
+  width: 100%;
+  display: block;
+}
+
+table.totalBox.proformaBottom td {
+  width: 100%;
+  display: block;
+}

@@ -1,0 +1,56 @@
+.table-strip tr:nth-child(even) {
+  background-color: #00000012;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+input:focus {
+  outline: unset;
+}
+
+td {
+  font-size: 12px;
+  color: #4d4f75;
+}
+
+.tableBorder tr:nth-child(even) {
+  background: #ffffff;
+}
+
+.tableBorder tr:nth-child(odd) {
+  background: #eeeded;
+}
+
+.tableBorder th {
+  font-size: 12px;
+  border-collapse: collapse;
+  padding: 5px;
+  border: 1px solid rgba(112, 111, 111, 0.671);
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th {
+  padding: 2px 10px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #1b2245;
+  color: #fff;
+}
+
+p {
+  margin: 0px;
+  font-size: 13px;
+}
+
+.orderPdfViewWidth {
+  width: 100%;
+}
+.orderPdfViewWidth table {
+  width: 100%;
+}

@@ -1,0 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* .rs__cell.rs__time {
+	display: none !important;
+}
+#root > div.px-2.py-4.main-content > div > div > div > div.css-12aktbw > div.css-s6u7kg > span:nth-child(1) {
+	display: none !important;
+} */
+/* .rs__cell {
+	height: 60px;
+} */
+
+.rs__cell{
+	display: flex;
+	flex-direction: column;
+}
+
+.rs__event__item {
+	position:relative !important;
+	display: block !important;
+	height: auto !important;
+	left: 0 !important;
+	width: 100% !important;
+}
+
+.MuiButtonBase-root > div > div > h6 {
+	color: #fff !important;
+}
+.css-ess3ih {
+
+	grid-template-columns: 10% repeat(6, 1fr) !important;
+}
+
+.css-s6u7kg.rs__cell.rs__header {
+	display: none !important;
+}
+
+.rs__cell.rs__time {
+	display: none !important;
+}
+
+.css-s6u7kg {
+	min-height: 400px !important;
+}
+
+.css-s6u7kg {
+	grid-template-columns: 10% repeat(6, 1fr) !important;
+}
+
+div.css-1d1h06e span:nth-child(1) {
+	display: none !important;
+}

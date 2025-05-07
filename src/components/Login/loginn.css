@@ -1,0 +1,245 @@
+.loginWrapper .wrapper_login {
+  max-width: 365px;
+  /* min-height: 469px; */
+  padding: 40px 20px 40px 20px;
+  background-color: #ffffff00;
+  border-radius: 10px;
+  /* border: 1px solid rgba(255, 255, 255, 0.219); */
+}
+
+.loginWrapper .wrapper_login .logo img {
+  width: 100px;
+  height: 100px;
+  filter: brightness(0) invert(1);
+  margin: auto;
+}
+
+.loginWrapper .wrapper_login .name {
+  font-weight: 600;
+  font-size: 1.4rem;
+  letter-spacing: 1.3px;
+  padding-left: 10px;
+  color: #555;
+}
+
+.loginWrapper .text-center.mt-4.name {
+  font-weight: 700;
+  font-size: 25px;
+  color: #4171a6;
+}
+
+.loginWrapper .wrapper_login .form-field input {
+  width: 100%;
+  display: block;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 10px 15px 10px 10px;
+}
+
+.loginWrapper .wrapper_login .form-field {
+  display: flex;
+
+  margin-bottom: 20px;
+  border-radius: 20px;
+}
+
+.loginWrapper .px-2.py-4.main-content {
+  min-height: unset !important;
+}
+
+.wrapper_login .form-field .fas {
+  color: #555;
+}
+
+.loginWrapper button {
+  box-shadow: none !important;
+  height: 45px;
+  background-color: #ffffff !important;
+  margin-right: 10px;
+  color: #203764 !important;
+  border-radius: 25px;
+  width: 100%;
+  font-size: 17px;
+  line-height: 0px;
+  border: 2px solid #203764;
+  margin-bottom: 2px;
+}
+
+.loginWrapper .wrapper_login .btn:hover {
+  background-color: #ffffff;
+  color: #203764;
+}
+
+body {
+  background-color: #203764;
+}
+
+.loginWrapper .wrapper_login a {
+  text-decoration: none;
+  font-size: 0.8rem;
+  color: #03a9f4;
+}
+
+.wrapper_login a:hover {
+  color: #203764;
+}
+
+.loginWrapper .form-field.d-flex.align-items-center span {
+  line-height: 50px;
+}
+
+@media (max-width: 380px) {
+  .wrapper_login {
+    margin: 30px 20px;
+    padding: 40px 15px 15px 15px;
+  }
+}
+
+.loginWrapper .form-field.d-flex.align-items-center span {
+  background: #ffffff;
+  color: #203764;
+  border-radius: 22px 0px 0px 22px;
+  font-size: 22px;
+  width: 40px;
+  border: 1px solid #e8f0fe !important;
+  padding-left: 5px;
+  display: inline-block;
+  height: 49px;
+}
+
+.loginWrapper .form-field.d-flex.align-items-center input {
+  height: 49px;
+  background: #ffff;
+}
+
+div#root {
+  height: 100%;
+  width: 100%;
+}
+
+.loginWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 80px;
+}
+
+/* #root{
+        height: 100vh !important;
+    }
+    .px-2.py-4.main-content {
+        height: 100vh ;
+    } */
+/* .px-2.py-4.main-content {
+        height: 100%;
+    } */
+/* .px-2.py-4.main-content.loginMain{
+        height: 100%;
+    } */
+.forgotLink {
+  text-align: right;
+  text-decoration: underline;
+  color: #Fff !important;
+  display: block;
+}
+
+.lgo img {
+  width: 80px;
+  filter: brightness(0) invert(1);
+}
+
+.forgotPass {
+  /* background: #fff; */
+  width: 500px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.mainForgot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+  flex-direction: column;
+}
+
+.lgo {
+  display: flex;
+  justify-content: center;
+}
+
+.forgotPass label {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.forgotPass input {
+  border: 2px solid #ffffff !important;
+  margin-bottom: 5px;
+  background: #fff;
+}
+
+.forgotPass input:focus {
+
+  background-color: #fff;
+}
+
+.buttonForgot button {
+  background: #fff;
+  color: #203764;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 7px 20px;
+  border-radius: 5px;
+}
+
+.buttonForgot {
+  text-align: center;
+  margin-top: 30px;
+}
+
+/* .mainForgot h2 {
+  color: #141414;
+  font-size: 20px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 600;
+} */
+.mainForgot h2 {
+  color: #ffffff;
+  font-size: 25px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.parentOtp {
+  display: flex;
+  justify-content: center;
+}
+
+.forgotPass p {
+  text-align: center;
+  color: #fff;
+}
+
+.forgotPass .base-Input-root input {
+  height: 55px;
+  width: 55px;
+  margin-right: 10px;
+  background: #ffff;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 20px;
+  }
+.forgotPass .MuiBox-root.css-1c1kq07 {
+  margin-top: 30px;
+  justify-content: center;
+}
+.parentOtp {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
