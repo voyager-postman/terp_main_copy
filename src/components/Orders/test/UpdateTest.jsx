@@ -111,13 +111,13 @@ const UpdateTest = () => {
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
   const { data: quote } = useQuery("getAllQuotation");
-  const { data: summary, refetch: getSummary } = useQuery(
-    `getOrderSummary?quote_id=${state.order_id}`,
-    {
-      enabled: !!state.order_id,
-    }
-  );
-  console.log(summary);
+  // const { data: summary, refetch: getSummary } = useQuery(
+  //   `getOrderSummary?quote_id=${state.order_id}`,
+  //   {
+  //     enabled: !!state.order_id,
+  //   }
+  // );
+  // console.log(summary);
   const [orderId, setOrderId] = useState("");
   const [gross, setGross] = useState(false);
   const [freight, setFreight] = useState(false);
@@ -234,7 +234,7 @@ const UpdateTest = () => {
     r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost || quoteFind?.O_Extra;
     r.fx_rate =
       state.fx_rate ||
-      currency?.find((v) => +v.currency_id == +r.fx_id)?.fx_rate ||
+      currency?.find((v) => +v.ID == +r.fx_id)?.fx_rate ||
       currency?.[
         consignee?.findIndex((v) => +v.consignee_id == +r.consignee_id)
       ]?.fx_rate ||
@@ -299,38 +299,38 @@ const UpdateTest = () => {
       return +v.OD_Box % 1 != 0;
     });
   }, [details]);
-  const isMinWeightError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) <
-      freights?.find(
-        (v) => v.Freight_provider == computedState.Freight_provider_
-      )?.min_weight
-    );
-  }, [freights, summary]);
-  const isMinWeightTransportError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) <
-        freights?.find(
-          (v) => v.Freight_provider == computedState.Freight_provider_
-        )?.min_weight &&
-      (+summary?.Gross_weight || 0) >=
-        transport?.find(
-          (v) =>
-            v.Transportation_provider == computedState.Transportation_provider
-        )?.max_weight3
-    );
-  }, [freights, summary]);
-  const isMinTransportError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) >=
-      transport?.find(
-        (v) =>
-          v.Transportation_provider == computedState.Transportation_provider
-      )?.max_weight3
-    );
-  }, [freights, summary]);
-  console.log(isMinWeightError);
-  console.log(isMinTransportError);
+  // const isMinWeightError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) <
+  //     freights?.find(
+  //       (v) => v.Freight_provider == computedState.Freight_provider_
+  //     )?.min_weight
+  //   );
+  // }, [freights, summary]);
+  // const isMinWeightTransportError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) <
+  //       freights?.find(
+  //         (v) => v.Freight_provider == computedState.Freight_provider_
+  //       )?.min_weight &&
+  //     (+summary?.Gross_weight || 0) >=
+  //       transport?.find(
+  //         (v) =>
+  //           v.Transportation_provider == computedState.Transportation_provider
+  //       )?.max_weight3
+  //   );
+  // }, [freights, summary]);
+  // const isMinTransportError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) >=
+  //     transport?.find(
+  //       (v) =>
+  //         v.Transportation_provider == computedState.Transportation_provider
+  //     )?.max_weight3
+  //   );
+  // }, [freights, summary]);
+  // console.log(isMinWeightError);
+  // console.log(isMinTransportError);
   const newItfList1 = async () => {
     if (state.consignee_id) {
       try {
@@ -350,22 +350,22 @@ const UpdateTest = () => {
     }
   };
   const grossTransspotationErr = async () => {
-    if (state.order_id) {
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/OrderGrossTransportError`,
-          { order_id: state.order_id }
-        );
-        console.log(response);
-        if (response.data.success == true) {
-          setGross(true);
-          setGrossMass(response.data.message);
-        }
-        toast.success(response);
-      } catch (e) {
-        console.error("Something went wrong", e);
-      }
-    }
+    // if (state.order_id) {
+    //   try {
+    //     const response = await axios.post(
+    //       `${API_BASE_URL}/OrderGrossTransportError`,
+    //       { order_id: state.order_id }
+    //     );
+    //     console.log(response);
+    //     if (response.data.success == true) {
+    //       setGross(true);
+    //       setGrossMass(response.data.message);
+    //     }
+    //     toast.success(response);
+    //   } catch (e) {
+    //     console.error("Something went wrong", e);
+    //   }
+    // }
   };
 
   const calculateList = async () => {
@@ -431,21 +431,21 @@ const UpdateTest = () => {
     console.log(exchangeRate3);
   };
   const orderCrossFreight = async () => {
-    if (state.order_id) {
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/OrderGrossFreightError`,
-          { order_id: state.order_id }
-        );
-        console.log(response); // Log the response to the console
-        if (response.data.success == true) {
-          setFreight(true);
-          setFreightMass(response.data.message);
-        }
-      } catch (e) {
-        console.error("Something went wrong", e); // Log the error to the console
-      }
-    }
+    // if (state.order_id) {
+    //   try {
+    //     const response = await axios.post(
+    //       `${API_BASE_URL}/OrderGrossFreightError`,
+    //       { order_id: state.order_id }
+    //     );
+    //     console.log(response); // Log the response to the console
+    //     if (response.data.success == true) {
+    //       setFreight(true);
+    //       setFreightMass(response.data.message);
+    //     }
+    //   } catch (e) {
+    //     console.error("Something went wrong", e); // Log the error to the console
+    //   }
+    // }
   };
 
   const deleteOrder = (id) => {
@@ -565,14 +565,12 @@ const UpdateTest = () => {
 
         getOrdersDetails();
         oneQoutationDAta();
-        getSummary();
         oneQoutationDAta();
         setShow(true);
         setMassageShow1(data.message);
       } else if (data.success == true) {
         calculateList();
         setShow(false);
-        getSummary();
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
@@ -586,7 +584,6 @@ const UpdateTest = () => {
       await getOrdersDetails(data.data.data);
       MySwal.close();
       setIsLoading(false);
-      getSummary();
     } catch (e) {
       console.error(e);
     } finally {
@@ -625,14 +622,12 @@ const UpdateTest = () => {
 
         getOrdersDetails();
         oneQoutationDAta();
-        getSummary();
         oneQoutationDAta();
 
         setMassageShow1(data.message);
       } else if (data.success == true) {
         calculateList();
 
-        getSummary();
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
@@ -645,7 +640,6 @@ const UpdateTest = () => {
       await getOrdersDetails(data.data.data);
       MySwal.close();
       setIsLoading(false);
-      getSummary();
     } catch (e) {
       console.error(e);
     } finally {
@@ -689,14 +683,12 @@ const UpdateTest = () => {
 
         getOrdersDetails();
         oneQoutationDAta();
-        getSummary();
         oneQoutationDAta();
         setShow(true);
         setMassageShow1(data.message);
       } else if (data.success == true) {
         calculateList();
         setShow(false);
-        getSummary();
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
@@ -710,7 +702,6 @@ const UpdateTest = () => {
       await getOrdersDetails(data.data.data);
       MySwal.close();
       setIsLoading(false);
-      getSummary();
     } catch (e) {
       console.error(e);
     } finally {
@@ -854,7 +845,6 @@ const UpdateTest = () => {
         };
       });
 
-      getSummary();
       getOrdersDetails();
       // navigate("/orders");
       MySwal.close();
@@ -1102,7 +1092,7 @@ const UpdateTest = () => {
                               id: v.client_id,
                               name: v.client_name,
                             })) || []
-                          } // Ensure options is always an array
+                          } 
                           sx={{ width: 300 }}
                           getOptionLabel={(option) => option?.name || ""} // Display name of the option
                           isOptionEqualToValue={(option, value) =>

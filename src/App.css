@@ -2109,7 +2109,7 @@ button.swal2-confirm.swal2-styled {
   padding: 10px;
   border-radius: 5px;
   font-size: 18px;
-  color: #000 !important;
+  color: #000;
 }
 
 .exampleQuo span.mdi.mdi-close {
@@ -3916,4 +3916,9 @@ g#SvgjsG4264 {
   display: flex;
   margin-top: 10px;
   height: 40px;
+}
+.newError p {
+  background: unset !important;
+  color: #fff !important;
+  text-align: center;
 }

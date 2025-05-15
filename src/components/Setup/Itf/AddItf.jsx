@@ -1090,6 +1090,47 @@ const AddItf = () => {
   //     return newEditEan;
   //   });
   // };
+  // const handleEditEan = (index, e) => {
+  //   const { name, value } = e.target;
+
+  //   setEditEan((prevEditEan) => {
+  //     const newEditEan = [...prevEditEan];
+
+  //     if (name === "detail_type") {
+  //       newEditEan[index] = {
+  //         ...newEditEan[index],
+  //         [name]: value,
+  //         item_id: "",
+  //         COA: "", // Reset COA as well when changing type
+  //       };
+  //     } else if (name === "item_id") {
+  //       // Update item_id and COA when item_id changes
+  //       const detailType = newEditEan[index].detail_type;
+  //       let selectedItem = null;
+
+  //       if (detailType == "1") {
+  //         selectedItem = packagingList.find((item) => item.Item == value);
+  //       } else if (detailType == "2") {
+  //         selectedItem = boxList.find((item) => item.Item == value);
+  //       } else if (detailType == "3") {
+  //         selectedItem = eanList.find((item) => item.Item == value);
+  //       }
+
+  //       newEditEan[index] = {
+  //         ...newEditEan[index],
+  //         [name]: value,
+  //         COA: selectedItem?.COA || "", // Update COA based on selected item
+  //       };
+  //     } else {
+  //       newEditEan[index] = {
+  //         ...newEditEan[index],
+  //         [name]: value,
+  //       };
+  //     }
+
+  //     return newEditEan;
+  //   });
+  // };
   const handleEditEan = (index, e) => {
     const { name, value } = e.target;
 
@@ -1104,22 +1145,21 @@ const AddItf = () => {
           COA: "", // Reset COA as well when changing type
         };
       } else if (name === "item_id") {
-        // Update item_id and COA when item_id changes
         const detailType = newEditEan[index].detail_type;
         let selectedItem = null;
 
         if (detailType == "1") {
-          selectedItem = packagingList.find((item) => item.Item == value);
+          selectedItem = packagingList.find((item) => item.ID == value); // ✅ Changed to ID
         } else if (detailType == "2") {
-          selectedItem = boxList.find((item) => item.Item == value);
+          selectedItem = boxList.find((item) => item.ID == value); // ✅ Changed to ID
         } else if (detailType == "3") {
-          selectedItem = eanList.find((item) => item.Item == value);
+          selectedItem = eanList.find((item) => item.ID == value); // ✅ Changed to ID
         }
 
         newEditEan[index] = {
           ...newEditEan[index],
           [name]: value,
-          COA: selectedItem?.COA || "", // Update COA based on selected item
+          COA: selectedItem?.COA || "", // Will now properly update
         };
       } else {
         newEditEan[index] = {
@@ -1577,6 +1617,18 @@ const AddItf = () => {
                             </td>
                             <td style={{ width: "280px" }}>
                               {element.detail_type == "3" ? (
+                                // <select
+                                //   name="item_id"
+                                //   onChange={(e) => handleEditEan(index, e)}
+                                //   value={element.item_id}
+                                // >
+                                //   <option value="">Select EAN</option>
+                                //   {eanList?.map((item) => (
+                                //     <option value={item.Item}>
+                                //       {item.Name_EN}
+                                //     </option>
+                                //   ))}
+                                // </select>
                                 <select
                                   name="item_id"
                                   onChange={(e) => handleEditEan(index, e)}
@@ -1584,12 +1636,24 @@ const AddItf = () => {
                                 >
                                   <option value="">Select EAN</option>
                                   {eanList?.map((item) => (
-                                    <option value={item.Item}>
+                                    <option key={item.ID} value={item.ID}>
                                       {item.Name_EN}
                                     </option>
                                   ))}
                                 </select>
                               ) : element.detail_type == "1" ? (
+                                // <select
+                                //   name="item_id"
+                                //   onChange={(e) => handleEditEan(index, e)}
+                                //   value={element.item_id}
+                                // >
+                                //   <option value="">Select Packaging</option>
+                                //   {packagingList?.map((item) => (
+                                //     <option value={item.Item}>
+                                //       {item.Name_EN}
+                                //     </option>
+                                //   ))}
+                                // </select>
                                 <select
                                   name="item_id"
                                   onChange={(e) => handleEditEan(index, e)}
@@ -1597,12 +1661,25 @@ const AddItf = () => {
                                 >
                                   <option value="">Select Packaging</option>
                                   {packagingList?.map((item) => (
-                                    <option value={item.Item}>
+                                    <option key={item.ID} value={item.ID}>
                                       {item.Name_EN}
                                     </option>
                                   ))}
                                 </select>
                               ) : element.detail_type == "2" ? (
+                                // <select
+                                //   name="item_id"
+                                //   onChange={(e) => handleEditEan(index, e)}
+                                //   value={element.item_id}
+                                // >
+                                //   <option value="">Select Box</option>
+                                //   {boxList?.map((item) => (
+                                //     <option value={item.Item}>
+                                //       {item.Name_EN}
+                                //     </option>
+                                //   ))}
+                                // </select>
+
                                 <select
                                   name="item_id"
                                   onChange={(e) => handleEditEan(index, e)}
@@ -1610,7 +1687,7 @@ const AddItf = () => {
                                 >
                                   <option value="">Select Box</option>
                                   {boxList?.map((item) => (
-                                    <option value={item.Item}>
+                                    <option key={item.ID} value={item.ID}>
                                       {item.Name_EN}
                                     </option>
                                   ))}
@@ -1729,11 +1806,59 @@ const AddItf = () => {
                               className="itfAutoComplete"
                             >
                               {element.detail_type === "3" ? (
+                                // <Autocomplete
+                                //   disablePortal
+                                //   options={eanList?.map((item) => ({
+                                //     label: item.Name_EN,
+                                //     value: item.Item,
+                                //   }))}
+                                //   getOptionLabel={(option) =>
+                                //     option.label || "Select EAN"
+                                //   }
+                                //   value={
+                                //     eanList
+                                //       ?.map((item) => ({
+                                //         label: item.Name_EN,
+                                //         value: item.Item,
+                                //       }))
+                                //       .find(
+                                //         (option) =>
+                                //           option.value === element.item_id
+                                //       ) || null
+                                //   }
+                                //   onChange={(event, value) => {
+                                //     addFieldHandleChange(index, {
+                                //       target: {
+                                //         name: "item_id",
+                                //         value: value?.value || "",
+                                //       },
+                                //     });
+                                //     if (value?.value) {
+                                //       const selectedItem = eanList.find(
+                                //         (item) => item.Item === value.value
+                                //       );
+                                //       addFieldHandleChange(index, {
+                                //         target: {
+                                //           name: "COA",
+                                //           value: selectedItem?.COA || "", // set the COA directly
+                                //         },
+                                //       });
+                                //     }
+                                //   }}
+                                //   renderInput={(params) => (
+                                //     <TextField
+                                //       {...params}
+                                //       placeholder="Select EAN"
+                                //       variant="outlined"
+                                //     />
+                                //   )}
+                                // />
                                 <Autocomplete
                                   disablePortal
                                   options={eanList?.map((item) => ({
                                     label: item.Name_EN,
-                                    value: item.Item,
+                                    value: item.ID, // ✅ Now using ID instead of Item
+                                    fullItem: item, // Optional: keep full object if needed later
                                   }))}
                                   getOptionLabel={(option) =>
                                     option.label || "Select EAN"
@@ -1742,7 +1867,7 @@ const AddItf = () => {
                                     eanList
                                       ?.map((item) => ({
                                         label: item.Name_EN,
-                                        value: item.Item,
+                                        value: item.ID,
                                       }))
                                       .find(
                                         (option) =>
@@ -1753,17 +1878,18 @@ const AddItf = () => {
                                     addFieldHandleChange(index, {
                                       target: {
                                         name: "item_id",
-                                        value: value?.value || "",
+                                        value: value?.value || "", // ✅ now passing ID
                                       },
                                     });
+
                                     if (value?.value) {
                                       const selectedItem = eanList.find(
-                                        (item) => item.Item === value.value
-                                      );
+                                        (item) => item.ID === value.value
+                                      ); // ✅ match on ID
                                       addFieldHandleChange(index, {
                                         target: {
                                           name: "COA",
-                                          value: selectedItem?.COA || "", // set the COA directly
+                                          value: selectedItem?.COA || "",
                                         },
                                       });
                                     }
@@ -1777,11 +1903,58 @@ const AddItf = () => {
                                   )}
                                 />
                               ) : element.detail_type === "1" ? (
+                                // <Autocomplete
+                                //   disablePortal
+                                //   options={packagingList?.map((item) => ({
+                                //     label: item.Name_EN,
+                                //     value: item.Item,
+                                //   }))}
+                                //   getOptionLabel={(option) =>
+                                //     option.label || "Select Packaging"
+                                //   }
+                                //   value={
+                                //     packagingList
+                                //       ?.map((item) => ({
+                                //         label: item.Name_EN,
+                                //         value: item.Item,
+                                //       }))
+                                //       .find(
+                                //         (option) =>
+                                //           option.value === element.item_id
+                                //       ) || null
+                                //   }
+                                //   onChange={(event, value) => {
+                                //     addFieldHandleChange(index, {
+                                //       target: {
+                                //         name: "item_id",
+                                //         value: value?.value || "",
+                                //       },
+                                //     });
+                                //     if (value?.value) {
+                                //       const selectedItem = packagingList.find(
+                                //         (item) => item.Item === value.value
+                                //       );
+                                //       addFieldHandleChange(index, {
+                                //         target: {
+                                //           name: "COA",
+                                //           value: selectedItem?.COA || "",
+                                //         },
+                                //       });
+                                //     }
+                                //   }}
+                                //   renderInput={(params) => (
+                                //     <TextField
+                                //       {...params}
+                                //       placeholder="Select Packaging"
+                                //       variant="outlined"
+                                //     />
+                                //   )}
+                                // />
                                 <Autocomplete
                                   disablePortal
                                   options={packagingList?.map((item) => ({
                                     label: item.Name_EN,
-                                    value: item.Item,
+                                    value: item.ID, // ✅ Use ID instead of Item
                                   }))}
                                   getOptionLabel={(option) =>
                                     option.label || "Select Packaging"
@@ -1790,7 +1963,7 @@ const AddItf = () => {
                                     packagingList
                                       ?.map((item) => ({
                                         label: item.Name_EN,
-                                        value: item.Item,
+                                        value: item.ID,
                                       }))
                                       .find(
                                         (option) =>
@@ -1801,12 +1974,13 @@ const AddItf = () => {
                                     addFieldHandleChange(index, {
                                       target: {
                                         name: "item_id",
-                                        value: value?.value || "",
+                                        value: value?.value || "", // ✅ Pass ID
                                       },
                                     });
+
                                     if (value?.value) {
                                       const selectedItem = packagingList.find(
-                                        (item) => item.Item === value.value
+                                        (item) => item.ID === value.value // ✅ Match on ID
                                       );
                                       addFieldHandleChange(index, {
                                         target: {
@@ -1825,11 +1999,58 @@ const AddItf = () => {
                                   )}
                                 />
                               ) : element.detail_type === "2" ? (
+                                // <Autocomplete
+                                //   disablePortal
+                                //   options={boxList?.map((item) => ({
+                                //     label: item.Name_EN,
+                                //     value: item.Item,
+                                //   }))}
+                                //   getOptionLabel={(option) =>
+                                //     option.label || "Select Box"
+                                //   }
+                                //   value={
+                                //     boxList
+                                //       ?.map((item) => ({
+                                //         label: item.Name_EN,
+                                //         value: item.Item,
+                                //       }))
+                                //       .find(
+                                //         (option) =>
+                                //           option.value === element.item_id
+                                //       ) || null
+                                //   }
+                                //   onChange={(event, value) => {
+                                //     addFieldHandleChange(index, {
+                                //       target: {
+                                //         name: "item_id",
+                                //         value: value?.value || "",
+                                //       },
+                                //     });
+                                //     if (value?.value) {
+                                //       const selectedItem = boxList.find(
+                                //         (item) => item.Item === value.value
+                                //       );
+                                //       addFieldHandleChange(index, {
+                                //         target: {
+                                //           name: "COA",
+                                //           value: selectedItem?.COA || "",
+                                //         },
+                                //       });
+                                //     }
+                                //   }}
+                                //   renderInput={(params) => (
+                                //     <TextField
+                                //       {...params}
+                                //       placeholder="Select Box"
+                                //       variant="outlined"
+                                //     />
+                                //   )}
+                                // />
                                 <Autocomplete
                                   disablePortal
                                   options={boxList?.map((item) => ({
                                     label: item.Name_EN,
-                                    value: item.Item,
+                                    value: item.ID, // ✅ Use ID instead of Item
                                   }))}
                                   getOptionLabel={(option) =>
                                     option.label || "Select Box"
@@ -1838,7 +2059,7 @@ const AddItf = () => {
                                     boxList
                                       ?.map((item) => ({
                                         label: item.Name_EN,
-                                        value: item.Item,
+                                        value: item.ID,
                                       }))
                                       .find(
                                         (option) =>
@@ -1849,12 +2070,13 @@ const AddItf = () => {
                                     addFieldHandleChange(index, {
                                       target: {
                                         name: "item_id",
-                                        value: value?.value || "",
+                                        value: value?.value || "", // ✅ Now using ID
                                       },
                                     });
+
                                     if (value?.value) {
                                       const selectedItem = boxList.find(
-                                        (item) => item.Item === value.value
+                                        (item) => item.ID === value.value // ✅ Match on ID
                                       );
                                       addFieldHandleChange(index, {
                                         target: {

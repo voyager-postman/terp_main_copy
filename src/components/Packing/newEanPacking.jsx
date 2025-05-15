@@ -8,12 +8,10 @@ import MySwal from "../../swal";
 import { ComboBox } from "../combobox";
 import { TableView } from "../table";
 import { Button, Modal } from "react-bootstrap";
-import {
-  LocalizationProvider,
-  DesktopDateTimePicker,
-} from "@mui/x-date-pickers";
+import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import TextField from "@mui/material/TextField";
+import { format } from "date-fns";
 import Box from "@mui/material/Box";
 import CloseIcon from "@mui/icons-material/Close";
 import { Autocomplete } from "@mui/material";
@@ -172,7 +170,7 @@ const NewEanPacking = () => {
   }, [toggle === true]);
   const options =
     eanListData?.map((item) => ({
-      id: item.EAN_ID,
+      id: item.ean_id,
       name: role === "Operation" ? item.ean_name_th : item.ean_name_en,
     })) || [];
   const getPackingCommon = () => {
@@ -254,9 +252,11 @@ const NewEanPacking = () => {
     }
   };
   const handleChangeData = (e, name) => {
+    console.log(name);
+    console.log(e);
     setData((prevState) => ({ ...prevState, [name]: e }));
   };
-
+  console.log(data);
   const handleChangeQty = (e) => {
     setData((prevState) => ({ ...prevState, ean_quantity: e.target.value }));
   };
@@ -540,7 +540,7 @@ const NewEanPacking = () => {
                                 </div>
                               </div>
                               <div className="col-lg-6"></div>
-                              <div className="form-group col-lg-4">
+                              <div className="form-group col-lg-3">
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>Date :</strong>
@@ -559,7 +559,7 @@ const NewEanPacking = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div className="form-group col-lg-4">
+                              <div className="form-group col-lg-3">
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
@@ -584,7 +584,7 @@ const NewEanPacking = () => {
                                 </div>
                               </div>
 
-                              <div className="form-group col-lg-4">
+                              <div className="form-group col-lg-3">
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
@@ -644,6 +644,7 @@ const NewEanPacking = () => {
                                   </div>
                                   <div className="form-group col-lg-3 eanDateTime">
                                     <h6>Start Time</h6>
+
                                     <LocalizationProvider
                                       dateAdapter={AdapterDateFns}
                                     >
@@ -655,12 +656,14 @@ const NewEanPacking = () => {
                                           mt: 4,
                                         }}
                                       >
-                                        <DesktopDateTimePicker
+                                        <DateTimePicker
                                           value={selectedDate1}
                                           onChange={handleDateChange1}
+                                          format="dd-MM-yyyy HH:mm"
                                           renderInput={(params) => (
                                             <TextField {...params} />
                                           )}
+                                          ampm={false}
                                         />
                                       </Box>
                                     </LocalizationProvider>
@@ -685,12 +688,14 @@ const NewEanPacking = () => {
                                           mt: 4,
                                         }}
                                       >
-                                        <DesktopDateTimePicker
+                                        <DateTimePicker
                                           value={selectedDate}
                                           onChange={handleDateChange}
+                                          format="dd-MM-yyyy HH:mm"
                                           renderInput={(params) => (
                                             <TextField {...params} />
                                           )}
+                                          ampm={false}
                                         />
                                       </Box>
                                     </LocalizationProvider>
@@ -801,7 +806,7 @@ const NewEanPacking = () => {
                                     `${API_BASE_URL}/ReleaseAccess`,
                                     {
                                       id: from.sorting_id,
-                                      accesstype: 4, // Mark as in use
+                                      accesstype: 4,
                                     }
                                   );
 
@@ -813,17 +818,11 @@ const NewEanPacking = () => {
                                   );
                                 }
                               } else {
-                                // Optional: Handle the case where sorting_id is missing
                                 toast.warning(
                                   "Invalid operation: Sorting ID not found."
                                 );
                               }
                             }}
-                            // style={{
-                            //   background: "none",
-                            //   border: "none",
-                            //   cursor: "pointer",
-                            // }}
                           >
                             Close
                           </button>
@@ -852,19 +851,7 @@ const NewEanPacking = () => {
                 <div className="formEan formCreate">
                   <div className="form-group mb-3 autoComplete">
                     <label>EAN</label>
-                    {/* <ComboBox
-                      options={eanListData?.map((item) => ({
-                        id: item.ean_id,
-                        name:
-                          // (email === "Plaew" && role === "Operation") ||
-                          // (email === "Gam" && role === "Operation") ||
-                          role === "Operation"
-                            ? item.ean_name_th
-                            : item.ean_name_en,
-                      }))}
-                      value={data?.ean_id}
-                      onChange={(e) => handleChangeData(e, "ean_id")}
-                    /> */}
+
                     <Autocomplete
                       options={options}
                       getOptionLabel={(option) => option.name}
@@ -899,14 +886,7 @@ const NewEanPacking = () => {
                   </div>
                   <div className="form-group mb-3 autoComplete">
                     <label>Unit</label>
-                    {/* <ComboBox
-                      options={unitType?.map((item) => ({
-                        id: item.unit_id,
-                        name: item.unit_name_en,
-                      }))}
-                      value={data?.unit_id}
-                      onChange={(e) => handleChangeData(e, "unit_id")}
-                    /> */}
+
                     <Autocomplete
                       options={unitType || []}
                       getOptionLabel={(option) => option.Name_EN}
@@ -933,47 +913,7 @@ const NewEanPacking = () => {
                   </div>
                   <div className="form-group mb-3 autoComplete">
                     <label>Brand</label>
-                    {/* <ComboBox
-                      options={brands?.map((item) => ({
-                        id: item.brand_id,
-                        name: item.Brand_name,
-                      }))}
-                      value={data?.brand_id}
-                      onChange={(e) => handleChangeData(e, "brand_id")}
-                    /> */}
-                    {/* <Autocomplete
-                      options={
-                        brands?.map((item) => ({
-                          id: item.ID,
-                          name: item.Name_EN, 
-                        })) || []
-                      }
-                      getOptionLabel={(option) =>
-                        option.name || option.Brand_name || ""
-                      } // Use a fallback to avoid undefined
-                      onChange={(event, newValue) => {
-                        if (newValue) {
-                          handleChangeData(newValue.id, "brand_id"); 
-                        }
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder="Select Brand"
-                          variant="outlined"
-                        />
-                      )}
-                      value={
-                        brands?.find(
-                          (option) => option.ID === data?.brand_id
-                        ) || null
-                      } // Ensure this matches the structure
-                      isOptionEqualToValue={(option, value) =>
-                        option.id === value.id
-                      } 
-                      disablePortal
-                      sx={{ width: 300 }} 
-                    /> */}
+
                     <Autocomplete
                       options={brandOptions}
                       getOptionLabel={(option) => option.name || ""}
@@ -1003,17 +943,7 @@ const NewEanPacking = () => {
                   </div>
                   <div className="form-group mb-3 autoComplete">
                     <label>Assigned Order</label>
-                    {/* <select
-                      value={selectedOrder}
-                      onChange={(e) => setSelectedOrder(e.target.value)}
-                    >
-                      <option value="">Select...</option>
-                      {assigned.map((item, index) => (
-                        <option key={index} value={item.od_id}>
-                          {item.Dropdown}
-                        </option>
-                      ))}
-                    </select> */}
+
                     <Autocomplete
                       options={assigned}
                       getOptionLabel={(option) => option.Dropdown}
@@ -1042,13 +972,6 @@ const NewEanPacking = () => {
                   </div>
                 </div>
                 <div className="modal-footer justify-center">
-                  {/* <button
-                      type="button"
-                      className="bg-gray-300 px-4 py-2 rounded"
-                      onClick={closeModal}
-                    >
-                      Close
-                    </button> */}
                   <button
                     type="button"
                     onClick={() => saveNewDetails()}
@@ -1062,7 +985,7 @@ const NewEanPacking = () => {
           )}
         </div>
       </main>
-      <Modal show={show} onHide={handleClose} className="exampleQuo">
+      <Modal show={show} onHide={handleClose} className="exampleQuo newError">
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
@@ -1078,7 +1001,7 @@ const NewEanPacking = () => {
           </div>
           <div className="modal-body">
             <div className="eanCheck">
-              <p className="text-red-500">{massageShow}</p>
+              <p className="">{massageShow}</p>
             </div>
           </div>
         </div>

@@ -16,10 +16,10 @@ const Sorting = () => {
   const [id, setId] = useState(null);
   const [viewData, setViewData] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const { data: sorted, refetch } = useQuery("getSorting");
+  // const { data: sorted, refetch } = useQuery("getSorting");
   const [data, setData] = useState([]);
   const [restoredRows, setRestoredRows] = useState([]);
-  console.log(sorted);
+  // console.log(sorted);
   const getSortData = () => {
     axios.get(`${API_BASE_URL}/getViewToSort`).then((res) => {
       console.log(res);

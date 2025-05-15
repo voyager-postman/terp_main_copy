@@ -367,13 +367,16 @@ export const AdjustEan = () => {
             >
               <i className="mdi mdi-pencil" />
             </Link>
-            <button
-              type="button"
-              onClick={() => restoreAdjustEan(a.packing_common_id)}
-              disabled={restoredRows.includes(a.packing_common_id)}
-            >
-              <i className="mdi mdi-restore" />
-            </button>
+
+            {parseFloat(a.qty_available) === parseFloat(a.Packed) && (
+              <button
+                type="button"
+                onClick={() => restoreAdjustEan(a.packing_common_id)}
+                disabled={restoredRows.includes(a.packing_common_id)}
+              >
+                <i className="mdi mdi-restore" />
+              </button>
+            )}
           </div>
         ),
       },

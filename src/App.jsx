@@ -376,7 +376,6 @@ function App() {
                 <Route path="/packagingNew" element={<PackagingNew />} />
                 <Route path="updatePackaging" element={<UpdatePackaging />} />
                 <Route path="/invoice_edit" element={<InvoiceEdit />} />
-
                 <Route path="/airlineNew" element={<AirlineNew />} />
                 <Route path="/airportNew" element={<AirportNew />} />
                 <Route path="/bankNew" element={<BankNew />} />

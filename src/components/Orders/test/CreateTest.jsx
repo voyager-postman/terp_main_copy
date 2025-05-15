@@ -238,7 +238,7 @@ const CreateTest = () => {
 
     r.fx_rate =
       state.fx_rate ||
-      currency?.find((v) => +v.currency_id == +r.fx_id)?.fx_rate ||
+      currency?.find((v) => +v.ID == +r.fx_id)?.fx_rate ||
       currency?.[
         consignee?.findIndex((v) => +v.consignee_id == +r.consignee_id)
       ]?.fx_rate ||

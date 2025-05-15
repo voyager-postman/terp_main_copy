@@ -219,21 +219,34 @@ const ItfNew = () => {
             "" // Return nothing if itf_code is undefined, null, or empty
           ),
       },
+      // {
+      //   Header: "ITF NET Weight",
+      //   accessor: (a) => {
+      //     const weight = Number(a.itf_Net_Weight);
+      //     return !isNaN(weight) ? `${weight.toFixed(1)} KG` : "N/A"; // Ensure it's a valid number before formatting
+      //   },
+      // },
+      // {
+      //   Header: "ITF Gross Weight",
+      //   accessor: (a) => {
+      //     const weight = Number(a.Calculated_ITF_Gross_Weight);
+      //     return !isNaN(weight) ? `${weight.toFixed(1)} KG` : "N/A"; // Ensure it's a valid number before formatting
+      //   },
+      // },
       {
         Header: "ITF NET Weight",
         accessor: (a) => {
-          const weight = Number(a.itf_Net_Weight);
-          return !isNaN(weight) ? `${weight.toFixed(1)} KG` : "N/A"; // Ensure it's a valid number before formatting
+          const weight = (a.itf_Net_Weight);
+          return !isNaN(weight) ? `${weight} KG` : "N/A";
         },
       },
       {
         Header: "ITF Gross Weight",
         accessor: (a) => {
-          const weight = Number(a.Calculated_ITF_Gross_Weight);
-          return !isNaN(weight) ? `${weight.toFixed(1)} KG` : "N/A"; // Ensure it's a valid number before formatting
+          const weight = (a.Calculated_ITF_Gross_Weight);
+          return !isNaN(weight) ? `${weight} KG` : "N/A";
         },
       },
-
       {
         Header: "ITF VVSW",
         accessor: (a) => a.ITF_VVSW,
@@ -257,20 +270,20 @@ const ItfNew = () => {
           >
             <input
               onClick={(e) => {
-                e.stopPropagation(); // Ensure only the input click works
+                e.stopPropagation();
                 updateBankStatus(a.ID);
               }}
               checked={a.Available == "1" ? true : false}
               type="checkbox"
               style={{
-                width: "20px", // Adjust width and height if needed
+                width: "20px", 
                 height: "20px",
-                cursor: "pointer", // Make it clear that this is the clickable area
+                cursor: "pointer", 
               }}
             />
             <span
               style={{
-                pointerEvents: "none", // Prevent clicks on the surrounding label text
+                pointerEvents: "none", 
               }}
             >
               <span>OFF</span>
@@ -296,7 +309,6 @@ const ItfNew = () => {
           </Link>
         ),
       },
-
     ],
     []
   );

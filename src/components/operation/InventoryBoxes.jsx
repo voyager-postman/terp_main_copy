@@ -24,7 +24,12 @@ const InventoryBoxes = () => {
   useEffect(() => {
     getBoxesList();
   }, []);
-
+  const formatTwoDecimals = (value) => {
+    return new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
   const handleChange = (e) => {
     setQuantity(e.target.value);
   };
@@ -82,9 +87,7 @@ const InventoryBoxes = () => {
 
       {
         Header: () => (
-          <div style={{ textAlign: "center",}}>
-            Quantity Available{" "}
-          </div>
+          <div style={{ textAlign: "center" }}>Quantity Available </div>
         ),
         accessor: "Quantity Available",
         Cell: ({ value }) => (
@@ -154,7 +157,7 @@ const InventoryBoxes = () => {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                onClick={()=>setQuantity("")}
+                onClick={() => setQuantity("")}
               >
                 <i className="mdi mdi-close"></i>
               </button>

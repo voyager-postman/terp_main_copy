@@ -99,7 +99,7 @@ const additionalLinks = [
           { name: "Receiving", link: "/receiving" },
           { name: "Sorting", link: "/sorting" },
           { name: "Packing", link: "/eanPacking" },
-          { name: "Adjust EAN", link: "/adjustEan" },
+          { name: "EAN", link: "/adjustEan" },
           { name: "Order Packing", link: "/orderPackaging" },
         ],
       },

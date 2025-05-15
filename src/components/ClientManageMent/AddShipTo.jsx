@@ -589,9 +589,10 @@ const AddShipTo = () => {
     commissionType: "",
     commissionValue: "",
     commissionCurrency: "",
+    chargeVolume: "",
     deliveryTerms: "",
     paymentTerms: "",
-    chargeVolume: "",
+
     statementDueDate: 1,
     extraCost: "",
     markupValue: "",
@@ -701,14 +702,35 @@ const AddShipTo = () => {
         });
       });
   };
-
   const handleChange5 = (e) => {
-    const { name, value, type, checked } = e.target;
-    setState5((prevState) => ({
-      ...prevState,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, type, checked, value } = e.target;
+
+    if (name === "commissionCurrency") {
+      // Toggle between "THB" and "FX"
+      setState5((prevState) => ({
+        ...prevState,
+        commissionCurrency: checked ? "THB" : "FX",
+      }));
+    } else if (name === "chargeVolume") {
+      setState5((prevState) => ({
+        ...prevState,
+        chargeVolume: checked ? 1 : 0,
+      }));
+    } else {
+      setState5((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
+
+  // const handleChange5 = (e) => {
+  //   const { name, value, type, checked } = e.target;
+  //   setState5((prevState) => ({
+  //     ...prevState,
+  //     [name]: type === "checkbox" ? checked : value,
+  //   }));
+  // };
   const getCongineeDetails = () => {
     axios
       .post(`${API_BASE_URL}/getConsigneeStatistics`, {

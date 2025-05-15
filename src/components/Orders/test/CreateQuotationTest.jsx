@@ -121,13 +121,13 @@ const CreateQuotationTest = () => {
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
   const { data: quote } = useQuery("getAllQuotation");
-  const { data: summary, refetch: getSummary } = useQuery(
-    `getOrderSummary?quote_id=${state.order_id}`,
-    {
-      enabled: !!state.order_id,
-    }
-  );
-  console.log(summary);
+  // const { data: summary, refetch: getSummary } = useQuery(
+  //   `getOrderSummary?quote_id=${state.order_id}`,
+  //   {
+  //     enabled: !!state.order_id,
+  //   }
+  // );
+  // console.log(summary);
   const oneQoutationDAta = () => {
     console.log(state.order_id);
     axios
@@ -228,7 +228,7 @@ const CreateQuotationTest = () => {
 
     r.fx_rate =
       state.fx_rate ||
-      currency?.find((v) => +v.currency_id == +r.fx_id)?.fx_rate ||
+      currency?.find((v) => +v.ID == +r.fx_id)?.fx_rate ||
       currency?.[
         consignee?.findIndex((v) => +v.consignee_id == +r.consignee_id)
       ]?.fx_rate ||
@@ -311,39 +311,39 @@ const CreateQuotationTest = () => {
       return +v.OD_Box % 1 != 0;
     });
   }, [details]);
-  console.log(isError);
-  const isMinWeightError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) <
-      freights?.find(
-        (v) => v.Freight_provider == computedState.Freight_provider_
-      )?.min_weight
-    );
-  }, [freights, summary]);
-  const isMinWeightTransportError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) <
-        freights?.find(
-          (v) => v.Freight_provider == computedState.Freight_provider_
-        )?.min_weight &&
-      (+summary?.Gross_weight || 0) >=
-        transport?.find(
-          (v) =>
-            v.Transportation_provider == computedState.Transportation_provider
-        )?.max_weight3
-    );
-  }, [freights, summary]);
-  const isMinTransportError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) >=
-      transport?.find(
-        (v) =>
-          v.Transportation_provider == computedState.Transportation_provider
-      )?.max_weight3
-    );
-  }, [freights, summary]);
-  console.log(isMinWeightError);
-  console.log(isMinTransportError);
+  // console.log(isError);
+  // const isMinWeightError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) <
+  //     freights?.find(
+  //       (v) => v.Freight_provider == computedState.Freight_provider_
+  //     )?.min_weight
+  //   );
+  // }, [freights, summary]);
+  // const isMinWeightTransportError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) <
+  //       freights?.find(
+  //         (v) => v.Freight_provider == computedState.Freight_provider_
+  //       )?.min_weight &&
+  //     (+summary?.Gross_weight || 0) >=
+  //       transport?.find(
+  //         (v) =>
+  //           v.Transportation_provider == computedState.Transportation_provider
+  //       )?.max_weight3
+  //   );
+  // }, [freights, summary]);
+  // const isMinTransportError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) >=
+  //     transport?.find(
+  //       (v) =>
+  //         v.Transportation_provider == computedState.Transportation_provider
+  //     )?.max_weight3
+  //   );
+  // }, [freights, summary]);
+  // console.log(isMinWeightError);
+  // console.log(isMinTransportError);
 
   const deleteDetail = async (i) => {
     if (isReadOnly || isLoading) return;
@@ -385,22 +385,22 @@ const CreateQuotationTest = () => {
     setNotes1(e.target.value);
   };
   const grossTransspotationErr = async () => {
-    if (orderId) {
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/OrderGrossTransportError`,
-          { order_id: orderId }
-        );
-        console.log(response); // Log the response to the console
-        if (response.data.success == true) {
-          setGross(true);
-          setGrossMass(response.data.message);
-        }
-        toast.success(response);
-      } catch (e) {
-        console.error("Something went wrong", e); // Log the error to the console
-      }
-    }
+    // if (orderId) {
+    //   try {
+    //     const response = await axios.post(
+    //       `${API_BASE_URL}/OrderGrossTransportError`,
+    //       { order_id: orderId }
+    //     );
+    //     console.log(response); // Log the response to the console
+    //     if (response.data.success == true) {
+    //       setGross(true);
+    //       setGrossMass(response.data.message);
+    //     }
+    //     toast.success(response);
+    //   } catch (e) {
+    //     console.error("Something went wrong", e); // Log the error to the console
+    //   }
+    // }
   };
   const dataSubmit1 = () => {
     console.log(notes1);
@@ -444,21 +444,21 @@ const CreateQuotationTest = () => {
       });
   };
   const orderCrossFreight = async () => {
-    if (orderId) {
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/OrderGrossFreightError`,
-          { order_id: orderId }
-        );
-        console.log(response); // Log the response to the console
-        if (response.data.success == true) {
-          setFreight(true);
-          setFreightMass(response.data.message);
-        }
-      } catch (e) {
-        console.error("Something went wrong", e); // Log the error to the console
-      }
-    }
+    // if (orderId) {
+    //   try {
+    //     const response = await axios.post(
+    //       `${API_BASE_URL}/OrderGrossFreightError`,
+    //       { order_id: orderId }
+    //     );
+    //     console.log(response); // Log the response to the console
+    //     if (response.data.success == true) {
+    //       setFreight(true);
+    //       setFreightMass(response.data.message);
+    //     }
+    //   } catch (e) {
+    //     console.error("Something went wrong", e); // Log the error to the console
+    //   }
+    // }
   };
   const deleteOrder = async () => {
     console.log(deleteOrderId);
@@ -539,7 +539,8 @@ const CreateQuotationTest = () => {
       }
 
       await getOrdersDetails(data.data);
-      getSummary();
+      navigate("/quotation_test");
+      // getSummary();
     } catch (e) {
       console.error(e);
       toast.error("Something went wrong", {
@@ -596,7 +597,7 @@ const CreateQuotationTest = () => {
       }
 
       await getOrdersDetails(data.data);
-      getSummary();
+      // getSummary();
     } catch (e) {
       console.error(e);
       toast.error("Something went wrong", {
@@ -651,7 +652,7 @@ const CreateQuotationTest = () => {
       }
 
       await getOrdersDetails(data.data);
-      getSummary();
+      // getSummary();
     } catch (e) {
       console.error(e);
       toast.error("Something went wrong", {
@@ -762,9 +763,9 @@ const CreateQuotationTest = () => {
         };
       });
 
-      getSummary();
+      // getSummary();
       getOrdersDetails();
-      // navigate("/orders");
+      // navigate("/quotation_test");
       MySwal.close();
       closeModal();
     } catch (e) {

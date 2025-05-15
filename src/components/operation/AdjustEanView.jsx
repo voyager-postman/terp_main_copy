@@ -81,13 +81,13 @@ const AdjustEanView = () => {
                       <p>
                         {" "}
                         <span>Used Quantity :</span>{" "}
-                        <strong>{totalDetails?.qty_used}</strong>
+                        <strong>{totalDetails?.Qty}</strong>
                       </p>
 
                       <p>
                         {" "}
                         <span>Number of Staff :</span>{" "}
-                        <strong>{totalDetails?.number_of_staff} </strong>
+                        <strong>{totalDetails?.Staff} </strong>
                       </p>
 
                       <p>
@@ -95,9 +95,9 @@ const AdjustEanView = () => {
                         <span>Start Time :</span>{" "}
                         <strong>
                           {" "}
-                          {totalDetails?.start_time
+                          {totalDetails?.Start_Time
                             ? format(
-                                new Date(totalDetails?.start_time),
+                                new Date(totalDetails?.Start_Time),
                                 "HH:mm dd-MM-yyyy"
                               )
                             : "N/A"}{" "}
@@ -108,9 +108,9 @@ const AdjustEanView = () => {
                         {" "}
                         <span>End Time :</span>{" "}
                         <strong>
-                          {totalDetails?.end_time
+                          {totalDetails?.End_Time
                             ? format(
-                                new Date(totalDetails?.end_time),
+                                new Date(totalDetails?.End_Time),
                                 "HH:mm dd-MM-yyyy"
                               )
                             : "N/A"}{" "}
@@ -164,13 +164,13 @@ const AdjustEanView = () => {
                             data-bs-target="#myModal"
                           >
                             <td>{item.ean_name_en}</td>
-                            <td>{item.ean_qty}</td>
-                            <td>{item.packing_ean_unit}</td>
-                            <td>{item.ean_cost}</td>
+                            <td>{item.Qty}</td>
+                            <td>{item.unit_name}</td>
+                            <td>{item.EAN_COST}</td>
                             <td>{item.average_weight}</td>
                             <td>{item.EanPerKg}</td>
                             <td>{item.EanPerHour}</td>
-                            <td>{item.Wastage}</td>
+                            <td>{item.Wasted}</td>
                           </tr>
                         );
                       })}

@@ -28,11 +28,11 @@ export const EANAvailable = () => {
       },
       {
         Header: "Brand",
-        accessor: "brand",
+        accessor: "Brand_Name",
       },
       {
         Header: "Quantity Available",
-        accessor: "qty_available",
+        accessor: "Available_EAN",
       },
       {
         Header: "Average Weight(g)",

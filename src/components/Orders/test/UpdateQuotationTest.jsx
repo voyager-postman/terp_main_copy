@@ -111,13 +111,13 @@ const UpdateQuotationTest = () => {
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
   const { data: quote } = useQuery("getAllQuotation");
-  const { data: summary, refetch: getSummary } = useQuery(
-    `getOrderSummary?quote_id=${state.order_id}`,
-    {
-      enabled: !!state.order_id,
-    }
-  );
-  console.log(summary);
+  // const { data: summary, refetch: getSummary } = useQuery(
+  //   `getOrderSummary?quote_id=${state.order_id}`,
+  //   {
+  //     enabled: !!state.order_id,
+  //   }
+  // );
+  // console.log(summary);
   const [orderId, setOrderId] = useState("");
   const [gross, setGross] = useState(false);
   const [freight, setFreight] = useState(false);
@@ -235,7 +235,7 @@ const UpdateQuotationTest = () => {
     r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost || quoteFind?.O_Extra;
     r.fx_rate =
       state.fx_rate ||
-      currency?.find((v) => +v.currency_id == +r.fx_id)?.fx_rate ||
+      currency?.find((v) => +v.ID == +r.fx_id)?.fx_rate ||
       currency?.[
         consignee?.findIndex((v) => +v.consignee_id == +r.consignee_id)
       ]?.fx_rate ||
@@ -355,22 +355,22 @@ const UpdateQuotationTest = () => {
     }
   };
   const grossTransspotationErr = async () => {
-    if (state.order_id) {
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/OrderGrossTransportError`,
-          { order_id: state.order_id }
-        );
-        console.log(response);
-        if (response.data.success == true) {
-          setGross(true);
-          setGrossMass(response.data.message);
-        }
-        toast.success(response);
-      } catch (e) {
-        console.error("Something went wrong", e);
-      }
-    }
+    // if (state.order_id) {
+    //   try {
+    //     const response = await axios.post(
+    //       `${API_BASE_URL}/OrderGrossTransportError`,
+    //       { order_id: state.order_id }
+    //     );
+    //     console.log(response);
+    //     if (response.data.success == true) {
+    //       setGross(true);
+    //       setGrossMass(response.data.message);
+    //     }
+    //     toast.success(response);
+    //   } catch (e) {
+    //     console.error("Something went wrong", e);
+    //   }
+    // }
   };
 
   const calculateList = async () => {
@@ -436,21 +436,21 @@ const UpdateQuotationTest = () => {
     console.log(exchangeRate3);
   };
   const orderCrossFreight = async () => {
-    if (state.order_id) {
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/OrderGrossFreightError`,
-          { order_id: state.order_id }
-        );
-        console.log(response); // Log the response to the console
-        if (response.data.success == true) {
-          setFreight(true);
-          setFreightMass(response.data.message);
-        }
-      } catch (e) {
-        console.error("Something went wrong", e); // Log the error to the console
-      }
-    }
+    // if (state.order_id) {
+    //   try {
+    //     const response = await axios.post(
+    //       `${API_BASE_URL}/OrderGrossFreightError`,
+    //       { order_id: state.order_id }
+    //     );
+    //     console.log(response); // Log the response to the console
+    //     if (response.data.success == true) {
+    //       setFreight(true);
+    //       setFreightMass(response.data.message);
+    //     }
+    //   } catch (e) {
+    //     console.error("Something went wrong", e); // Log the error to the console
+    //   }
+    // }
   };
 
   const deleteOrder = (id) => {
@@ -571,14 +571,14 @@ const UpdateQuotationTest = () => {
 
         getOrdersDetails();
         oneQoutationDAta();
-        getSummary();
+        // getSummary();
         oneQoutationDAta();
         setShow(true);
         setMassageShow1(data.message);
       } else if (data.success == true) {
         calculateList();
         setShow(false);
-        getSummary();
+        // getSummary();
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
@@ -698,7 +698,7 @@ const UpdateQuotationTest = () => {
       } else if (data.success == true) {
         calculateList();
 
-        getSummary();
+        // getSummary();
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
@@ -706,7 +706,7 @@ const UpdateQuotationTest = () => {
       await getOrdersDetails(data.data.data);
       MySwal.close();
       setIsLoading(false);
-      getSummary();
+      // getSummary();
     } catch (e) {
       console.error(e);
     } finally {
@@ -750,14 +750,14 @@ const UpdateQuotationTest = () => {
 
         getOrdersDetails();
         oneQoutationDAta();
-        getSummary();
+        // getSummary();
         oneQoutationDAta();
         setShow(true);
         setMassageShow1(data.message);
       } else if (data.success == true) {
         calculateList();
         setShow(false);
-        getSummary();
+        // getSummary();
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
@@ -771,7 +771,7 @@ const UpdateQuotationTest = () => {
       await getOrdersDetails(data.data.data);
       MySwal.close();
       setIsLoading(false);
-      getSummary();
+      // getSummary();
     } catch (e) {
       console.error(e);
     } finally {
@@ -918,7 +918,7 @@ const UpdateQuotationTest = () => {
         };
       });
 
-      getSummary();
+      // getSummary();
       getOrdersDetails();
       // navigate("/orders");
       MySwal.close();
