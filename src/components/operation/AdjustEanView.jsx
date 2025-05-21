@@ -44,13 +44,6 @@ const AdjustEanView = () => {
       enabled: !!from?.order_id,
     }
   );
-  const { data: summary, refetch: getSummary } = useQuery(
-    `getOrderSummary?quote_id=${from?.order_id}`,
-    {
-      enabled: !!from?.order_id,
-    }
-  );
-  console.log(summary);
 
   return (
     <div>
@@ -164,13 +157,13 @@ const AdjustEanView = () => {
                             data-bs-target="#myModal"
                           >
                             <td>{item.ean_name_en}</td>
-                            <td>{item.Qty}</td>
-                            <td>{item.unit_name}</td>
-                            <td>{item.EAN_COST}</td>
+                            <td>{item.ean_qty}</td>
+                            <td>{item.packing_ean_unit}</td>
+                            <td>{item.ean_cost}</td>
                             <td>{item.average_weight}</td>
                             <td>{item.EanPerKg}</td>
                             <td>{item.EanPerHour}</td>
-                            <td>{item.Wasted}</td>
+                            <td>{item.Wastage}</td>
                           </tr>
                         );
                       })}

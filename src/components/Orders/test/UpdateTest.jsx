@@ -16,8 +16,40 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Select, { components } from "react-select";
 import { FaCaretDown } from "react-icons/fa"; // Import an icon from react-icon
 import { set } from "date-fns";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { FaCalendarAlt } from "react-icons/fa";
+
 const UpdateTest = () => {
   // new selct
+  const CustomInput = ({ value, onClick }) => (
+    <div
+      className="custom-input"
+      onClick={onClick}
+      style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+    >
+      <input
+        type="text"
+        value={value}
+        readOnly
+        style={{
+          padding: "10px",
+          paddingLeft: "35px",
+          width: "250px",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+        }}
+      />
+      <FaCalendarAlt
+        style={{
+          position: "absolute",
+          right: "10px",
+          fontSize: "18px",
+          color: "#888",
+        }}
+      />
+    </div>
+  );
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -83,6 +115,7 @@ const UpdateTest = () => {
     Q_Markup: "",
     O_Extra: "",
     Location_name: "",
+    Daily_FX_Rate: "",
   });
   const [exchangeRate1, setExchangeRate1] = useState();
   const [exchangeRate2, setExchangeRate2] = useState("");
@@ -95,9 +128,12 @@ const UpdateTest = () => {
       return {
         ...prevState,
         [name]: value,
+        fx_rate_manually_set:
+          name === "fx_rate" ? true : prevState.fx_rate_manually_set,
       };
     });
   };
+
   const { data: clients } = useQuery("getClientDataAsOptions");
   const { data: brands } = useQuery("getBrand");
   const { data: locations } = useQuery("getLocation");
@@ -111,13 +147,7 @@ const UpdateTest = () => {
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
   const { data: quote } = useQuery("getAllQuotation");
-  // const { data: summary, refetch: getSummary } = useQuery(
-  //   `getOrderSummary?quote_id=${state.order_id}`,
-  //   {
-  //     enabled: !!state.order_id,
-  //   }
-  // );
-  // console.log(summary);
+
   const [orderId, setOrderId] = useState("");
   const [gross, setGross] = useState(false);
   const [freight, setFreight] = useState(false);
@@ -190,6 +220,7 @@ const UpdateTest = () => {
               ? new Date(newData.load_date).toISOString().slice(0, 10)
               : prevState.load_date,
             fx_rate: prevState.fx_rate,
+            Daily_FX_Rate: newData.Daily_FX_Rate,
             Q_Markup: prevState.Q_Markup,
             Location_name: newData.location_name,
           }));
@@ -202,7 +233,7 @@ const UpdateTest = () => {
         console.log(e);
       });
   };
-
+  console.log(state);
   useEffect(() => {
     oneQoutationDAta();
   }, []);
@@ -232,14 +263,17 @@ const UpdateTest = () => {
     );
     r.fx_id = r.fx_id || consigneeFind?.currency || quoteFind?.fx_id;
     r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost || quoteFind?.O_Extra;
-    r.fx_rate =
-      state.fx_rate ||
-      currency?.find((v) => +v.ID == +r.fx_id)?.fx_rate ||
-      currency?.[
-        consignee?.findIndex((v) => +v.consignee_id == +r.consignee_id)
-      ]?.fx_rate ||
-      quoteFind?.fx_rate ||
-      0;
+    // r.fx_rate =
+    //   !state.fx_rate_manually_set && r.fx_id
+    //     ? currency?.find((v) => +v.ID === +r.fx_id)?.fx_rate || 0
+    //     : state.fx_rate;
+    r.fx_rate = (() => {
+      if (state.fx_rate_manually_set) return state.fx_rate;
+      if (!state.fx_rate && state.Daily_FX_Rate) return state.Daily_FX_Rate;
+      const matchedCurrency = currency?.find((v) => +v.ID === +r.fx_id);
+      return matchedCurrency?.fx_rate || state.fx_rate || 0;
+    })();
+
     r.rebate = r.rebate || consigneeFind?.O_Rebate || quoteFind?.rebate;
     r.Clearance_provider =
       r.Clearance_provider ||
@@ -619,16 +653,11 @@ const UpdateTest = () => {
 
       if (data.success == false) {
         calculateList();
-
         getOrdersDetails();
         oneQoutationDAta();
-        oneQoutationDAta();
-
         setMassageShow1(data.message);
       } else if (data.success == true) {
         calculateList();
-
-        oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
         toast.success("Order Update successfully", {
@@ -759,7 +788,6 @@ const UpdateTest = () => {
   //       };
   //     });
 
-  //     getSummary();
   //     getOrdersDetails();
   //     // navigate("/orders");
   //     MySwal.close();
@@ -1092,7 +1120,7 @@ const UpdateTest = () => {
                               id: v.client_id,
                               name: v.client_name,
                             })) || []
-                          } 
+                          }
                           sx={{ width: 300 }}
                           getOptionLabel={(option) => option?.name || ""} // Display name of the option
                           isOptionEqualToValue={(option, value) =>
@@ -1307,7 +1335,14 @@ const UpdateTest = () => {
                               : null
                           }
                           onChange={(event, value) => {
-                            setState({ ...state, fx_id: value?.id || null });
+                            const selectedFxRate =
+                              currency.find((c) => c.ID === value?.id)
+                                ?.fx_rate || 0;
+                            setState({
+                              ...state,
+                              fx_id: value?.id || null,
+                              fx_rate: selectedFxRate, // update fx_rate with selected currency's rate
+                            });
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1758,11 +1793,30 @@ const UpdateTest = () => {
                       </div>
                       <div className="col-lg-3 form-group">
                         <h6>Loading Date</h6>
-                        <input
+                        {/* <input
                           type="date"
                           onChange={handleChange}
                           value={computedState.load_date}
                           name="load_date"
+                        /> */}
+                        <DatePicker
+                          selected={
+                            computedState.load_date
+                              ? new Date(computedState.load_date)
+                              : null
+                          }
+                          onChange={(date) =>
+                            handleChange({
+                              target: {
+                                name: "load_date",
+                                value: date,
+                              },
+                            })
+                          }
+                          name="load_date"
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="dd/MM/yyyy"
+                          customInput={<CustomInput />} // Optional: only include if you have a custom input
                         />
                       </div>
                     </div>

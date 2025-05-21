@@ -1136,17 +1136,28 @@ const QuotationTest = () => {
 
       {
         Header: "Status",
-        accessor: (a) => ({ 2: "Confirmed" }[a.Status] || "Pending"),
+        accessor: (a) =>
+          ({
+            1: "Pending",
+            2: "Active",
+            3: "Packed",
+            4: "Shipped",
+            5: "Cancelled",
+            6: "Expired",
+          }[a.Status] || "Unknown"),
       },
+
       {
         // {(+a.Status === 1 || +a.Status === 2) && (
         Header: "Actions",
         accessor: (a) => (
           <div className="editIcon">
-            <Link to="/quotation_view_test" state={{ from: { ...a } }}>
-              <i className="mdi mdi-eye" />
-            </Link>
-            {+a.Status === 0 && (
+            {(+a.Status === 1 || +a.Status === 2 || +a.Status === 6) && (
+              <Link to="/quotation_view_test" state={{ from: { ...a } }}>
+                <i className="mdi mdi-eye" />
+              </Link>
+            )}
+            {(+a.Status === 1 || +a.Status === 2) && (
               <Link to="/updateTestQuotation" state={{ from: { ...a } }}>
                 <i className="mdi mdi-pencil" />
               </Link>
@@ -1165,23 +1176,24 @@ const QuotationTest = () => {
                 <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
               </svg>
             </Link> */}
-
-            <button
-              type="button"
-              data-bs-toggle="modal"
-              onClick={() => setFilterData1(a)}
-              data-bs-target="#exampleModalCustomization"
-            >
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
+            {(+a.Status === 1 || +a.Status === 2 || +a.Status === 6) && (
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                onClick={() => setFilterData1(a)}
+                data-bs-target="#exampleModalCustomization"
               >
-                <title>Quotation</title>
-                <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
-              </svg>
-            </button>
-            {+a.Status !== 2 && (
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <title>Quotation</title>
+                  <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
+                </svg>
+              </button>
+            )}
+            {(+a.Status === 1 || +a.Status === 2) && (
               // <Link
               //   className="SvgAnchor"
               //   to="/quotation_proforma_test"
@@ -1203,20 +1215,21 @@ const QuotationTest = () => {
                 <i className="fi fi-sr-square-p" />
               </button>
             )}
-            <button
-              type="button"
-              style={{
-                width: "20px",
-                color: "#203764",
-                fontSize: "22px",
-                marginTop: "10px",
-              }}
-              onClick={() => handleEditClick(a.Quotation_ID)}
-            >
-              <i className="mdi mdi-content-copy" />
-            </button>
-
-            {(+a.Status === 0 || +a.Status === 1) && (
+            {(+a.Status === 2 || +a.Status === 6) && (
+              <button
+                type="button"
+                style={{
+                  width: "20px",
+                  color: "#203764",
+                  fontSize: "22px",
+                  marginTop: "10px",
+                }}
+                onClick={() => handleEditClick(a.Quotation_ID)}
+              >
+                <i className="mdi mdi-content-copy" />
+              </button>
+            )}
+            {(+a.Status === 2 || +a.Status === 6) && (
               <button
                 type="button"
                 onClick={() => quotationConfirmation(a.Order_ID)}
@@ -1224,7 +1237,7 @@ const QuotationTest = () => {
                 <i className="mdi mdi-check-circle" />
               </button>
             )}
-            {+a.Status == 0 && (
+            {(+a.Status === 1 || +a.Status === 2 || +a.Status === 6) && (
               <button
                 type="button"
                 style={{

@@ -727,14 +727,14 @@ button.swal2-cancel.swal2-styled.swal2-default-outline {
 button.btn-close {
   width: unset;
 }
-button.btn-close i {
-  color: #000000;
-  font-weight: 900;
-  font-size: 22px;
-  position: relative;
-  top: -8px;
-  left: 0px;
-}
+  /* button.btn-close i {
+    color: #000000;
+    font-weight: 900;
+    font-size: 22px;
+    position: relative;
+    top: -8px;
+    left: 0px;
+  } */
 .MuiIconButton-root {
   padding: unset;
   width: unset !important;

@@ -778,7 +778,7 @@ const Receiving = () => {
                     <div
                       className="modal-header border-0"
                       style={{
-                        backgroundColor: color ? "#2f423c" : "",
+                        backgroundColor: color,
                       }}
                     >
                       <h1 className="modal-title fs-5" id="exampleModalLabel">
@@ -796,7 +796,7 @@ const Receiving = () => {
                     <div
                       className="modal-body"
                       style={{
-                        backgroundColor: color ? "#2f423c" : "",
+                        backgroundColor: color,
                       }}
                     >
                       <div className="eanCheck errorMessage recheckReceive">
@@ -822,7 +822,7 @@ const Receiving = () => {
                     <div
                       className="modal-footer"
                       style={{
-                        backgroundColor: color ? "#2f423c" : "",
+                        backgroundColor: color,
                       }}
                     ></div>
                   </div>

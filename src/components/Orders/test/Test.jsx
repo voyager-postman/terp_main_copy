@@ -1462,7 +1462,7 @@ const Test = () => {
           img.onerror = (error) => reject(error);
         });
       };
-      
+
       // Add a logo with Proforma Address and Proforma Invoice
       const addLogoWithDetails = async () => {
         const logoData = await convertImageToBase64(logo1);
@@ -1767,8 +1767,16 @@ const Test = () => {
       },
       {
         Header: "Status",
-        accessor: (a) => ({ 1: "Cancelled" }[a.Status] || "Pending"),
+        accessor: (a) =>
+          ({
+            1: "Pending",
+            2: "Active",
+            3: "Packed",
+            4: "Shipped",
+            5: "Cancelled",
+          }[a.Status] || "Unknown"),
       },
+
       {
         Header: "Actions",
         accessor: (a) => (
@@ -1793,108 +1801,100 @@ const Test = () => {
 
             {+a.is_deleted !== 1 && (
               <>
-                <Link to="/updateTestOrder" state={{ from: { ...a } }}>
-                  <i className="mdi mdi-pencil" />
-                </Link>
-
-                {/* <Link
-                  className="SvgAnchor"
-                  to="/proforma_invoice_test"
-                  state={{ from: { ...a } }}
-                >
-                  <i className="fi fi-sr-square-p"></i>
-                </Link> */}
-                <button type="button" onClick={() => performaOrder(a)}>
-                  {" "}
-                  <i className="fi fi-sr-square-p"></i>
-                </button>
-
-                {/* <Link
-                  className="OpePdf"
-                  to="/operationPdf_test"
-                  state={{ from: { ...a } }}
-                >
-                  <i class="fi fi-sr-square-o"></i>
-                </Link> */}
-                <button type="button" onClick={() => operationPdfTest(a)}>
-                  {" "}
-                  <i class="fi fi-sr-square-o"></i>
-                </button>
-                {/* <Link
-                  className="SvgAnchor"
-                  to="/order_custom_pdf_test"
-                  state={{ from: { ...a } }}
-                >
-                  <svg
-                    className="SvgQuo"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
+                {(+a.Status === 1 || +a.Status === 2) && (
+                  <>
+                    <Link to="/updateTestOrder" state={{ from: { ...a } }}>
+                      <i className="mdi mdi-pencil" />
+                    </Link>
+                  </>
+                )}
+                {(+a.Status === 1 ||
+                  +a.Status === 2 ||
+                  +a.Status === 3 ||
+                  +a.Status === 4) && (
+                  <button type="button" onClick={() => performaOrder(a)}>
+                    {" "}
+                    <i className="fi fi-sr-square-p"></i>
+                  </button>
+                )}
+                {(+a.Status === 2 || +a.Status === 3 || +a.Status === 4) && (
+                  <button type="button" onClick={() => operationPdfTest(a)}>
+                    {" "}
+                    <i class="fi fi-sr-square-o"></i>
+                  </button>
+                )}
+                {+a.Status === 2 && (
+                  <button type="button" onClick={() => customInvoicePdf(a)}>
+                    {" "}
+                    <svg
+                      className="SvgQuo"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                    >
+                      <title>alpha-c-box-outline</title>
+                      <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
+                    </svg>
+                  </button>
+                )}
+                {+a.Status === 2 && (
+                  <button
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                    onClick={() => inventoryBoxes(a.Order_ID)}
                   >
-                    <title>alpha-c-box-outline</title>
-                    <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
-                  </svg>
-                </Link> */}
-                <button type="button" onClick={() => customInvoicePdf(a)}>
-                  {" "}
-                  <svg
-                    className="SvgQuo"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <title>alpha-c-box-outline</title>
-                    <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  onClick={() => inventoryBoxes(a.Order_ID)}
-                >
-                  {" "}
-                  <i className="mdi mdi-note-outline" />
-                </button>
-
-                <button
-                  type="button"
-                  style={{
-                    width: "20px",
-                    color: "#203764",
-                    fontSize: "22px",
-                    marginTop: "10px",
-                  }}
-                  onClick={() => handleEditClick(a.Order_ID)}
-                >
-                  <i className="mdi mdi-content-copy" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => openModal(a.Order_ID, a.Consignee_ID)}
-                >
-                  <i className="mdi mdi-airplane-clock" />
-                </button>
-
-                <button
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal1"
-                  onClick={() => setDeleteOrderId(a.Order_ID)}
-                >
-                  <i className="mdi mdi-delete " />
-                </button>
-
-                <button type="button" onClick={() => CheckBox(a.Order_ID)}>
-                  <i
-                    className="mdi mdi-check"
+                    {" "}
+                    <i className="mdi mdi-note-outline" />
+                  </button>
+                )}
+                {(+a.Status === 2 ||
+                  +a.Status === 3 ||
+                  +a.Status === 4 ||
+                  +a.Status === 5) && (
+                  <button
+                    type="button"
                     style={{
                       width: "20px",
                       color: "#203764",
                       fontSize: "22px",
                       marginTop: "10px",
                     }}
-                  />
-                </button>
+                    onClick={() => handleEditClick(a.Order_ID)}
+                  >
+                    <i className="mdi mdi-content-copy" />
+                  </button>
+                )}
+                {(+a.Status === 2 || +a.Status === 3) && (
+                  <button
+                    type="button"
+                    onClick={() => openModal(a.Order_ID, a.Consignee_ID)}
+                  >
+                    <i className="mdi mdi-airplane-clock" />
+                  </button>
+                )}
+                {(+a.Status === 1 || +a.Status === 2) && (
+                  <button
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal1"
+                    onClick={() => setDeleteOrderId(a.Order_ID)}
+                  >
+                    <i className="mdi mdi-delete " />
+                  </button>
+                )}
+                {+a.Status === 1 && (
+                  <button type="button" onClick={() => CheckBox(a.Order_ID)}>
+                    <i
+                      className="mdi mdi-check"
+                      style={{
+                        width: "20px",
+                        color: "#203764",
+                        fontSize: "22px",
+                        marginTop: "10px",
+                      }}
+                    />
+                  </button>
+                )}
               </>
             )}
           </div>

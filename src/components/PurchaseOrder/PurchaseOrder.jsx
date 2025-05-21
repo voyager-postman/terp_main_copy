@@ -4886,14 +4886,27 @@ const PurchaseOrder = () => {
                 </div>
               </div>
               <div className="uploadFileMain">
-                <div>
+                <div className="claimDateMargin">
                   <p>
                     <strong>Claim Date</strong>
                   </p>
-                  <input
+                  {/* <input
                     type="date"
                     value={selectedDate}
                     onChange={handleDateChange}
+                  /> */}
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date) =>
+                      handleDateChange({
+                        target: {
+                          value: date,
+                        },
+                      })
+                    }
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="dd/MM/yyyy"
+                    customInput={<CustomInput />} // Optional: only include if you have a custom input
                   />
                 </div>
                 <div className="parentInsideUp">

@@ -16,7 +16,39 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Select, { components } from "react-select";
 import { FaCaretDown } from "react-icons/fa"; // Import an icon from react-icon
 import { set } from "date-fns";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { FaCalendarAlt } from "react-icons/fa";
+
 const UpdateQuotationTest = () => {
+  const CustomInput = ({ value, onClick }) => (
+    <div
+      className="custom-input"
+      onClick={onClick}
+      style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+    >
+      <input
+        type="text"
+        value={value}
+        readOnly
+        style={{
+          padding: "10px",
+          paddingLeft: "35px",
+          width: "250px",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+        }}
+      />
+      <FaCalendarAlt
+        style={{
+          position: "absolute",
+          right: "10px",
+          fontSize: "18px",
+          color: "#888",
+        }}
+      />
+    </div>
+  );
   // new selct
   const location = useLocation();
   const navigate = useNavigate();
@@ -83,6 +115,7 @@ const UpdateQuotationTest = () => {
     Q_Markup: "",
     O_Extra: "",
     Location_name: "",
+    Daily_FX_Rate: "",
   });
   const [exchangeRate1, setExchangeRate1] = useState();
   const [exchangeRate2, setExchangeRate2] = useState("");
@@ -95,9 +128,12 @@ const UpdateQuotationTest = () => {
       return {
         ...prevState,
         [name]: value,
+        fx_rate_manually_set:
+          name === "fx_rate" ? true : prevState.fx_rate_manually_set,
       };
     });
   };
+
   const { data: clients } = useQuery("getClientDataAsOptions");
   const { data: brands } = useQuery("getBrand");
   const { data: locations } = useQuery("getLocation");
@@ -111,13 +147,7 @@ const UpdateQuotationTest = () => {
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
   const { data: quote } = useQuery("getAllQuotation");
-  // const { data: summary, refetch: getSummary } = useQuery(
-  //   `getOrderSummary?quote_id=${state.order_id}`,
-  //   {
-  //     enabled: !!state.order_id,
-  //   }
-  // );
-  // console.log(summary);
+
   const [orderId, setOrderId] = useState("");
   const [gross, setGross] = useState(false);
   const [freight, setFreight] = useState(false);
@@ -191,6 +221,7 @@ const UpdateQuotationTest = () => {
               : prevState.load_date,
             fx_rate: prevState.fx_rate,
             Q_Markup: prevState.Q_Markup,
+            Daily_FX_Rate: newData.Daily_FX_Rate,
             Location_name: newData.location_name,
           }));
           setExchangeRate1(newData.Charge_Volume || 0);
@@ -233,14 +264,17 @@ const UpdateQuotationTest = () => {
     );
     r.fx_id = r.fx_id || consigneeFind?.currency || quoteFind?.fx_id;
     r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost || quoteFind?.O_Extra;
-    r.fx_rate =
-      state.fx_rate ||
-      currency?.find((v) => +v.ID == +r.fx_id)?.fx_rate ||
-      currency?.[
-        consignee?.findIndex((v) => +v.consignee_id == +r.consignee_id)
-      ]?.fx_rate ||
-      quoteFind?.fx_rate ||
-      0;
+    // r.fx_rate =
+    //   !state.fx_rate_manually_set && r.fx_id
+    //     ? currency?.find((v) => +v.ID === +r.fx_id)?.fx_rate || 0
+    //     : state.fx_rate;
+    r.fx_rate = (() => {
+      if (state.fx_rate_manually_set) return state.fx_rate;
+      if (!state.fx_rate && state.Daily_FX_Rate) return state.Daily_FX_Rate;
+      const matchedCurrency = currency?.find((v) => +v.ID === +r.fx_id);
+      return matchedCurrency?.fx_rate || state.fx_rate || 0;
+    })();
+
     r.consignee_name =
       r.consignee_name ||
       consigneeFind?.consignee_name ||
@@ -304,38 +338,38 @@ const UpdateQuotationTest = () => {
       return +v.OD_Box % 1 != 0;
     });
   }, [details]);
-  const isMinWeightError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) <
-      freights?.find(
-        (v) => v.Freight_provider == computedState.Freight_provider_
-      )?.min_weight
-    );
-  }, [freights, summary]);
-  const isMinWeightTransportError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) <
-        freights?.find(
-          (v) => v.Freight_provider == computedState.Freight_provider_
-        )?.min_weight &&
-      (+summary?.Gross_weight || 0) >=
-        transport?.find(
-          (v) =>
-            v.Transportation_provider == computedState.Transportation_provider
-        )?.max_weight3
-    );
-  }, [freights, summary]);
-  const isMinTransportError = useMemo(() => {
-    return (
-      (+summary?.Gross_weight || 0) >=
-      transport?.find(
-        (v) =>
-          v.Transportation_provider == computedState.Transportation_provider
-      )?.max_weight3
-    );
-  }, [freights, summary]);
-  console.log(isMinWeightError);
-  console.log(isMinTransportError);
+  // const isMinWeightError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) <
+  //     freights?.find(
+  //       (v) => v.Freight_provider == computedState.Freight_provider_
+  //     )?.min_weight
+  //   );
+  // }, [freights, summary]);
+  // const isMinWeightTransportError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) <
+  //       freights?.find(
+  //         (v) => v.Freight_provider == computedState.Freight_provider_
+  //       )?.min_weight &&
+  //     (+summary?.Gross_weight || 0) >=
+  //       transport?.find(
+  //         (v) =>
+  //           v.Transportation_provider == computedState.Transportation_provider
+  //       )?.max_weight3
+  //   );
+  // }, [freights, summary]);
+  // const isMinTransportError = useMemo(() => {
+  //   return (
+  //     (+summary?.Gross_weight || 0) >=
+  //     transport?.find(
+  //       (v) =>
+  //         v.Transportation_provider == computedState.Transportation_provider
+  //     )?.max_weight3
+  //   );
+  // }, [freights, summary]);
+  // console.log(isMinWeightError);
+  // console.log(isMinTransportError);
   const newItfList1 = async () => {
     if (state.consignee_id) {
       try {
@@ -411,7 +445,6 @@ const UpdateQuotationTest = () => {
         );
         console.log(response.data); // Log the response data
         setBrandNew(response.data.data);
-        // Update state or perform other actions with response data if needed
       } catch (e) {
         console.log("Error:", e);
         // toast.error("Something went wrong");
@@ -523,7 +556,7 @@ const UpdateQuotationTest = () => {
           theme: "colored",
         });
 
-        navigate("/test");
+        navigate("/quotation_test");
       }
     } catch (e) {
       toast.error("Something went wrong");
@@ -592,7 +625,7 @@ const UpdateQuotationTest = () => {
       await getOrdersDetails(data.data.data);
       MySwal.close();
       setIsLoading(false);
-      getSummary();
+      // getSummary();
     } catch (e) {
       console.error(e);
     } finally {
@@ -631,14 +664,14 @@ const UpdateQuotationTest = () => {
 
         getOrdersDetails();
         oneQoutationDAta();
-        getSummary();
+        // getSummary();
         oneQoutationDAta();
-
+        console.log("call lse part ");
         setMassageShow1(data.message);
       } else if (data.success == true) {
         calculateList();
-
-        getSummary();
+        console.log("call true part ");
+        // getSummary();
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
@@ -651,7 +684,7 @@ const UpdateQuotationTest = () => {
       await getOrdersDetails(data.data.data);
       MySwal.close();
       setIsLoading(false);
-      getSummary();
+      // getSummary();
     } catch (e) {
       console.error(e);
     } finally {
@@ -691,7 +724,7 @@ const UpdateQuotationTest = () => {
 
         getOrdersDetails();
         oneQoutationDAta();
-        getSummary();
+        // getSummary();
         oneQoutationDAta();
 
         setMassageShow1(data.message);
@@ -1318,44 +1351,6 @@ const UpdateQuotationTest = () => {
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
                         <h6>Currency</h6>
-                        {/* <Autocomplete
-                          options={
-                            currency?.map((v) => ({
-                              id: v.currency_id,
-                              name: v.currency,
-                            })) || []
-                          } // Ensure options is always an array
-                          sx={{ width: 300 }}
-                          getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                          isOptionEqualToValue={(option, value) =>
-                            option.id === value?.id
-                          } // Compare by `id`
-                          value={
-                            currency?.find(
-                              (cur) => cur.currency_id === computedState.fx_id
-                            )
-                              ? {
-                                  id: currency.find(
-                                    (cur) =>
-                                      cur.currency_id === computedState.fx_id
-                                  ).currency_id,
-                                  name: currency.find(
-                                    (cur) =>
-                                      cur.currency_id === computedState.fx_id
-                                  ).currency,
-                                }
-                              : null // Ensure value matches the structure of options
-                          }
-                          onChange={(event, value) => {
-                            setState({ ...state, fx_id: value?.id || null }); // Update state with selected `id`
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select currency"
-                            />
-                          )}
-                        /> */}
                         <Autocomplete
                           options={
                             currency?.map((v) => ({
@@ -1381,7 +1376,14 @@ const UpdateQuotationTest = () => {
                               : null
                           }
                           onChange={(event, value) => {
-                            setState({ ...state, fx_id: value?.id || null }); // Update state with selected ID
+                            const selectedFxRate =
+                              currency.find((c) => c.ID === value?.id)
+                                ?.fx_rate || 0;
+                            setState({
+                              ...state,
+                              fx_id: value?.id || null,
+                              fx_rate: selectedFxRate, // update fx_rate with selected currency's rate
+                            });
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1832,11 +1834,26 @@ const UpdateQuotationTest = () => {
                       </div>
                       <div className="col-lg-3 form-group">
                         <h6>Loading Date</h6>
-                        <input
+                        {/* <input
                           type="date"
                           onChange={handleChange}
                           value={computedState.load_date}
                           name="load_date"
+                        /> */}
+                        <DatePicker
+                          selected={computedState.load_date}
+                          onChange={(date) =>
+                            handleChange({
+                              target: {
+                                name: "load_date",
+                                value: date,
+                              },
+                            })
+                          }
+                          name="load_date"
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="dd/MM/yyyy"
+                          customInput={<CustomInput />} // Optional: Only if you have a custom styled input
                         />
                       </div>
                     </div>

@@ -99,12 +99,7 @@ const UpdateOrder = () => {
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
   const { data: quote } = useQuery("getAllQuotation");
-  const { data: summary, refetch: getSummary } = useQuery(
-    `getOrderSummary?quote_id=${state.order_id}`,
-    {
-      enabled: !!state.order_id,
-    }
-  );
+
   console.log(summary);
   const [orderId, setOrderId] = useState("");
   const [gross, setGross] = useState(false);
@@ -467,15 +462,13 @@ const UpdateOrder = () => {
 
         getOrdersDetails();
         oneQoutationDAta();
-        getSummary();
-        oneQoutationDAta();
+          oneQoutationDAta();
         setShow(true);
         setMassageShow1(data.message);
       } else if (data.success == true) {
         calculateList();
         setShow(false);
-        getSummary();
-        oneQoutationDAta();
+          oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
         toast.success("Order Calculated successfully", {
@@ -488,7 +481,6 @@ const UpdateOrder = () => {
       await getOrdersDetails(data.data.data);
       MySwal.close();
       setIsLoading(false);
-      getSummary();
     } catch (e) {
       console.error(e);
     } finally {
@@ -568,7 +560,6 @@ const UpdateOrder = () => {
         };
       });
 
-      getSummary();
       getOrdersDetails();
       // navigate("/orders");
       MySwal.close();

@@ -74,12 +74,7 @@ export const Pdf_View = () => {
   useEffect(() => {
     oneQoutationDAta();
   }, [from?.Order_ID]);
-  const { data: totalDetails, refetch: getSummary } = useQuery(
-    `getOrderSummary?quote_id=${from?.Order_ID}`,
-    {
-      enabled: !!from?.Order_ID,
-    }
-  );
+
   console.log(totalDetails);
   const pdfAllData = () => {
     axios

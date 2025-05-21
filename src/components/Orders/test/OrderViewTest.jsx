@@ -41,12 +41,7 @@ const OrderViewTest = () => {
     }
   );
   console.log(details);
-  const { data: summary, refetch: getSummary } = useQuery(
-    `getOrderSummary?quote_id=${from?.Order_ID}`,
-    {
-      enabled: !!from?.Order_ID,
-    }
-  );
+
   const twoDecimal = new Intl.NumberFormat("en-US", {
     style: "decimal",
     minimumFractionDigits: 2,
@@ -62,7 +57,6 @@ const OrderViewTest = () => {
     minimumFractionDigits: 3,
     maximumFractionDigits: 3,
   });
-  console.log(summary);
   return (
     <div>
       <div className="databaseTableSection pt-0">

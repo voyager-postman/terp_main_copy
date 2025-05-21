@@ -249,7 +249,6 @@ const CreatePurchaseOrder = () => {
     console.log(paymentData);
 
     try {
-      // Send POST request to insertClientPayment endpoint (first API)
       const response = await axios.post(
         `${API_BASE_URL}/POPayments`,
         paymentData

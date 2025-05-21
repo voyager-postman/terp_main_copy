@@ -386,7 +386,7 @@ export const AdjustEan = () => {
   console.log;
   return (
     <>
-      <Card title={"Adjust EAN"}>
+      <Card title={"EAN"}>
         <TableView columns={columns} data={data} />
       </Card>
       {isOpen && (

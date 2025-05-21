@@ -1695,6 +1695,7 @@ td.borderUnsetPod input {
   bottom: 12px;
   font-size: 25px;
   right: 5px;
+  left: 0px;
 }
 
 .adjustEanQuan {
@@ -3921,4 +3922,7 @@ g#SvgjsG4264 {
   background: unset !important;
   color: #fff !important;
   text-align: center;
+}
+.claimDateMargin input{
+  margin-right: unset;
 }

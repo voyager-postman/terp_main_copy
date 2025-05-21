@@ -13,8 +13,39 @@ import Autocomplete from "@mui/material/Autocomplete";
 import "../../Orders/order/CreateOrder.css";
 import { ComboBox } from "../../combobox";
 import Select, { components } from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { FaCalendarAlt } from "react-icons/fa";
 import { FaCaretDown } from "react-icons/fa"; // Import an icon from react-icons
 const CreateQuotationTest = () => {
+  const CustomInput = ({ value, onClick }) => (
+    <div
+      className="custom-input"
+      onClick={onClick}
+      style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+    >
+      <input
+        type="text"
+        value={value}
+        readOnly
+        style={{
+          padding: "10px",
+          paddingLeft: "35px",
+          width: "250px",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+        }}
+      />
+      <FaCalendarAlt
+        style={{
+          position: "absolute",
+          right: "10px",
+          fontSize: "18px",
+          color: "#888",
+        }}
+      />
+    </div>
+  );
   const location = useLocation();
   const navigate = useNavigate();
   const [consigneeNew, setConsigneeNew] = useState();
@@ -105,6 +136,8 @@ const CreateQuotationTest = () => {
       return {
         ...prevState,
         [name]: value,
+        fx_rate_manually_set:
+          name === "fx_rate" ? true : prevState.fx_rate_manually_set,
       };
     });
   };
@@ -121,13 +154,7 @@ const CreateQuotationTest = () => {
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
   const { data: quote } = useQuery("getAllQuotation");
-  // const { data: summary, refetch: getSummary } = useQuery(
-  //   `getOrderSummary?quote_id=${state.order_id}`,
-  //   {
-  //     enabled: !!state.order_id,
-  //   }
-  // );
-  // console.log(summary);
+
   const oneQoutationDAta = () => {
     console.log(state.order_id);
     axios
@@ -227,13 +254,10 @@ const CreateQuotationTest = () => {
     r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost || quoteFind?.O_Extra;
 
     r.fx_rate =
-      state.fx_rate ||
-      currency?.find((v) => +v.ID == +r.fx_id)?.fx_rate ||
-      currency?.[
-        consignee?.findIndex((v) => +v.consignee_id == +r.consignee_id)
-      ]?.fx_rate ||
-      quoteFind?.fx_rate ||
-      0;
+      !state.fx_rate_manually_set && r.fx_id
+        ? currency?.find((v) => +v.ID === +r.fx_id)?.fx_rate || 0
+        : state.fx_rate;
+
     r.rebate = r.rebate || consigneeFind?.O_Rebate || quoteFind?.rebate;
     r.Clearance_provider =
       r.Clearance_provider ||
@@ -424,7 +448,7 @@ const CreateQuotationTest = () => {
             autoClose: 1000,
             theme: "colored",
           });
-          navigate("/test");
+          navigate("/quotation_test");
         } else {
           setShow(true);
         }
@@ -467,7 +491,7 @@ const CreateQuotationTest = () => {
       try {
         await axios.post(`${API_BASE_URL}/deleteOrder`, { id: deleteOrderId });
         toast.success("Quotation cancel successfully");
-        navigate("/test");
+        navigate("/quotation_test");
         oneQoutationDAta();
         refetch();
       } catch (e) {
@@ -475,7 +499,7 @@ const CreateQuotationTest = () => {
         console.log(e);
       }
     } else {
-      navigate("/test");
+      navigate("/quotation_test");
     }
   };
   console.log(details);
@@ -539,7 +563,7 @@ const CreateQuotationTest = () => {
       }
 
       await getOrdersDetails(data.data);
-      navigate("/quotation_test");
+      // navigate("/quotation_test");
       // getSummary();
     } catch (e) {
       console.error(e);
@@ -645,14 +669,15 @@ const CreateQuotationTest = () => {
       } else if (data.success === true) {
         calculateList();
         setShow(false);
-        toast.success("Quotation Calculated successfully", {
+        toast.success("Quotation Create successfully", {
           autoClose: 1000,
           theme: "colored",
         });
       }
 
       await getOrdersDetails(data.data);
-      // getSummary();
+
+      navigate("/quotation_test"); // getSummary();
     } catch (e) {
       console.error(e);
       toast.error("Something went wrong", {
@@ -1145,10 +1170,13 @@ const CreateQuotationTest = () => {
                             ) || null
                           } // Find the selected currency based on fx_id
                           onChange={(event, newValue) => {
-                            // Pass the selected value to setState
                             setState((prevState) => ({
                               ...prevState,
-                              fx_id: newValue ? newValue.ID : "", // If no value is selected, set an empty string
+                              fx_id: newValue ? newValue.ID : "",
+                              fx_rate:
+                                newValue && newValue.fx_rate
+                                  ? parseFloat(newValue.fx_rate)
+                                  : 0, // auto-set fx_rate
                             }));
                           }}
                           renderInput={(params) => (
@@ -1534,11 +1562,25 @@ const CreateQuotationTest = () => {
                       </div>
                       <div className="col-lg-3 form-group">
                         <h6>Loading Date</h6>
-                        <input
+                        {/* <input
                           type="date"
                           onChange={handleChange}
                           value={computedState.load_date}
                           name="load_date"
+                        /> */}
+                        <DatePicker
+                          selected={computedState.load_date}
+                          onChange={(date) =>
+                            handleChange({
+                              target: {
+                                name: "load_date",
+                                value: date,
+                              },
+                            })
+                          }
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="dd/MM/yyyy"
+                          customInput={<CustomInput />} // Optional: only include if you have a custom input
                         />
                       </div>
                     </div>
