@@ -1912,7 +1912,7 @@ const CreateClient = () => {
                           <td>{item.Email}</td>
                           <td>{item.mobile}</td>
                           <td>
-                            <div class="editIcon">
+                            <div>
                               {/* edit popup */}
                               <button
                                 type="button"
@@ -2890,11 +2890,11 @@ const CreateClient = () => {
                     {customization?.map((item) => {
                       return (
                         <tr>
-                          <td>{item.itf_name_en}</td>
+                          <td>{item.Name_EN}</td>
                           <td>{item.Custom_Name}</td>
                           <td>{item.Dummy_Price}</td>
                           <td>
-                            <div class="editIcon">
+                            <div>
                               <button
                                 type="button"
                                 onClick={() =>
@@ -2934,10 +2934,10 @@ const CreateClient = () => {
                                     <div className="modal-body">
                                       <div className="formCreate">
                                         <div className="row">
-                                          <div className="form-group col-lg-12">
+                                          <div className="form-group col-lg-12 mb-2">
                                             <h6>ITF Name </h6>
-                                            <div className="ceateTransport">
-                                              <select
+                                            <div className="ceateTransport autoComplete">
+                                              {/* <select
                                                 name="ITF"
                                                 onChange={handleChange2}
                                                 value={dataCustomization.ITF}
@@ -2953,12 +2953,45 @@ const CreateClient = () => {
                                                     {item.itf_name_en}
                                                   </option>
                                                 ))}
-                                              </select>
+                                              </select> */}
+                                              <Autocomplete
+                                                disablePortal
+                                                options={getItf || []}
+                                                getOptionLabel={(option) =>
+                                                  option.ITF_Internal_Name_EN ||
+                                                  ""
+                                                }
+                                                onChange={(e, newValue) =>
+                                                  setDataCustomization(
+                                                    (prevState) => ({
+                                                      ...prevState,
+                                                      ITF: newValue?.ID || "",
+                                                    })
+                                                  )
+                                                }
+                                                value={
+                                                  getItf?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      dataCustomization.ITF
+                                                  ) || null
+                                                }
+                                                sx={{ width: 300 }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder="Select ITF"
+                                                    InputLabelProps={{
+                                                      shrink: false,
+                                                    }}
+                                                  />
+                                                )}
+                                              />
                                             </div>
                                           </div>
                                           <div class="form-group col-lg-12">
                                             <h6> Custom Name </h6>
-                                            <div className=" ">
+                                            <div>
                                               <input
                                                 type="text"
                                                 name="Custom_Name"
@@ -2967,12 +3000,13 @@ const CreateClient = () => {
                                                   dataCustomization.Custom_Name
                                                 }
                                                 placeholder="Custom Name"
+                                                className="mb-2"
                                               />
                                             </div>
                                           </div>
                                           <div class="form-group col-lg-12">
                                             <h6> Agreed price </h6>
-                                            <div className=" ">
+                                            <div>
                                               <input
                                                 type="number"
                                                 name="Dummy_Price"
@@ -3055,14 +3089,14 @@ const CreateClient = () => {
                               <h6>ITF Name </h6>
                               <div className="ceateTransport autoComplete">
                                 <Autocomplete
-                                  options={getItf || []} // List of ITF options
+                                  options={getItf || []} 
                                   getOptionLabel={(option) =>
                                     option.itf_name_en || ""
-                                  } // Label to display
+                                  } 
                                   onChange={(event, newValue) => {
                                     setDataCustomization((prevState) => ({
                                       ...prevState,
-                                      ITF: newValue ? newValue.itf_id : "", // Update selected itf_id
+                                      ITF: newValue ? newValue.itf_id : "", 
                                     }));
                                   }}
                                   renderInput={(params) => (
@@ -3077,10 +3111,10 @@ const CreateClient = () => {
                                       (item) =>
                                         item.itf_id === dataCustomization.ITF
                                     ) || null
-                                  } // Set value based on selected itf_id
+                                  }
                                   isOptionEqualToValue={(option, value) =>
                                     option.itf_id === value.itf_id
-                                  } // Option comparison
+                                  } 
                                 />
                               </div>
                             </div>

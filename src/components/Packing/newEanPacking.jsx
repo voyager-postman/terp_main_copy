@@ -35,19 +35,34 @@ const NewEanPacking = () => {
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
+  // const eanList = () => {
+  //   axios
+  //     .post(`${API_BASE_URL}/getEANList`, {
+  //       item_id: from?.Produce_id,
+  //     })
+  //     .then((response) => {
+  //       console.log(response);
+  //       setEanListData(response.data.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error updating the data!", error);
+  //     });
+  // };
+
   const eanList = () => {
     axios
-      .post(`${API_BASE_URL}/getEANList`, {
-        item_id: from?.Produce_id,
+      .post(`${API_BASE_URL}/PEANDropdownList`, {
+        produce_id: from?.Produce_id,
       })
       .then((response) => {
-        console.log(response);
+        console.log(response.data);
         setEanListData(response.data.data);
       })
       .catch((error) => {
         console.error("There was an error updating the data!", error);
       });
   };
+
   console.log(eanListData);
   useEffect(() => {
     eanList();
@@ -168,10 +183,15 @@ const NewEanPacking = () => {
 
     setState((prevState) => ({ ...prevState, defaultData }));
   }, [toggle === true]);
+  // const options =
+  //   eanListData?.map((item) => ({
+  //     id: item.ean_id,
+  //     name: role === "Operation" ? item.ean_name_th : item.ean_name_en,
+  //   })) || [];
   const options =
     eanListData?.map((item) => ({
-      id: item.ean_id,
-      name: role === "Operation" ? item.ean_name_th : item.ean_name_en,
+      id: item.ID,
+      name: role === "Operation" ? item.EAN_Internal_TH : item.EAN_Internal_EN,
     })) || [];
   const getPackingCommon = () => {
     const request = {
@@ -526,7 +546,7 @@ const NewEanPacking = () => {
                                
                               </div>
                             </div> */}
-                            <div className="row mt-2 inputMarginUnset formCreate">
+                            {/* <div className="row mt-2 inputMarginUnset formCreate">
                               <div className="form-group col-lg-6">
                                 <div className="parentPurchaseView mb-3">
                                   <div className="me-3">
@@ -539,7 +559,19 @@ const NewEanPacking = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div className="col-lg-6"></div>
+
+                              <div className="col-lg-6">
+                                <div className="parentPurchaseView mb-3">
+                                  <div className="me-3">
+                                    <strong>
+                                      Name <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.Name_EN}</p>
+                                  </div>
+                                </div>
+                              </div>
                               <div className="form-group col-lg-3">
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
@@ -596,6 +628,90 @@ const NewEanPacking = () => {
                                   </div>
                                 </div>
 
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      Quantity/crate<span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from["Qty/Crate"]}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div> */}
+                            <div className="row mt-2 inputMarginUnset formCreate">
+                              <div className="form-group col-lg-3">
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      PODCODE <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.PODCODE}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      Supplier <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.Vendor_Name}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>Date :</strong>
+                                  </div>
+                                  <div>{formatDate1(from?.Date)}</div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      Name <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.Name_EN}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="form-group col-lg-3">
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      Quantity
+                                      <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.Quantity}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      Unit<span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.Unit}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      Crate
+                                      <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{formatTwoDecimals(from?.Crates)}</p>
+                                  </div>
+                                </div>
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>

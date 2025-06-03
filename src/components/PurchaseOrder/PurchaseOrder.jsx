@@ -88,6 +88,7 @@ const PurchaseOrder = () => {
   const [singlePodId, setSinglePodId] = useState("");
 
   const [podId, setPodId] = useState("");
+  const [numericvalueofdata, setNumericvalueofdata] = useState("");
   const [stock1, setStock1] = useState("");
   const [show1, setShow1] = useState(false);
   const [selectedRows, setSelectedRows] = useState({});
@@ -955,7 +956,6 @@ const PurchaseOrder = () => {
           `${API_BASE_URL}/Checkeaccessfile`,
           {
             id: a.PO_ID,
-
             accesstype: 1, // Mark as in use
           }
         );
@@ -2086,7 +2086,7 @@ const PurchaseOrder = () => {
           );
 
           const deposit = detailsResponse.data.cpn_data?.Available_deposit || 0;
-
+          console.log(detailsResponse);
           setDepositAvailableNew(deposit);
           setBasePayment(detailsResponse.data.cpn_data?.left_pay || 0); // set it once
           setVatNew(detailsResponse.data.cpn_data?.Vat_payment || 0);
@@ -2395,6 +2395,23 @@ const PurchaseOrder = () => {
       toast.error("Something went wrong");
     }
   };
+
+  // tushar onchnage function
+  const handleDepositeAvailable = (e) => {
+    const { value } = e.target;
+
+    // Convert to number to ensure numeric comparison
+    const numericValue = Number(value);
+    setNumericvalueofdata(numericValue);
+    // if (numericValue > depositAvailableFromAPI) {
+    //   toast.error(`You cannot enter more than ${depositAvailableFromAPI}`);
+    //   return;
+    // }
+
+    setHasUserChangedValues(true);
+    setDepositAvailableNew(value);
+  };
+
   const submitPaymentData = async () => {
     if (!selectedPaymentDate) {
       setShow2(true);
@@ -2412,7 +2429,8 @@ const PurchaseOrder = () => {
       Bank_Fees: bankChargeAmount,
       Rounding: roundingAmount,
       available_Deposit: depositAvailable,
-      Payment_Amount: totalPaymentAmount,
+      // Payment_Amount: totalPaymentAmount,
+      Payment_Amount: paymentAmmountNew,
       Notes: paymentNotes,
       Bank_Ref: bankReference,
       PO_id: singlePodId.PO_ID,
@@ -2449,43 +2467,46 @@ const PurchaseOrder = () => {
       );
       console.log("Payment data submitted successfully", response);
       getPurchaseOrder();
-      if (response?.data?.success) {
+      if (response?.data?.success === true) {
         // If success = true, show success toast
         toast.success(response.data?.message);
+        const updatedCollectPaymentId = response?.data.data;
+        setCollectPaymentId(updatedCollectPaymentId);
+        setProcesureResult("");
+        setRoundingNew("");
+        setPaymentAmmountNew("");
+        setDepositAvailableNew("");
+        setSelectedPaymentDate(null);
+        setSelectedPaymentChannel("");
+        setBankReference("");
+        setBankChargeAmount("0");
+        setDepositAvailable("");
+        setRoundingAmount("");
+        setTotalPaymentAmount("");
+        setPaymentNotes("");
+        // Hide modal after successful submission
+
+        const accessResponse = await axios.post(
+          `${API_BASE_URL}/ReleaseAccess`,
+          {
+            id: singlePodId.PO_ID,
+
+            accesstype: 1, // Mark as in use
+          }
+        );
+        console.log(accessResponse);
+        let modalElement = document.getElementById("modalCombine");
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
       } else {
-        // If success = false, show modal with API message
-        setShow1(true);
-        setStock1(response.data || "Procedure returned an error");
+        toast.warning(response.data.message);
+        //           setShow1(true);
+        // setStock1(response.data || "Procedure returned an error");
       }
 
       // Update client details and summary table with collectPaymentId from the response
-      const updatedCollectPaymentId = response?.data.data;
-      setCollectPaymentId(updatedCollectPaymentId);
-      setProcesureResult("");
-      setRoundingNew("");
-      setPaymentAmmountNew("");
-      setDepositAvailableNew("");
-      setSelectedPaymentDate(null);
-      setSelectedPaymentChannel("");
-      setBankReference("");
-      setBankChargeAmount("0");
-      setDepositAvailable("");
-      setRoundingAmount("");
-      setTotalPaymentAmount("");
-      setPaymentNotes("");
-      // Hide modal after successful submission
-
-      const accessResponse = await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
-        id: singlePodId.PO_ID,
-
-        accesstype: 1, // Mark as in use
-      });
-      console.log(accessResponse);
-      let modalElement = document.getElementById("modalCombine");
-      let modalInstance = bootstrap.Modal.getInstance(modalElement);
-      if (modalInstance) {
-        modalInstance.hide();
-      }
     } catch (error) {
       // Handle error case for first API
       console.error("Error submitting payment data", error);
@@ -3921,12 +3942,10 @@ const PurchaseOrder = () => {
                           <div className="parentFormPayment">
                             <p>Available Deposit</p>
                             <input
-                              type="text"
+                              type="number"
                               value={depositAvailableNew}
-                              onChange={(e) => {
-                                setHasUserChangedValues(true);
-                                setDepositAvailableNew(e.target.value);
-                              }}
+                              name="availabledeposite"
+                              onChange={handleDepositeAvailable}
                             />
                           </div>
                         </div>

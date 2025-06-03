@@ -13,7 +13,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import "../../Orders/order/CreateOrder.css";
 import { ComboBox } from "../../combobox";
 import Select, { components } from "react-select";
-import { FaCaretDown } from "react-icons/fa"; // Import an icon from react-icons
+import { FaCaretDown } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
@@ -46,18 +46,62 @@ const CreateTest = () => {
       />
     </div>
   );
+  const handleSaveOrderPopulate = () => {
+    const payload = {
+      order_id: state.order_id, // You must have this in your component
+      user_id: localStorage.getItem("id"), // You must also define this
+      Order_NW: orderNetWeight,
+    };
 
+    axios
+      .post(`${API_BASE_URL}/OrderPopulate`, payload)
+      .then((res) => {
+        getOrdersDetails();
+        toast.success("Order populated successfully", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+        // ✅ Close the modal by ID (no ref needed)
+        const modalEl = document.getElementById("consigneeOne");
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+
+        setOrderNetWeight("");
+      })
+
+      .catch((err) => {
+        toast.error("Failed to populate order", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      });
+  };
+  useEffect(() => {
+    const modal = document.getElementById("consigneeOne");
+
+    const clearDataOnClose = () => {
+      setOrderNetWeight(""); // Clear input value
+    };
+
+    // Listen for modal close
+    modal?.addEventListener("hidden.bs.modal", clearDataOnClose);
+
+    // Clean up the event listener on unmount
+    return () => {
+      modal?.removeEventListener("hidden.bs.modal", clearDataOnClose);
+    };
+  }, []);
+  // new selct
+  const [orderNetWeight, setOrderNetWeight] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const [consigneeNew, setConsigneeNew] = useState();
   const [consigneeNew1, setConsigneeNew1] = useState();
   const [consigneeNew2, setConsigneeNew2] = useState();
-
   const { from } = location.state || {};
   console.log(from);
   const isReadOnly = from?.isReadOnly;
   const [data, setData] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
   const [orderErr, setOrderErr] = useState(true);
   const [deleteOrderId, setDeleteOrderId] = useState("");
@@ -66,6 +110,8 @@ const CreateTest = () => {
   const [exchangeRate1, setExchangeRate1] = useState(0);
   const [exchangeRate2, setExchangeRate2] = useState(0);
   const [exchangeRate3, setExchangeRate3] = useState(0);
+  const [exchangeRate4, setExchangeRate4] = useState(0);
+
   const [isRecalculateClicked, setIsRecalculateClicked] = useState(false);
   const [isRecalculateClicked1, setIsRecalculateClicked1] = useState(false);
   const [massageShow, setMassageShow] = useState("");
@@ -83,7 +129,6 @@ const CreateTest = () => {
   };
   console.log(massageShow);
   console.log(massageShow1);
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   console.log(massageShow);
@@ -97,7 +142,6 @@ const CreateTest = () => {
     showConfirmButton: false,
     allowOutsideClick: false,
   });
-
   const [state, setState] = useState({
     created: from?.created
       ? new Date(from?.created).toISOString().slice(0, 10)
@@ -116,7 +160,6 @@ const CreateTest = () => {
     Transportation_provider: from?.Transportation_provider || "",
     consignee_id: from?.consignee_id || "",
     consignee_name: from?.consignee_name || "",
-
     fx_id: from?.fx_id || "",
     mark_up: from?.mark_up || 0,
     rebate: from?.rebate || 0,
@@ -157,7 +200,6 @@ const CreateTest = () => {
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
   const { data: quote } = useQuery("getAllQuotation");
-
   const oneQoutationDAta = () => {
     axios
       .get(`${API_BASE_URL}/NewgetOrdersById`, {
@@ -177,12 +219,12 @@ const CreateTest = () => {
   useEffect(() => {
     oneQoutationDAta();
   }, [state.order_id]);
+
   const [orderId, setOrderId] = useState("");
   const [gross, setGross] = useState(false);
   const [freight, setFreight] = useState(false);
   const [grossMass, setGrossMass] = useState("");
   const [freightMass, setFreightMass] = useState("");
-
   console.log(from?.order_id);
   console.log(orderId);
   console.log(grossMass);
@@ -215,27 +257,138 @@ const CreateTest = () => {
     }
   };
 
-  const handleAgreedPricingChange4 = (e) => {
-    setExchangeRate1(e.target.checked);
-    console.log(exchangeRate1);
+  const handleAgreedPricingChange4 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate1(newValue);
+    if (state?.order_id) {
+      try {
+        const response = await updateAllOrderStatuses({
+          id: state.order_id,
+          field: name,
+          value: newValue,
+        });
+
+        console.log("API success:", response);
+        if (response?.data?.message) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to update status", {
+          autoClose: 1500,
+          theme: "colored",
+        });
+      }
+    }
   };
-  const handleAgreedPricingChange5 = (e) => {
-    setExchangeRate2(e.target.checked);
-    console.log(exchangeRate2);
+  const handleAgreedPricingChange5 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate2(newValue);
+    if (state?.order_id) {
+      try {
+        const response = await updateAllOrderStatuses({
+          id: state.order_id,
+          field: name,
+          value: newValue,
+        });
+
+        console.log("API success:", response);
+        if (response?.data?.message) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to update status", {
+          autoClose: 1500,
+          theme: "colored",
+        });
+      }
+    }
   };
-  const handleAgreedPricingChange6 = (e) => {
-    setExchangeRate3(e.target.checked);
-    console.log(exchangeRate3);
+  const handleAgreedPricingChange6 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate3(newValue);
+    if (state?.order_id) {
+      try {
+        const response = await updateAllOrderStatuses({
+          id: state.order_id,
+          field: name,
+          value: newValue,
+        });
+
+        console.log("API success:", response);
+        if (response?.data?.message) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to update status", {
+          autoClose: 1500,
+          theme: "colored",
+        });
+      }
+    }
+  };
+  const handleAgreedPricingChange7 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate4(newValue);
+    if (state?.order_id) {
+      try {
+        const response = await updateAllOrderStatuses({
+          id: state.order_id,
+          field: name,
+          value: newValue,
+        });
+
+        console.log("API success:", response);
+        if (response?.data?.message) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to update status", {
+          autoClose: 1500,
+          theme: "colored",
+        });
+      }
+    }
+  };
+  const updateAllOrderStatuses = async ({ id, field, value }) => {
+    return axios.post(`${API_BASE_URL}/updateAllOrderStatuses`, {
+      id,
+      field,
+      value,
+    });
   };
   useEffect(() => {
     const consigneeFind = consigneesNew?.find(
       (v) => v.consignee_id == state.consignee_id
     );
-
     if (consigneeFind) {
       setExchangeRate1(consigneeFind?.Charge_Volume || 0);
       setExchangeRate2(consigneeFind?.Palletized || 0);
       setExchangeRate3(consigneeFind?.CO_Chamber_Required || 0);
+      setExchangeRate4(consigneeFind?.Precooling || 0);
     }
   }, [state.consignee_id, consigneesNew]);
   const computedState = useMemo(() => {
@@ -467,49 +620,7 @@ const CreateTest = () => {
       navigate("/test");
     }
   };
-  console.log(details);
-  const update = async () => {
-    if (orderErr) {
-      toast.error("Please Add Order or Order Details");
-    } else {
-      try {
-        const response = await axios.post(`${API_BASE_URL}/createOrder`, {
-          input: {
-            ...computedState,
-            user: localStorage.getItem("id"),
-            palletized: !!computedState.palletized,
-            Chamber: !!computedState.Chamber,
 
-            order_id: state.order_id,
-          },
-          details: details?.filter(
-            (v) => v.ITF && v.itf_quantity && v.itf_unit
-          ),
-        });
-        console.log(response); // Log the response here
-        oneQoutationDAta();
-        // let modalElement = document.getElementById("exampleQuo");
-        // let modalInstance = bootstrap.Modal.getInstance(modalElement);
-
-        if (response.data.success == false) {
-          // modalInstance.show();
-          setShow(true);
-          setMassageShow(response.data.message);
-        } else if (response.data.success == true) {
-          setShow(false);
-
-          toast.success("Order Create successfully", {
-            autoClose: 1000,
-            theme: "colored",
-          });
-          navigate("/test");
-        }
-      } catch (e) {
-        console.error(e); // Log the error to the console
-        toast.error("Something went wrong");
-      }
-    }
-  };
   const calculateList = async () => {
     if (state.order_id) {
       try {
@@ -518,7 +629,7 @@ const CreateTest = () => {
         });
         console.log(response);
 
-        setCalculateListData(response.data.data);
+        setCalculateListData(response.data);
       } catch (e) {
         console.error("Something went wrong", e);
       }
@@ -542,6 +653,7 @@ const CreateTest = () => {
             user: localStorage.getItem("id"),
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
+            Precooling: exchangeRate4 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
             Location_name: computedState.Location_name,
           },
@@ -598,6 +710,7 @@ const CreateTest = () => {
             user: localStorage.getItem("id"),
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
+            Precooling: exchangeRate4 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
             Location_name: computedState.Location_name,
           },
@@ -653,6 +766,7 @@ const CreateTest = () => {
             user: localStorage.getItem("id"),
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
+            Precooling: exchangeRate4 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
             Location_name: computedState.Location_name,
           },
@@ -769,7 +883,10 @@ const CreateTest = () => {
           user: localStorage.getItem("id"),
           palletized: exchangeRate2 ? 1 : 0,
           Chamber: exchangeRate3 ? 1 : 0,
+          Precooling: exchangeRate4 ? 1 : 0,
+
           Charge_Volume: exchangeRate1 ? 1 : 0,
+          is_quotation: 0,
         },
         details: values,
         Is_Recalculate: 0,
@@ -816,9 +933,8 @@ const CreateTest = () => {
         const response = await axios.post(`${API_BASE_URL}/NewItfDropDown`, {
           Consignee_id: state.consignee_id,
         });
-        console.log(response.data); // Log the response data
+        console.log(response.data);
         setItfName(response.data.data);
-        // Update state or perform other actions with response data if needed
       } catch (e) {
         console.log("Error:", e);
         // toast.error("Something went wrong");
@@ -834,9 +950,8 @@ const CreateTest = () => {
             Consignee_id: state.consignee_id,
           }
         );
-        console.log(response.data); // Log the response data
+        console.log(response.data);
         setBrandNew(response.data.data);
-        // Update state or perform other actions with response data if needed
       } catch (e) {
         console.log("Error:", e);
         // toast.error("Something went wrong");
@@ -908,8 +1023,8 @@ const CreateTest = () => {
     }),
     clearIndicator: (base) => ({
       ...base,
-      opacity: "0", // Initially hide the clear button
-      transition: "opacity 0.2s ease", // Smooth transition for visibility
+      opacity: "0",
+      transition: "opacity 0.2s ease",
     }),
     singleValue: (base) => ({
       ...base,
@@ -918,10 +1033,10 @@ const CreateTest = () => {
     container: (base) => ({
       ...base,
       "&:hover .react-select__clear-indicator": {
-        opacity: "1", // Show the clear button on hover
+        opacity: "1",
       },
       "&:focus-within .react-select__clear-indicator": {
-        opacity: "1", // Show the clear button on focus
+        opacity: "1",
       },
     }),
   };
@@ -936,27 +1051,18 @@ const CreateTest = () => {
 
   const options = itfNew
     ? itfNew.map((v) => ({
-        value: v.ID, // Standardized property name for value
+        value: v.ID,
         label: v.itf_name,
-        Produce: v.Produce, // Standardized property name for value
+        Produce: v.Produce,
         Claim_Markup: v.Claim_Markup,
         HSCODE: v.HSCODE,
         Produce_Status: v.Produce_Status,
-        // Standardized property name for label
       }))
     : [];
   const selectedOption = options.find(
     (option) =>
       option.value === (toEditDetails?.ITF ?? defaultDetailsValue?.ITF)
   );
-
-  // const handleChangeSe = (selected) => {
-  //   console.log(selected);
-  //   setToEditDetails((prevDetails) => ({
-  //     ...prevDetails,
-  //     ITF: selected ? selected.value : "", // Update selected ITF
-  //   }));
-  // };
 
   const handleChangeSe = (selected) => {
     console.log(selected);
@@ -1487,7 +1593,7 @@ const CreateTest = () => {
                           name="fx_rate"
                         />
                       </div>
-                      <div className="col-lg-3 form-group">
+                      <div className="col-lg-2 form-group">
                         <h6>Markup Rate</h6>
                         <div className="parentShip">
                           <div className="markupShip">
@@ -1505,7 +1611,7 @@ const CreateTest = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="col-lg-3 form-group">
+                      <div className="col-lg-2 form-group">
                         <h6> Rebate</h6>
                         <div className="parentShip">
                           <div className="markupShip">
@@ -1526,10 +1632,10 @@ const CreateTest = () => {
                       <div className="col-lg-2 form-group">
                         <h6>Charge Volume</h6>
                         <div className="flex gap-2 items-center">
-                          <label className="toggleSwitch large">
+                          <label className="toggleSwitch large" onclick="">
                             <input
                               type="checkbox"
-                              name="Commission_Currency"
+                              name="Charge_Volume"
                               checked={exchangeRate1 == 1}
                               onChange={handleAgreedPricingChange4}
                             />
@@ -1539,7 +1645,6 @@ const CreateTest = () => {
                             </span>
                             <a></a>
                           </label>
-                          <label htmlFor="Palletized">Palletized</label>
                         </div>
                       </div>
                       <div className="col-lg-2 form-group">
@@ -1548,7 +1653,7 @@ const CreateTest = () => {
                           <label className="toggleSwitch large">
                             <input
                               type="checkbox"
-                              name="Commission_Currency"
+                              name="palletized"
                               checked={exchangeRate2 == 1}
                               onChange={handleAgreedPricingChange5}
                             />
@@ -1558,7 +1663,6 @@ const CreateTest = () => {
                             </span>
                             <a></a>
                           </label>
-                          <label htmlFor="Palletized">Palletized</label>
                         </div>
                       </div>
                       <div className="col-lg-2 form-group">
@@ -1567,7 +1671,7 @@ const CreateTest = () => {
                           <label className="toggleSwitch large">
                             <input
                               type="checkbox"
-                              name="Commission_Currency"
+                              name="Chamber"
                               checked={exchangeRate3 == 1}
                               onChange={handleAgreedPricingChange6}
                             />
@@ -1577,7 +1681,24 @@ const CreateTest = () => {
                             </span>
                             <a></a>
                           </label>
-                          <label htmlFor="Palletized">Palletized</label>
+                        </div>
+                      </div>
+                      <div className="col-lg-2 form-group">
+                        <h6>Precooling</h6>
+                        <div className="flex gap-2 items-center">
+                          <label className="toggleSwitch large">
+                            <input
+                              type="checkbox"
+                              name="PreColling"
+                              checked={exchangeRate4 == 1}
+                              onChange={handleAgreedPricingChange7}
+                            />
+                            <span>
+                              <span>OFF</span>
+                              <span>ON</span>
+                            </span>
+                            <a></a>
+                          </label>
                         </div>
                       </div>
                       <div className="col-lg-3 form-group">
@@ -1626,6 +1747,67 @@ const CreateTest = () => {
                               Add
                             </button>
                           )}
+                          <button
+                            type="button"
+                            // onClick={() => {
+                            //   setSelectedDetails(null);
+                            //   setToEditDetails({});
+                            //   openModal();
+                            //   // saveNewDetails1();
+                            // }}
+                            data-bs-toggle="modal"
+                            data-bs-target="#consigneeOne"
+                          >
+                            Add Consignee Items
+                          </button>
+                          <div
+                            className="modal fade"
+                            id="consigneeOne"
+                            tabIndex={-1}
+                            aria-labelledby="exampleModalLabel"
+                            aria-hidden="true"
+                          >
+                            <div className="modal-dialog modalShipTo ">
+                              <div className="modal-content">
+                                <div className="modal-header">
+                                  <h1
+                                    className="modal-title fs-5"
+                                    id="exampleModalLabel"
+                                  >
+                                    Quotation Populate
+                                  </h1>
+                                  <button
+                                    type="button"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                  >
+                                    <i class="mdi mdi-close"></i>
+                                  </button>
+                                </div>
+                                <div className="modal-body">
+                                  <label htmlFor="">Order Net Weight</label>
+                                  <input
+                                    type="number"
+                                    value={orderNetWeight}
+                                    onChange={(e) =>
+                                      setOrderNetWeight(e.target.value)
+                                    }
+                                    className="form-control"
+                                  />
+                                </div>
+                                <div className="modal-footer justify-content-right">
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={handleSaveOrderPopulate}
+                                  >
+                                    Save
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                       {isError && (
@@ -2459,6 +2641,31 @@ const CreateTest = () => {
                     <table>
                       <thead>
                         <tr>
+                          {Object.values(calculateListData?.header || {}).map(
+                            (label, index) => (
+                              <th key={index}>{label}</th>
+                            )
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {calculateListData?.data?.map((row, rowIndex) => (
+                          <tr key={rowIndex}>
+                            {Object.keys(calculateListData?.header || {}).map(
+                              (_, colIndex) => {
+                                const colKey = `COL${colIndex + 1}`; // Dynamically build COL1, COL2, ...
+                                return (
+                                  <td key={colKey}>{row[colKey] ?? ""}</td>
+                                );
+                              }
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {/* <table>
+                      <thead>
+                        <tr>
                           <th>ITF</th>
                           <th>Last Update</th>
                           <th>EXW</th>
@@ -2503,8 +2710,7 @@ const CreateTest = () => {
                           </tr>
                         ))}
                       </thead>
-                      <tbody>{/* Add dynamic table data here */}</tbody>
-                    </table>
+                      <tbody>{/* Add dynamic table data here */}
                   </div>
                 </div>
               </div>

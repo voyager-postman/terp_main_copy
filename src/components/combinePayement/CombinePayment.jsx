@@ -409,7 +409,7 @@ const CombinePayment = () => {
       Bank_Fees: bankChargeAmount,
       Rounding: roundingAmount,
       available_Deposit: depositAvailable,
-      Payment_Amount: totalPaymentAmount,
+      Payment_Amount: paymentAmmountNew,
       Notes: paymentNotes,
       Bank_Ref: bankReference,
       CPN_id: singlePodId.ID,
@@ -466,9 +466,10 @@ const CombinePayment = () => {
           modalInstance.hide();
         }
       } else {
+        toast.warning(response.data.message);
         // If success = false, show modal with API message
-        setShow1(true);
-        setStock1(response.data || "Procedure returned an error");
+        // setShow1(true);
+        // setStock1(response.data || "Procedure returned an error");
       }
       getCombinedPayment();
       const updatedCollectPaymentId = response?.data.data;

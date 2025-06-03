@@ -14,6 +14,24 @@ import { Card } from "../../card";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 const AddShipTo = () => {
+  const [unitDropdown, setUnitDropDown] = useState([]);
+  const getUnitDropdown = () => {
+    axios
+      .get(`${API_BASE_URL}/getAllUnit`)
+      .then((resp) => {
+        console.log(resp);
+
+        setUnitDropDown(resp.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  useState(() => {
+    getUnitDropdown();
+  }, []);
+
+  //
   const location = useLocation();
   const { from } = location.state || {};
 
@@ -399,6 +417,8 @@ const AddShipTo = () => {
       ITF: "",
       Custom_Name: "",
       Dummy_Price: "",
+      Barcode: "",
+      Unit: from?.Invoice_Unit,
     });
   };
   const updatedata = async () => {
@@ -587,12 +607,12 @@ const AddShipTo = () => {
     markup: "",
     rebate: "",
     commissionType: "",
+    Invoice_Unit: "",
     commissionValue: "",
     commissionCurrency: "",
     chargeVolume: "",
     deliveryTerms: "",
     paymentTerms: "",
-
     statementDueDate: 1,
     extraCost: "",
     markupValue: "",
@@ -624,6 +644,7 @@ const AddShipTo = () => {
           });
           setState5({
             invoiceCurrency: data?.currency,
+            Invoice_Unit: data?.Invoice_Unit,
             markup: "",
             rebate: data?.rebate,
             commissionType: data?.commission,
@@ -1213,11 +1234,15 @@ const AddShipTo = () => {
       [name]: name === "Commission_Currency" && value === "" ? "FX" : newValue,
     }));
   };
+  console.log(from);
   const [dataCustomization, setDataCustomization] = useState({
     Consignee_id: from?.consignee_id || "",
+    Client_ID: from?.client_id || "",
     ITF: "",
     Custom_Name: "",
     Dummy_Price: "",
+    Unit: from?.Invoice_Unit,
+    Barcode: "",
   });
   const { data: brands } = useQuery("getBrand");
   const { data: client } = useQuery("getAllClients");
@@ -1354,25 +1379,44 @@ const AddShipTo = () => {
     axios
       .post(
         `${API_BASE_URL}/createConsigneeCustomize`,
-        dataCustomization // Use the updated state directly
+
+        {
+          ...dataCustomization,
+          Client_ID: from?.client_id,
+          Consignee_id: from?.consignee_id,
+        }
+        // Use the updated state directly
       )
       .then((response) => {
-        console.log(response);
-        toast.success("Customization Data Added Successfully", {
-          autoClose: 1000,
-          theme: "colored",
-        });
-        getAllCustomization();
-        setDataCustomization({
-          Consignee_id: from?.consignee_id || "",
-          ITF: "",
-          Custom_Name: "",
-          Dummy_Price: "",
-        });
-        let modalElement = document.getElementById("exampleModalCustomization");
-        let modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-          modalInstance.hide();
+        if (response.data?.success) {
+          console.log(response);
+          toast.success("Customization Data Added Successfully", {
+            autoClose: 1000,
+            theme: "colored",
+          });
+          let modalElement = document.getElementById(
+            "exampleModalCustomization"
+          );
+          let modalInstance = bootstrap.Modal.getInstance(modalElement);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+          setDataCustomization({
+            Consignee_id: from?.consignee_id || "",
+            Client_ID: from?.client_id || "",
+            ITF: "",
+            ITF: "",
+            Custom_Name: "",
+            Dummy_Price: "",
+            Unit: from?.Invoice_Unit,
+            Barcode: "",
+          });
+          getAllCustomization();
+        } else {
+          toast.warn("This Consignee already has the specified ITF", {
+            autoClose: 1000,
+            theme: "colored",
+          });
         }
       })
       .catch((error) => {
@@ -1418,6 +1462,7 @@ const AddShipTo = () => {
           profit: state5.markupValue,
           rebate: state5.rebateValue,
           commission: state5.commissionType,
+          Invoice_Unit: state5.Invoice_Unit,
           commission_value: state5.commissionValue,
           Charge_Volume: state5.chargeVolume ? 1 : 0,
           Commission_Currency: state5.commissionCurrency,
@@ -1473,6 +1518,8 @@ const AddShipTo = () => {
         // Clear the form fields
         setDataCustomization({
           Consignee_id: from?.consignee_id || "",
+          Client_ID: from?.client_id || "",
+          ITF: "",
           ITF: "",
           Custom_Name: "",
           Dummy_Price: "",
@@ -1615,6 +1662,8 @@ const AddShipTo = () => {
       ITF: selectedUser?.ITF || "",
       Custom_Name: selectedUser?.Custom_Name || "",
       Dummy_Price: selectedUser?.Dummy_Price || "",
+      Unit: selectedUser?.Unit || "",
+      Barcode: selectedUser?.Barcode || "",
     }));
 
     console.log(selectedUser);
@@ -2692,7 +2741,7 @@ const AddShipTo = () => {
                           <td>{item.Email}</td>
                           <td>{item.mobile}</td>
                           <td>
-                            <div class="editIcon">
+                            <div>
                               {/* edit popup */}
                               <button
                                 type="button"
@@ -2737,7 +2786,7 @@ const AddShipTo = () => {
                                             <div class="form-group col-lg-3">
                                               <h6>Contact Type </h6>
                                               <div class="ceateTransport autoComplete">
-                                                <select
+                                                {/* <select
                                                   name="contact_type_id"
                                                   onChange={handleChange1}
                                                   value={state1.contact_type_id}
@@ -2755,7 +2804,39 @@ const AddShipTo = () => {
                                                       {item.type_en}
                                                     </option>
                                                   ))}
-                                                </select>
+                                                </select> */}
+                                                <Autocomplete
+                                                  disablePortal
+                                                  options={contactType || []}
+                                                  getOptionLabel={(option) =>
+                                                    option.type_en || ""
+                                                  }
+                                                  onChange={(e, newValue) =>
+                                                    setState1((prevState) => ({
+                                                      ...prevState,
+                                                      contact_type_id:
+                                                        newValue?.contact_type_id ||
+                                                        "",
+                                                    }))
+                                                  }
+                                                  value={
+                                                    contactType.find(
+                                                      (item) =>
+                                                        item.contact_type_id ===
+                                                        state1.contact_type_id
+                                                    ) || null
+                                                  }
+                                                  sx={{ width: 300 }}
+                                                  renderInput={(params) => (
+                                                    <TextField
+                                                      {...params}
+                                                      placeholder="Select Type"
+                                                      InputLabelProps={{
+                                                        shrink: false,
+                                                      }}
+                                                    />
+                                                  )}
+                                                />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
@@ -3189,16 +3270,20 @@ const AddShipTo = () => {
                       <th> ITF Name</th>
                       <th>Custom Name</th>
                       <th>Dummy Price</th>
+                      <th>Unit</th>
+                      <th>Barcode</th>
                       <th>Action</th>
                     </tr>
                     {customization?.map((item) => {
                       return (
                         <tr>
-                          <td>{item.itf_name_en}</td>
+                          <td>{item.Name_EN}</td>
                           <td>{item.Custom_Name}</td>
                           <td>{item.Dummy_Price}</td>
+                          <td>{item.unit_name}</td>
+                          <td>{item.Barcode}</td>
                           <td>
-                            <div class="editIcon">
+                            <div>
                               <button
                                 type="button"
                                 onClick={() =>
@@ -3230,6 +3315,7 @@ const AddShipTo = () => {
                                         class="btn-close"
                                         data-bs-dismiss="modal"
                                         aria-label="Close"
+                                        onClick={dataClear1}
                                       >
                                         <i class="mdi mdi-close"></i>
                                       </button>
@@ -3237,10 +3323,10 @@ const AddShipTo = () => {
                                     <div className="modal-body">
                                       <div className="formCreate">
                                         <div className="row">
-                                          <div className="form-group col-lg-12">
+                                          <div className="form-group col-lg-12 mb-2">
                                             <h6>ITF Name </h6>
-                                            <div className="ceateTransport">
-                                              <select
+                                            <div className="ceateTransport autoComplete">
+                                              {/* <select
                                                 name="ITF"
                                                 onChange={handleChange2}
                                                 value={dataCustomization.ITF}
@@ -3250,13 +3336,46 @@ const AddShipTo = () => {
                                                 </option>
                                                 {getItf?.map((item) => (
                                                   <option
-                                                    key={item.itf_id}
-                                                    value={item.itf_id}
+                                                    key={item.ID}
+                                                    value={item.ID}
                                                   >
                                                     {item.ITF_Internal_Name_EN}
                                                   </option>
                                                 ))}
-                                              </select>
+                                              </select> */}
+                                              <Autocomplete
+                                                disablePortal
+                                                options={getItf || []}
+                                                getOptionLabel={(option) =>
+                                                  option.ITF_Internal_Name_EN ||
+                                                  ""
+                                                }
+                                                onChange={(e, newValue) =>
+                                                  setDataCustomization(
+                                                    (prevState) => ({
+                                                      ...prevState,
+                                                      ITF: newValue?.ID || "",
+                                                    })
+                                                  )
+                                                }
+                                                value={
+                                                  getItf?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      dataCustomization.ITF
+                                                  ) || null
+                                                }
+                                                sx={{ width: 300 }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder="Select ITF"
+                                                    InputLabelProps={{
+                                                      shrink: false,
+                                                    }}
+                                                  />
+                                                )}
+                                              />
                                             </div>
                                           </div>
                                           <div class="form-group col-lg-12">
@@ -3265,6 +3384,7 @@ const AddShipTo = () => {
                                               <input
                                                 type="text"
                                                 name="Custom_Name"
+                                                className="mb-2"
                                                 onChange={handleChange2}
                                                 value={
                                                   dataCustomization.Custom_Name
@@ -3285,6 +3405,59 @@ const AddShipTo = () => {
                                                 }
                                                 placeholder="Custom Name"
                                               />
+                                            </div>
+                                          </div>
+                                          <div className="form-group col-lg-12 ">
+                                            <h6>Unit </h6>
+                                            <div className="ceateTransport autoComplete">
+                                              <Autocomplete
+                                                options={unitDropdown || []} // List of ITFs
+                                                getOptionLabel={(option) =>
+                                                  option.Name_EN || ""
+                                                } // Label to display (itf_name_en for each ITF)
+                                                onChange={(event, newValue) => {
+                                                  handleChange2({
+                                                    target: {
+                                                      name: "Unit",
+                                                      value: newValue
+                                                        ? newValue.ID
+                                                        : "",
+                                                    }, // Update ITF in state
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder="Select ITF"
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  unitDropdown?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      dataCustomization.Unit
+                                                  ) || null
+                                                } // Set selected value based on ITF
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID} // Option comparison by itf_id
+                                              />
+                                            </div>
+                                            <div class="form-group col-lg-12 mt-2">
+                                              <h6> Barcode </h6>
+                                              <div className=" ">
+                                                <input
+                                                  type="text"
+                                                  name="Barcode"
+                                                  onChange={handleChange2}
+                                                  value={
+                                                    dataCustomization.Barcode
+                                                  }
+                                                  placeholder="BarCode Name"
+                                                />
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
@@ -3364,7 +3537,7 @@ const AddShipTo = () => {
                                     handleChange2({
                                       target: {
                                         name: "ITF",
-                                        value: newValue ? newValue.itf_id : "",
+                                        value: newValue ? newValue.ID : "",
                                       }, // Update ITF in state
                                     });
                                   }}
@@ -3378,11 +3551,11 @@ const AddShipTo = () => {
                                   value={
                                     getItf?.find(
                                       (item) =>
-                                        item.itf_id === dataCustomization.ITF
+                                        item.ID === dataCustomization.ITF
                                     ) || null
                                   } // Set selected value based on ITF
                                   isOptionEqualToValue={(option, value) =>
-                                    option.itf_id === value.itf_id
+                                    option.ID === value.ID
                                   } // Option comparison by itf_id
                                 />
                               </div>
@@ -3410,6 +3583,53 @@ const AddShipTo = () => {
                                   value={dataCustomization.Dummy_Price}
                                   placeholder="Custom Name"
                                 />
+                              </div>
+                            </div>
+                            <div className="form-group col-lg-12 ">
+                              <h6>Unit </h6>
+                              <div className="ceateTransport autoComplete">
+                                <Autocomplete
+                                  options={unitDropdown || []} // List of ITFs
+                                  getOptionLabel={(option) =>
+                                    option.Name_EN || ""
+                                  } // Label to display (itf_name_en for each ITF)
+                                  onChange={(event, newValue) => {
+                                    handleChange2({
+                                      target: {
+                                        name: "Unit",
+                                        value: newValue ? newValue.ID : "",
+                                      }, // Update ITF in state
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select ITF"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    unitDropdown?.find(
+                                      (item) =>
+                                        item.ID === dataCustomization.Unit
+                                    ) || null
+                                  } // Set selected value based on ITF
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  } // Option comparison by itf_id
+                                />
+                              </div>
+                              <div class="form-group col-lg-12 mt-2">
+                                <h6> Barcode </h6>
+                                <div className=" ">
+                                  <input
+                                    type="text"
+                                    name="Barcode"
+                                    onChange={handleChange2}
+                                    value={dataCustomization.Barcode}
+                                    placeholder="BarCode Name"
+                                  />
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -3478,24 +3698,97 @@ const AddShipTo = () => {
                           } // Set selected value based on invoiceCurrency
                           isOptionEqualToValue={(option, value) =>
                             option.ID === value.ID
-                          } // Option comparison by currency_id
+                          }
                         />
                       </div>
-
-                      <div className="col-lg-3 form-group autoComplete">
+                      <div className="col-lg-2 form-group autoComplete">
+                        <h6> Invoice Unit</h6>
+                        {/* <Autocomplete
+                          options={
+                            Array.isArray(unitDropdown)
+                              ? unitDropdown.map((item) => ({
+                                  unit_id: item.ID,
+                                  unit_name_en: item.Name_EN,
+                                }))
+                              : []
+                          }
+                          getOptionLabel={(option) =>
+                            option?.unit_name_en || "Select Invoice Unit"
+                          }
+                          onChange={(event, newValue) => {
+                            handleChange5({
+                              target: {
+                                name: "Invoice_Unit",
+                                value: newValue ? newValue.unit_id : "",
+                              },
+                            });
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Unit"
+                              variant="outlined"
+                            />
+                          )}
+                          value={
+                            Array.isArray(unitDropdown)
+                              ? unitDropdown
+                                  .map((item) => ({
+                                    unit_id: item.ID,
+                                    unit_name_en: item.Name_EN,
+                                  }))
+                                  .find(
+                                    (unit) =>
+                                      unit.unit_id === state.Invoice_Unit
+                                  ) || null
+                              : null
+                          }
+                          isOptionEqualToValue={(option, value) =>
+                            option.unit_id === value?.unit_id
+                          }
+                        /> */}
+                        <Autocomplete
+                          options={unitDropdown || []}
+                          getOptionLabel={(option) => option.Name_EN || ""} // Use Name_EN from API
+                          onChange={(event, newValue) => {
+                            handleChange5({
+                              target: {
+                                name: "Invoice_Unit",
+                                value: newValue ? newValue.ID : "",
+                              },
+                            });
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Unit"
+                              variant="outlined"
+                            />
+                          )}
+                          value={
+                            unitDropdown?.find(
+                              (item) => item.ID === state5.Invoice_Unit
+                            ) || null
+                          }
+                          isOptionEqualToValue={(option, value) =>
+                            option.ID === value.ID
+                          }
+                        />
+                      </div>
+                      <div className="col-lg-2 form-group autoComplete">
                         <h6>Commission</h6>
 
                         <Autocomplete
-                          options={commission || []} // List of commission types
+                          options={commission || []}
                           getOptionLabel={(option) =>
                             option.commission_name_en || ""
-                          } // Label to display (commission name in English)
+                          }
                           onChange={(event, newValue) => {
                             handleChange5({
                               target: {
                                 name: "commissionType",
                                 value: newValue ? newValue.id : "",
-                              }, // Update commissionType in state
+                              },
                             });
                           }}
                           renderInput={(params) => (
@@ -3529,7 +3822,7 @@ const AddShipTo = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="col-lg-2 shipToToggle">
+                      <div className="col-lg-1 shipToToggle">
                         <h6>Commission </h6>
                         <label
                           style={{

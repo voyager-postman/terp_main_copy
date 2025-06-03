@@ -220,7 +220,7 @@ const CreatePurchaseOrder = () => {
       Bank_Fees: bankChargeAmount,
       Rounding: roundingAmount,
       available_Deposit: depositAvailable,
-      Payment_Amount: totalPaymentAmount,
+      Payment_Amount: paymentAmmountNew,
       Notes: paymentNotes,
       Bank_Ref: bankReference,
       PO_id: singleDataShow?.PO_ID || singleDataSet?.PO_ID,
@@ -257,45 +257,49 @@ const CreatePurchaseOrder = () => {
       if (response?.data?.success) {
         // If success = true, show success toast
         toast.success(response.data?.message);
-      } else {
-        // If success = false, show modal with API message
-        setShow1(true);
-        setStock1(response.data || "Procedure returned an error");
-      }
-      // Update client details and summary table with collectPaymentId from the response
-      getDetils();
-      const accessResponse = await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
-        id: from?.PO_ID,
-        edit: 1,
-        accesstype: 1, // Mark as in use
-      });
-
-      if (podId) {
+        getDetils();
         const accessResponse = await axios.post(
           `${API_BASE_URL}/ReleaseAccess`,
           {
-            id: podId,
+            id: from?.PO_ID,
             edit: 1,
             accesstype: 1, // Mark as in use
           }
         );
+
+        if (podId) {
+          const accessResponse = await axios.post(
+            `${API_BASE_URL}/ReleaseAccess`,
+            {
+              id: podId,
+              edit: 1,
+              accesstype: 1, // Mark as in use
+            }
+          );
+        }
+        console.log("Access file updated before payment:", accessResponse.data);
+        navigate("/purchase_orders");
+        setSelectedPaymentDate(null);
+        setSelectedPaymentChannel("");
+        setBankReference("");
+        setBankChargeAmount("0");
+        setDepositAvailable("");
+        setRoundingAmount("");
+        setTotalPaymentAmount("");
+        setPaymentNotes("");
+        // Hide modal after successful submission
+        let modalElement = document.getElementById("modalCombine");
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+      } else {
+        toast.warning(response.data.message);
+        // If success = false, show modal with API message
+        // setShow1(true);
+        // setStock1(response.data || "Procedure returned an error");
       }
-      console.log("Access file updated before payment:", accessResponse.data);
-      navigate("/purchase_orders");
-      setSelectedPaymentDate(null);
-      setSelectedPaymentChannel("");
-      setBankReference("");
-      setBankChargeAmount("0");
-      setDepositAvailable("");
-      setRoundingAmount("");
-      setTotalPaymentAmount("");
-      setPaymentNotes("");
-      // Hide modal after successful submission
-      let modalElement = document.getElementById("modalCombine");
-      let modalInstance = bootstrap.Modal.getInstance(modalElement);
-      if (modalInstance) {
-        modalInstance.hide();
-      }
+      // Update client details and summary table with collectPaymentId from the response
     } catch (error) {
       // Handle error case for first API
       console.error("Error submitting payment data", error);
@@ -335,37 +339,53 @@ const CreatePurchaseOrder = () => {
   // useEffect(() => {
   //   itemData1();
   // }, []);
-  useEffect(() => {
-    const fetchOptions = async () => {
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/PurchaseTypeItemsList`
-        );
-        console.log(response.data);
-        setOptionItem(response.data.data); // Assuming data is already an array of objects
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchOptions = async () => {
+  //     try {
+  //       const response = await axios.post(
+  //         `${API_BASE_URL}/PurchaseTypeItemsList`
+  //       );
+  //       console.log(response.data);
+  //       setOptionItem(response.data.data); // Assuming data is already an array of objects
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
 
-    fetchOptions();
-  }, []);
-  useEffect(() => {
-    const fetchUnits = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/getAllUnit`);
-        console.log("API Response:", response.data.data);
+  //   fetchOptions();
+  // }, []);
+  // useEffect(() => {
+  //   const fetchUnits = async () => {
+  //     try {
+  //       const response = await axios.get(`${API_BASE_URL}/getAllUnit`);
+  //       console.log("API Response:", response.data.data);
 
-        // Assuming response.data.data is the correct array
-        setUnitItem(response.data.data || []);
-      } catch (error) {
-        console.error("Error fetching units:", error);
-        setUnitItem([]); // Fallback to an empty array
-      }
-    };
+  //       // Assuming response.data.data is the correct array
+  //       setUnitItem(response.data.data || []);
+  //     } catch (error) {
+  //       console.error("Error fetching units:", error);
+  //       setUnitItem([]); // Fallback to an empty array
+  //     }
+  //   };
 
-    fetchUnits();
-  }, []);
+  //   fetchUnits();
+  // }, []);
+  const fetchDropdownData = async () => {
+    try {
+      const [purchaseTypeRes, unitRes] = await Promise.all([
+        axios.post(`${API_BASE_URL}/PurchaseTypeItemsList`),
+        axios.get(`${API_BASE_URL}/getAllUnit`),
+      ]);
+
+      setOptionItem(purchaseTypeRes.data.data || []);
+      setUnitItem(unitRes.data.data || []);
+    } catch (error) {
+      console.error("Error fetching dropdown data:", error);
+      setOptionItem([]);
+      setUnitItem([]);
+    }
+  };
+
   const deleteDetails = async (pod_id) => {
     try {
       console.log(pod_id);
@@ -595,6 +615,7 @@ const CreatePurchaseOrder = () => {
     everyDataSet();
   }, [responceId]);
   const update = async (e) => {
+    await fetchDropdownData(); // Load dropdown data
     setButtonClicked(false);
     try {
       const response = await axios.post(
@@ -613,7 +634,7 @@ const CreatePurchaseOrder = () => {
         pod_price: 0,
         pod_vat: 0,
         pod_wht_id: 0,
-        pod_crate: 0,
+        pod_crate: 1,
         Unit_Name_EN: 0,
         Unit_Name_TH: 0,
         item_Name_EN: 0,
@@ -1014,7 +1035,8 @@ const CreatePurchaseOrder = () => {
     }));
   };
 
-  const handleEditClick = (item) => {
+  const handleEditClick = async (item) => {
+    await fetchDropdownData();
     setFormDataAdd(item); // Set the selected item’s data
     setModalOne(true); // Fill the form with item data
     // Open the modal
@@ -1336,32 +1358,7 @@ const CreatePurchaseOrder = () => {
                               <div className="addMOdalContent formCreate mt-0 px-2">
                                 <div className="col-lg-12 autoComplete mb-2 ">
                                   <h6>Select Item</h6>
-                                  {/* <Autocomplete
-                                    disablePortal
-                                    options={
-                                      Array.isArray(optionItem)
-                                        ? optionItem
-                                        : []
-                                    }
-                                    getOptionLabel={(option) =>
-                                      option.Name_EN || option.Name_TH || ""
-                                    }
-                                    value={
-                                      optionItem.find(
-                                        (opt) =>
-                                          opt.ID === formDataAdd.pod_type_id
-                                      ) || null
-                                    } // Set value
-                                    onChange={(e, newValue) =>
-                                      handleItemChange(newValue)
-                                    }
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder="Select Item"
-                                      />
-                                    )}
-                                  /> */}
+
                                   <Select
                                     value={
                                       optionItem.find(

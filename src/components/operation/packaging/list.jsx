@@ -81,7 +81,7 @@ export const OrderPackagingList = () => {
       },
       {
         Header: "Load Time",
-       accessor: "Freight_load_time",
+        accessor: "Freight_load_time",
       },
       {
         Header: "Supplier",
@@ -105,12 +105,12 @@ export const OrderPackagingList = () => {
 							state={{ from: { ...a, isReadOnly: true } }}>
 							<i className="mdi mdi-eye"></i>
 						</Link> */}
-            {+a.Status == 1 && (
+            {+a.Status == 2 && (
               <Link to="/orderPackagingEdit" state={{ from: { ...a } }}>
                 <i className="mdi mdi-pencil" />
               </Link>
             )}
-            {+a.Status == 1 && (
+            {+a.Status == 2 && (
               <>
                 <button
                   type="button"
@@ -130,17 +130,17 @@ export const OrderPackagingList = () => {
                 >
                   {/* <i class="mdi mdi-delete "></i> */}
                 </button>
-                {+a.go_to_invoice == 0 && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      generateInvoice(a.Order_ID, a.FX_ID, a.O_FX_Rate)
-                    }
-                  >
-                    <i className="mdi mdi-check" />
-                    {/* <i className="mdi mdi-restore" /> */}
-                  </button>
-                )}
+                {/* {+a.go_to_invoice == 0 && ( */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    generateInvoice(a.Order_ID, a.FX_ID, a.O_FX_Rate)
+                  }
+                >
+                  <i className="mdi mdi-check" />
+                  {/* <i className="mdi mdi-restore" /> */}
+                </button>
+                {/* )} */}
               </>
             )}
           </div>

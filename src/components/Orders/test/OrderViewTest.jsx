@@ -296,7 +296,7 @@ const OrderViewTest = () => {
                             <td>{item.Unit_Name}</td>
                             <td>{NoDecimal.format(item.OD_Box)}</td>
                             <td>{threeDecimal.format(item.OD_NW)}</td>
-                            <td> {twoDecimal.format(item.OD_Order_Price)}</td>
+                            <td> {twoDecimal.format(item.unit_price)}</td>
                             <td>
                               {item.OD_Adjusted_Price
                                 ? twoDecimal.format(item.OD_Adjusted_Price)
@@ -408,7 +408,7 @@ const OrderViewTest = () => {
               {/* <button className="btn btn-primary" type="submit" name="signup">
                 Create
               </button> */}
-              <Link className="btn btn-danger" to={"/orders"}>
+              <Link className="btn btn-danger" to={"/test"}>
                 Close
               </Link>
             </div>

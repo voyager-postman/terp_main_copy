@@ -46,6 +46,53 @@ const CreateQuotationTest = () => {
       />
     </div>
   );
+  const handleSaveOrderPopulate = () => {
+    const payload = {
+      order_id: state.order_id, // You must have this in your component
+      user_id: localStorage.getItem("id"), // You must also define this
+      Order_NW: orderNetWeight,
+    };
+
+    axios
+      .post(`${API_BASE_URL}/OrderPopulate`, payload)
+      .then((res) => {
+        getOrdersDetails();
+        toast.success("Quotation populated successfully", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+        // ✅ Close the modal by ID (no ref needed)
+        const modalEl = document.getElementById("consigneeOne");
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+
+        setOrderNetWeight("");
+      })
+
+      .catch((err) => {
+        toast.error("Failed to populate quotation", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      });
+  };
+  useEffect(() => {
+    const modal = document.getElementById("consigneeOne");
+
+    const clearDataOnClose = () => {
+      setOrderNetWeight(""); // Clear input value
+    };
+
+    // Listen for modal close
+    modal?.addEventListener("hidden.bs.modal", clearDataOnClose);
+
+    // Clean up the event listener on unmount
+    return () => {
+      modal?.removeEventListener("hidden.bs.modal", clearDataOnClose);
+    };
+  }, []);
+  // new selct
+  const [orderNetWeight, setOrderNetWeight] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const [consigneeNew, setConsigneeNew] = useState();
@@ -65,6 +112,8 @@ const CreateQuotationTest = () => {
   const [exchangeRate1, setExchangeRate1] = useState(0);
   const [exchangeRate2, setExchangeRate2] = useState(0);
   const [exchangeRate3, setExchangeRate3] = useState(0);
+  const [exchangeRate4, setExchangeRate4] = useState(0);
+
   const [isRecalculateClicked, setIsRecalculateClicked] = useState(false);
   const [isRecalculateClicked1, setIsRecalculateClicked1] = useState(false);
   const [massageShow, setMassageShow] = useState("");
@@ -213,17 +262,128 @@ const CreateQuotationTest = () => {
     }
   };
 
-  const handleAgreedPricingChange4 = (e) => {
-    setExchangeRate1(e.target.checked);
-    console.log(exchangeRate1);
+  const handleAgreedPricingChange4 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate1(newValue);
+    if (state?.order_id) {
+      try {
+        const response = await updateAllOrderStatuses({
+          id: state.order_id,
+          field: name,
+          value: newValue,
+        });
+
+        console.log("API success:", response);
+        if (response?.data?.message) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to update status", {
+          autoClose: 1500,
+          theme: "colored",
+        });
+      }
+    }
   };
-  const handleAgreedPricingChange5 = (e) => {
-    setExchangeRate2(e.target.checked);
-    console.log(exchangeRate2);
+  const handleAgreedPricingChange5 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate2(newValue);
+    if (state?.order_id) {
+      try {
+        const response = await updateAllOrderStatuses({
+          id: state.order_id,
+          field: name,
+          value: newValue,
+        });
+
+        console.log("API success:", response);
+        if (response?.data?.message) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to update status", {
+          autoClose: 1500,
+          theme: "colored",
+        });
+      }
+    }
   };
-  const handleAgreedPricingChange6 = (e) => {
-    setExchangeRate3(e.target.checked);
-    console.log(exchangeRate3);
+  const handleAgreedPricingChange6 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate3(newValue);
+    if (state?.order_id) {
+      try {
+        const response = await updateAllOrderStatuses({
+          id: state.order_id,
+          field: name,
+          value: newValue,
+        });
+
+        console.log("API success:", response);
+        if (response?.data?.message) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to update status", {
+          autoClose: 1500,
+          theme: "colored",
+        });
+      }
+    }
+  };
+  const handleAgreedPricingChange7 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate4(newValue);
+    if (state?.order_id) {
+      try {
+        const response = await updateAllOrderStatuses({
+          id: state.order_id,
+          field: name,
+          value: newValue,
+        });
+
+        console.log("API success:", response);
+        if (response?.data?.message) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to update status", {
+          autoClose: 1500,
+          theme: "colored",
+        });
+      }
+    }
+  };
+  const updateAllOrderStatuses = async ({ id, field, value }) => {
+    return axios.post(`${API_BASE_URL}/updateAllOrderStatuses`, {
+      id,
+      field,
+      value,
+    });
   };
   const computedState = useMemo(() => {
     console.log(state.quote_id);
@@ -269,7 +429,7 @@ const CreateQuotationTest = () => {
       consigneeFind?.Default_location ||
       quoteFind?.loading_location;
     r.brand_id = state.brand_id || consigneeFind?.brand || quoteFind?.brand_id;
-    r.mark_up = r.mark_up || consigneeFind?.Q_Markup || quoteFind?.profit;
+    r.mark_up = r.mark_up || consigneeFind?.O_Markup || quoteFind?.profit;
     r.consignee_name =
       r.consignee_name ||
       consigneeFind?.consignee_name ||
@@ -291,7 +451,7 @@ const CreateQuotationTest = () => {
       state.Freight_provider_ ||
       liners?.find((v) => v.liner_id == r.liner_id)?.preffered_supplier ||
       quoteFind?.Freight_provider_;
-    r.Q_Markup = r.mark_up || consigneeFind?.Q_Markup || quoteFind?.profit;
+    r.Q_Markup = r.Q_Markup || consigneeFind?.Q_Markup || quoteFind?.profit;
     r.Location_name = consigneeFind?.name;
 
     return r;
@@ -318,12 +478,13 @@ const CreateQuotationTest = () => {
       setExchangeRate1(consigneeFind?.Charge_Volume || 0);
       setExchangeRate2(consigneeFind?.Palletized || 0);
       setExchangeRate3(consigneeFind?.CO_Chamber_Required || 0);
+      setExchangeRate4(consigneeFind?.Precooling || 0);
     }
   }, [state.consignee_id, consigneesNew]);
   console.log(from);
   console.log(computedState);
   const { data: details, refetch: getOrdersDetails } = useQuery(
-    `NewgetQuotationDetailsView?quotation_id=${state.order_id}`,
+    `NewgetOrdersDetails?id=${state.order_id}`,
     {
       enabled: !!state.order_id,
     }
@@ -512,7 +673,7 @@ const CreateQuotationTest = () => {
         });
         console.log(response);
 
-        setCalculateListData(response.data.data);
+        setCalculateListData(response.data);
       } catch (e) {
         console.error("Something went wrong", e);
       }
@@ -536,6 +697,7 @@ const CreateQuotationTest = () => {
             user: localStorage.getItem("id"),
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
+            Precooling: exchangeRate4 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
             Location_name: computedState.Location_name,
           },
@@ -594,6 +756,7 @@ const CreateQuotationTest = () => {
             user: localStorage.getItem("id"),
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
+            Precooling: exchangeRate4 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
             Location_name: computedState.Location_name,
           },
@@ -650,6 +813,7 @@ const CreateQuotationTest = () => {
             user: localStorage.getItem("id"),
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
+            Precooling: exchangeRate4 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
             Location_name: computedState.Location_name,
           },
@@ -761,21 +925,21 @@ const CreateQuotationTest = () => {
     loadingModal.fire();
     closeModal();
     try {
-      const { data } = await axios.post(
-        `${API_BASE_URL}/NewInsertQuotationDetails`,
-        {
-          input: {
-            ...computedState,
-            user: localStorage.getItem("id"),
-            palletized: exchangeRate2 ? 1 : 0,
-            Chamber: exchangeRate3 ? 1 : 0,
-            Charge_Volume: exchangeRate1 ? 1 : 0,
-          },
-          details: values,
-          Is_Recalculate: 0,
-          Is_Quotation: 1,
-        }
-      );
+      const { data } = await axios.post(`${API_BASE_URL}/NewaddOrderInput`, {
+        input: {
+          ...computedState,
+          user: localStorage.getItem("id"),
+          palletized: exchangeRate2 ? 1 : 0,
+          Chamber: exchangeRate3 ? 1 : 0,
+          Precooling: exchangeRate4 ? 1 : 0,
+
+          Charge_Volume: exchangeRate1 ? 1 : 0,
+          is_quotation: 1,
+        },
+        details: values,
+        Is_Recalculate: 0,
+        Is_Quotation: 1,
+      });
       oneQoutationDAta();
       setOrderId(data?.order_id);
       console.log(data.order_id);
@@ -1466,17 +1630,17 @@ const CreateQuotationTest = () => {
                           name="fx_rate"
                         />
                       </div>
-                      <div className="col-lg-3 form-group">
+                      <div className="col-lg-2 form-group">
                         <h6>Markup Rate</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
                               type="number"
                               placeholder="0"
-                              value={computedState.mark_up}
+                              value={computedState.Q_Markup}
                               // value={state.mark_up || consigneeNew}
                               onChange={handleChange}
-                              name="mark_up"
+                              name="Q_Markup"
                             />
                           </div>
                           <div className="shipPercent">
@@ -1484,7 +1648,7 @@ const CreateQuotationTest = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="col-lg-3 form-group">
+                      <div className="col-lg-2 form-group">
                         <h6> Rebate</h6>
                         <div className="parentShip">
                           <div className="markupShip">
@@ -1505,10 +1669,10 @@ const CreateQuotationTest = () => {
                       <div className="col-lg-2 form-group">
                         <h6>Charge Volume</h6>
                         <div className="flex gap-2 items-center">
-                          <label className="toggleSwitch large">
+                          <label className="toggleSwitch large" onclick="">
                             <input
                               type="checkbox"
-                              name="Commission_Currency"
+                              name="Charge_Volume"
                               checked={exchangeRate1 == 1}
                               onChange={handleAgreedPricingChange4}
                             />
@@ -1518,7 +1682,6 @@ const CreateQuotationTest = () => {
                             </span>
                             <a></a>
                           </label>
-                          <label htmlFor="Palletized">Palletized</label>
                         </div>
                       </div>
                       <div className="col-lg-2 form-group">
@@ -1527,7 +1690,7 @@ const CreateQuotationTest = () => {
                           <label className="toggleSwitch large">
                             <input
                               type="checkbox"
-                              name="Commission_Currency"
+                              name="palletized"
                               checked={exchangeRate2 == 1}
                               onChange={handleAgreedPricingChange5}
                             />
@@ -1537,17 +1700,15 @@ const CreateQuotationTest = () => {
                             </span>
                             <a></a>
                           </label>
-                          <label htmlFor="Palletized">Palletized</label>
                         </div>
                       </div>
-
                       <div className="col-lg-2 form-group">
                         <h6>CO from Chamber</h6>
                         <div className="flex gap-2 items-center">
                           <label className="toggleSwitch large">
                             <input
                               type="checkbox"
-                              name="Commission_Currency"
+                              name="Chamber"
                               checked={exchangeRate3 == 1}
                               onChange={handleAgreedPricingChange6}
                             />
@@ -1557,7 +1718,24 @@ const CreateQuotationTest = () => {
                             </span>
                             <a></a>
                           </label>
-                          <label htmlFor="Palletized">Palletized</label>
+                        </div>
+                      </div>
+                      <div className="col-lg-2 form-group">
+                        <h6>Precooling</h6>
+                        <div className="flex gap-2 items-center">
+                          <label className="toggleSwitch large">
+                            <input
+                              type="checkbox"
+                              name="PreColling"
+                              checked={exchangeRate4 == 1}
+                              onChange={handleAgreedPricingChange7}
+                            />
+                            <span>
+                              <span>OFF</span>
+                              <span>ON</span>
+                            </span>
+                            <a></a>
+                          </label>
                         </div>
                       </div>
                       <div className="col-lg-3 form-group">
@@ -1605,6 +1783,67 @@ const CreateQuotationTest = () => {
                           >
                             Add
                           </button>
+                          <button
+                            type="button"
+                            // onClick={() => {
+                            //   setSelectedDetails(null);
+                            //   setToEditDetails({});
+                            //   openModal();
+                            //   // saveNewDetails1();
+                            // }}
+                            data-bs-toggle="modal"
+                            data-bs-target="#consigneeOne"
+                          >
+                            Add Consignee Items
+                          </button>
+                          <div
+                            className="modal fade"
+                            id="consigneeOne"
+                            tabIndex={-1}
+                            aria-labelledby="exampleModalLabel"
+                            aria-hidden="true"
+                          >
+                            <div className="modal-dialog modalShipTo ">
+                              <div className="modal-content">
+                                <div className="modal-header">
+                                  <h1
+                                    className="modal-title fs-5"
+                                    id="exampleModalLabel"
+                                  >
+                                    Quotation Populate
+                                  </h1>
+                                  <button
+                                    type="button"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                  >
+                                    <i class="mdi mdi-close"></i>
+                                  </button>
+                                </div>
+                                <div className="modal-body">
+                                  <label htmlFor=""> Net Weight</label>
+                                  <input
+                                    type="number"
+                                    value={orderNetWeight}
+                                    onChange={(e) =>
+                                      setOrderNetWeight(e.target.value)
+                                    }
+                                    className="form-control"
+                                  />
+                                </div>
+                                <div className="modal-footer justify-content-right">
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={handleSaveOrderPopulate}
+                                  >
+                                    Save
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                           {/* )} */}
                         </div>
                       )}
@@ -2397,6 +2636,31 @@ const CreateQuotationTest = () => {
                     <table>
                       <thead>
                         <tr>
+                          {Object.values(calculateListData?.header || {}).map(
+                            (label, index) => (
+                              <th key={index}>{label}</th>
+                            )
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {calculateListData?.data?.map((row, rowIndex) => (
+                          <tr key={rowIndex}>
+                            {Object.keys(calculateListData?.header || {}).map(
+                              (_, colIndex) => {
+                                const colKey = `COL${colIndex + 1}`; // Dynamically build COL1, COL2, ...
+                                return (
+                                  <td key={colKey}>{row[colKey] ?? ""}</td>
+                                );
+                              }
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {/* <table>
+                      <thead>
+                        <tr>
                           <th>ITF</th>
                           <th>Last Update</th>
                           <th>EXW</th>
@@ -2441,8 +2705,8 @@ const CreateQuotationTest = () => {
                           </tr>
                         ))}
                       </thead>
-                      <tbody>{/* Add dynamic table data here */}</tbody>
-                    </table>
+                      <tbody>{/* Add dynamic table data here *
+                    </table> */}
                   </div>
                 </div>
               </div>

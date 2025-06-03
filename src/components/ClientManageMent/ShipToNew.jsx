@@ -596,6 +596,11 @@ const ShipToNew = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalState"
             >
+              {/* <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              > */}
               <svg
                 className="SvgQuo"
                 xmlns="http://www.w3.org/2000/svg"
@@ -603,6 +608,41 @@ const ShipToNew = () => {
               >
                 <title>currency-eth</title>
                 <path d="M6,5H18V7H6M7,11H17V13H7M5.5,17H18.5V19H5.5"></path>
+              </svg>
+            </button>
+            <button
+              onClick={() => setSelectedClientId(a)} // Set client_id on button click
+              className="SvgAnchor"
+              type="button"
+              // data-bs-toggle="modal"
+              // data-bs-target="#modalState"
+            >
+              <svg
+                viewBox="-2 0 26 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 18L20 18"
+                  stroke="#203764"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M4 12L20 12"
+                  stroke="#203764"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M4 6L20 6"
+                  stroke="#203764"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <circle cx="0" cy="6" r="2" fill="#203764" />
+                <circle cx="0" cy="12" r="2" fill="#203764" />
+                <circle cx="0" cy="18" r="2" fill="#203764" />
               </svg>
             </button>
           </>

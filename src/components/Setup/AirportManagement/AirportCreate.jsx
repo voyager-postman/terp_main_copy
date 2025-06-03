@@ -15,6 +15,7 @@ const AirportCreate = () => {
   console.log(clearance);
   const location = useLocation();
   const { from } = location.state || {};
+  console.log(from);
   const navigate = useNavigate();
   const [state, setState] = useState({
     port_id: from?.port_id ?? undefined,
@@ -32,6 +33,12 @@ const AirportCreate = () => {
     prefered_liner: from?.prefered_liner ?? "",
   });
   console.log(state);
+  const [chargeVolume, setChargeVolume] = useState(false);
+  useEffect(() => {
+    if (from) {
+      setChargeVolume(from.CO_Chamber_Required === 1); // or == "1" if string
+    }
+  }, [from]);
   const [portType, setPortType] = useState([]);
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -61,13 +68,20 @@ const AirportCreate = () => {
   useEffect(() => {
     loadPortType();
   }, []);
+  const handleAgreedPricingChange1 = (e) => {
+    setChargeVolume(e.target.checked);
+  };
+
   const updatePort = () => {
     axios
       .post(
         `${API_BASE_URL}/${
           typeof state.port_id == "undefined" ? "addAirport" : "updateAirPort"
         }`,
-        state
+        {
+          ...state,
+          CO_Chamber: chargeVolume ? 1 : 0, // Convert boolean to 1 or 0
+        }
       )
       .then((response) => {
         toast[response.data.success == true ? "success" : "error"](
@@ -88,6 +102,9 @@ const AirportCreate = () => {
           return false;
         }
       });
+  };
+  const handleAgreedPricingChange = async (e) => {
+    const { name, checked } = e.target;
   };
   return (
     <Card
@@ -692,6 +709,22 @@ const AirportCreate = () => {
                     ) : (
                       <></>
                     )}
+                    <div className="col-lg-12 form-group mt-4">
+                      <h6>Requires Chamber CO</h6>
+                      <label className="toggleSwitch large">
+                        <input
+                          type="checkbox"
+                          name="Charge_Volume"
+                          checked={chargeVolume}
+                          onChange={handleAgreedPricingChange1}
+                        />
+                        <span>
+                          <span>OFF</span>
+                          <span>ON</span>
+                        </span>
+                        <a></a>
+                      </label>
+                    </div>
                   </div>
                 </form>
               </div>

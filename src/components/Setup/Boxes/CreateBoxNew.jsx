@@ -19,6 +19,7 @@ const CreateBoxNew = () => {
     box_length: "",
     box_pallet: "",
     box_image: null, // State for the image
+    Per_Bun: "",
   };
 
   const [state, setState] = useState(defaultState);
@@ -192,10 +193,12 @@ const CreateBoxNew = () => {
     request.append("Inventory_Type", classification3Id);
     request.append("WHT", classification4Id);
     request.append("Brand", classification5Id);
+    request.append("Per_Bun", state.Per_Bun);
 
     if (state.box_image) {
       request.append("images", state.box_image);
     }
+
     const fieldCheck =
       state.box_name === "" ||
       state.External_Ref === "" ||
@@ -203,6 +206,7 @@ const CreateBoxNew = () => {
       state.box_weight === "" ||
       state.box_width === "" ||
       state.box_length === "" ||
+      state.Per_Bun === "" ||
       state.box_pallet === "";
     if (fieldCheck) {
       toast.warn("Please Fill All The Fields", {
@@ -326,6 +330,28 @@ const CreateBoxNew = () => {
                         isOptionEqualToValue={(option, value) =>
                           option.id === value?.id
                         }
+                      />
+                    </div>
+                    <div className="form-group col-lg-3">
+                      <h6> Per Bun</h6>
+                      {/* <input
+                        type="number"
+                        id="name_th"
+                        name="Per_Bun"
+                        // onChange={handleChange}
+                        className="form-control"
+                        placeholder="Per Bun"
+                        // defaultValue={editBoxData.Per_Bun}
+                      /> */}
+
+                      <input
+                         type="number"
+                        id="name_th"
+                        name="Per_Bun"
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Per Bun"
+                        value={state.Per_Bun}
                       />
                     </div>
                   </div>

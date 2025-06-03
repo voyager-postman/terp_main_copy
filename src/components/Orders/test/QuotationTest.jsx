@@ -39,10 +39,19 @@ const QuotationTest = () => {
     setStatus(event.target.value);
   };
   const getAllQuotation = () => {
-    axios.get(`${API_BASE_URL}/NewgetAllQuotation`).then((res) => {
-      setData(res.data.data || []);
-    });
+    axios
+      .get(`${API_BASE_URL}/NewgetOrders`, {
+        params: { is_quotation: 1 }, // or is_quotation: 1
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching quotations:", err);
+      });
   };
+
   useEffect(() => {
     getAllQuotation();
   }, []);
@@ -67,14 +76,7 @@ const QuotationTest = () => {
       orderData1();
     }
   }, [status]);
-  const confirmQuotation = async (id) => {
-    try {
-      await axios.post(`${API_BASE_URL}/NewconfirmQuotation`, { quote_id: id });
-      toast.success("Quotation confirmed successfully");
-    } catch (e) {
-      toast.error("Something went wrong");
-    }
-  };
+
   const handleAgreedPricingChange3 = (e) => {
     setExchangeRate(e.target.checked);
     console.log(exchangeRate);
@@ -151,6 +153,26 @@ const QuotationTest = () => {
       const response = await axios.post(`${API_BASE_URL}/NewconfirmQuotation`, {
         quotation_id: quotation_id,
         user_id: localStorage.getItem("id"),
+        // Other data you may need to pass
+      });
+      console.log("API response:", response);
+      loadingModal.close();
+      getAllQuotation();
+      toast.success("Quotation Confirmation successfully");
+      // Handle the response as needed
+    } catch (error) {
+      console.error("API call error:", error);
+      loadingModal.close();
+      toast.error("Failed to Quotation Confirmation");
+    }
+  };
+
+  const quotationConfirmationForOrder = async (quotation_id) => {
+    loadingModal.fire();
+    try {
+      const response = await axios.post(`${API_BASE_URL}/QuotationConfirm`, {
+        order_id: quotation_id,
+        // user_id: localStorage.getItem("id"),
         // Other data you may need to pass
       });
       console.log("API response:", response);
@@ -261,8 +283,8 @@ const QuotationTest = () => {
         doc.setTextColor(0, 0, 0);
         doc.text(
           `Order: ${
-            filterData?.data?.data?.Quotation_number
-              ? filterData?.data?.data?.Quotation_number
+            filterData?.data?.data?.Quotation_Number
+              ? filterData?.data?.data?.Quotation_Number
               : ""
           }`,
           127,
@@ -407,33 +429,16 @@ const QuotationTest = () => {
       });
       await addLogoWithDetails(); // Wait for logo and details to be added
       const tableStartY = Math.max(currentY1, currentY2);
-      const columns = [
-        { header: "#", dataKey: "index" },
-        { header: "Hs code", dataKey: "HS_CODE" },
-        { header: "N.W (KG)", dataKey: "net_weight" },
-        { header: "Box", dataKey: "Number_of_boxes" },
-        { header: "Item Detail", dataKey: "itf_name_en" },
-        { header: "QTY", dataKey: "itf_quantity" },
-        { header: "Unit", dataKey: "unit_name_en" },
-        { header: "Unit Price", dataKey: "calculated_price" },
-        { header: "Line Total", dataKey: "line_total" },
-      ];
-      const rows = invoiceResponse?.data?.data.map((item, index) => ({
-        index: index + 1,
-        HS_CODE: item.HS_CODE,
-        net_weight: `${formatterNg.format(item.OD_NW)}`,
-        Number_of_boxes: `${formatterNo.format(item.OD_Box)}`,
-        itf_name_en: item.itf_name_en,
-        itf_quantity: `${formatterNg.format(item.OD_QTY)}`,
-        unit_name_en: item.unit_name_en,
-        calculated_price: `${twoDecimal.format(item.OD_Final_price)}`,
-        line_total: twoDecimal.format(
-          item.OD_QTY *
-            (item.OD_Quotation_Price
-              ? item.OD_Quotation_Price
-              : item.OD_Final_price)
-        ),
+      const rawHeader = invoiceResponse?.data?.header;
+      const rawData = invoiceResponse?.data?.data;
+      const columns = Object.keys(rawHeader).map((key, index) => ({
+        header: rawHeader[key], // display name
+        dataKey: `COL${index + 1}`, // maps to "COL1", "COL2", etc.
       }));
+      const rows = rawData.map((row) => {
+        // Optional: format numbers or values here if needed
+        return { ...row };
+      });
       doc.autoTable({
         head: [columns.map((col) => col.header)],
         body: rows.map((row) => columns.map((col) => row[col.dataKey])),
@@ -448,10 +453,12 @@ const QuotationTest = () => {
           overflow: "linebreak",
         },
         columnStyles: {
+          1: { halign: "center" },
           2: { halign: "right" },
-          3: { halign: "center" },
+          3: { halign: "right" },
           4: { cellWidth: 50 },
           5: { halign: "right" },
+          6: { halign: "center" },
           7: { halign: "right" },
           8: { halign: "right" },
         },
@@ -883,12 +890,10 @@ const QuotationTest = () => {
       const imgWidth = 47;
       const imgHeight = 47;
       const rows = invoiceResponse?.data?.quotationDetails.map((item) => ({
-        ITF_Name: item.ITF_Name,
-        ITF_Scientific_name: item.ITF_Scientific_name,
-        ITF_HSCODE: item.ITF_HSCODE,
-        quotation_price_unit: `${twoDecimal.format(item.OD_Final_price)}    ${
-          item.Unit_price ? item.Unit_price : ""
-        }`, // Combine Price and Unit
+        ITF_Name: item.col1,
+        ITF_Scientific_name: item.col2,
+        ITF_HSCODE: item.col3,
+        quotation_price_unit: item.col4,
       }));
       const renderTable = (rowsData, startY) => {
         console.log(startY);
@@ -903,7 +908,9 @@ const QuotationTest = () => {
           startY: tableStartY,
           willDrawCell: (data) => {
             if (data.section === "body") {
-              const contentHeight = doc.getTextDimensions(data.cell.raw).h;
+              const contentHeight = doc.getTextDimensions(
+                Number(data?.cell?.raw)
+              ).h;
               if (includeImage) {
                 data.row.height = Math.max(contentHeight + imgHeight, 10);
               } else {
@@ -979,10 +986,10 @@ const QuotationTest = () => {
             right: 7,
           },
           columnStyles: {
-            0: { halign: "left", cellWidth: 59 },
-            1: { halign: "left", cellWidth: 70 },
-            2: { halign: "center", cellWidth: 30 },
-            3: { halign: "center", cellWidth: 37 },
+            0: { halign: "left", cellWidth: 49 },
+            1: { halign: "left", cellWidth: 49 },
+            2: { halign: "center", cellWidth: 49 },
+            3: { halign: "center", cellWidth: 49 },
           },
           headStyles: {
             fillColor: [32, 55, 100],
@@ -1102,6 +1109,28 @@ const QuotationTest = () => {
       loadingModal.close();
     }
   };
+
+  const updateBankStatus = (bankID) => {
+    const request = {
+      itf_id: bankID,
+    };
+
+    axios
+      .post(`${API_BASE_URL}/StatusChangeItf`, request)
+      .then((response) => {
+        if (response.data.success == true) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+          getAllQuotation();
+          return;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const columns = useMemo(
     () => [
       {
@@ -1133,6 +1162,44 @@ const QuotationTest = () => {
         //     : "NA";
         // },
       },
+      // {
+      //   Header: "Precooling",
+      //   accessor: (a) => (
+      //     <label
+      //       style={{
+      //         display: "flex",
+      //         justifyContent: "center",
+      //         alignItems: "center",
+      //         marginBottom: "10px",
+      //       }}
+      //       className="toggleSwitch large"
+      //       onclick=""
+      //     >
+      //       <input
+      //         onClick={(e) => {
+      //           e.stopPropagation();
+      //           updateBankStatus(a.ID);
+      //         }}
+      //         checked={a.Available == "1" ? true : false}
+      //         type="checkbox"
+      //         style={{
+      //           width: "20px",
+      //           height: "20px",
+      //           cursor: "pointer",
+      //         }}
+      //       />
+      //       <span
+      //         style={{
+      //           pointerEvents: "none",
+      //         }}
+      //       >
+      //         <span>OFF</span>
+      //         <span>ON</span>
+      //       </span>
+      //       <a></a>
+      //     </label>
+      //   ),
+      // },
 
       {
         Header: "Status",
@@ -1148,35 +1215,39 @@ const QuotationTest = () => {
       },
 
       {
-        // {(+a.Status === 1 || +a.Status === 2) && (
         Header: "Actions",
         accessor: (a) => (
           <div className="editIcon">
-            {(+a.Status === 1 || +a.Status === 2 || +a.Status === 6) && (
+            {(+a.Status === 1 ||
+              +a.Status === 2 ||
+              +a.Status === 6 ||
+              (a.Is_quotation === 0 &&
+                +a.Status >= 2 &&
+                a.Quotation_Number != null &&
+                a.Quotation_Number !== "")) && (
               <Link to="/quotation_view_test" state={{ from: { ...a } }}>
                 <i className="mdi mdi-eye" />
               </Link>
             )}
-            {(+a.Status === 1 || +a.Status === 2) && (
+            {/* {(+a.Status === 1 || +a.Status === 2) && (
               <Link to="/updateTestQuotation" state={{ from: { ...a } }}>
                 <i className="mdi mdi-pencil" />
               </Link>
-            )}
-            {/* <Link
-              className="SvgAnchor"
-              to="/qoutation_pdf_test"
-              state={{ from: { ...a } }}
-            >
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <title>Quotation</title>
-                <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
-              </svg>
-            </Link> */}
-            {(+a.Status === 1 || +a.Status === 2 || +a.Status === 6) && (
+            )} */}
+            {(+a.Status === 1 || +a.Status === 2) &&
+              !([2, 3, 4, 5].includes(+a.Status) && +a.Is_quotation === 0) && (
+                <Link to="/updateTestQuotation" state={{ from: { ...a } }}>
+                  <i className="mdi mdi-pencil" />
+                </Link>
+              )}
+
+            {(+a.Status === 1 ||
+              +a.Status === 2 ||
+              +a.Status === 6 ||
+              (a.Is_quotation === 0 &&
+                +a.Status >= 2 &&
+                a.Quotation_Number != null &&
+                a.Quotation_Number !== "")) && (
               <button
                 type="button"
                 data-bs-toggle="modal"
@@ -1194,14 +1265,6 @@ const QuotationTest = () => {
               </button>
             )}
             {(+a.Status === 1 || +a.Status === 2) && (
-              // <Link
-              //   className="SvgAnchor"
-              //   to="/quotation_proforma_test"
-              //   state={{ from: { ...a } }}
-              // >
-              //   <i className="fi fi-sr-square-p" />
-              // </Link>
-
               <button
                 type="button"
                 style={{
@@ -1215,7 +1278,12 @@ const QuotationTest = () => {
                 <i className="fi fi-sr-square-p" />
               </button>
             )}
-            {(+a.Status === 2 || +a.Status === 6) && (
+            {(+a.Status === 2 ||
+              +a.Status === 6 ||
+              (a.Is_quotation === 0 &&
+                +a.Status >= 2 &&
+                a.Quotation_Number != null &&
+                a.Quotation_Number !== "")) && (
               <button
                 type="button"
                 style={{
@@ -1224,12 +1292,17 @@ const QuotationTest = () => {
                   fontSize: "22px",
                   marginTop: "10px",
                 }}
-                onClick={() => handleEditClick(a.Quotation_ID)}
+                onClick={() => handleEditClick(a.Order_ID)}
               >
                 <i className="mdi mdi-content-copy" />
               </button>
             )}
-            {(+a.Status === 2 || +a.Status === 6) && (
+            {(+a.Status === 2 ||
+              (a.Is_quotation === 0 &&
+                +a.Status >= 2 &&
+                +a.Status < 6 &&
+                a.Quotation_Number != null &&
+                a.Quotation_Number !== "")) && (
               <button
                 type="button"
                 onClick={() => quotationConfirmation(a.Order_ID)}
@@ -1237,18 +1310,41 @@ const QuotationTest = () => {
                 <i className="mdi mdi-check-circle" />
               </button>
             )}
-            {(+a.Status === 1 || +a.Status === 2 || +a.Status === 6) && (
+
+            {(+a.Status === 1 ||
+              +a.Status === 2 ||
+              (a.Is_quotation === 0 &&
+                +a.Status === 2 &&
+                a.Quotation_Number != null &&
+                a.Quotation_Number !== "")) &&
+              !([2, 3, 4, 5].includes(+a.Status) && +a.Is_quotation === 0) && (
+                <button
+                  type="button"
+                  style={{
+                    width: "20px",
+                    color: "#203764",
+                    fontSize: "22px",
+                    marginTop: "10px",
+                  }}
+                  onClick={() => deleteOrder(a.Order_ID)}
+                >
+                  <i className="mdi mdi-delete " />
+                </button>
+              )}
+            {+a.Status === 1 && (
               <button
                 type="button"
-                style={{
-                  width: "20px",
-                  color: "#203764",
-                  fontSize: "22px",
-                  marginTop: "10px",
-                }}
-                onClick={() => deleteOrder(a.Quotation_ID)}
+                onClick={() => quotationConfirmationForOrder(a.Order_ID)}
               >
-                <i className="mdi mdi-delete " />
+                <i
+                  className="mdi mdi-check"
+                  style={{
+                    width: "20px",
+                    color: "#203764",
+                    fontSize: "22px",
+                    marginTop: "10px",
+                  }}
+                />
               </button>
             )}
             {+a.Status == 1 && (
@@ -1260,7 +1356,7 @@ const QuotationTest = () => {
                   fontSize: "22px",
                   marginTop: "10px",
                 }}
-                onClick={() => expireQoutation(a.Quotation_ID)}
+                onClick={() => expireQoutation(a.Order_ID)}
               >
                 <i className="mdi mdi-clock-alert" />
               </button>

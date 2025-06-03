@@ -42,6 +42,7 @@ const UpdateBox = () => {
     box_pallet: from?.box_pallet || "",
     box_cbm: from?.box_cbm || "",
     box_mlw: from?.box_mlw || "",
+    Per_Bun: from?.Per_Bun || "",
   };
   const [editBoxData, setEditBoxData] = useState(defaultState);
   const handleChange = (event) => {
@@ -168,21 +169,19 @@ const UpdateBox = () => {
     axios
       .get(`${API_BASE_URL}/getBrand`)
       .then((response) => {
-      
-          const data = response.data.data;
-          setClassification5(data);
+        const data = response.data.data;
+        setClassification5(data);
 
-          // Find and set the default selection (ID 9)
-          const defaultSelection = data?.find((item) => item.ID === from?.Brand);
-          if (defaultSelection) {
-            const formattedSelection = {
-              id: defaultSelection.ID,
-              name: defaultSelection.Name_EN,
-            };
-            setSelectedClassification5(formattedSelection);
-            setClassification5Id(formattedSelection.id);
-          }
-       
+        // Find and set the default selection (ID 9)
+        const defaultSelection = data?.find((item) => item.ID === from?.Brand);
+        if (defaultSelection) {
+          const formattedSelection = {
+            id: defaultSelection.ID,
+            name: defaultSelection.Name_EN,
+          };
+          setSelectedClassification5(formattedSelection);
+          setClassification5Id(formattedSelection.id);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -215,7 +214,7 @@ const UpdateBox = () => {
     formData.append("Inventory_Type", classification3Id);
     formData.append("WHT", classification4Id);
     formData.append("Brand", classification5Id);
-
+    formData.append("Per_Bun", editBoxData.Per_Bun);
     if (editBoxData.box_image instanceof File) {
       formData.append("images", editBoxData.box_image);
     }
@@ -325,8 +324,31 @@ const UpdateBox = () => {
                           option.id === value?.id
                         }
                       />
-                     
                     </div>
+                    <div className="form-group col-lg-3">
+                      <h6> Per Bun</h6>
+                      <input
+                        type="number"
+                        id="name_th"
+                        name="Per_Bun"
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Per Bun"
+                        defaultValue={editBoxData.Per_Bun}
+                      />
+                    </div>
+                    {/* <div className="form-group col-lg-3">
+                      {" "}
+                      <input
+                        type="number"
+                        id="name_th"
+                        name="Per_Bun"
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Per Bun"
+                        defaultValue={editBoxData.Per_Bun}
+                      />
+                    </div> */}
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-3">
@@ -475,7 +497,6 @@ const UpdateBox = () => {
                           option.id === value?.id
                         }
                       />
-                     
                     </div>
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
                       <h6>VAT Type</h6>
@@ -510,7 +531,6 @@ const UpdateBox = () => {
                           option.id === value?.id
                         }
                       />
-                     
                     </div>
 
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
@@ -546,7 +566,6 @@ const UpdateBox = () => {
                           option.id === value?.id
                         }
                       />
-                     
                     </div>
 
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
@@ -582,7 +601,6 @@ const UpdateBox = () => {
                           option.id === value?.id
                         }
                       />
-                     
                     </div>
                     <div className="form-group col-lg-12">
                       <h6>Image</h6>

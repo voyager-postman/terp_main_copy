@@ -142,10 +142,10 @@ div#root {
   margin: 0;
   z-index: 1000;
 }
-
+/* 
 .nav-link:focus {
   color: #fff !important;
-}
+} */
 
 .navSec .nav-item .dropdown-menu li {
   padding: 5px 10px;

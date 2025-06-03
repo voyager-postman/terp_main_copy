@@ -121,9 +121,13 @@ const Test = () => {
   //   }
   // }, [status]);
   const orderData = () => {
-    axios.get(`${API_BASE_URL}/NewgetOrders`).then((res) => {
-      setData(res.data.data || []);
-    });
+    axios
+      .get(`${API_BASE_URL}/NewgetOrders`, {
+        params: { is_quotation: 0 }, // or is_quotation: 1
+      })
+      .then((res) => {
+        setData(res.data.data || []);
+      });
   };
   useEffect(() => {
     orderData();
@@ -253,7 +257,10 @@ const Test = () => {
 
   const CheckBox = async (id) => {
     try {
-      await axios.post(`${API_BASE_URL}/ApproveOrder`, { order_id: id });
+      await axios.post(`${API_BASE_URL}/ApproveOrder`, {
+        order_id: id,
+        user_id: localStorage.getItem("id"),
+      });
       toast.success("Order Approved successfully");
       orderData();
     } catch (e) {
@@ -754,34 +761,31 @@ const Test = () => {
         minimumFractionDigits: 4,
         maximumFractionDigits: 4,
       });
-      const rows = pdfResponse?.data?.results?.map((item, index) => ({
-        index: index + 1,
-        itf_th: item.itf_th, // Thai text should be correctly displayed
-        HS_CODE: item.HS_CODE,
-        qty: newFormatter1.format(item.Net_Weight),
-        unit: "KG",
-        box: noFormatter.format(item.Boxes),
-        fob: newFormatter5.format(item.FOB),
-      }));
+      const { results, header } = pdfResponse?.data || {};
+      const columnKeys = Object.keys(results?.[0] || {}); // ["COL1", "COL2", ...]
+      const headerLabels = Object.values(header);
+      const bodyRows = results?.map((item) =>
+        columnKeys.map((key) => item[key])
+      );
+      // const rows = pdfResponse?.data?.results?.map((item, index) => ({
+      //   index: index + 1,
+      //   itf_th: item.itf_th, // Thai text should be correctly displayed
+      //   HS_CODE: item.HS_CODE,
+      //   qty: newFormatter1.format(item.Net_Weight),
+      //   unit: "KG",
+      //   box: noFormatter.format(item.Boxes),
+      //   fob: newFormatter5.format(item.FOB),
+      // }));
       const startY = 83; // Start Y position for the table
 
       // Draw the table
       doc.autoTable({
-        head: [
-          ["#", "Item Detail", "Hs Code", "Qty", "Unit", "Box", "FOB (THB)"],
-        ],
-        body: rows.map((row) => [
-          row.index,
-          row.itf_th,
-          row.HS_CODE,
-          row.qty,
-          row.unit,
-          row.box,
-          row.fob,
-        ]),
+        head: [headerLabels],
+        body: bodyRows,
         columnStyles: {
           3: { halign: "right" }, // Right align the FOB column (index 6)
           2: { halign: "center" }, // Right align the FOB column (index 6)
+          4: { halign: "center" }, // Right align the FOB column (index 6)
           5: { halign: "right" }, // Right align the FOB column (index 6)
           6: { halign: "right" }, // Right align the FOB column (index 6)
         },
@@ -1195,32 +1199,22 @@ const Test = () => {
       );
       const tableStartY = Math.max(currentY1, currentY2);
       await addLogoWithDetails(); // Wait for logo and details to be added
-      const columns = [
-        { header: "#", dataKey: "index" },
-        { header: "Hs code", dataKey: "hs_code" },
-        { header: "N.W (KG)", dataKey: "net_weight" },
-        { header: "Box", dataKey: "Number_of_boxes" },
-        { header: "Item Detail", dataKey: "ITF_Name" },
-        { header: "QTY", dataKey: "itf_quantity" },
-        { header: "Unit", dataKey: "Unit_Name" },
-        { header: "Unit Price", dataKey: "Final_Price" },
-        { header: "Line Total", dataKey: "line_total" },
-      ];
-      const rows = invoiceResponse?.data?.orderDetails?.map((item, index) => ({
-        index: index + 1,
-        hs_code: item.hs_code,
-        net_weight: `${formatterNg.format(item.OD_NW)}`,
-        Number_of_boxes: `${formatterNo.format(item.OD_Box)}`,
-        ITF_Name: item.ITF_Name,
-        itf_quantity: `${formatterNg.format(item.OD_QTY)}`,
-        Unit_Name: item.Unit_Name,
-        Final_Price: `${twoDecimal.format(item.OD_Final_price)}`,
-        line_total: twoDecimal.format(item?.OD_QTY * item?.OD_Final_price),
-      }));
+      const { orderDetails = [], header = {} } = invoiceResponse?.data || {};
+
+      // 1. Get column keys from the first item (e.g., "COL1", "COL2", ...)
+      const columnKeys = Object.keys(orderDetails[0] || {});
+
+      // 2. Get display headers from the `header` object
+      const headerLabels = Object.values(header); // ["#", "HS Code", "N.W.(KG)", ..., "Line Total"]
+
+      // 3. Build body rows based on orderDetails and columnKeys
+      const bodyRows = orderDetails.map((item) =>
+        columnKeys.map((key) => item[key])
+      );
 
       doc.autoTable({
-        head: [columns.map((col) => col.header)],
-        body: rows.map((row) => columns.map((col) => row[col.dataKey])),
+        head: [headerLabels],
+        body: bodyRows,
         startY: tableStartY,
         headStyles: {
           fillColor: "#203764",
@@ -1238,9 +1232,11 @@ const Test = () => {
           minCellHeight: 8, // Ensures rows have a minimum height
         },
         columnStyles: {
+          1: { halign: "center" },
           2: { halign: "right" },
-          3: { halign: "center" },
+          3: { halign: "right" },
           5: { halign: "right" },
+          6: { halign: "center" },
           7: { halign: "right" },
           8: { halign: "right" },
         },
@@ -1599,50 +1595,31 @@ const Test = () => {
             styles: { halign: "center" },
           },
         ],
-        [
-          { content: "Packing", styles: { halign: "center" } },
-          { content: "Boxes", styles: { halign: "center" } },
-          { content: "Brand	", styles: { halign: "center" } },
-          { content: "ITF", styles: { halign: "center" } },
-          { content: "EAN", styles: { halign: "center" } },
-          { content: " Net Weight	", styles: { halign: "center" } },
-          { content: "BOXES" },
-          { content: "empty1", styles: { halign: "center" } },
-        ],
+        Object.values(deliveryApi?.data?.header).map((label) => ({
+          content: label,
+          styles: { halign: "center" },
+        })),
       ];
       const formatterThree = new Intl.NumberFormat("en-US", {
         style: "decimal",
         minimumFractionDigits: 3,
         maximumFractionDigits: 3,
       });
-      const rows = deliveryApi?.data?.data?.map((item, index) => ({
-        index: item.Packaging,
-        itf_th: item.Boxes1,
-        HS_CODE: item.Brand,
-        Net_Weight: item.itf,
-        unit: formatterThree.format(item.ean_weight),
-        Boxes: formatterThree.format(item.Net_Weight),
-        FOB: formatterNo.format(item.Boxes2),
-      }));
+      console.log(deliveryApi?.data?.data);
+      const rows = (deliveryApi?.data?.data || []).map((item) => [
+        item.col1 || "",
+        item.col2 || "",
+        item.col3 || "",
+        item.col4 || "",
+        formatterThree.format(Number(item.col5 || 0)),
+        formatterThree.format(Number(item.col6 || 0)),
+        formatterNo.format(Number(item.col7 || 0)),
+      ]);
 
       // Adding the table to the PDF
       doc.autoTable({
         head: headers,
-        body: rows.map((row) => [
-          {
-            content: row.index ? row.index : "",
-            styles: { font: "NotoSansThai", fontSize: 10 },
-          },
-          {
-            content: row.itf_th ? row.itf_th : "",
-            styles: { font: "NotoSansThai", fontSize: 10 },
-          },
-          row.HS_CODE,
-          row.Net_Weight,
-          row.unit,
-          row.Boxes,
-          row.FOB,
-        ]),
+        body: rows, // ← FIX: just use the array directly
         startY: yTop,
         theme: "grid",
         headStyles: {
@@ -1651,8 +1628,9 @@ const Test = () => {
           halign: "center",
         },
         styles: {
+          fontSize: 10,
           textColor: (0, 0, 0), // Text color for body cells
-          // cellWidth: "wrap",
+          font: "NotoSansThai",
           valign: "middle",
           lineWidth: 0.01, // Adjust the border width
           lineColor: [26, 35, 126], // Border color
@@ -1733,6 +1711,29 @@ const Test = () => {
   const inventoryBoxes = (order_id) => {
     setOrderId(order_id);
   };
+
+  const updateBankStatus = (bankID) => {
+    const request = {
+      itf_id: bankID,
+    };
+
+    axios
+      .post(`${API_BASE_URL}/StatusChangeItf`, request)
+      .then((response) => {
+        if (response.data.success == true) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+          orderData();
+          return;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -1776,7 +1777,44 @@ const Test = () => {
             5: "Cancelled",
           }[a.Status] || "Unknown"),
       },
-
+      // {
+      //   Header: "Precooling",
+      //   accessor: (a) => (
+      //     <label
+      //       style={{
+      //         display: "flex",
+      //         justifyContent: "center",
+      //         alignItems: "center",
+      //         marginBottom: "10px",
+      //       }}
+      //       className="toggleSwitch large"
+      //       onclick=""
+      //     >
+      //       <input
+      //         onClick={(e) => {
+      //           e.stopPropagation();
+      //           updateBankStatus(a.ID);
+      //         }}
+      //         checked={a.Available == "1" ? true : false}
+      //         type="checkbox"
+      //         style={{
+      //           width: "20px",
+      //           height: "20px",
+      //           cursor: "pointer",
+      //         }}
+      //       />
+      //       <span
+      //         style={{
+      //           pointerEvents: "none",
+      //         }}
+      //       >
+      //         <span>OFF</span>
+      //         <span>ON</span>
+      //       </span>
+      //       <a></a>
+      //     </label>
+      //   ),
+      // },
       {
         Header: "Actions",
         accessor: (a) => (
@@ -1882,6 +1920,7 @@ const Test = () => {
                     <i className="mdi mdi-delete " />
                   </button>
                 )}
+
                 {+a.Status === 1 && (
                   <button type="button" onClick={() => CheckBox(a.Order_ID)}>
                     <i

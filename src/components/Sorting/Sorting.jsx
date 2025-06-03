@@ -255,8 +255,6 @@ const Sorting = () => {
               <i
                 className="mdi mdi-check me-2"
                 type="button"
-                // data-bs-toggle="modal"
-                // data-bs-target="#exampleModal"
                 style={{
                   width: "20px",
                   color: "#203764",
@@ -265,22 +263,11 @@ const Sorting = () => {
                 }}
               />
             </button>
-            {/* <button type="button" onClick={() => openModal(a.sorting_id)}>
-              <i
-                className="mdi mdi-delete"
-                style={{
-                  width: "20px",
-                  color: "#203764",
-                  fontSize: "22px",
-                  marginTop: "10px",
-                }}
-              />
-            </button> */}
+
             <button
               type="button"
               className="me-2"
               onClick={() => restoreSorting(a.receiving_id, a.pod_code)}
-              // disabled={restoredRows.includes(a.receiving_id)}
             >
               <i
                 className="mdi mdi-restore"
@@ -438,11 +425,10 @@ const Sorting = () => {
         console.log("Access file updated (edit mode):", accessResponse.data);
 
         toast.success("Sorting Added Successfully", {
-          autoClose: 2000,
-          onClose: () => {
-            closeBootstrapModal();
-            // setShow(true);
-          },
+          // autoClose: 2000,
+          // onClose: () => {
+          //   closeBootstrapModal();
+          // },
         });
       } else if (res.success === false) {
         setStock(res);
@@ -460,7 +446,7 @@ const Sorting = () => {
         console.log("Access file updated (edit mode):", accessResponse.data);
 
         toast.success("Sorting Added Successfully", {
-          autoClose: 1000,
+          // autoClose: 1000,
           theme: "colored",
           onClose: () => {
             closeBootstrapModal();

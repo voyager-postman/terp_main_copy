@@ -1,4 +1,4 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Nabla&family=Rubik+Mono+One&display=swap');
+ /* @import url('https://fonts.googleapis.com/css2?family=Nabla&family=Rubik+Mono+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nabla&family=Open+Sans:wght@400;500&family=Rubik+Mono+One&display=swap'); */
 html {
   height: 100vh;
@@ -217,6 +217,7 @@ background-color: var(--bs-pink);
 ::placeholder {
   font-size: 15px;
   text-transform: uppercase;
+  font-weight: 500 !important;
 }
 
 /* hover Animation */
@@ -869,7 +870,7 @@ button.btn.btn-primary {
 
 .borderTerpProduce th {
   color: #000;
-  font-weight: 800;
+  font-weight: 600;
   border: 1px solid #d2d6da;
 }
 
@@ -2290,10 +2291,13 @@ fieldset {
 /* 9/3/2024 */
 i.mdi.mdi-pencil {
   font-size: 20px !important;
+  color:#203764;
 }
 
 i.mdi.mdi-delete {
   font-size: 20px !important;
+  color:#203764;
+
 }
 
 /* 7/12/2024 */
@@ -3923,6 +3927,9 @@ g#SvgjsG4264 {
   color: #fff !important;
   text-align: center;
 }
-.claimDateMargin input{
+.claimDateMargin input {
   margin-right: unset;
+}
+.modal-header h1 {
+  font-weight: 500;
 }

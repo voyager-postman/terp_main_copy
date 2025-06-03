@@ -31,7 +31,7 @@ const Quotation_View_Test = () => {
     oneQoutationDAta();
   }, [from?.Order_ID]);
   const { data: details, refetch: getOrdersDetails } = useQuery(
-    `NewgetQuotationDetailsView?quotation_id=${from.Order_ID}`,
+    `NewgetOrdersDetails?id=${from?.Order_ID}`,
     {
       enabled: !!from.Order_ID,
     }
@@ -92,7 +92,7 @@ const Quotation_View_Test = () => {
                           </strong>
                         </div>
                         <div>
-                          <p>{data?.Quotation_number}</p>
+                          <p>{data?.Quotation_Number}</p>
                         </div>
                       </div>
                     </div>
@@ -411,7 +411,7 @@ const Quotation_View_Test = () => {
               {/* <button className="btn btn-primary" type="submit" name="signup">
                 Create
               </button> */}
-              <Link className="btn btn-danger" to={"/quotation"}>
+              <Link className="btn btn-danger" to={"/quotation_test"}>
                 Close
               </Link>
             </div>

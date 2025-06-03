@@ -340,7 +340,9 @@ const ApexChart = () => {
               </div>
             </div>
             <div className="selectProduce comparisonNone">
-              <h6 style={{ color: "#fff" }}>Comparison Period</h6>
+              <h6 className="mb-2" style={{ color: "#fff" }}>
+                Comparison Period
+              </h6>
               <Autocomplete
                 disablePortal
                 options={dataComparison}

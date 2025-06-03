@@ -334,7 +334,7 @@ const PurchaseView = () => {
                         aria-labelledby="exampleModalLabel"
                         aria-hidden="true"
                       >
-                        <div className="modal-dialog">
+                        <div className="modal-dialog modalShipTo ">
                           <div className="modal-content">
                             <div className="modal-header">
                               <h1
