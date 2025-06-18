@@ -1,0 +1,31 @@
+ {
+    "header": {
+        "logoName": "เทอร์ป",
+        "viewBtn": "ดูทั้งหมด",
+        "notificationHead": "การแจ้งเตือน",
+        "noNotification": "ไม่มีการแจ้งเตือน",
+        "mainMenu1": "ค่าใช้จ่าย"
+    },
+    "dashboard": {
+        "DashboardHead": "แดชบอร์ด",
+        "timePeriod": "เลือกช่วงเวลา",
+        "SelectClient": "เลือกลูกค้า",
+        "SelectConsignee": "เลือกลูกค้า",
+        "ComparisonPeriod": "ช่วงเปรียบเทียบ",
+        "ConfirmBtn": "ยืนยัน",
+        "itemOrderHead": "5 อันดับสินค้าที่สั่งซื้อสูงสุด",
+        "invoiceValue": "มูลค่าใบแจ้งหนี้",
+        "topH1": "ชื่อไอทีเอฟ",
+        "topH2": "ช่วงสุดท้าย กก",
+        "topH3": "งวดปัจจุบัน กก.",
+        "topH4": "ความแตกต่าง",
+        "topH5": "% เปลี่ยนแปลง",
+        "select": "เลือก...",
+        "graphHead": "ราคาผลผลิต ผู้รับสินค้า",
+        "price": "ราคา"
+    },
+    "footer": {
+        "footerOne": "ลิขสิทธิ์ ©",
+        "footerTwo": "สงวนลิขสิทธิ์."
+    }
+}

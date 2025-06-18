@@ -46,36 +46,7 @@ const CreateTest = () => {
       />
     </div>
   );
-  const handleSaveOrderPopulate = () => {
-    const payload = {
-      order_id: state.order_id, // You must have this in your component
-      user_id: localStorage.getItem("id"), // You must also define this
-      Order_NW: orderNetWeight,
-    };
 
-    axios
-      .post(`${API_BASE_URL}/OrderPopulate`, payload)
-      .then((res) => {
-        getOrdersDetails();
-        toast.success("Order populated successfully", {
-          autoClose: 1000,
-          theme: "colored",
-        });
-        // ✅ Close the modal by ID (no ref needed)
-        const modalEl = document.getElementById("consigneeOne");
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        if (modalInstance) modalInstance.hide();
-
-        setOrderNetWeight("");
-      })
-
-      .catch((err) => {
-        toast.error("Failed to populate order", {
-          autoClose: 1000,
-          theme: "colored",
-        });
-      });
-  };
   useEffect(() => {
     const modal = document.getElementById("consigneeOne");
 
@@ -123,6 +94,13 @@ const CreateTest = () => {
   const [itfNew, setItfName] = useState([]);
   const [brandNew, setBrandNew] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [color, setColor] = useState(false);
+  const [show1, setShow1] = useState(false);
+  const handleClose1 = () => setShow1(false);
+  const closeIcon1 = () => {
+    setShow1(false);
+  };
+
   const handleCloseModal = () => {
     setCalculateListData([]);
     setShowModal(false); // Hide the modal
@@ -893,9 +871,10 @@ const CreateTest = () => {
         Is_Quotation: 0,
       });
       oneQoutationDAta();
-      setOrderId(data?.order_id);
+
       console.log(data.order_id);
       toast.success("Order detail added successfully");
+      setOrderId(data?.order_id);
       setDeleteOrderId(data?.order_id);
       setState((prevState) => {
         return {
@@ -1092,11 +1071,58 @@ const CreateTest = () => {
       }));
     }
   };
+  const handleSaveOrderPopulate = () => {
+    const payload = {
+      order_id: state.order_id, // You must have this in your component
+      user_id: localStorage.getItem("id"), // You must also define this
+      Order_NW: orderNetWeight,
+      input: {
+        ...computedState,
+        user: localStorage.getItem("id"),
+        palletized: exchangeRate2 ? 1 : 0,
+        Chamber: exchangeRate3 ? 1 : 0,
+        Precooling: exchangeRate4 ? 1 : 0,
 
+        Charge_Volume: exchangeRate1 ? 1 : 0,
+        is_quotation: 0,
+      },
+    };
+
+    axios
+      .post(`${API_BASE_URL}/OrderPopulate`, payload)
+      .then((res) => {
+        setOrderId(res?.data?.order_id);
+        setDeleteOrderId(res?.data?.order_id);
+        setState((prevState) => {
+          return {
+            ...prevState,
+            order_id: res?.data?.order_id,
+          };
+        });
+        getOrdersDetails();
+        toast.success("Order populated successfully", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+        // ✅ Close the modal by ID (no ref needed)
+        const modalEl = document.getElementById("consigneeOne");
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+
+        setOrderNetWeight("");
+      })
+
+      .catch((err) => {
+        toast.error("Failed to populate order", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      });
+  };
   return (
     <>
       <Card
-        title={`Order Test Management /Create
+        title={`Order Management /Create
          Form`}
       >
         <div className="top-space-search-reslute">
@@ -1739,9 +1765,15 @@ const CreateTest = () => {
                             <button
                               type="button"
                               onClick={() => {
-                                setSelectedDetails(null);
-                                setToEditDetails({});
-                                openModal();
+                                if (!computedState.load_date) {
+                                  // Show error modal if load_date is not present
+                                  setShow1(true); // assuming `show1` is controlled by `setShow1`
+                                } else {
+                                  // Proceed to open the main modal if validation passes
+                                  setSelectedDetails(null);
+                                  setToEditDetails({});
+                                  openModal();
+                                }
                               }}
                             >
                               Add
@@ -1749,14 +1781,16 @@ const CreateTest = () => {
                           )}
                           <button
                             type="button"
-                            // onClick={() => {
-                            //   setSelectedDetails(null);
-                            //   setToEditDetails({});
-                            //   openModal();
-                            //   // saveNewDetails1();
-                            // }}
-                            data-bs-toggle="modal"
-                            data-bs-target="#consigneeOne"
+                            onClick={() => {
+                              if (!computedState.load_date) {
+                                setShow1(true); // Show error modal
+                              } else {
+                                const modal = new bootstrap.Modal(
+                                  document.getElementById("consigneeOne")
+                                );
+                                modal.show(); // Manually open the modal if validation passes
+                              }
+                            }}
                           >
                             Add Consignee Items
                           </button>
@@ -2727,6 +2761,58 @@ const CreateTest = () => {
           </div>
         </div>
       )}
+      <Modal
+        className="modalError receiveModal"
+        show={show1}
+        onHide={handleClose1}
+      >
+        <div className="modal-content">
+          <div
+            className="modal-header border-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <h1 className="modal-title fs-5" id="exampleModalLabel">
+              Order Check
+            </h1>
+            <button
+              style={{ color: "#fff", fontSize: "30px" }}
+              type="button"
+              onClick={closeIcon1}
+            >
+              <i class="mdi mdi-close"></i>
+            </button>
+          </div>
+          <div
+            className="modal-body pt-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <div className="eanCheck errorMessage recheckReceive">
+              <p
+                style={{
+                  backgroundColor: color ? "" : "#631f37",
+                }}
+                className="mt-0 pt-0"
+              >
+                Loading Date missing
+              </p>
+
+              <div className="closeBtnRece">
+                <button onClick={closeIcon1}>Close</button>
+              </div>
+            </div>
+          </div>
+          <div
+            className="modal-footer"
+            style={{
+              backgroundColor: color,
+            }}
+          ></div>
+        </div>
+      </Modal>
     </>
   );
 };

@@ -314,7 +314,7 @@ const Quotation_View_Test = () => {
                               (localStorage.getItem("level") === "Level 1" &&
                                 localStorage.getItem("role") === "Admin") ||
                               localStorage.getItem("level") === "Level 5"
-                            ) && <td>{v.OD_Profit_Percentage}%</td>}
+                            ) && <td>{item.OD_Profit_Percentage}%</td>}
                           </tr>
                         );
                       })}

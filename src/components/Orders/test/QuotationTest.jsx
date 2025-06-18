@@ -32,11 +32,17 @@ const QuotationTest = () => {
     allowOutsideClick: false,
   });
   const [data, setData] = useState([]);
+  const [chargeVolume, setChargeVolume] = useState(false);
+
+  const [idData, setIdData] = useState("");
   const [status, setStatus] = useState("");
   const [filterData1, setFilterData1] = useState("");
-
+  const [isRecalculateChecked, setIsRecalculateChecked] = useState(false);
   const handleChange = (event) => {
     setStatus(event.target.value);
+  };
+  const handleAgreedPricingChange = (e) => {
+    setIsRecalculateChecked(e.target.checked);
   };
   const getAllQuotation = () => {
     axios
@@ -50,6 +56,9 @@ const QuotationTest = () => {
       .catch((err) => {
         console.error("Error fetching quotations:", err);
       });
+  };
+  const handleAgreedPricingChange1 = (e) => {
+    setChargeVolume(e.target.checked);
   };
 
   useEffect(() => {
@@ -128,16 +137,28 @@ const QuotationTest = () => {
       toast.error("Failed to Quotation Expired  ");
     }
   };
-  const handleEditClick = async (quotation_id) => {
+  const handleEditClick1 = async (quotation_id) => {
+    setIdData(quotation_id);
+  };
+  const handleEditClick = async () => {
     loadingModal.fire();
     try {
-      const response = await axios.post(`${API_BASE_URL}/copyQuotation`, {
-        quotation_id: quotation_id,
-        user_id: localStorage.getItem("id"),
+      const response = await axios.post(`${API_BASE_URL}/copyOrder`, {
+        order_id: idData,
+        user: localStorage.getItem("id"),
+        Is_quotation: 1,
+        Recalculate: chargeVolume ? 1 : 0, // Convert boolean to 1 or 0
         // Other data you may need to pass
       });
       console.log("API response:", response);
+      let modalElement = document.getElementById("consigneeOne");
+      let modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+
       loadingModal.close();
+      setChargeVolume(false);
       getAllQuotation();
       toast.success("Quotation Copy successfully");
       // Handle the response as needed
@@ -1201,19 +1222,22 @@ const QuotationTest = () => {
       //   ),
       // },
 
+      // {
+      //   Header: "Status",
+      //   accessor: (a) =>
+      //     ({
+      //       1: "Pending",
+      //       2: "Active",
+      //       3: "Packed",
+      //       4: "Shipped",
+      //       5: "Cancelled",
+      //       6: "Expired",
+      //     }[a.Status] || "Unknown"),
+      // },
       {
         Header: "Status",
-        accessor: (a) =>
-          ({
-            1: "Pending",
-            2: "Active",
-            3: "Packed",
-            4: "Shipped",
-            5: "Cancelled",
-            6: "Expired",
-          }[a.Status] || "Unknown"),
+        accessor: "status_name",
       },
-
       {
         Header: "Actions",
         accessor: (a) => (
@@ -1292,11 +1316,17 @@ const QuotationTest = () => {
                   fontSize: "22px",
                   marginTop: "10px",
                 }}
-                onClick={() => handleEditClick(a.Order_ID)}
+                onClick={() => handleEditClick1(a.Order_ID)}
               >
-                <i className="mdi mdi-content-copy" />
+                <i
+                  className="mdi mdi-content-copy"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#consigneeOne"
+                />{" "}
               </button>
             )}
+
             {(+a.Status === 2 ||
               (a.Is_quotation === 0 &&
                 +a.Status >= 2 &&
@@ -1372,8 +1402,59 @@ const QuotationTest = () => {
   };
   return (
     <>
+      <div
+        className="modal fade"
+        id="consigneeOne"
+        tabIndex={-1}
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modalShipTo ">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">
+                Quotation Copy
+              </h1>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <i className="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <label htmlFor="">Recalculate</label>
+              <br />
+              <label className="toggleSwitch large">
+                <input
+                  type="checkbox"
+                  name="Charge_Volume"
+                  checked={chargeVolume}
+                  onChange={handleAgreedPricingChange1}
+                />
+                <span>
+                  <span>No</span>
+                  <span>Yes</span>
+                </span>
+                <a></a>
+              </label>
+            </div>
+            <div className="modal-footer justify-content-right">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => handleEditClick()}
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <Card
-        title="Quotation Test Management"
+        title="Quotation  Management"
         endElement={
           <button
             type="button"

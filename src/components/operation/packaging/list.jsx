@@ -100,37 +100,16 @@ export const OrderPackagingList = () => {
         Header: "Actions",
         accessor: (a) => (
           <div className="editIcon gap-2">
-            {/* <Link
-							to="/createOrder"
-							state={{ from: { ...a, isReadOnly: true } }}>
-							<i className="mdi mdi-eye"></i>
-						</Link> */}
-            {+a.Status == 2 && (
+            {[4, 5, 6].includes(+a.Status) && (
               <Link to="/orderPackagingEdit" state={{ from: { ...a } }}>
                 <i className="mdi mdi-pencil" />
               </Link>
             )}
-            {+a.Status == 2 && (
+
+            {+a.Status === 6 && (
               <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    // MySwal.fire({
-                    // 	title: "Are you sure?",
-                    // 	text: "You won't be able to revert this!",
-                    // 	icon: "warning",
-                    // 	showCancelButton: true,
-                    // 	confirmButtonColor: "#3085d6",
-                    // 	cancelButtonColor: "#d33",
-                    // 	confirmButtonText: "Yes, confirm it!",
-                    // }).then((result) => {
-                    // 	if (result.isConfirmed) confirmQuotation(a.quote_id)
-                    // })
-                  }}
-                >
-                  {/* <i class="mdi mdi-delete "></i> */}
-                </button>
-                {/* {+a.go_to_invoice == 0 && ( */}
+                <button type="button" onClick={() => {}}></button>
+
                 <button
                   type="button"
                   onClick={() =>
@@ -138,9 +117,7 @@ export const OrderPackagingList = () => {
                   }
                 >
                   <i className="mdi mdi-check" />
-                  {/* <i className="mdi mdi-restore" /> */}
                 </button>
-                {/* )} */}
               </>
             )}
           </div>

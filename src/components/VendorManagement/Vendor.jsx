@@ -1,4 +1,4 @@
-import axios from "axios"
+// import axios from "axios"
 import { useMemo } from "react"
 import { useQuery } from "react-query"
 import { Link, useNavigate } from "react-router-dom"
@@ -6,6 +6,7 @@ import { toast } from "react-toastify"
 import { API_BASE_URL } from "../../Url/Url"
 import { Card } from "../../card"
 import { TableView } from "../table"
+import axios from "../../Url/Api";
 
 const Vendor = () => {
 	const { data } = useQuery("getAllVendor")
@@ -18,7 +19,7 @@ const Vendor = () => {
 		axios
 			.post(`${API_BASE_URL}/updateVendorStatus`, request)
 			.then((response) => {
-				toast[response.data.succes ? "success" : "error"](
+				toast[response.data.success ? "success" : "error"](
 					response.data.message,
 					{
 						autoClose: 1000,
@@ -71,7 +72,7 @@ const Vendor = () => {
 							onclick=""
 						>
 							<input
-								onChange={() => updateVendorStatus(a.vendor_id)}
+								onChange={() => updateVendorStatus(a.ID)}
 								type="checkbox"
 								defaultChecked={a.status == "on"}
 							/>

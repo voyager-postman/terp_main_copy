@@ -25,7 +25,7 @@ const InvoiceThird = () => {
   const customInvoiceDetails = () => {
     axios
       .post(`${API_BASE_URL}/InvoiceDetails`, {
-        order_id: from?.order_id,
+        order_id: from?.Order_ID,
         Invoice_id: from?.Invoice_id,
       })
       .then((response) => {
@@ -44,7 +44,7 @@ const InvoiceThird = () => {
   const pdfTableData = () => {
     axios
       .post(`${API_BASE_URL}/invoicePdfTable`, {
-        invoice_id: from?.Invoice_id,
+        invoice_id: from?.Order_ID,
       })
       .then((response) => {
         console.log(response);
@@ -63,7 +63,7 @@ const InvoiceThird = () => {
   const pdfAllData = () => {
     axios
       .post(`${API_BASE_URL}/CustomeInvoicePdfDetails`, {
-        order_id: from?.order_id,
+        order_id: from?.Order_ID,
         invoice_id: from?.Invoice_id,
       })
       .then((response) => {
@@ -180,7 +180,7 @@ const InvoiceThird = () => {
   const delivery = () => {
     axios
       .post(`${API_BASE_URL}/pdf_delivery_by  `, {
-        order_id: from?.order_id,
+        order_id: from?.Order_ID,
       })
       .then((response) => {
         console.log(response.status);
@@ -555,7 +555,7 @@ const InvoiceThird = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${from?.Invoice_number || "default"}_Custom_${dateTime}.pdf`
+      `${from?.Invoice_Number || "default"}_Custom_${dateTime}.pdf`
     );
     try {
       const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
@@ -563,7 +563,7 @@ const InvoiceThird = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${from?.Invoice_number}_Custom_${dateTime}.pdf`
+          `${API_IMAGE_URL}${from?.Invoice_Number}_Custom_${dateTime}.pdf`
         );
       } else {
         console.log("Failed to upload PDF");

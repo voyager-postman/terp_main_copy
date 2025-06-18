@@ -23,6 +23,7 @@ const CreateClient = () => {
   const [fromDate, setFromDate] = useState("");
   const [orderItem, setOrderItem] = useState([]);
   const [paymentTable1, setPaymentTable1] = useState([]);
+  
   const [paidAmounts, setPaidAmounts] = useState({});
   const [totalPaidAmount, setTotalPaidAmount] = useState(0);
   const [clientId, setClientId] = useState("");
@@ -63,6 +64,22 @@ const CreateClient = () => {
   console.log(from);
   const navigate = useNavigate();
   // new
+  const [unitDropdown, setUnitDropDown] = useState([]);
+  const getUnitDropdown = () => {
+    axios
+      .get(`${API_BASE_URL}/getAllUnit`)
+      .then((resp) => {
+        console.log(resp);
+
+        setUnitDropDown(resp.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  useState(() => {
+    getUnitDropdown();
+  }, []);
 
   const getAllTimePeriod = () => {
     axios.get(`${API_BASE_URL}/statisticsDateSelection1`).then((res) => {
@@ -78,7 +95,7 @@ const CreateClient = () => {
   };
   const getAllProduce = () => {
     axios.get(`${API_BASE_URL}/getAllProduceItem`).then((res) => {
-      setValue(res.value.value || []);
+      setValue(res?.value?.value || []);
     });
   };
   useEffect(() => {
@@ -640,6 +657,8 @@ const CreateClient = () => {
     ITF: "",
     Custom_Name: "",
     Dummy_Price: "",
+    Barcode: "",
+    Unit: "",
   });
   const { data: brands } = useQuery("getBrand");
   const { data: paymentChannle } = useQuery("PaymentChannela");
@@ -963,10 +982,27 @@ const CreateClient = () => {
       ITF: "",
       Custom_Name: "",
       Dummy_Price: "",
+      Unit: "",
+      Barcode: "",
     });
   };
 
   const submitCusomizationData = () => {
+    if (!dataCustomization.ITF) {
+      toast.warn("Please enter ITF", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!dataCustomization.Unit) {
+      toast.warn("Please enter Unit", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
     console.log(dataCustomization);
     axios
       .post(
@@ -985,6 +1021,8 @@ const CreateClient = () => {
           ITF: "",
           Custom_Name: "",
           Dummy_Price: "",
+          Unit: "",
+          Barcode: "",
         });
         let modalElement = document.getElementById("exampleModalCustomization");
         let modalInstance = bootstrap.Modal.getInstance(modalElement);
@@ -1024,6 +1062,21 @@ const CreateClient = () => {
       });
   };
   const customizationDataSubmit = (e) => {
+    if (!dataCustomization.ITF) {
+      toast.warn("Please enter ITF", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!dataCustomization.Unit) {
+      toast.warn("Please enter Unit", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
     console.log(dataCustomization);
     e.preventDefault();
     axios
@@ -1354,6 +1407,8 @@ const CreateClient = () => {
       ITF: selectedUser?.ITF || "",
       Custom_Name: selectedUser?.Custom_Name || "",
       Dummy_Price: selectedUser?.Dummy_Price || "",
+      Unit: selectedUser?.Unit || "",
+      Barcode: selectedUser?.Barcode || "",
     }));
 
     console.log(selectedUser);
@@ -1475,35 +1530,8 @@ const CreateClient = () => {
                 >
                   <div className="formCreate">
                     <form action="">
-                      <div className="row">
-                        {/* <div className="form-group col-lg-3">
-                          <h6> Client</h6>
-
-                          <div className=" ">
-                            <select
-                              name="client_id"
-                              onChange={handleChange}
-                              value={state.client_id}
-                            >
-                              <option value="">Select Client</option>
-                              {client?.map((item) => (
-                                <option value={item.client_id}>
-                                  {item.client_name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div> */}
-                        {/* <div className="form-group col-lg-4">
-                          <h6>Code</h6>
-                          <input
-                            type="text"
-                            name="CODE"
-                            className="w-full"
-                            value={state.CODE}
-                            onChange={handleChange}
-                          />
-                        </div> */}
+                        <div className="row">
+                       
                         <div className="form-group col-lg-4">
                           <h6>Name</h6>
                           <input
@@ -1524,29 +1552,7 @@ const CreateClient = () => {
                             onChange={handleChange}
                           />
                         </div>
-
                         <div className="form-group col-lg-4">
-                          <h6>Email</h6>
-                          <input
-                            type="email"
-                            className="w-full"
-                            value={state.client_email}
-                            name="client_email"
-                            onChange={handleChange}
-                          />
-                        </div>
-
-                        <div className="form-group col-lg-6">
-                          <h6>Phone Number</h6>
-                          <input
-                            type="email"
-                            className="w-full"
-                            value={state.client_phone}
-                            name="client_phone"
-                            onChange={handleChange}
-                          />
-                        </div>
-                        <div className="form-group col-lg-6">
                           <h6> Brand</h6>
                           <div className="ceateTransport autoComplete">
                             <Autocomplete
@@ -1578,240 +1584,64 @@ const CreateClient = () => {
                             />
                           </div>
                         </div>
-                        {/* 
-                        <div className="form-group col-lg-3">
-                          <h6> Location</h6>
-
-                          <div className="ceateTransport">
-                            <select
-                              value={state.Default_location}
-                              name="Default_location"
-                              onChange={handleChange}
-                            >
-                              <option value="">Select Location</option>
-                              {locations?.map((item) => (
-                                <option value={item.id}>{item.name}</option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="form-group col-lg-3">
-                          <h6> Port of origin</h6>
-                          <div className="ceateTransport">
-                            <select
-                              value={state.port_of_orign}
-                              name="port_of_orign"
-                              onChange={handleChange}
-                            >
-                              <option value="">Select Airport</option>
-                              {port?.map((item) => (
-                                <option value={item.port_id}>
-                                  {item.port_name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="form-group col-lg-3">
-                          <h6> Port of Destination</h6>
-                          <div className="ceateTransport">
-                            <select
-                              value={state.destination_port}
-                              name="destination_port"
-                              onChange={handleChange}
-                            >
-                              <option value="">Select Airport</option>
-                              {port?.map((item) => (
-                                <option value={item.port_id}>
-                                  {item.port_name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="form-group col-lg-3">
-                          <h6> Airline</h6>
-                          <div className="ceateTransport">
-                            <select
-                              value={state.liner_Drop}
-                              name="liner_Drop"
-                              onChange={handleChange}
-                            >
-                              <option value="">Please Select Airline</option>
-                              {liner?.map((item) => (
-                                <option value={item.liner_id}>
-                                  {item.liner_name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div> */}
-                        {/* <div className="form-group col-lg-4">
-                          <h6> Invoice Currency</h6>
-
-                          <div className="ceateTransport">
-                            <select
-                              value={state.currency}
-                              name="currency"
-                              onChange={handleChange}
-                            >
-                              <option value="">Select Location</option>
-                              {currency?.map((item) => (
-                                <option value={item.currency_id}>
-                                  {item.currency}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
                         <div className="form-group col-lg-4">
-                          <h6>Markup </h6>
-                          <div className="parentShip">
-                            <div className="markupShip">
-                              <input
-                                type="number"
-                                value={state.profit}
-                                name="profit"
-                                onChange={handleChange}
-                              />
-                            </div>
-                            <div className="shipPercent">
-                              <span>%</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="form-group col-lg-4">
-                          <h6>Rebate</h6>
-                          <div className="parentShip">
-                            <div className="markupShip">
-                              <input
-                                type="number"
-                                value={state.rebate}
-                                name="rebate"
-                                onChange={handleChange}
-                              />
-                            </div>
-                            <div className="shipPercent">
-                              <span>%</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="form-group col-lg-4">
-                          <h6> Commission</h6>
-                          <div className="ceateTransport">
-                            <select
-                              value={state.commission}
-                              name="commission"
-                              onChange={handleChange}
-                            >
-                              <option value="">Select Commission</option>
-                              {commission?.map((item) => (
-                                <option value={item.id}>
-                                  {item.commission_name_en}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="form-group col-lg-4">
-                          <h6>Commission Value</h6>
-                          <input
-                            type="number"
-                            className="w-full"
-                            value={state.commission_value}
-                            name="commission_value"
-                            onChange={handleChange}
-                          />
-                        </div>
-
-                        <div className="form-group col-lg-4 shipToToggle">
-                          <h6>Commission Currency</h6>
-                          <label
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: "10px",
-                            }}
-                            className="toggleSwitch large"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={state.Commission_Currency === "THB"}
-                              onChange={handleChange}
-                              name="Commission_Currency"
-                            />
-                            <span>
-                              <span>FX</span>
-                              <span> THB</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div> */}
-                        <div className="form-group col-lg-12">
                           <h6>Address</h6>
-                          <textarea
-                            name="client_address"
-                            className="border-2 rounded-md border-[#203764] w-full"
-                            onChange={handleChange}
-                            value={state.client_address}
-                          />
-                        </div>
-
-                        {/* <div className="col-lg-12">
-                          <h6
-                            className="mt-4"
-                            style={{
-                              fontWeight: "600",
-                              marginBottom: "10px",
-                              fontSize: "20px",
-                            }}
-                          >
-                            Bank Informations
-                          </h6>
-                          <div className="row ">
-                            <div className="form-group col-lg-4">
-                              <h6>Bank Name</h6>
-
-                              <input
-                                onChange={handleChange}
-                                type="text"
-                                id="name_en"
-                                name="bank_name"
-                                className="form-control"
-                                placeholder="axis "
-                                value={state.bank_name}
-                              />
-                            </div>
-                            <div className="form-group col-lg-4">
-                              <h6>Account Name</h6>
-                              <input
-                                onChange={handleChange}
-                                type="text"
-                                id="name_en"
-                                name="account_name"
-                                className="form-control"
-                                placeholder="xxxxx "
-                                value={state.account_name}
-                              />
-                            </div>
-                            <div className="form-group col-lg-4">
-                              <h6>Account Number</h6>
-                              <input
-                                onChange={handleChange}
-                                type="text"
-                                id="name_en"
-                                name="account_number"
-                                className="form-control"
-                                placeholder="3345345435 "
-                                value={state.account_number}
-                              />
-                            </div>
+                          <div>
+                            <input
+                              name="client_address"
+                              className="border-2 rounded-md border-[#203764] w-full"
+                              onChange={handleChange}
+                              value={state.client_address}
+                            />
                           </div>
-                        </div> */}
+                          <div>
+                            <input
+                              name="client_address"
+                              className="border-2 rounded-md border-[#203764] w-full"
+                              // onChange={handleChange}
+                              // value={state.client_address}
+                            />
+                          </div>
+                          <div>
+                            <input
+                              name="client_address"
+                              className="border-2 rounded-md border-[#203764] w-full"
+                              // onChange={handleChange}
+                              // value={state.client_address}
+                            />
+                          </div>
+                          <div>
+                            <input
+                              name="client_address"
+                              className="border-2 rounded-md border-[#203764] w-full"
+                              // onChange={handleChange}
+                              // value={state.client_address}
+                            />
+                          </div>
+                        </div>
+                        <div className="form-group col-lg-4">
+                          <div>
+                            <h6>Email</h6>
+                            <input
+                              type="email"
+                              className="w-full"
+                              value={state.client_email}
+                              name="client_email"
+                              onChange={handleChange}
+                            />
+                          </div>
+                          <div>
+                            <h6>Phone Number</h6>
+                            <input
+                              type="email"
+                              className="w-full"
+                              value={state.client_phone}
+                              name="client_phone"
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+ 
                         <div className="col-lg-12">
                           <h6
                             className="mt-4"
@@ -1826,7 +1656,7 @@ const CreateClient = () => {
                           <div className="row ">
                             <div className="form-group col-lg-4">
                               <h6>Bank Name</h6>
-
+ 
                               <input
                                 onChange={handleChange}
                                 type="text"
@@ -1864,6 +1694,7 @@ const CreateClient = () => {
                           </div>
                         </div>
                       </div>
+ 
                     </form>
                   </div>
                   <div className="card-footer text-center">
@@ -2884,7 +2715,8 @@ const CreateClient = () => {
                       <th> ITF Name</th>
                       <th>Custom Name</th>
                       <th>Dummy Price</th>
-
+                      <th>Unit</th>
+                      <th>Barcode</th>
                       <th>Action</th>
                     </tr>
                     {customization?.map((item) => {
@@ -2893,6 +2725,8 @@ const CreateClient = () => {
                           <td>{item.Name_EN}</td>
                           <td>{item.Custom_Name}</td>
                           <td>{item.Dummy_Price}</td>
+                          <td>{item.unit_name}</td>
+                          <td>{item.Barcode}</td>
                           <td>
                             <div>
                               <button
@@ -3018,6 +2852,59 @@ const CreateClient = () => {
                                               />
                                             </div>
                                           </div>
+                                          <div className="form-group col-lg-12 ">
+                                            <h6>Unit </h6>
+                                            <div className="ceateTransport autoComplete">
+                                              <Autocomplete
+                                                options={unitDropdown || []} // List of ITFs
+                                                getOptionLabel={(option) =>
+                                                  option.Name_EN || ""
+                                                } // Label to display (itf_name_en for each ITF)
+                                                onChange={(event, newValue) => {
+                                                  handleChange2({
+                                                    target: {
+                                                      name: "Unit",
+                                                      value: newValue
+                                                        ? newValue.ID
+                                                        : "",
+                                                    }, // Update ITF in state
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder="Select ITF"
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  unitDropdown?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      dataCustomization.Unit
+                                                  ) || null
+                                                } // Set selected value based on ITF
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID} // Option comparison by itf_id
+                                              />
+                                            </div>
+                                            <div class="form-group col-lg-12 mt-2">
+                                              <h6> Barcode </h6>
+                                              <div className=" ">
+                                                <input
+                                                  type="text"
+                                                  name="Barcode"
+                                                  onChange={handleChange2}
+                                                  value={
+                                                    dataCustomization.Barcode
+                                                  }
+                                                  placeholder="BarCode Name"
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
@@ -3089,14 +2976,14 @@ const CreateClient = () => {
                               <h6>ITF Name </h6>
                               <div className="ceateTransport autoComplete">
                                 <Autocomplete
-                                  options={getItf || []} 
+                                  options={getItf || []}
                                   getOptionLabel={(option) =>
-                                    option.itf_name_en || ""
-                                  } 
+                                    option.ITF_Internal_Name_EN || ""
+                                  }
                                   onChange={(event, newValue) => {
                                     setDataCustomization((prevState) => ({
                                       ...prevState,
-                                      ITF: newValue ? newValue.itf_id : "", 
+                                      ITF: newValue ? newValue.ID : "",
                                     }));
                                   }}
                                   renderInput={(params) => (
@@ -3109,12 +2996,12 @@ const CreateClient = () => {
                                   value={
                                     getItf?.find(
                                       (item) =>
-                                        item.itf_id === dataCustomization.ITF
+                                        item.ID === dataCustomization.ITF
                                     ) || null
                                   }
                                   isOptionEqualToValue={(option, value) =>
-                                    option.itf_id === value.itf_id
-                                  } 
+                                    option.ID === value.ID
+                                  }
                                 />
                               </div>
                             </div>
@@ -3140,6 +3027,54 @@ const CreateClient = () => {
                                   value={dataCustomization.Dummy_Price}
                                   placeholder="Custom Name"
                                 />
+                              </div>
+                            </div>
+
+                            <div className="form-group col-lg-12 ">
+                              <h6>Unit </h6>
+                              <div className="ceateTransport autoComplete">
+                                <Autocomplete
+                                  options={unitDropdown || []} // List of ITFs
+                                  getOptionLabel={(option) =>
+                                    option.Name_EN || ""
+                                  } // Label to display (itf_name_en for each ITF)
+                                  onChange={(event, newValue) => {
+                                    handleChange2({
+                                      target: {
+                                        name: "Unit",
+                                        value: newValue ? newValue.ID : "",
+                                      }, // Update ITF in state
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select ITF"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    unitDropdown?.find(
+                                      (item) =>
+                                        item.ID === dataCustomization.Unit
+                                    ) || null
+                                  } // Set selected value based on ITF
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  } // Option comparison by itf_id
+                                />
+                              </div>
+                              <div class="form-group col-lg-12 mt-2">
+                                <h6> Barcode </h6>
+                                <div className=" ">
+                                  <input
+                                    type="text"
+                                    name="Barcode"
+                                    onChange={handleChange2}
+                                    value={dataCustomization.Barcode}
+                                    placeholder="BarCode Name"
+                                  />
+                                </div>
                               </div>
                             </div>
                           </div>

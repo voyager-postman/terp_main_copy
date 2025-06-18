@@ -2,7 +2,8 @@ import React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../Url/Api";
 import { API_BASE_URL } from "../../Url/Url";
 const InvoiceView = () => {
   const location = useLocation();
@@ -15,24 +16,24 @@ const InvoiceView = () => {
     setData(from);
   }, []);
   const { data: details, refetch: getOrdersDetails } = useQuery(
-    `getInvoiceDeatilsTable?invoice_id=${from?.Invoice_id}`,
+    `getInvoiceDeatilsTable?invoice_id=${from?.Order_ID}`,
     {
-      enabled: !!from?.Invoice_id,
+      enabled: !!from?.Order_ID,
     }
   );
   console.log(details);
-  const { data: summary, refetch: getSummary } = useQuery(
-    `getInvoiceSummary?invoice_id=${from?.Invoice_id}`,
-    {
-      enabled: !!from?.Invoice_id,
-    }
-  );
-  console.log(summary);
+  // const { data: summary, refetch: getSummary } = useQuery(
+  //   `getInvoiceSummary?invoice_id=${from?.Order_ID}`,
+  //   {
+  //     enabled: !!from?.Order_ID,
+  //   }
+  // );
+  // console.log(summary);
   const oneQoutationDAta = () => {
     axios
       .get(`${API_BASE_URL}/getInvoiceById`, {
         params: {
-          invoiceId: from?.Invoice_id,
+          invoiceId: from?.Order_ID,
         },
       })
       .then((response) => {
@@ -97,20 +98,33 @@ const InvoiceView = () => {
                         </div>
                       </div>
                       <div className=" mt-5 borderBottompurchase">
-                        <div className="InvoceViewFlex">
-                          <div className="invoiceViewTop">
+                        <div className="InvoceViewFlex row">
+                          <div className="invoiceViewTop col-lg-3">
                             <div className="parentPurchaseView">
                               <div className="me-3">
                                 <strong>
-                                  Invoice Number <span>:</span>{" "}
+                                  Code <span>:</span>{" "}
                                 </strong>
                               </div>
                               <div>
-                                <p>{data?.Invoice_number}</p>
+                                <p>{data?.Invoice_Number}</p>
                               </div>
                             </div>
                           </div>
-                          <div className="invoiceViewTop">
+                          <div className="invoiceViewTop col-lg-3">
+                            <div className="parentPurchaseView">
+                              <div className="me-3">
+                                <strong>
+                                  Create By <span>:</span>{" "}
+                                </strong>
+                              </div>
+                              <div>
+                                <p>{data1?.created_by}</p>
+                                {/* <p>{data?.Client_name}</p> */}
+                              </div>
+                            </div>
+                          </div>
+                          {/* <div className="invoiceViewTop">
                             <div className="parentPurchaseView">
                               <div className="me-3">
                                 <strong>
@@ -133,7 +147,7 @@ const InvoiceView = () => {
                                 <p>{data?.Consignee_name}</p>
                               </div>
                             </div>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                       <div className="row purchaseViewRow mt-4">
@@ -141,21 +155,22 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Ship Date <span>:</span>
+                                Client <span>:</span>{" "}
                               </strong>
                             </div>
                             <div>
-                              <p>{formatDate(data?.Ship_date)}</p>
+                              <p>{data1?.client_name}</p>
                             </div>
                           </div>
+
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                AWB <span>:</span>
+                                Ship To <span>:</span>{" "}
                               </strong>
                             </div>
                             <div>
-                              <p>{data?.bl}</p>
+                              <p>{data?.Consignee_name}</p>
                             </div>
                           </div>
                           <div className="parentPurchaseView">
@@ -182,59 +197,26 @@ const InvoiceView = () => {
                               </p>
                             </div>
                           </div>
-                        </div>
-                        <div className="col-lg-4">
-                          <div className="parentPurchaseView">
+                          {/* <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Total Commission<span>:</span>
+                                Ship Date <span>:</span>
                               </strong>
                             </div>
                             <div>
-                              <p>{twoDecimal.format(data?.COMMISION)}</p>
+                              <p>{formatDate(data?.Ship_date)}</p>
                             </div>
                           </div>
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Total Rebate <span>:</span>
+                                AWB <span>:</span>
                               </strong>
                             </div>
                             <div>
-                              <p> {data?.REBATE}</p>
+                              <p>{data?.bl}</p>
                             </div>
-                          </div>
-                          {!(
-                            (localStorage.getItem("level") === "Level 1" &&
-                              localStorage.getItem("role") === "Admin") ||
-                            localStorage.getItem("level") === "Level 5"
-                          ) && (
-                            <div className="parentPurchaseView">
-                              <div className="me-3">
-                                <strong>
-                                  Total Profit <span>:</span>
-                                </strong>
-                              </div>
-                              <div>
-                                <p>
-                                  {" "}
-                                  {twoDecimal.format(data?.Invoice_profit)}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                          {localStorage.getItem("level") !== "Level 5" && (
-                            <div className="parentPurchaseView">
-                              <div className="me-3">
-                                <strong>
-                                  Markup Rate <span>:</span>
-                                </strong>
-                              </div>
-                              <div>
-                                <p>{data?.Invoice_profit_percentage}</p>
-                              </div>
-                            </div>
-                          )}
+                          </div> */}
                         </div>
                         <div className="col-lg-4">
                           <div className="parentPurchaseView">
@@ -254,20 +236,101 @@ const InvoiceView = () => {
                               </strong>
                             </div>
                             <div>
-                              <p>{data?.fx_rate}</p>
+                              <p>{data?.Daily_FX_Rate}</p>
+                            </div>
+                          </div>
+                          {localStorage.getItem("level") !== "Level 5" && (
+                            <div className="parentPurchaseView">
+                              <div className="me-3">
+                                <strong>
+                                  Markup Rate <span>:</span>
+                                </strong>
+                              </div>
+                              <div>
+                                <p>{data?.O_Markup}</p>
+                              </div>
+                            </div>
+                          )}
+                          {/* <div className="parentPurchaseView">
+                            <div className="me-3">
+                              <strong>
+                                Total Commission<span>:</span>
+                              </strong>
+                            </div>
+                            <div>
+                              <p>{twoDecimal.format(data?.COMMISION)}</p>
+                            </div>
+                          </div> */}
+                          <div className="parentPurchaseView">
+                            <div className="me-3">
+                              <strong>
+                                Rebate <span>:</span>
+                              </strong>
+                            </div>
+                            <div>
+                              <p> {data?.O_Rebate}</p>
+                            </div>
+                          </div>
+                          {!(
+                            (localStorage.getItem("level") === "Level 1" &&
+                              localStorage.getItem("role") === "Admin") ||
+                            localStorage.getItem("level") === "Level 5"
+                          ) && (
+                            <div className="parentPurchaseView">
+                              <div className="me-3">
+                                <strong>
+                                  Total Profit <span>:</span>
+                                </strong>
+                              </div>
+                              <div>
+                                <p> {twoDecimal.format(data?.Profit)}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="col-lg-4">
+                          <div className="parentPurchaseView">
+                            <div className="me-3">
+                              <strong>
+                                Clearance<span>:</span>
+                              </strong>
+                            </div>
+                            <div>
+                              <p>{data1?.clearance_name}</p>
                             </div>
                           </div>
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                FX Rebate <span>:</span>
+                                Palletized <span>:</span>
                               </strong>
                             </div>
                             <div>
-                              <p>{data?.REBATE_FX}</p>
+                              <p>{data?.palletized}</p>
+                              {/* <p>{data?.REBATE_FX}</p> */}
                             </div>
                           </div>
                           <div className="parentPurchaseView">
+                            <div className="me-3">
+                              <strong>
+                                CO from Chamber <span>:</span>
+                              </strong>
+                            </div>
+                            <div>
+                              <p>{data?.Chamber}</p>
+                            </div>
+                          </div>
+                          <div className="parentPurchaseView">
+                            <div className="me-3">
+                              <strong>
+                                Ship Date <span>:</span>
+                              </strong>
+                            </div>
+                            <div>
+                              <p>{formatDate(data?.Ship_date)}</p>
+                            </div>
+                          </div>
+                          {/* <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
                                 FX Commission <span>:</span>
@@ -276,7 +339,7 @@ const InvoiceView = () => {
                             <div>
                               <p>{data?.COMMISION_FX}</p>
                             </div>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                       <div className="row my-3">
@@ -300,8 +363,8 @@ const InvoiceView = () => {
                                 <th> Unit</th>
                                 <th>Number of Box</th>
                                 <th>NW</th>
-                                <th> Final Price</th>
-                                <th> Calculated Price</th>
+                                <th> Unit Price </th>
+                                <th> Adjust Price</th>
                                 {!(
                                   (localStorage.getItem("level") ===
                                     "Level 1" &&
@@ -316,23 +379,17 @@ const InvoiceView = () => {
                                     data-bs-toggle="modal"
                                     data-bs-target="#myModal"
                                   >
-                                    <td>{item.ITF_name}</td>
-                                    <td>{item.brand_name}</td>
+                                    <td>{item.ITF_Name}</td>
+                                    <td>{item.Brand_name}</td>
+                                    <td>{threeDecimal.format(item.QTY)}</td>
+                                    <td>{item.Unit_Name}</td>
+                                    <td>{NoDecimal.format(item.Box)}</td>
+                                    <td>{threeDecimal.format(item.NW)}</td>
                                     <td>
-                                      {threeDecimal.format(item.itf_quantity)}
-                                    </td>
-                                    <td>{item.itf_unit_name}</td>
-                                    <td>
-                                      {NoDecimal.format(item.Number_of_boxes)}
-                                    </td>
-                                    <td>
-                                      {threeDecimal.format(item.net_weight)}
+                                      {twoDecimal.format(item.Final_price)}
                                     </td>
                                     <td>
-                                      {twoDecimal.format(item.Final_Price)}
-                                    </td>
-                                    <td>
-                                      {twoDecimal.format(item.calculated_price)}
+                                      {twoDecimal.format(item.Calculated_Price)}
                                     </td>
 
                                     {!(
@@ -342,9 +399,7 @@ const InvoiceView = () => {
                                           "Admin") ||
                                       localStorage.getItem("level") ===
                                         "Level 5"
-                                    ) && (
-                                      <td>{item.Invoice_profit_percentage}%</td>
-                                    )}
+                                    ) && <td>{item.Profit_Percentage}%</td>}
                                   </tr>
                                 );
                               })}
@@ -354,19 +409,19 @@ const InvoiceView = () => {
                             <div className="col-lg-3">
                               <div>
                                 <b> Total NW : </b>
-                                {(+data1?.nw || 0).toLocaleString()}
+                                {(+data1?.NW || 0).toLocaleString()}
                               </div>
                               <div>
                                 <b> Total GW : </b>
-                                {(+data1?.gw || 0).toLocaleString()}
+                                {(+data1?.GW || 0).toLocaleString()}
                               </div>
                               <div>
                                 <b> Total Box : </b>
-                                {(+data1?.box || 0).toLocaleString()}
+                                {(+data1?.Box || 0).toLocaleString()}
                               </div>
                               <div>
                                 <b> Total CBM : </b>
-                                {(+data1?.cbm || 0).toLocaleString()}
+                                {(+data1?.CBM || 0).toLocaleString()}
                               </div>
                               <div>
                                 <b> Total ITF : </b>
@@ -376,15 +431,21 @@ const InvoiceView = () => {
                             <div className="col-lg-3">
                               <div>
                                 <b>Freight : </b>
-                                {(+data1?.freight || 0).toLocaleString()}
+                                {(+data1?.Freight || 0).toLocaleString()}
                               </div>
                               <div>
                                 <b>TransPort : </b>
-                                {(+data1?.transport || 0).toLocaleString()}
+                                {(+data1?.Transport || 0).toLocaleString()}
                               </div>
                               <div>
                                 <b>Clearance : </b>
-                                {(+data1?.clearance || 0).toLocaleString()}
+                                {(+data1?.Clearance || 0).toLocaleString()}
+                              </div>
+                              <div>
+                                <b>Extra : </b>
+                                <span>
+                                  {(+data1?.Extra || 0).toLocaleString()}
+                                </span>
                               </div>
                             </div>
                             <div className="col-lg-3">
@@ -397,25 +458,23 @@ const InvoiceView = () => {
                                 {(+data1?.CNF || 0).toLocaleString()}
                               </div>
                               {!(
-                            (localStorage.getItem("level") === "Level 1" &&
-                              localStorage.getItem("role") === "Admin") ||
-                            localStorage.getItem("level") === "Level 5"
-                          ) && (
+                                (localStorage.getItem("level") === "Level 1" &&
+                                  localStorage.getItem("role") === "Admin") ||
+                                localStorage.getItem("level") === "Level 5"
+                              ) && (
                                 <div className="">
                                   <b> Total Profit : </b>
+                                  {(+data1?.Profit || 0).toLocaleString()}
+                                </div>
+                              )}
+                              {localStorage.getItem("level") !== "Level 5" && (
+                                <div style={{ marginLeft: "2px" }}>
+                                  <b> Profit % : </b>
                                   {(
-                                    +data1?.Invoice_profit || 0
+                                    +data1?.Profit_Percentage || 0
                                   ).toLocaleString()}
                                 </div>
                               )}
-                                  {localStorage.getItem("level") !== "Level 5" && (
-                              <div style={{ marginLeft: "2px" }}>
-                                <b> Profit % : </b>
-                                {(
-                                  +data1?.Invoice_profit_percentage || 0
-                                ).toLocaleString()}
-                              </div>
-                                )}
                             </div>
                             <div className="col-lg-3">
                               <div>
@@ -425,7 +484,9 @@ const InvoiceView = () => {
                               <div>
                                 <div>
                                   <b> Total Commission FX: </b>
-                                  {(+data1?.COMMISION_FX || 0).toLocaleString()}
+                                  {(
+                                    +data1?.Commission_FX || 0
+                                  ).toLocaleString()}
                                 </div>
                                 <div>
                                   <b> Total Rebate FX : </b>

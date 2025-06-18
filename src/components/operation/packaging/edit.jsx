@@ -10,10 +10,28 @@ import { Button, Modal } from "react-bootstrap";
 export const OrderPackagingEdit = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
+  // const [editRowIndex, setEditRowIndex] = useState(null);
+  const [editedValue, setEditedValue] = useState({});
   const { from } = location.state || {};
   console.log(from);
 
+  const [editRowIndex, setEditRowIndex] = useState(null);
+  const [editRowIndex1, setEditRowIndex1] = useState(null);
+  const [editRowIndex2, setEditRowIndex2] = useState(null);
+
+  const [editBoxes, setEditBoxes] = useState("");
+  const showEditBoxes = (index) => {
+    setEditBoxes(index);
+  };
+  const showEditEan = (index) => {
+    setEditRowIndex(index);
+  };
+  const showEditEan1 = (index) => {
+    setEditRowIndex1(index);
+  };
+  const showEditEan2 = (index) => {
+    setEditRowIndex2(index);
+  };
   const loadingModal = MySwal.mixin({
     title: "Loading...",
     didOpen: () => {
@@ -27,6 +45,8 @@ export const OrderPackagingEdit = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [stock, setStock] = useState("");
   const [details, setDetails] = useState([]);
+  const [tableHeader, setTableHeader] = useState("");
+
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -46,49 +66,86 @@ export const OrderPackagingEdit = () => {
       .then((response) => {
         console.log(response);
         setDetails(response.data.data || []);
+        setTableHeader(response.data.table_head);
       })
       .catch((e) => {});
   };
 
-  const handleEditValues = (index, e) => {
+  // const handleEditValues = (index, e) => {
+  //   if (isReadOnly || isLoading) return;
+  //   const newEditProduce = [...details];
+  //   newEditProduce[index][e.target.name] = e.target.value;
+  //   setDetails(newEditProduce);
+  // };
+  const handleEditValues = async (index, e) => {
     if (isReadOnly || isLoading) return;
+
+    const { name, value } = e.target;
     const newEditProduce = [...details];
-    newEditProduce[index][e.target.name] = e.target.value;
+    newEditProduce[index][name] = value;
     setDetails(newEditProduce);
+
+    const updatedRow = newEditProduce[index];
+
+    // Dynamically set payload based on input name
+    const payload = {
+      OD_ID: updatedRow.col2,
+    };
+
+    if (name === "col7") {
+      payload.ean_required = value;
+    } else if (name === "col15") {
+      payload.bonus = value;
+    } else if (name === "col16") {
+      payload.adjusted_gw_od = value;
+    }
+
+    try {
+      await axios.post(`${API_BASE_URL}/updatedoOrderPacking`, payload);
+      // Optional: Refresh or notify
+    } catch (error) {
+      console.error("Failed to update packing:", error);
+    }
   };
 
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
 
   const getDetails = async (orderId, odId) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/getOrderPacking`, {
-        order_id: orderId,
-        od_id: odId,
-      });
-      console.log(response);
-
-      if (response.data.data.buns !== undefined) {
-        // Merge the new bonus and adjusted_gw_od values with the existing details array
-        setDetails((prevDetails) =>
-          prevDetails.map((item) =>
-            item.order_id === orderId && item.od_id === odId
-              ? {
-                  ...item,
-                  bonus: response.data.data.buns,
-                  adjusted_gw_od: response.data.data.adjusted_gw_od,
-                  order_packing_id: response.data.data.order_packing_id,
-                  ean_per_od: response.data.data.new_pc_od,
-                  Number_of_boxes: response.data.data.new_box_od,
-                  net_weight: response.data.data.new_nw_od,
-                }
-              : item
-          )
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+    // try {
+    //   const response = await axios.post(`${API_BASE_URL}/getOrderPacking`, {
+    //     order_id: orderId,
+    //     od_id: odId,
+    //   });
+    //   console.log(response);
+    //   if (response.data.data.buns !== undefined) {
+    //     // Merge the new bonus and adjusted_gw_od values with the existing details array
+    //     setDetails((prevDetails) =>
+    //       prevDetails.map((item) =>
+    //         item.order_id === orderId && item.od_id === odId
+    //           ? {
+    //               ...item,
+    //               bonus: response.data.data.buns,
+    //               adjusted_gw_od: response.data.data.adjusted_gw_od,
+    //               order_packing_id: response.data.data.order_packing_id,
+    //               ean_per_od: response.data.data.new_pc_od,
+    //               Number_of_boxes: response.data.data.new_box_od,
+    //               net_weight: response.data.data.new_nw_od,
+    //             }
+    //           : item
+    //       )
+    //     );
+    //   }
+    // } catch (error) {
+    //   console.error("Error fetching data:", error);
+    // }
+  };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedValue((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   useEffect(() => {
@@ -101,31 +158,20 @@ export const OrderPackagingEdit = () => {
   }, []);
   console.log(stock);
   console.log(bonus, adjustedId);
-  const doPackaging = async (index, orderId, odId) => {
-    console.log(index, orderId, odId);
+  const doPackaging = async (index, orderId) => {
     const data = details[index];
     console.log(data);
-    if (!data.bonus || !data.adjusted_gw_od)
-      return toast.error("Please enter all values", {
-        theme: "colored",
-      });
+
     setIsLoading(true);
     loadingModal.fire();
 
     try {
       // Replace the key EAN_To_Pack with ean_per_od in the data object
-      const modifiedData = {
-        ...data,
-        ean_per_od: data.EAN_To_Pack,
-        net_weight: data.NW_To_Pack,
-        Number_of_boxes: data.Boxes,
-        user_id: localStorage.getItem("id"),
-        // Replace EAN_To_Pack with ean_per_od
-      };
 
       await axios
         .post(`${API_BASE_URL}/doOrderPacking`, {
-          ...modifiedData,
+          od_id: orderId,
+          user_id: localStorage.getItem("id"),
         })
         .then((response) => {
           console.log(response);
@@ -163,22 +209,23 @@ export const OrderPackagingEdit = () => {
     }
   };
 
-  const restoreOrderPackaging = (id, index) => {
+  const restoreOrderPackaging = (id, id1, index) => {
     console.log(id);
     // Check if the button is already disabled
-    if (disabledButtons.includes(index)) {
-      return;
-    }
+    // if (disabledButtons.includes(index)) {
+    //   return;
+    // }
 
     // Disable the button
-    setDisabledButtons((prevDisabledButtons) => [
-      ...prevDisabledButtons,
-      index,
-    ]);
+    // setDisabledButtons((prevDisabledButtons) => [
+    //   ...prevDisabledButtons,
+    //   index,
+    // ]);
 
     axios
       .post(`${API_BASE_URL}/RestoreOrderPacking`, {
-        opid: id,
+        order_id: id,
+        od_id: id1,
         user_id: localStorage.getItem("id"),
       })
       .then((response) => {
@@ -202,6 +249,59 @@ export const OrderPackagingEdit = () => {
       .catch((error) => {
         console.log(error);
       });
+  };
+  const formatterThree = new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    minimumFractionDigits: 3,
+    maxmumFractionDigits: 3,
+  });
+  //  const formatterNo = new Intl.NumberFormat("en-US", {
+  //   style: "decimal",
+  //   minimumFractionDigits: 0,
+  //   maxmumFractionDigits: 0,
+  // });
+
+  const formatterNo = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+  const handleSaveEdit = async (index) => {
+    if (isReadOnly || isLoading) return;
+
+    const row = details[index];
+    const payload = {
+      OD_ID: row.col2,
+    };
+
+    if (editedValue.col7 !== undefined) payload.ean_required = editedValue.col7;
+    if (editedValue.col15 !== undefined) payload.bonus = editedValue.col15;
+    if (editedValue.col16 !== undefined)
+      payload.adjusted_gw_od = editedValue.col16;
+
+    try {
+      await axios.post(`${API_BASE_URL}/updatedoOrderPacking`, payload);
+
+      // Update the main state only after successful update
+      const updatedDetails = [...details];
+      updatedDetails[index] = {
+        ...updatedDetails[index],
+        ...editedValue,
+      };
+      setDetails(updatedDetails);
+      setEditRowIndex(null);
+      setEditRowIndex1(null);
+      setEditRowIndex2(null);
+
+      setEditedValue({});
+      getOrdersDetails();
+      toast.success("Value updated successfully!");
+    } catch (error) {
+      console.error("Failed to update packing:", error);
+    }
+  };
+  const [editBuns, setEditBuns] = useState(null);
+  const showEditBuns = (index) => {
+    setEditBuns(index);
   };
   return (
     <>
@@ -256,7 +356,7 @@ export const OrderPackagingEdit = () => {
               </div>
               <div
                 id="datatable_wrapper"
-                className="information_dataTables dataTables_wrapper dt-bootstrap4 table-responsive mt-"
+                className="orderPackingEdit information_dataTables dataTables_wrapper dt-bootstrap4 table-responsive mt-"
               >
                 <table
                   id="example"
@@ -265,138 +365,222 @@ export const OrderPackagingEdit = () => {
                 >
                   <thead>
                     <tr>
-                      <th>ITF</th>
-                      <th> Brand </th>
-                      <th>% Completed</th>
-                      <th>EAN Required</th>
-                      <th>EAN Packed</th>
-                      <th>EAN to Pack</th>
-                      <th>Net weight Required</th>
-                      <th>Net weight Packed</th>
-                      <th>Net weight to Pack</th>
-                      <th>Number of Box</th>
-                      <th>Buns</th>
-                      <th>Weight Adjustment</th>
+                      {tableHeader &&
+                        Object.entries(tableHeader)
+                          .filter(
+                            ([key]) =>
+                              !["Order_ID", "OD ID", "Status"].includes(key)
+                          )
+                          .map(([key, label]) => <th key={key}>{label}</th>)}
                       <th>Action</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {details.map((v, i) => {
                       if (+v.status !== 1 && !v.bonus && !v.adjusted_gw_od) {
-                        getDetails(v.order_id, v.od_id); // Call getDetails with orderId and odId
+                        getDetails(v.order_id, v.od_id);
                       }
 
                       return (
                         <tr className="rowCursorPointer align-middle" key={i}>
-                          <td className="">{v.ITF}</td>
-                          <td>
-                            <>{v.Name_exp_3}</>
+                          <td className="text-start">{v.col3}</td>
+                          <td className="text-center">
+                            <>{v.col4}</>
                           </td>
-                          <td>
-                            <>{v.Percentage_Packed}</>
+                          <td className="text-center">
+                            <>{v.col5}</>
                           </td>
-                          <td>
-                            <>{v.EAN_Required}</>
-                          </td>
-                          <td>
-                            <>{v.Packed}</>
-                          </td>
-                          <td>
-                            {+v.status != 1 ? (
-                              <>{v.EAN_To_Pack}</>
-                            ) : (
-                              <input
-                                type="number"
-                                className="!w-24 mb-0"
-                                onChange={(e) => handleEditValues(i, e)}
-                                value={v.EAN_To_Pack}
-                                defaultValue="0"
-                                name="EAN_To_Pack"
-                              />
-                            )}
-                          </td>
-                          <td>
-                            <>{v.Net_Weight}</>
-                          </td>
-                          <td>
-                            <>{v.Packed_NW}</>
-                          </td>
-                          <td>
-                            {+v.status != 1 ? (
-                              <>{v.NW_To_Pack || 0}</>
-                            ) : (
-                              <input
-                                type="number"
-                                className="!w-24 mb-0"
-                                onChange={(e) => handleEditValues(i, e)}
-                                value={v.NW_To_Pack}
-                                defaultValue="0"
-                                name="NW_To_Pack"
-                              />
-                            )}
-                          </td>
-                          <td>
-                            {+v.status != 1 ? (
-                              <>{v.Boxes}</>
-                            ) : (
-                              <input
-                                type="number"
-                                className="!w-24 mb-0"
-                                onChange={(e) => handleEditValues(i, e)}
-                                value={v.Boxes}
-                                defaultValue="0"
-                                name="Boxes"
-                              />
-                            )}
+                          <td className="text-center">
+                            <>{formatterThree.format(v.col6)}</>
                           </td>
 
-                          <td>
-                            {+v.status !== 1 ? (
-                              v.bonus || 0
-                            ) : (
-                              <input
-                                type="number"
-                                className="!w-24 mb-0"
-                                onChange={(e) => handleEditValues(i, e)}
-                                defaultValue="0"
-                                value={v.bonus}
-                                name="bonus"
-                              />
-                            )}
-                          </td>
-                          <td>
-                            {+v.status !== 1 ? (
-                              v.adjusted_gw_od || 0
-                            ) : (
-                              <input
-                                type="number"
-                                className="!w-24 mb-0"
-                                onChange={(e) => handleEditValues(i, e)}
-                                defaultValue="0"
-                                value={v.adjusted_gw_od}
-                                name="adjusted_gw_od"
-                              />
-                            )}
+                          <td className="text-end">
+                            <div className="eanReq">
+                              <div>
+                                {v.col17 === 0 ? (
+                                  editRowIndex === i ? (
+                                    <div className="d-flex align-items-center">
+                                      <input
+                                        type="number"
+                                        className="mb-0"
+                                        onChange={handleInputChange}
+                                        defaultValue={v.col7}
+                                        name="col7"
+                                      />
+                                      <i
+                                        className="mdi mdi-check ps-2 cursor-pointer"
+                                        onClick={() => handleSaveEdit(i)}
+                                      ></i>
+                                    </div>
+                                  ) : (
+                                    <div className="d-flex align-items-center justify-content-end">
+                                      <p className="mb-0">{v.col7}</p>
+                                      <i
+                                        onClick={() => showEditEan(i, v)}
+                                        className="mdi mdi-pencil ps-2 cursor-pointer"
+                                      ></i>
+                                    </div>
+                                  )
+                                ) : (
+                                  <>
+                                    {formatterNo.format(
+                                      parseFloat(v.col7) || 0
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
                           </td>
 
+                          <td className="text-end">
+                            <>{formatterThree.format(v.col8)}</>
+                          </td>
+                          <td className="text-end">
+                            <>{formatterThree.format(v.col9)}</>
+                          </td>
+                          <td className="text-end">
+                            <>{formatterThree.format(v.col10)}</>
+                          </td>
+                          <td className="text-end">
+                            <>{formatterThree.format(v.col11)}</>
+                          </td>
+                          <td className="text-end">
+                            <>{formatterThree.format(v.col12)}</>
+                          </td>
+                          <td className="text-end">
+                            {formatterThree.format(parseFloat(v.col13) || 0)}
+                          </td>
+                          <td className="text-end">
+                            {formatterNo.format(parseFloat(v.col14) || 0)}
+                          </td>
+
+                          {/* <td className="text-end">
+                            <div className="eanReq">
+                              <div>
+                                {editBoxes === i ? (
+                                  <div>
+                                    {v.col17 === 1 ? (
+                                      <div>
+                                        <input
+                                          type="number"
+                                          className="mb-0"
+                                          onBlur={() => setEditBoxes(null)}
+                                          onChange={(e) =>
+                                            handleEditValues(i, e)
+                                          }
+                                          value={v.col15}
+                                          name="col15"
+                                        />
+                                        <i className="mdi mdi-check ps-2"></i>
+                                      </div>
+                                    ) : (
+                                      formatterNo.format(
+                                        parseFloat(v.col15) || 0
+                                      )
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="d-flex">
+                                    <p>{v.col15}</p>
+                                    <i
+                                      onClick={() => showEditBoxes(i)}
+                                      className="mdi mdi-pencil ps-2"
+                                    ></i>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td> */}
+                          <td className="text-end">
+                            <div className="eanReq">
+                              <div>
+                                {v.col17 === 1 ? (
+                                  editRowIndex1 === i ? (
+                                    <div className="d-flex align-items-center">
+                                      <input
+                                        type="number"
+                                        className="mb-0"
+                                        onChange={handleInputChange}
+                                        defaultValue={v.col15}
+                                        name="col15"
+                                      />
+                                      <i
+                                        className="mdi mdi-check ps-2 cursor-pointer"
+                                        onClick={() => handleSaveEdit(i)}
+                                      ></i>
+                                    </div>
+                                  ) : (
+                                    <div className="d-flex align-items-center justify-content-end">
+                                      <p className="mb-0">{v.col15}</p>
+                                      <i
+                                        onClick={() => showEditEan1(i, v)}
+                                        className="mdi mdi-pencil ps-2 cursor-pointer"
+                                      ></i>
+                                    </div>
+                                  )
+                                ) : (
+                                  <>
+                                    {formatterNo.format(
+                                      parseFloat(v.col15) || 0
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="text-end">
+                            <div className="eanReq">
+                              <div>
+                                {v.col17 === 1 ? (
+                                  editRowIndex2 === i ? (
+                                    <div className="d-flex align-items-center">
+                                      <input
+                                        type="number"
+                                        className="mb-0"
+                                        onChange={handleInputChange}
+                                        defaultValue={v.col16}
+                                        name="col16"
+                                      />
+                                      <i
+                                        className="mdi mdi-check ps-2 cursor-pointer"
+                                        onClick={() => handleSaveEdit(i)}
+                                      ></i>
+                                    </div>
+                                  ) : (
+                                    <div className="d-flex align-items-center justify-content-end">
+                                      <p className="mb-0">{v.col16}</p>
+                                      <i
+                                        onClick={() => showEditEan2(i, v)}
+                                        className="mdi mdi-pencil ps-2 cursor-pointer"
+                                      ></i>
+                                    </div>
+                                  )
+                                ) : (
+                                  <>
+                                    {formatterNo.format(
+                                      parseFloat(v.col16) || 0
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </td>
                           <td>
-                            {!isReadOnly && +v.status === 1 && (
+                            {!isReadOnly && +v.col17 === 0 && (
                               <button
                                 type="button"
-                                disabled={disabledPackagingButtons.includes(i)}
                                 className="py-1"
-                                onClick={() => doPackaging(i)}
+                                onClick={() => doPackaging(i, v.col2)}
                               >
                                 <i className="mdi mdi-package-variant-closed text-2xl"></i>
                               </button>
                             )}
-
-                            {!isReadOnly && +v.status === 0 && (
+                            {!isReadOnly && +v.col17 === 1 && (
                               <button
                                 type="button"
-                                disabled={disabledButtons.includes(i)}
                                 onClick={() => {
-                                  restoreOrderPackaging(v.order_packing_id, i);
+                                  restoreOrderPackaging(v.col1, v.col2, i);
                                 }}
                               >
                                 <i
@@ -443,7 +627,7 @@ export const OrderPackagingEdit = () => {
               <div className="eanCheck errorMessage">
                 <p>{stock.message ? stock.message : "NULL"}</p>
                 <p>{stock.message2 ? stock.message2 : "NULL"}</p>
-                <p>{stock.message3 ? stock.message3 : "NULL"}</p>
+                {/* <p>{stock.message3 ? stock.message3 : "NULL"}</p> */}
               </div>
             </div>
             <div className="modal-footer"></div>

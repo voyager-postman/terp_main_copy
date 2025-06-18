@@ -9,8 +9,9 @@ import moment from "moment";
 import axios from "axios";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { API_BASE_URL } from "../../Url/Url.js";
-
+import { useTranslation } from "react-i18next";
 const Navbar = () => {
+  const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -92,7 +93,7 @@ const Navbar = () => {
           <NavLink to={targetRoute} className="flex">
             <img src={Logo} alt="logo" className="md:cursor-pointer h-9" />
             <span className="text-white ml-2  justify-between items-center flex terplogo">
-              Terp
+              {t("header.logoName")}
             </span>
           </NavLink>
           <button
@@ -123,7 +124,7 @@ const Navbar = () => {
                 <ul className={`dropdown-menu ${isActive ? "show" : ""}`}>
                   <li>
                     <a className="dropdown-item">
-                      <h3>Notification</h3>
+                      <h3>{t("header.notificationHead")}</h3>
                       <div className="noti">
                         {data && data.length > 0 ? (
                           <>
@@ -142,11 +143,11 @@ const Navbar = () => {
                               </div>
                             ))}
                             <div className="notifcationButton">
-                              <button>View All</button>
+                              <button>{t("header.viewBtn")}</button>
                             </div>
                           </>
                         ) : (
-                          <h5>No notifications</h5>
+                          <h5>{t("header.noNotification")}</h5>
                         )}
                       </div>
                     </a>

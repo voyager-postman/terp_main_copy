@@ -1,4 +1,4 @@
- /* @import url('https://fonts.googleapis.com/css2?family=Nabla&family=Rubik+Mono+One&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Nabla&family=Rubik+Mono+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nabla&family=Open+Sans:wght@400;500&family=Rubik+Mono+One&display=swap'); */
 html {
   height: 100vh;
@@ -304,11 +304,10 @@ background-color: var(--bs-pink);
 ::placeholder {
   text-transform: lowercase;
 }
-
 .formCreate input {
   border: 2px solid #203764 !important;
   padding: 7px 10px;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   border-radius: 5px;
   width: 100%;
 }
@@ -856,12 +855,12 @@ button.btn.btn-primary {
 }
 
 .top-space-search-reslute table th {
-  padding: 10px 18px;
+  padding: 10px 10px;
   /* 0 5 */
 }
 
 .top-space-search-reslute table td {
-  padding: 9px 10px;
+  padding: 5px 10px;
 }
 
 .top-space-search-reslute {
@@ -2291,13 +2290,12 @@ fieldset {
 /* 9/3/2024 */
 i.mdi.mdi-pencil {
   font-size: 20px !important;
-  color:#203764;
+  color: #203764;
 }
 
 i.mdi.mdi-delete {
   font-size: 20px !important;
-  color:#203764;
-
+  color: #203764;
 }
 
 /* 7/12/2024 */
@@ -3932,4 +3930,36 @@ g#SvgjsG4264 {
 }
 .modal-header h1 {
   font-weight: 500;
+}
+.eanReq {
+  display: flex;
+}
+.eanReq {
+  position: relative;
+}
+.eanReq .mdi-check {
+  position: absolute;
+  right: 6%;
+  top: 1px;
+  color: #203764;
+  font-weight: 900;
+  font-size: 20px;
+  cursor: pointer;
+}
+.eanReq input {
+  min-width: 120px;
+  padding: 3px !important;
+}
+.selectEdit select {
+  min-width: 120px;
+  padding: 3px !important;
+}
+.eanReq i {
+  cursor: pointer;
+}
+.mdi-check {
+  cursor: pointer;
+}
+.mdi-pencil {
+  cursor: pointer;
 }

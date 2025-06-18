@@ -110,21 +110,7 @@ const AdjustEanView = () => {
                         </strong>
                       </p>
                     </div>
-                    {/* <div className="col-lg-3">
-                      <p>
-                        {" "}
-                        <span> Name :</span> <strong>{from?.name}</strong>
-                      </p>
-                      <p>
-                        {" "}
-                        <span> Quantity :</span>{" "}
-                        <strong>{from?.qty_available}</strong>
-                      </p>
-                      <p>
-                        {" "}
-                        <span>Unit :</span> <strong></strong>
-                      </p>
-                    </div> */}
+                  
                   </div>
                 </div>
                 <div

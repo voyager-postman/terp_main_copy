@@ -17,7 +17,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaCaretDown } from "react-icons/fa"; // Import an icon from react-icons
+
 const CreateQuotationTest = () => {
+  const [color, setColor] = useState(false);
+
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -51,11 +54,30 @@ const CreateQuotationTest = () => {
       order_id: state.order_id, // You must have this in your component
       user_id: localStorage.getItem("id"), // You must also define this
       Order_NW: orderNetWeight,
+      input: {
+        ...computedState,
+        user: localStorage.getItem("id"),
+        palletized: exchangeRate2 ? 1 : 0,
+        Chamber: exchangeRate3 ? 1 : 0,
+        Precooling: exchangeRate4 ? 1 : 0,
+
+        Charge_Volume: exchangeRate1 ? 1 : 0,
+        is_quotation: 1,
+      },
     };
 
     axios
       .post(`${API_BASE_URL}/OrderPopulate`, payload)
       .then((res) => {
+        console.log("✅ OrderPopulate response:", res?.data); // ← Add this line
+
+        setState((prevState) => {
+          return {
+            ...prevState,
+            order_id: res?.data?.order_id,
+          };
+        });
+        setOrderId(res?.data?.order_id);
         getOrdersDetails();
         toast.success("Quotation populated successfully", {
           autoClose: 1000,
@@ -120,6 +142,8 @@ const CreateQuotationTest = () => {
   const [massageShow1, setMassageShow1] = useState("");
   const [calculateListData, setCalculateListData] = useState([]);
   const [show, setShow] = useState(false);
+  const [show1, setShow1] = useState(false);
+
   const [notes1, setNotes1] = useState("");
   const [stock, setStock] = useState("");
   const [itfNew, setItfName] = useState([]);
@@ -133,6 +157,8 @@ const CreateQuotationTest = () => {
   console.log(massageShow1);
 
   const handleClose = () => setShow(false);
+  const handleClose1 = () => setShow1(false);
+
   const handleShow = () => setShow(true);
   console.log(massageShow);
   console.log(massageShow1);
@@ -800,7 +826,9 @@ const CreateQuotationTest = () => {
   const createTestOrder = async () => {
     const reai = details?.filter((v) => v.ITF && v.OD_QTY && v.OD_Unit);
     console.log(reai);
-    if (reai.length === 0) return;
+    if (reai.length === 0) {
+      return;
+    }
     setIsLoading(true);
     loadingModal.fire();
 
@@ -1051,6 +1079,9 @@ const CreateQuotationTest = () => {
   }, [computedState.client_id]);
 
   console.log(state);
+  const closeIcon1 = () => {
+    setShow1(false);
+  };
   const closeIcon = () => {
     setShow(false);
 
@@ -1156,7 +1187,7 @@ const CreateQuotationTest = () => {
   return (
     <>
       <Card
-        title={`Quotation Test Management /Create
+        title={`Quotation  Management /Create
          Form`}
       >
         <div className="top-space-search-reslute">
@@ -1269,32 +1300,7 @@ const CreateQuotationTest = () => {
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
                         <h6>Brands</h6>
-                        {/* <Autocomplete
-                          options={brands || []} // Ensure brands is an array
-                          getOptionLabel={(option) => option.Brand_name || ""} // Display the brand name
-                          value={
-                            brands?.find(
-                              (v) => v.brand_id === computedState.brand_id
-                            ) || null
-                          } // Find the selected brand by brand_id
-                          onChange={(event, newValue) => {
-                            // Update brand_id in the state based on the selected option
-                            setState({
-                              ...state,
-                              brand_id: newValue ? newValue.brand_id : "", // Set brand_id from the selected brand
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select Brand"
-                              variant="outlined"
-                            />
-                          )}
-                          isOptionEqualToValue={(option, value) =>
-                            option.brand_id === value?.brand_id
-                          } // Compare based on brand_id
-                        /> */}
+                      
                         <Autocomplete
                           options={brands || []} // Safe fallback if brands is undefined
                           getOptionLabel={(option) => option.Name_EN || ""} // Label display
@@ -1419,27 +1425,7 @@ const CreateQuotationTest = () => {
                       </div>
                       <div className="col-lg-3 form-group quotationSelectSer">
                         <h6>Port of Destination</h6>
-                        {/* <Autocomplete
-                          options={ports || []} // Ensure options is always an array, even if ports is undefined
-                          getOptionLabel={(option) => option.port_name || ""} // Display the port_name for each option
-                          value={
-                            ports?.find(
-                              (v) =>
-                                v.port_id === computedState.destination_port_id
-                            ) || null
-                          } // Find the port based on destination_port_id
-                          onChange={handleChange} // Update state when the selection changes
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select Destination Port"
-                              variant="outlined"
-                            />
-                          )}
-                          isOptionEqualToValue={(option, value) =>
-                            option.port_id === value?.port_id
-                          } // Match option with the selected value based on port_id
-                        /> */}
+
                         <Autocomplete
                           options={
                             ports?.map((v) => ({
@@ -1740,12 +1726,7 @@ const CreateQuotationTest = () => {
                       </div>
                       <div className="col-lg-3 form-group">
                         <h6>Loading Date</h6>
-                        {/* <input
-                          type="date"
-                          onChange={handleChange}
-                          value={computedState.load_date}
-                          name="load_date"
-                        /> */}
+
                         <DatePicker
                           selected={computedState.load_date}
                           onChange={(date) =>
@@ -1776,26 +1757,34 @@ const CreateQuotationTest = () => {
                           <button
                             type="button"
                             onClick={() => {
-                              setSelectedDetails(null);
-                              setToEditDetails({});
-                              openModal();
+                              if (!computedState.load_date) {
+                                setShow1(true);
+                              } else {
+                                setSelectedDetails(null);
+                                setToEditDetails({});
+                                openModal();
+                              }
                             }}
                           >
                             Add
                           </button>
+
                           <button
                             type="button"
-                            // onClick={() => {
-                            //   setSelectedDetails(null);
-                            //   setToEditDetails({});
-                            //   openModal();
-                            //   // saveNewDetails1();
-                            // }}
-                            data-bs-toggle="modal"
-                            data-bs-target="#consigneeOne"
+                            onClick={() => {
+                              if (!computedState.load_date) {
+                                setShow1(true); // Show error modal
+                              } else {
+                                const modal = new bootstrap.Modal(
+                                  document.getElementById("consigneeOne")
+                                );
+                                modal.show(); // Manually open the modal if validation passes
+                              }
+                            }}
                           >
                             Add Consignee Items
                           </button>
+
                           <div
                             className="modal fade"
                             id="consigneeOne"
@@ -1944,54 +1933,9 @@ const CreateQuotationTest = () => {
                         </tbody>
                       </table>
                     </div>
-                    {/* <div className="grid md:grid-cols-4 grid-cols-1 my-4">
-                      <div>
-                        Total NW <b>{(+data?.O_NW || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total FOB <b>{(+data?.O_FOB || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total Commission{" "}
-                        <b>{(data?.O_Commission_FX || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total GW <b>{(+data?.O_GW || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total Freight{" "}
-                        <b>{(+data?.O_Freight || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total Rebate{" "}
-                        <b>{(+data?.O_Rebate || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total Box <b>{(+data?.O_Box || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total CNF <b>{(+data?.O_CNF || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total Profit{" "}
-                        <b>
-                          {(+data?.O_Profit_Percentage || 0).toLocaleString()}
-                        </b>
-                      </div>
-                      <div>
-                        Total CBM <b>{(+data?.O_CBM || 0).toLocaleString()}</b>
-                      </div>
-                      <div>
-                        Total CNF FX{" "}
-                        <b>{(+data?.O_CNF_FX || 0).toLocaleString()}</b>
-                      </div>
-                    </div> */}
+
                     <div className="row py-4 px-4">
                       <div className="col-lg-3">
-                        {/* <div>
-                          <b> Total Item : </b>
-                          {(+data?.O_NW || 0).toLocaleString()}
-                        </div> */}
                         <div>
                           <b> Total NW : </b>
                           {(+data?.O_NW || 0).toLocaleString()}
@@ -2084,16 +2028,6 @@ const CreateQuotationTest = () => {
                         </div>
                       </div>
                     </div>
-                    {/* {(gross && freight) || gross || freight ? (
-                      <p className="text-red-500">
-                        <i className="mdi mdi-alert" />
-                        {`${grossMass}  `}
-                        &nbsp;
-                        {freightMass}
-                      </p>
-                    ) : (
-                      <></>
-                    )} */}
                   </form>
                 </div>
               </div>
@@ -2124,102 +2058,6 @@ const CreateQuotationTest = () => {
         </div>
       </Card>
       {isOpenModal && (
-        // <div className="fixed inset-0 flex items-center justify-center z-50">
-        //   {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-        //   <div
-        //     className="fixed w-screen h-screen bg-black/20"
-        //     onClick={closeModal}
-        //   />
-        //   <div className="bg-white rounded-lg shadow-lg p-4 max-w-md w-full z-50">
-        //     <h3>Edit Details</h3>
-        //     <div className="formEan formCreate">
-        //       <div className="form-group mb-3 itfHeight">
-        //         <label>ITF</label>
-        //         <ComboBox
-        //           options={itf?.map((v) => ({
-        //             id: v.itf_id,
-        //             name: v.itf_name_en,
-        //           }))}
-        //           value={toEditDetails?.ITF ?? defaultDetailsValue?.ITF}
-        //           onChange={(e) => setToEditDetails((v) => ({ ...v, ITF: e }))}
-        //         />
-        //       </div>
-        //       <div className="form-group">
-        //         <label>Quantity</label>
-        //         <input
-        //           type="number"
-        //           value={
-        //             toEditDetails?.itf_quantity ??
-        //             defaultDetailsValue?.itf_quantity ??
-        //             0
-        //           }
-        //           name="itf_quantity"
-        //           onChange={updateDetails}
-        //         />
-        //       </div>
-        //       <div className="form-group mb-3">
-        //         <h6>Brands</h6>
-        //         <ComboBox
-        //           options={brands?.map((v) => ({
-        //             id: v.brand_id,
-        //             name: v.Brand_name,
-        //           }))}
-        //           value={
-        //             toEditDetails?.brand_id ?? defaultDetailsValue?.brand_id
-        //           }
-        //           onChange={(e) =>
-        //             setToEditDetails((v) => ({ ...v, brand_id: e }))
-        //           }
-        //         />
-        //       </div>
-        //       <div className="form-group mb-3">
-        //         <label>Unit</label>
-        //         <ComboBox
-        //           options={unit?.map((v) => ({
-        //             id: v.unit_id,
-        //             name: v.unit_name_en,
-        //           }))}
-        //           value={
-        //             toEditDetails?.itf_unit ?? defaultDetailsValue?.itf_unit
-        //           }
-        //           onChange={(e) =>
-        //             setToEditDetails((v) => ({ ...v, itf_unit: e }))
-        //           }
-        //         />
-        //       </div>
-        //       <div className="form-group">
-        //         <label>Adjustment price</label>
-        //         <input
-        //           type="number"
-        //           value={
-        //             toEditDetails?.adjusted_price ??
-        //             defaultDetailsValue?.adjusted_price ??
-        //             0
-        //           }
-        //           name="adjusted_price"
-        //           onChange={updateDetails}
-        //         />
-        //       </div>
-        //       <div className="flex gap-2 justify-end">
-        //         <button
-        //           type="button"
-        //           className="bg-gray-300 px-4 py-2 rounded"
-        //           onClick={closeModal}
-        //         >
-        //           Close
-        //         </button>
-        //         <button
-        //           type="button"
-        //           onClick={saveNewDetails}
-        //           className="bg-black text-white px-4 py-2 rounded"
-        //         >
-        //           Save
-        //         </button>
-        //       </div>
-        //     </div>
-        //   </div>
-        // </div>
-
         <div className="fixed inset-0 flex items-center justify-center modalEanEdit">
           <div
             className="fixed w-screen h-screen bg-black/20"
@@ -2235,43 +2073,7 @@ const CreateQuotationTest = () => {
             <div className="formEan formCreate">
               <div className="form-group mb-3 itfHeight quotationSelectSer">
                 <label>ITF</label>
-                {/* <Autocomplete
-                  disablePortal
-                  options={itfNew?.map((v) => ({
-                    id: v.itf_id, // Standardizing the property name
-                    name: v.itf_name,
-                  }))} // Ensure mapping is consistent
-                  getOptionLabel={(option) => option.name || ""}
-                  value={
-                    itfNew
-                      ?.map((v) => ({
-                        id: v.itf_id,
-                        name: v.itf_name,
-                      }))
-                      .find(
-                        (item) =>
-                          item.id ===
-                          (toEditDetails?.ITF || defaultDetailsValue?.ITF)
-                      ) || null
-                  } // Match the mapped structure
-                  onChange={(event, newValue) => {
-                    setToEditDetails((prev) => ({
-                      ...prev,
-                      ITF: newValue ? newValue.id : null, // Update based on newValue.id
-                    }));
-                  }}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value?.id
-                  } // Handle null values
-                  sx={{ width: 300 }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="select ITF"
-                      variant="outlined"
-                    />
-                  )}
-                /> */}
+
                 <Select
                   value={selectedOption || null}
                   onChange={handleChangeSe}
@@ -2298,46 +2100,7 @@ const CreateQuotationTest = () => {
               </div>
               <div className="form-group mb-3 quotationSelectSer">
                 <h6>Brands</h6>
-                {/* <Autocomplete
-                  disablePortal
-                  options={brandNew?.map((v) => ({
-                    id: v.brand_id,
-                    name: v.Brand_name,
-                  }))} // Ensure mapping matches the desired structure
-                  getOptionLabel={(option) => option.name || ""} // Display name as label
-                  value={
-                    brandNew
-                      ?.map((v) => ({
-                        id: v.brand_id,
-                        name: v.Brand_name,
-                      }))
-                      .find(
-                        (item) =>
-                          item.id ===
-                          (toEditDetails?.brand_id ||
-                            defaultDetailsValue?.OD_Brand)
-                      ) || null
-                  } // Match the value with mapped options
-                  onChange={(event, newValue) => {
-                    setToEditDetails((prev) => ({
-                      ...prev,
-                      brand_id: newValue ? newValue.id : null,
-                      brand_id: newValue ? newValue.Brand_name : null,
-                       // Update brand_id with the selected value
-                    }));
-                  }}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value?.id
-                  } // Check equality by id
-                  sx={{ width: 300 }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      placeholder="select brand"
-                    />
-                  )}
-                /> */}
+
                 <Autocomplete
                   disablePortal
                   options={brandNew?.map((v) => ({
@@ -2380,44 +2143,6 @@ const CreateQuotationTest = () => {
               </div>
               <div className="form-group mb-3 quotationSelectSer">
                 <label>Unit</label>
-                {/* <Autocomplete
-                  disablePortal
-                  options={unit?.map((v) => ({
-                    id: v.unit_id,
-                    name: v.unit_name_en,
-                  }))} // Standardize the options structure
-                  getOptionLabel={(option) => option.name || ""} // Display unit name as label
-                  value={
-                    unit
-                      ?.map((v) => ({
-                        id: v.unit_id,
-                        name: v.unit_name_en,
-                      }))
-                      .find(
-                        (item) =>
-                          item.id ===
-                          (toEditDetails?.itf_unit ||
-                            defaultDetailsValue?.OD_Unit)
-                      ) || null
-                  } // Match the value with the options
-                  onChange={(event, newValue) => {
-                    setToEditDetails((prev) => ({
-                      ...prev,
-                      itf_unit: newValue ? newValue.id : null, // Update itf_unit with the selected option
-                    }));
-                  }}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value?.id
-                  } // Equality check by id
-                  sx={{ width: 300 }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      placeholder="select unit"
-                    />
-                  )}
-                /> */}
 
                 <Autocomplete
                   disablePortal
@@ -2508,39 +2233,7 @@ const CreateQuotationTest = () => {
           </div>
         </div>
       </Modal>
-      {/* <div
-        className="modal fade"
-        id="exampleQuo"
-        tabIndex={-1}
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Freight or transport Error
-              </h1>
 
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={closeIcon}
-              >
-                <span class="mdi mdi-close"></span>
-              </button>
-            </div>
-            <div className="modal-body">
-              <p>
-                {" "}
-                {massageShow ? massageShow : massageShow1 ? massageShow1 : ""}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div> */}
       <div
         className="modal fade"
         id="exampleModal1"
@@ -2658,55 +2351,6 @@ const CreateQuotationTest = () => {
                         ))}
                       </tbody>
                     </table>
-                    {/* <table>
-                      <thead>
-                        <tr>
-                          <th>ITF</th>
-                          <th>Last Update</th>
-                          <th>EXW</th>
-                          <th>TC</th>
-                          <th>Commission</th>
-                          <th>FOB</th>
-                          <th>GW</th>
-                          <th>Freight</th>
-                          <th>CNF</th>
-                          <th>Margin</th>
-                          <th>Fx Rate</th>
-                          <th>Fx Rebate</th>
-                          <th>Calculated Price</th>
-                          <th>Final Price</th>
-                          <th>Rebate</th>
-                          <th>Base</th>
-                          <th>Profit</th>
-                          <th>Profit %</th>
-                        </tr>
-                        {calculateListData?.map((item, index) => (
-                          <tr key={index}>
-                            <td>{item.ITF}</td>
-                            <td>
-                              {item["Last Update"] ? item["Last Update"] : ""}
-                            </td>
-                            <td>{item.EXW}</td>
-                            <td>{item.TCC}</td>
-                            <td>{item.Commission}</td>
-                            <td>{item.FOB_Cost}</td>
-                            <td>{item.GW}</td>
-                            <td>{item.freight}</td>
-                            <td>{item.CNF_COST}</td>
-                            <td>{item.Margin}</td>
-                            <td>{item.FX_Rate}</td>
-                            <td>{item.FX_Rebate}</td>
-                            <td>{item.Calculated_price}</td>
-                            <td>{item.FInal_Price}</td>
-                            <td>{item.Rebate}</td>
-                            <td>{item.base}</td>
-                            <td>{item.profit}</td>
-                            <td>{item.profit_Percentage}</td>
-                          </tr>
-                        ))}
-                      </thead>
-                      <tbody>{/* Add dynamic table data here *
-                    </table> */}
                   </div>
                 </div>
               </div>
@@ -2723,6 +2367,58 @@ const CreateQuotationTest = () => {
           </div>
         </div>
       )}
+      <Modal
+        className="modalError receiveModal"
+        show={show1}
+        onHide={handleClose1}
+      >
+        <div className="modal-content">
+          <div
+            className="modal-header border-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <h1 className="modal-title fs-5" id="exampleModalLabel">
+              Quotation Check
+            </h1>
+            <button
+              style={{ color: "#fff", fontSize: "30px" }}
+              type="button"
+              onClick={closeIcon1}
+            >
+              <i class="mdi mdi-close"></i>
+            </button>
+          </div>
+          <div
+            className="modal-body pt-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <div className="eanCheck errorMessage recheckReceive">
+              <p
+              className="pt-0"
+                style={{
+                  backgroundColor: color ? "" : "#631f37",
+                }}
+              >
+                Loading Date missing
+              </p>
+
+              <div className="closeBtnRece">
+                <button onClick={closeIcon1}>Close</button>
+              </div>
+            </div>
+          </div>
+          <div
+            className="modal-footer"
+            style={{
+              backgroundColor: color,
+            }}
+          ></div>
+        </div>
+      </Modal>
     </>
   );
 };

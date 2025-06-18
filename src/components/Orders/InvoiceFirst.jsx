@@ -33,7 +33,7 @@ const InvoiceFirst = () => {
   const dynamicMessage = () => {
     axios
       .post(`${API_BASE_URL}/invoice_procedure`, {
-        Invoice_id: from?.Invoice_id,
+        Invoice_id: from?.Order_ID,
       })
       .then((response) => {
         console.log(response);
@@ -48,7 +48,7 @@ const InvoiceFirst = () => {
   const delivery = () => {
     axios
       .post(`${API_BASE_URL}/pdf_delivery_by  `, {
-        order_id: from?.order_id,
+        order_id: from?.Order_ID,
       })
       .then((response) => {
         setMassageSet1(response.data.message);
@@ -66,7 +66,7 @@ const InvoiceFirst = () => {
   const pdfAllData = () => {
     axios
       .post(`${API_BASE_URL}/InvoicePdfDetails`, {
-        order_id: from?.order_id,
+        order_id: from?.Order_ID,
         invoice_id: from?.Invoice_id,
       })
       .then((response) => {
@@ -634,7 +634,7 @@ const InvoiceFirst = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${from?.Invoice_number || "default"}_Invoice_${dateTime}.pdf`
+      `${from?.Invoice_Number || "default"}_Invoice_${dateTime}.pdf`
     );
 
     try {
@@ -644,7 +644,7 @@ const InvoiceFirst = () => {
         console.log("PDF uploaded successfully");
         window.open(
           `${API_IMAGE_URL}${
-            from?.Invoice_number || "default"
+            from?.Invoice_Number || "default"
           }_Invoice_${dateTime}.pdf`
         );
       } else {

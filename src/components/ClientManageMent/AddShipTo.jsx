@@ -500,7 +500,7 @@ const AddShipTo = () => {
         console.log(allDates);
         // Align data for Compared_To_Period
         const comparedToPeriodData = allDates.map((date) => {
-          const item = GraphData[0].find((entry) => entry.X === date);
+          const item = GraphData[0]?.find((entry) => entry.X === date);
 
           console.log(date);
           return {
@@ -520,7 +520,7 @@ const AddShipTo = () => {
         const selectedPeriodData = allDates.map((date) => {
           console.log(GraphData[1]);
           console.log(date);
-          const item = GraphData[1].find((entry) => entry.X === date);
+          const item = GraphData[1]?.find((entry) => entry.X === date);
           console.log(item);
           return {
             x: date,
@@ -622,6 +622,7 @@ const AddShipTo = () => {
     claim: "",
     other: "",
     final: "",
+    Rounding: "",
   });
   const oneQoutationData = () => {
     if (from?.consignee_id) {
@@ -661,6 +662,7 @@ const AddShipTo = () => {
             claim: claimValue,
             other: data?.Extra_Margin,
             freightAdjust: data?.Freight_Adjustment,
+            Rounding: data?.Rounding,
             final: "",
           });
         })
@@ -1286,6 +1288,7 @@ const AddShipTo = () => {
   };
   const { data: currency } = useQuery("getCurrency");
   const { data: DropdownDelivery } = useQuery("DropdownDelivery");
+  const { data: RoundingDataList } = useQuery("GetRoundingTable");
 
   const [data, setData] = useState([]);
   const [customization, setCustomization] = useState([]);
@@ -1375,6 +1378,22 @@ const AddShipTo = () => {
   };
 
   const submitCustomizationData = () => {
+    if (!dataCustomization.ITF) {
+      toast.warn("Please enter ITF", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!dataCustomization.Unit) {
+      toast.warn("Please enter Unit", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
     console.log(dataCustomization);
     axios
       .post(
@@ -1473,6 +1492,7 @@ const AddShipTo = () => {
           Quotation_Margin: state5.quotation,
           Extra_Margin: state5.other,
           Freight_Adjustment: state5.freightAdjust,
+          Rounding: state5.Rounding,
         }
       )
       .then((response) => {
@@ -1495,6 +1515,22 @@ const AddShipTo = () => {
   };
 
   const customizationDataSubmit = (e) => {
+    if (!dataCustomization.ITF) {
+      toast.warn("Please enter ITF", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!dataCustomization.Unit) {
+      toast.warn("Please enter Unit", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
     console.log(dataCustomization);
     e.preventDefault();
     axios
@@ -1519,7 +1555,6 @@ const AddShipTo = () => {
         setDataCustomization({
           Consignee_id: from?.consignee_id || "",
           Client_ID: from?.client_id || "",
-          ITF: "",
           ITF: "",
           Custom_Name: "",
           Dummy_Price: "",
@@ -2140,8 +2175,8 @@ const AddShipTo = () => {
                 >
                   <div className="formCreate">
                     <form action="">
-                      <div className="row">
-                        <div className="form-group col-lg-3 autoComplete">
+                       <div className="row">
+                        <div className="form-group col-lg-4 autoComplete">
                           <h6> Client</h6>
                           <div className=" ">
                             <Autocomplete
@@ -2175,7 +2210,7 @@ const AddShipTo = () => {
                             />
                           </div>
                         </div>
-                        <div className="form-group col-lg-3">
+                        <div className="form-group col-lg-4">
                           <h6>Code</h6>
                           <input
                             type="text"
@@ -2185,7 +2220,7 @@ const AddShipTo = () => {
                             onChange={handleChange}
                           />
                         </div>
-                        <div className="form-group col-lg-3">
+                        <div className="form-group col-lg-4">
                           <h6>Name</h6>
                           <input
                             type="text"
@@ -2195,41 +2230,68 @@ const AddShipTo = () => {
                             onChange={handleChange}
                           />
                         </div>
-                        <div className="form-group col-lg-3">
-                          <h6>Tax Number</h6>
-                          <input
-                            type="text"
-                            className="w-full"
-                            name="consignee_tax_number"
-                            value={state.consignee_tax_number}
-                            onChange={handleChange}
-                          />
-                        </div>
 
                         <div className="form-group col-lg-4">
-                          <h6>Email</h6>
-                          <input
-                            type="email"
-                            className="w-full"
-                            name="consignee_email"
-                            value={state.consignee_email}
-                            onChange={handleChange}
-                          />
+                          <div>
+                            <h6>Address</h6>
+                            <input
+                              name="consignee_address"
+                              className="border-2 rounded-md border-[#203764] w-full"
+                              onChange={handleChange}
+                              value={state.consignee_address}
+                            />
+                          </div>
+                          <div>
+                            <input
+                              name="consignee_address"
+                              className="border-2 rounded-md border-[#203764] w-full"
+                              onChange={handleChange}
+                              value={state.consignee_address}
+                            />
+                          </div>
+                          <div>
+                            <input
+                              name="consignee_address"
+                              className="border-2 rounded-md border-[#203764] w-full"
+                              onChange={handleChange}
+                              value={state.consignee_address}
+                            />
+                          </div>
+                          <div>
+                            <input
+                              name="consignee_address"
+                              className="border-2 rounded-md border-[#203764] w-full"
+                              onChange={handleChange}
+                              value={state.consignee_address}
+                            />
+                          </div>
+                        </div>
+                        <div className="form-group col-lg-4">
+                          <div>
+                            <h6>Tax Number</h6>
+                            <input
+                              type="text"
+                              className="w-full"
+                              name="consignee_tax_number"
+                              value={state.consignee_tax_number}
+                              onChange={handleChange}
+                            />
+                          </div>
+                          <div>
+                            <h6>Phone Number</h6>
+                            <input
+                              type="text"
+                              className="w-full"
+                              name="consignee_phone"
+                              value={state.consignee_phone}
+                              onChange={handleChange}
+                            />
+                          </div>
                         </div>
 
-                        <div className="form-group col-lg-4">
-                          <h6>Phone Number</h6>
-                          <input
-                            type="text"
-                            className="w-full"
-                            name="consignee_phone"
-                            value={state.consignee_phone}
-                            onChange={handleChange}
-                          />
-                        </div>
                         <div className="form-group col-lg-4">
                           <h6> Brand</h6>
-                          <div className="ceateTransport autoComplete">
+                          <div className="ceateTransport autoComplete mb-2">
                             <Autocomplete
                               options={brands || []} // List of brand options
                               getOptionLabel={(option) => option.Name_EN || ""} // Label to display
@@ -2256,6 +2318,16 @@ const AddShipTo = () => {
                               isOptionEqualToValue={(option, value) =>
                                 option.ID === value.ID
                               } // Option comparison
+                            />
+                          </div>
+                          <div>
+                            <h6>Email</h6>
+                            <input
+                              type="email"
+                              className="w-full"
+                              name="consignee_email"
+                              value={state.consignee_email}
+                              onChange={handleChange}
                             />
                           </div>
                         </div>
@@ -2396,252 +2468,7 @@ const AddShipTo = () => {
                             />
                           </div>
                         </div>
-                        {/* <div className="form-group col-lg-4">
-                          <h6> Invoice Currency</h6>
-
-                          <div className="ceateTransport">
-                            <select
-                              value={state.currency}
-                              name="currency"
-                              onChange={handleChange}
-                            >
-                              <option value="">Select Location</option>
-                              {currency?.map((item) => (
-                                <option value={item.currency_id}>
-                                  {item.currency}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="form-group col-lg-4">
-                          <h6>Markup </h6>
-                          <div className="parentShip">
-                            <div className="markupShip">
-                              <input
-                                type="number"
-                                value={state.profit}
-                                name="profit"
-                                onChange={handleChange}
-                              />
-                            </div>
-                            <div className="shipPercent">
-                              <span>%</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="form-group col-lg-4">
-                          <h6>Rebate</h6>
-                          <div className="parentShip">
-                            <div className="markupShip">
-                              <input
-                                type="number"
-                                value={state.rebate}
-                                name="rebate"
-                                onChange={handleChange}
-                              />
-                            </div>
-                            <div className="shipPercent">
-                              <span>%</span>
-                            </div>
-                          </div>
-                        </div> */}
-
-                        {/* <div className="form-group col-lg-4">
-                          <h6> Commission</h6>
-                          <div className="ceateTransport">
-                            <select
-                              value={state.commission}
-                              name="commission"
-                              onChange={handleChange}
-                            >
-                              <option value="">Select Commission</option>
-                              {commission?.map((item) => (
-                                <option value={item.id}>
-                                  {item.commission_name_en}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="form-group col-lg-4">
-                          <h6>Commission Value</h6>
-                          <input
-                            type="number"
-                            className="w-full"
-                            value={state.commission_value}
-                            name="commission_value"
-                            onChange={handleChange}
-                          />
-                        </div> */}
-
-                        {/* <div className="form-group col-lg-4 shipToToggle">
-                          <h6>Commission Currency</h6>
-                          <label
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: "10px",
-                            }}
-                            className="toggleSwitch large"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={state.Commission_Currency === "THB"}
-                              onChange={handleChange}
-                              name="Commission_Currency"
-                            />
-                            <span>
-                              <span>FX</span>
-                              <span> THB</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div> */}
-                        {/* <div className="form-group col-lg-4">
-                          <h6> Delivery terms Incoterms</h6>
-                          <div className="ceateTransport">
-                            <select
-                              value={state.commission}
-                              name="commission"
-                              onChange={handleChange}
-                            >
-                              <option value="">Select Commission</option>
-                              {commission?.map((item) => (
-                                <option value={item.id}>
-                                  {item.commission_name_en}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div> */}
-                        <div className="form-group col-lg-12">
-                          <h6>Address</h6>
-                          <textarea
-                            name="consignee_address"
-                            className="border-2 rounded-md border-[#203764] w-full"
-                            onChange={handleChange}
-                            value={state.consignee_address}
-                          />
-                        </div>
-                        {/* 
-                        <div className="row">
-                          <h6
-                            className="mt-4"
-                            style={{
-                              fontWeight: "600",
-                              marginBottom: "10px",
-                              fontSize: "20px",
-                            }}
-                          >
-                            Notify
-                          </h6>
-
-                          <div className="form-group col-lg-6">
-                            <h6> Name</h6>
-
-                            <input
-                              type="text"
-                              className="form-control"
-                              value={state.notify_name}
-                              name="notify_name"
-                              onChange={handleChange}
-                            />
-                          </div>
-                          <div className="form-group col-lg-6">
-                            <h6>Tax Number</h6>
-                            <input
-                              type="text"
-                              className="form-control"
-                              value={state.notify_tax_number}
-                              name="notify_tax_number"
-                              onChange={handleChange}
-                            />
-                          </div>
-                          <div className="form-group col-lg-6">
-                            <h6> Email</h6>
-                            <input
-                              type="email"
-                              className="form-control"
-                              value={state.notify_email}
-                              name="notify_email"
-                              onChange={handleChange}
-                            />
-                          </div>
-                          <div className="form-group col-lg-6">
-                            <h6> Phone Number</h6>
-                            <input
-                              type="text"
-                              className="form-control"
-                              value={state.notify_phone}
-                              name="notify_phone"
-                              onChange={handleChange}
-                            />
-                          </div>
-                          <div className="form-group col-lg-12">
-                            <h6>Address</h6>
-                            <textarea
-                              className="border-2 rounded-md border-[#203764] w-full"
-                              value={state.notify_address}
-                              name="notify_address"
-                              onChange={handleChange}
-                            />
-                          </div>
-                        </div> */}
-                        {/* <div className="col-lg-12">
-                          <h6
-                            className="mt-4"
-                            style={{
-                              fontWeight: "600",
-                              marginBottom: "10px",
-                              fontSize: "20px",
-                            }}
-                          >
-                            Bank Informations
-                          </h6>
-                          <div className="row ">
-                            <div className="form-group col-lg-4">
-                              <h6>Bank Name</h6>
-
-                              <input
-                                onChange={handleChange}
-                                type="text"
-                                id="name_en"
-                                name="bank_name"
-                                className="form-control"
-                                placeholder="axis "
-                                value={state.bank_name}
-                              />
-                            </div>
-                            <div className="form-group col-lg-4">
-                              <h6>Account Name</h6>
-                              <input
-                                onChange={handleChange}
-                                type="text"
-                                id="name_en"
-                                name="account_name"
-                                className="form-control"
-                                placeholder="xxxxx "
-                                value={state.account_name}
-                              />
-                            </div>
-                            <div className="form-group col-lg-4">
-                              <h6>Account Number</h6>
-                              <input
-                                onChange={handleChange}
-                                type="text"
-                                id="name_en"
-                                name="account_number"
-                                className="form-control"
-                                placeholder="3345345435 "
-                                value={state.account_number}
-                              />
-                            </div>
-                          </div>
-                        </div> */}
+                       
                         <div className="col-lg-12">
                           <h6
                             className="mt-4"
@@ -2820,7 +2647,7 @@ const AddShipTo = () => {
                                                     }))
                                                   }
                                                   value={
-                                                    contactType.find(
+                                                    contactType?.find(
                                                       (item) =>
                                                         item.contact_type_id ===
                                                         state1.contact_type_id
@@ -3871,7 +3698,7 @@ const AddShipTo = () => {
                         </label>
                       </div>
 
-                      <div className="col-lg-3 form-group autoComplete">
+                      <div className="col-lg-2 form-group autoComplete">
                         <h6>Delivery Terms Incoterms</h6>
                         <Autocomplete
                           options={DropdownDelivery || []} // List of delivery terms and incoterms
@@ -3902,7 +3729,7 @@ const AddShipTo = () => {
                         />
                       </div>
 
-                      <div className="col-lg-3 form-group autoComplete">
+                      <div className="col-lg-2 form-group autoComplete">
                         <h6>Payment Terms</h6>
                         <Autocomplete
                           options={FXCorrection || []} // List of payment terms
@@ -3953,6 +3780,48 @@ const AddShipTo = () => {
                             />
                           )}
                           sx={{ width: 300 }}
+                        />
+                      </div>
+
+                      {/* <div className="col-lg-2 form-group">
+                        <h6>Rounding</h6>
+                        <input
+                          type="text"
+                          name="Rounding"
+                          className="form-control"
+                          placeholder="15.000"
+                          value={state5.extraCost}
+                          onChange={handleChange5}
+                        />
+                      </div> */}
+                      <div className="col-lg-2 form-group autoComplete">
+                        <h6>Rounding</h6>
+                        <Autocomplete
+                          options={RoundingDataList || []} // List of delivery terms and incoterms
+                          getOptionLabel={(option) => option.DropDown || ""} // Label to display (Incoterms)
+                          onChange={(event, newValue) => {
+                            handleChange5({
+                              target: {
+                                name: "Rounding",
+                                value: newValue ? newValue.ID : "",
+                              }, // Update deliveryTerms in state
+                            });
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Rounding"
+                              variant="outlined"
+                            />
+                          )}
+                          value={
+                            RoundingDataList?.find(
+                              (item) => item.ID === state5.Rounding
+                            ) || null
+                          } // Set selected value based on deliveryTerms
+                          isOptionEqualToValue={(option, value) =>
+                            option.ID === value.ID
+                          } // Option comparison by id
                         />
                       </div>
                       <div className="col-lg-2 form-group">
@@ -4497,7 +4366,7 @@ const AddShipTo = () => {
                             disablePortal
                             options={value.slice(0, 3)} // Only the top three options
                             value={
-                              value.find(
+                              value?.find(
                                 (item) => item.ID === selectedInvoiceId
                               ) || null
                             }
@@ -4546,7 +4415,7 @@ const AddShipTo = () => {
                           <Select
                             options={options}
                             onChange={handleDropdownChange}
-                            value={options.find(
+                            value={options?.find(
                               (option) => option.value === selectedDataset
                             )}
                             placeholder="Select..."

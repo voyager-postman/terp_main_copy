@@ -20,7 +20,10 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import Select from "react-select";
 import ReactApexChart from "react-apexcharts";
+import { useTranslation } from "react-i18next";
+import Dashboard from "./Dashboard";
 const DashboardNew = () => {
+  const [t, i18n] = useTranslation("global");
   const location = useLocation();
 
   const { from } = location.state || {};
@@ -660,11 +663,79 @@ const DashboardNew = () => {
     style: "decimal",
     minimumFractionDigits: 0,
   });
+  // const [chartOptions, setChartOptions] = useState({
+  //   series: [
+  //     {
+  //       name: "Produce Trend",
+  //       data: [],
+  //     },
+  //   ],
+  //   options: {
+  //     chart: {
+  //       type: "area",
+  //       stacked: false,
+  //       height: 350,
+  //       zoom: {
+  //         type: "x",
+  //         enabled: true,
+  //         autoScaleYaxis: true,
+  //       },
+  //       toolbar: {
+  //         autoSelected: "zoom",
+  //       },
+  //     },
+  //     colors: ["#203764"],
+  //     dataLabels: {
+  //       enabled: false,
+  //     },
+  //     markers: {
+  //       size: 0,
+  //     },
+  //     title: {
+  //       text: t("dashboard.graphHead"),
+  //       align: "left",
+  //     },
+  //     fill: {
+  //       type: "gradient",
+  //       gradient: {
+  //         shadeIntensity: 1,
+  //         inverseColors: false,
+  //         opacityFrom: 0.5,
+  //         opacityTo: 0,
+  //         stops: [0, 90, 100],
+  //       },
+  //     },
+  //     yaxis: {
+  //       title: {
+  //         text: t("dashboard.price"),
+  //       },
+  //     },
+  //     xaxis: {
+  //       type: "datetime",
+  //       labels: {
+  //         formatter: function (val) {
+  //           const date = new Date(val);
+  //           const day = date.getDate();
+  //           const month = date.toLocaleString("default", { month: "short" });
+  //           return `${day} ${month}`; // e.g., "12 Jul"
+  //         },
+  //       },
+  //     },
+  //     tooltip: {
+  //       shared: false,
+  //       y: {
+  //         formatter: function (val) {
+  //           return val.toFixed(0);
+  //         },
+  //       },
+  //     },
+  //   },
+  // });
   const [chartOptions, setChartOptions] = useState({
     series: [
       {
         name: "Produce Trend",
-        data: [], // Initial empty data
+        data: [],
       },
     ],
     options: {
@@ -689,7 +760,7 @@ const DashboardNew = () => {
         size: 0,
       },
       title: {
-        text: "Produce Price Consignee",
+        text: "",
         align: "left",
       },
       fill: {
@@ -704,7 +775,7 @@ const DashboardNew = () => {
       },
       yaxis: {
         title: {
-          text: "Price",
+          text: "",
         },
       },
       xaxis: {
@@ -714,7 +785,7 @@ const DashboardNew = () => {
             const date = new Date(val);
             const day = date.getDate();
             const month = date.toLocaleString("default", { month: "short" });
-            return `${day} ${month}`; // e.g., "12 Jul"
+            return `${day} ${month}`;
           },
         },
       },
@@ -728,7 +799,26 @@ const DashboardNew = () => {
       },
     },
   });
-  // newDash
+
+  useEffect(() => {
+    setChartOptions((prev) => ({
+      ...prev,
+      options: {
+        ...prev.options,
+        title: {
+          ...prev.options.title,
+          text: t("dashboard.graphHead"),
+        },
+        yaxis: {
+          ...prev.options.yaxis,
+          title: {
+            ...prev.options.yaxis.title,
+            text: t("dashboard.price"),
+          },
+        },
+      },
+    }));
+  }, [t, i18n.language]);
   const [data, setData] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -871,7 +961,7 @@ const DashboardNew = () => {
           doc.addImage(imgData, "JPEG", 7, 5.7, 20, 20);
           doc.setFontSize(10);
           doc.setTextColor(0, 0, 0);
-          doc.text("Siam Eats Co.,Ltd. (0395561000010) ", 30, 10);
+          doc.text("Siam Eats Co.,Ltd. (0395561000010)", 30, 10);
           doc.text("16/8 Mu 11 ", 30, 14);
           const longTextOne =
             "Khlong Nueng, Khlong Luang, Pathum Thani 12120 THAILAND";
@@ -1950,8 +2040,9 @@ const DashboardNew = () => {
             >
               <div className="container-fluid py-1 px-0">
                 <nav aria-label="breadcrumb" style={{ width: "100%" }}>
-                  
-                  <h6 className="font-weight-bolder mb-0">Dashboard</h6>
+                  <h6 className="font-weight-bolder mb-0">
+                    {t("dashboard.DashboardHead")}
+                  </h6>
                 </nav>
 
                 {/* Button trigger modal */}
@@ -2105,7 +2196,7 @@ const DashboardNew = () => {
             </nav>
             <div className="row newSmallCard ">
               <div className="selectTimeHead">
-                <h6>Select Time Period :</h6>
+                <h6>{t("dashboard.timePeriod")} :</h6>
               </div>
               <div className="flex flex-wrap">
                 <div>
@@ -2125,7 +2216,7 @@ const DashboardNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Client"
+                            placeholder={t("dashboard.SelectClient")}
                             variant="outlined"
                           />
                         )}
@@ -2147,7 +2238,7 @@ const DashboardNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Consignee"
+                            placeholder={t("dashboard.SelectConsignee")}
                             variant="outlined"
                           />
                         )}
@@ -2175,7 +2266,10 @@ const DashboardNew = () => {
                       setSelectedComparison(value ? value.ID : null);
                     }}
                     renderInput={(params) => (
-                      <TextField {...params} placeholder="Comparison Period" />
+                      <TextField
+                        {...params}
+                        placeholder={t("dashboard.ComparisonPeriod")}
+                      />
                     )}
                   />
                 </div>
@@ -2217,7 +2311,7 @@ const DashboardNew = () => {
                     type="submit"
                     onClick={confirmData}
                   >
-                    Confirm
+                    {t("dashboard.ConfirmBtn")}
                   </button>
                 </div>
               </div>
@@ -2534,7 +2628,6 @@ const DashboardNew = () => {
                             paddingTop: "13px",
                           }}
                         >
-                          {/* {consigeeDetails?.Total_shipments} */}
                           {boxsData?.Manhour?.Count_
                             ? boxsData?.Manhour?.Count_
                             : 0}{" "}
@@ -2694,7 +2787,9 @@ const DashboardNew = () => {
               <div className="row">
                 <div className="col-lg-6 mb20">
                   <div className="itemsOrderSearch">
-                    <h3 className="itemOrder">Top 5 Items Ordered</h3>
+                    <h3 className="itemOrder">
+                      {t("dashboard.itemOrderHead")}
+                    </h3>
 
                     <div className="selectProduce">
                       <Autocomplete
@@ -2711,7 +2806,10 @@ const DashboardNew = () => {
                           // setProduceImages(value ? value.images : null); // Update images state
                         }}
                         renderInput={(params) => (
-                          <TextField {...params} placeholder="Invoice Value" />
+                          <TextField
+                            {...params}
+                            placeholder={t("dashboard.invoiceValue")}
+                          />
                         )}
                       />
                     </div>
@@ -2720,11 +2818,11 @@ const DashboardNew = () => {
                   <div className="tableCreateClient">
                     <table>
                       <tr>
-                        <th>ITF Name</th>
-                        <th> Last Period Kg</th>
-                        <th> Current Period Kg</th>
-                        <th> DIFF </th>
-                        <th> % Change </th>
+                        <th>{t("dashboard.topH1")}</th>
+                        <th>{t("dashboard.topH2")}</th>
+                        <th>{t("dashboard.topH3")}</th>
+                        <th>{t("dashboard.topH4")}</th>
+                        <th>{t("dashboard.topH5")}</th>
                       </tr>
                       <tbody>
                         {topFiveValue?.Top5Data?.map((item, index) => (
@@ -2749,7 +2847,7 @@ const DashboardNew = () => {
                         value={options.find(
                           (option) => option.value === selectedDataset
                         )}
-                        placeholder="Select..."
+                        placeholder={t("dashboard.select")}
                         isSearchable
                         styles={{
                           container: (provided) => ({

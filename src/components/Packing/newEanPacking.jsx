@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import MySwal from "../../swal";
 import { ComboBox } from "../combobox";
+import moment from "moment";
 import { TableView } from "../table";
 import { Button, Modal } from "react-bootstrap";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
@@ -20,8 +21,14 @@ const NewEanPacking = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
+  const [color, setColor] = useState(false);
   const [closeButton, setCloseButton] = useState(true);
   console.log(from.Produce_id);
+  const handleClose1 = () => setShow1(false);
+  const [show1, setShow1] = useState(false);
+  const closeIcon1 = () => {
+    setShow1(false);
+  };
   console.log(from);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [eanListData, setEanListData] = useState([]);
@@ -223,6 +230,47 @@ const NewEanPacking = () => {
       MySwal.close();
     });
   };
+
+  const getPackingCommonCancel = async () => {
+    console.log(packingCommonId);
+    try {
+      loadingModal.fire(); // Show loading modal
+
+      // 1. Release Access
+      await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
+        id: from.sorting_id,
+        accesstype: 4,
+      });
+
+      // 2. Get Packing Common if packingCommonId exists
+      if (packingCommonId) {
+        const response = await axios.post(`${API_BASE_URL}/PEANRESTORE`, {
+          packing_common_id: packingCommonId,
+        });
+
+        console.log(response);
+
+        if (response.data?.message === "success") {
+          toast.success("Packing data fetched successfully!", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+
+          // Optional: you can handle response data here
+          // setData(response.data.data);
+        }
+      }
+
+      // 3. Navigate after everything
+      navigate("/eanPacking");
+    } catch (error) {
+      console.error("Error in getPackingCommonCancel:", error);
+      toast.error("Failed to fetch packing data or release access!");
+    } finally {
+      loadingModal.close(); // Always close modal
+    }
+  };
+
   const brandOptions =
     brands?.map((item) => ({
       id: item.ID,
@@ -241,16 +289,32 @@ const NewEanPacking = () => {
         }
       });
   };
-
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setState((prevState) => {
-      return {
-        ...prevState,
-        [name]: value,
-      };
-    });
+    const cratesUsed = name === "crates_used" ? +value : +state.crates_used;
+    const qtyPerCrate = +from["Qty/Crate"] || 0;
+
+    const newState = {
+      ...state,
+      [name]: value,
+    };
+
+    if (name === "crates_used") {
+      newState.qty_used = cratesUsed * qtyPerCrate;
+    }
+
+    setState(newState);
   };
+
+  // const handleChange = (event) => {
+  //   const { name, value } = event.target;
+  //   setState((prevState) => {
+  //     return {
+  //       ...prevState,
+  //       [name]: value,
+  //     };
+  //   });
+  // };
   const formatDate1 = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -396,6 +460,11 @@ const NewEanPacking = () => {
         .post(`${API_BASE_URL}createEanPacking`, {
           packing_common_id: packingCommonId,
           packing_ean_id: packingEanId,
+          qty_used: state.qty_used,
+          crates_used: state.crates_used,
+          number_of_staff: state.number_of_staff,
+          start_time: moment(selectedDate1).format("DD-MM-YYYY HH:mm:ss"),
+          end_time: moment(selectedDate).format("DD-MM-YYYY HH:mm:ss"),
         })
         .then((response) => {
           console.log(response);
@@ -437,13 +506,14 @@ const NewEanPacking = () => {
       start_time: formatDate(selectedDate1),
       end_time: formatDate(selectedDate),
       user_id: localStorage.getItem("id"),
-      assigned_order: selectedOrder,
+      OD_ID: selectedOrder,
       state,
     };
 
     axios
       .post(`${API_BASE_URL}/createEanProducne`, request)
       .then((response) => {
+        console.log(response);
         console.log(response);
         setPackingCommonId(response.data.data);
         const packingEanId = response.data.packing_ean_id?.[0]?.[0]?.["@LID"];
@@ -469,24 +539,48 @@ const NewEanPacking = () => {
       });
   };
 
-  const handleNewSlecter = () => {
-    axios
-      .post(`${API_BASE_URL}/AssignOrderDropDownList`, {
-        produce_id: from.Produce_id,
-      })
-      .then((response) => {
-        console.log(response.data.data[0], "this is new item");
-        setAssigned(response.data.data[0]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  useEffect(() => {
-    handleNewSlecter();
-  }, []);
+  // const handleNewSlecter = () => {
+  //   axios
+  //     .post(`${API_BASE_URL}/AssignOrderDropDownList`, {
+  //       produce_id: from.Produce_id,
+  //     })
+  //     .then((response) => {
+  //       console.log(response.data.data[0], "this is new item");
+  //       setAssigned(response.data.data[0]);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
+  // useEffect(() => {
+  //   handleNewSlecter();
+  // }, []);
 
   console.log(selectedOrder, "this is selected value");
+  useEffect(() => {
+    console.log(data.brand_id);
+    console.log(data?.ean_id);
+    if (data?.ean_id && data?.brand_id) {
+      // Call the PEANORDER API
+      fetchPEANORDER(data.ean_id, data.brand_id);
+    }
+  }, [data?.ean_id, data?.brand_id]);
+
+  const fetchPEANORDER = (eanId, brandId) => {
+    axios
+      .post(`${API_BASE_URL}/PEANORDER`, {
+        EAN: eanId,
+        Brand: brandId,
+      })
+      .then((res) => {
+        setAssigned(res?.data?.data);
+        console.log("PEANORDER API response:", res.data);
+        // Handle response if needed
+      })
+      .catch((err) => {
+        console.error("Error calling PEANORDER:", err);
+      });
+  };
 
   return (
     <>
@@ -511,7 +605,7 @@ const NewEanPacking = () => {
                       <div className="row">
                         <div className="col-md-6">
                           <h6 className="font-weight-bolder mb-0">
-                            Operation / EAN Packing Management
+                            EAN Packing Management
                           </h6>
                         </div>
                       </div>
@@ -740,11 +834,11 @@ const NewEanPacking = () => {
                                   <div className="form-group col-lg-3">
                                     <h6>Quantity used</h6>
                                     <input
-                                      onChange={handleChange}
                                       type="number"
                                       name="qty_used"
                                       className="form-control"
                                       value={state.qty_used}
+                                      readOnly
                                     />
                                   </div>
 
@@ -828,7 +922,15 @@ const NewEanPacking = () => {
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => checkPackCommonId()}
+                                      onClick={() => {
+                                        if (
+                                          +from?.Crates < +state.crates_used
+                                        ) {
+                                          setShow1(true); // Show error/modal
+                                        } else {
+                                          checkPackCommonId(); // Call the function directly
+                                        }
+                                      }}
                                     >
                                       Add
                                     </button>
@@ -943,6 +1045,12 @@ const NewEanPacking = () => {
                             Close
                           </button>
                         ) : null}
+                        <button
+                          className="btn btn-danger"
+                          onClick={getPackingCommonCancel}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1060,7 +1168,7 @@ const NewEanPacking = () => {
                   <div className="form-group mb-3 autoComplete">
                     <label>Assigned Order</label>
 
-                    <Autocomplete
+                    {/* <Autocomplete
                       options={assigned}
                       getOptionLabel={(option) => option.Dropdown}
                       onChange={(event, newValue) => {
@@ -1082,6 +1190,37 @@ const NewEanPacking = () => {
                           (option) => option.od_id === selectedOrder
                         ) || null
                       }
+                      disablePortal
+                      sx={{ width: 300 }}
+                    /> */}
+                    <Autocomplete
+                      options={[
+                        { Display: "Not Allocated", OD_ID: "" },
+                        ...assigned,
+                      ]}
+                      getOptionLabel={(option) => option.Display || ""}
+                      onChange={(event, newValue) => {
+                        setSelectedOrder(newValue?.OD_ID || ""); // If "Not Allocated" or null is selected, set blank
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select Order"
+                          variant="outlined"
+                        />
+                      )}
+                      value={
+                        [
+                          { Display: "Not Allocated", OD_ID: "" },
+                          ...assigned,
+                        ].find((option) => option.OD_ID === selectedOrder) ||
+                        null
+                      }
+                      isOptionEqualToValue={(option, value) =>
+                        option.OD_ID === value.OD_ID
+                      }
+                      clearOnEscape
+                      clearIcon={<i className="mdi mdi-close" />}
                       disablePortal
                       sx={{ width: 300 }}
                     />
@@ -1120,6 +1259,58 @@ const NewEanPacking = () => {
               <p className="">{massageShow}</p>
             </div>
           </div>
+        </div>
+      </Modal>
+      <Modal
+        className="modalError receiveModal"
+        show={show1}
+        onHide={handleClose1}
+      >
+        <div className="modal-content">
+          <div
+            className="modal-header border-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <h1 className="modal-title fs-5" id="exampleModalLabel">
+              Crates used Check
+            </h1>
+            <button
+              style={{ color: "#fff", fontSize: "30px" }}
+              type="button"
+              onClick={closeIcon1}
+            >
+              <i class="mdi mdi-close"></i>
+            </button>
+          </div>
+          <div
+            className="modal-body pt-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <div className="eanCheck errorMessage recheckReceive">
+              <p
+                className="pt-0"
+                style={{
+                  backgroundColor: color ? "" : "#631f37",
+                }}
+              >
+                Crates entered more than available
+              </p>
+
+              <div className="closeBtnRece">
+                <button onClick={closeIcon1}>Close</button>
+              </div>
+            </div>
+          </div>
+          <div
+            className="modal-footer"
+            style={{
+              backgroundColor: color,
+            }}
+          ></div>
         </div>
       </Modal>
     </>

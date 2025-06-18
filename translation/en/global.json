@@ -1,0 +1,32 @@
+ {
+    "header": {
+        "logoName": "Terp",
+        "viewBtn": "View All",
+        "notificationHead": "Notifications",
+        "noNotification": "No notifications",
+        "mainMenu1": "Expenses"
+    },
+    "dashboard": {
+        "DashboardHead": "Dashboard",
+        "timePeriod": "Select Time Period",
+        "SelectClient": "Select Client",
+        "SelectConsignee": "Select Consignee",
+        "ComparisonPeriod": "Comparison Period",
+        "ConfirmBtn": "Confirm",
+        "itemOrderHead": "Top 5 Items Ordered",
+        "invoiceValue": "Invoice Value",
+        "topH1": "ITF Name",
+        "topH2": "Last Period Kg",
+        "topH3": "Current Period Kg",
+        "topH4": "DIFF",
+        "topH5": "% Change",
+        "select":"Select...",
+        "graphHead":"Produce Price Consignee",
+        "price":"Price"
+ 
+    },
+    "footer":{
+        "footerOne":"Copyright ©",
+        "footerTwo":"All rights reserved."
+    }
+}

@@ -1,4 +1,5 @@
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../Url/Api";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
@@ -17,7 +18,7 @@ const AddVendor = () => {
   const [state, setState] = useState({
     user_id: localStorage.getItem("id"),
 
-    vendor_id: from?.vendor_id ?? undefined,
+    vendor_id: from?.ID ?? undefined,
     name: from?.name ?? "",
     id_card: from?.id_card ?? "",
     Entity: from?.Entity ?? "",

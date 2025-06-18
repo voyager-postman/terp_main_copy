@@ -24,12 +24,10 @@ import Login from "./components/Login/Login";
 import Navbar from "./components/Navbar/Navbar";
 import Claim from "./components/Orders/Claim";
 import ClaimDetails from "./components/Orders/ClaimDetails";
-import CreateQutoation from "./components/Orders/CreateQutoation";
 import Invoice from "./components/Orders/Invoice";
 import InvoiceDetails from "./components/Orders/InvoiceDetails";
 import Operation from "./components/Orders/Operation";
 import OperationDetails from "./components/Orders/OperationDetails";
-import Quotation from "./components/Orders/Quotation";
 import UpdateOperation from "./components/Orders/UpdateOperation";
 import CreateOrder from "./components/Orders/order/CreateOrder";
 import Orders from "./components/Orders/order/list";
@@ -116,7 +114,6 @@ import InventoryProduce from "./components/operation/InventoryProduce";
 import InventoryPackaging from "./components/operation/InventoryPackaging";
 import OrderView from "./components/Orders/OrderView";
 import PurchaseView from "./components/PurchaseOrder/PurchaseView";
-import QuotationView from "./components/Orders/QuotationView";
 import Journey from "./components/Setup/Journey/Journey";
 import CreateJourney from "./components/Setup/Journey/CreateJourney";
 import EditJourney from "./components/Setup/Journey/EditJourney";
@@ -126,15 +123,12 @@ import Notification from "./components/Setup/notification/Notification";
 import CreateNotification from "./components/Setup/notification/CreateNotification";
 import Updatenotification from "./components/Setup/user/Updatenotification";
 import InvoiceSecPdf from "./components/Orders/InvoiceSecPdf";
-import UpdateQutoation from "./components/Orders/UpdateQutoation";
 import UpdateOrder from "./components/Orders/order/UpdateOrder";
 import UpdatePrice from "./components/updatePrice/UpdatePrice";
 import InvoiceThird from "./components/Orders/InvoiceThird";
 import InvoiceView from "./components/Orders/InvoiceView";
 import InvoiceEdit from "./components/Orders/InvoiceEdit";
-import QuotaionPdf from "./components/Orders/QuotaionPdf";
 import CurrencyExchange from "./components/Accounting/CurrencyExchange";
-import QuotationProforma from "./components/Orders/QuotationProforma";
 import ProformaInvoice from "./components/Orders/ProformaInvoice";
 import ProformaInvoiceTest from "./components/Orders/test/ProformaInvoiceTest";
 import ForgotPassword from "./components/Login/ForgotPassword";
@@ -185,6 +179,7 @@ import BonousDetection from "./components/hr/BonousDetection";
 import Contract from "./components/hr/Contract";
 import UserHr from "./components/hr/UserHr";
 import MenuManagement from "./components/hr/MenuManagement";
+import InvoiceEdit2 from "./components/Orders/test/InvoiceEdit2";
 
 function App() {
   const location = useLocation(); // Hook to get the current URL location
@@ -334,7 +329,6 @@ function App() {
                 <Route path="/ship_to" element={<ShipTo />} />
                 <Route path="/add_ship_to" element={<AddShipTo />} />
                 <Route path="/edit_ship_to" element={<AddShipTo />} />
-                <Route path="/quotation" element={<Quotation />} />
                 <Route
                   path="/operation_details"
                   element={<OperationDetails />}
@@ -365,7 +359,7 @@ function App() {
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/language" element={<Language />} />
                 <Route path="/produceNew" element={<ProduceNew />} />
-                <Route path="/quotationpdf" element={<QuotaionPdf />} />
+
                 <Route
                   path="/qoutation_pdf_test"
                   element={<QuotaionPdfTest />}
@@ -376,6 +370,8 @@ function App() {
                 <Route path="/packagingNew" element={<PackagingNew />} />
                 <Route path="updatePackaging" element={<UpdatePackaging />} />
                 <Route path="/invoice_edit" element={<InvoiceEdit />} />
+                <Route path="/invoice_edit1" element={<InvoiceEdit2 />} />
+
                 <Route path="/airlineNew" element={<AirlineNew />} />
                 <Route path="/airportNew" element={<AirportNew />} />
                 <Route path="/bankNew" element={<BankNew />} />
@@ -405,7 +401,6 @@ function App() {
                 <Route path="/custom_invoice_pdf" element={<InvoiceThird />} />
                 <Route path="/invoiceview" element={<InvoiceView />} />
 
-                <Route path="/quotationview" element={<QuotationView />} />
                 <Route
                   path="/quotation_view_test"
                   element={<Quotation_View_Test />}
@@ -418,10 +413,7 @@ function App() {
                   element={<CreatePackagingNew />}
                 />
                 <Route path="/addTransport" element={<UpdateTransport />} />
-                <Route
-                  path="/quotationproforma"
-                  element={<QuotationProforma />}
-                />
+
                 <Route
                   path="/quotation_proforma_test"
                   element={<QuotationProformaTest />}
@@ -470,8 +462,6 @@ function App() {
                 />
                 <Route path="/debitnote" element={<DebitNotes />} />
                 <Route path="/hplNew" element={<HplNew />} />
-                <Route path="/createQutation" element={<CreateQutoation />} />
-                <Route path="/updateQutation" element={<UpdateQutoation />} />
                 <Route path="/currencyex" element={<CurrencyExchange />} />
 
                 <Route path="/createUser" element={<CreateUser />} />

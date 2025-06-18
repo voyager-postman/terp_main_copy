@@ -1,7 +1,7 @@
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../Url/Api";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { IsLoginAuthenticateContext } from "../../Contexts/LoginContext";
@@ -10,7 +10,6 @@ import { API_BASE_URL } from "../../Url/Url";
 import logo from "../../assets/logoNew.png";
 import { addUserDetail } from "../userDetailToken";
 import "./loginn.css";
-// import "./login.css"
 
 const Login = () => {
   const [isAuthenticate, setIsAuthenticate] = useState(

@@ -49,11 +49,27 @@ const UpdateQuotationTest = () => {
       />
     </div>
   );
+  const [color, setColor] = useState(false);
+
+  const handleClose1 = () => setShow1(false);
+  const [show1, setShow1] = useState(false);
+  const closeIcon1 = () => {
+    setShow1(false);
+  };
   const handleSaveOrderPopulate = () => {
     const payload = {
       order_id: from?.Order_ID, // You must have this in your component
       user_id: localStorage.getItem("id"), // You must also define this
       Order_NW: orderNetWeight,
+      input: {
+        ...computedState,
+        user: localStorage.getItem("id"),
+        palletized: exchangeRate2 ? 1 : 0,
+        Chamber: exchangeRate3 ? 1 : 0,
+        Precooling: exchangeRate4 ? 1 : 0,
+        Charge_Volume: exchangeRate1 ? 1 : 0,
+        is_quotation: 0,
+      },
     };
 
     axios
@@ -1337,7 +1353,7 @@ const UpdateQuotationTest = () => {
   };
   return (
     <>
-      <Card title={`Quotation Test Management / Update Form`}>
+      <Card title={`Quotation Management / Update Form`}>
         <div className="top-space-search-reslute">
           <div className="tab-content px-2 md:!px-4">
             <div className="tab-pane active" id="header" role="tabpanel">
@@ -2076,10 +2092,15 @@ const UpdateQuotationTest = () => {
                             <button
                               type="button"
                               onClick={() => {
-                                setSelectedDetails(null);
-                                setToEditDetails({});
-                                openModal();
-                                // saveNewDetails1();
+                                if (!computedState.load_date) {
+                                  // Show error modal if load_date is not present
+                                  setShow1(true); // assuming `show1` is controlled by `setShow1`
+                                } else {
+                                  // Proceed to open the main modal if validation passes
+                                  setSelectedDetails(null);
+                                  setToEditDetails({});
+                                  openModal();
+                                }
                               }}
                             >
                               Add
@@ -2087,17 +2108,20 @@ const UpdateQuotationTest = () => {
                           )}
                           <button
                             type="button"
-                            // onClick={() => {
-                            //   setSelectedDetails(null);
-                            //   setToEditDetails({});
-                            //   openModal();
-                            //   // saveNewDetails1();
-                            // }}
-                            data-bs-toggle="modal"
-                            data-bs-target="#consigneeOne"
+                            onClick={() => {
+                              if (!computedState.load_date) {
+                                setShow1(true); // Show error modal
+                              } else {
+                                const modal = new bootstrap.Modal(
+                                  document.getElementById("consigneeOne")
+                                );
+                                modal.show(); // Manually open the modal if validation passes
+                              }
+                            }}
                           >
                             Add Consignee Items
                           </button>
+
                           <div
                             className="modal fade"
                             id="consigneeOne"
@@ -3055,6 +3079,59 @@ const UpdateQuotationTest = () => {
           </div>
         </div>
       )}
+
+      <Modal
+        className="modalError receiveModal"
+        show={show1}
+        onHide={handleClose1}
+      >
+        <div className="modal-content">
+          <div
+            className="modal-header border-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <h1 className="modal-title fs-5" id="exampleModalLabel">
+              Quotation Check
+            </h1>
+            <button
+              style={{ color: "#fff", fontSize: "30px" }}
+              type="button"
+              onClick={closeIcon1}
+            >
+              <i class="mdi mdi-close"></i>
+            </button>
+          </div>
+          <div
+            className="modal-body pt-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <div className="eanCheck errorMessage recheckReceive">
+              <p
+                className="pt-0"
+                style={{
+                  backgroundColor: color ? "" : "#631f37",
+                }}
+              >
+                Loading Date missing
+              </p>
+
+              <div className="closeBtnRece">
+                <button onClick={closeIcon1}>Close</button>
+              </div>
+            </div>
+          </div>
+          <div
+            className="modal-footer"
+            style={{
+              backgroundColor: color,
+            }}
+          ></div>
+        </div>
+      </Modal>
     </>
   );
 };

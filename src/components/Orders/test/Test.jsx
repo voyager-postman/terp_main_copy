@@ -73,6 +73,7 @@ const Test = () => {
   const [orderId, setOrderId] = useState("");
   const [deleteOrderId, setDeleteOrderId] = useState("");
   const [startDate, setStartDate] = useState(null);
+  const [idData, setIdData] = useState("");
   const [startDate1, setStartDate1] = useState(null);
   const [startDate2, setStartDate2] = useState(null);
   const [Journey, setJourney] = useState([]);
@@ -81,6 +82,7 @@ const Test = () => {
   const [notes2, setNotes2] = useState("");
   const [show, setShow] = useState(false);
   const [stock, setStock] = useState("");
+  const [chargeVolume, setChargeVolume] = useState(false);
 
   const handleClose = () => setShow(false);
   const [journeyId, setJourneyId] = useState(null);
@@ -132,6 +134,9 @@ const Test = () => {
   useEffect(() => {
     orderData();
   }, []);
+  const handleEditClick1 = async (quotation_id) => {
+    setIdData(quotation_id);
+  };
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const { data: liner } = useQuery("getLiner");
@@ -267,6 +272,10 @@ const Test = () => {
       toast.error("Something went wrong");
     }
   };
+
+  const handleAgreedPricingChange1 = (e) => {
+    setChargeVolume(e.target.checked);
+  };
   const handleJourneySelection = async (selectedJourneyId) => {
     const journey_id = selectedJourneyId; // assuming selectedJourneyId comes directly as the ID
     const order_id = id; // Assuming 'id' is already storing the order_id you need
@@ -365,23 +374,32 @@ const Test = () => {
       toast.error("Error fetching freight details");
     }
   };
-  const handleEditClick = async (order_id) => {
+  const handleEditClick = async () => {
     loadingModal.fire();
     try {
       const response = await axios.post(`${API_BASE_URL}/copyOrder`, {
-        order_id: order_id,
+        order_id: idData,
         user: localStorage.getItem("id"),
+        Is_quotation: 0,
+        Recalculate: chargeVolume ? 1 : 0, // Convert boolean to 1 or 0
         // Other data you may need to pass
       });
       console.log("API response:", response);
+      let modalElement = document.getElementById("consigneeOne");
+      let modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+
       loadingModal.close();
+      setChargeVolume(false);
       orderData();
-      toast.success(" Copy Order Procedure successfully");
+      toast.success("Order Copy successfully");
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
       loadingModal.close();
-      toast.error("Failed to Copy Order Procedure");
+      toast.error("Failed to Order Copy");
     }
   };
   const handleChange2 = (e) => {
@@ -1768,14 +1786,7 @@ const Test = () => {
       },
       {
         Header: "Status",
-        accessor: (a) =>
-          ({
-            1: "Pending",
-            2: "Active",
-            3: "Packed",
-            4: "Shipped",
-            5: "Cancelled",
-          }[a.Status] || "Unknown"),
+        accessor: "status_name",
       },
       // {
       //   Header: "Precooling",
@@ -1839,29 +1850,29 @@ const Test = () => {
 
             {+a.is_deleted !== 1 && (
               <>
-                {(+a.Status === 1 || +a.Status === 2) && (
+                {(+a.Status === 3 || +a.Status === 4 || +a.Status === 5) && (
                   <>
                     <Link to="/updateTestOrder" state={{ from: { ...a } }}>
                       <i className="mdi mdi-pencil" />
                     </Link>
                   </>
                 )}
-                {(+a.Status === 1 ||
-                  +a.Status === 2 ||
-                  +a.Status === 3 ||
-                  +a.Status === 4) && (
+                {(+a.Status === 3 ||
+                  +a.Status === 4 ||
+                  +a.Status === 5 ||
+                  +a.Status >= 6) && (
                   <button type="button" onClick={() => performaOrder(a)}>
                     {" "}
                     <i className="fi fi-sr-square-p"></i>
                   </button>
                 )}
-                {(+a.Status === 2 || +a.Status === 3 || +a.Status === 4) && (
+                {(+a.Status === 4 || +a.Status === 5 || +a.Status >= 6) && (
                   <button type="button" onClick={() => operationPdfTest(a)}>
                     {" "}
                     <i class="fi fi-sr-square-o"></i>
                   </button>
                 )}
-                {+a.Status === 2 && (
+                {(+a.Status === 4 || +a.Status === 5) && (
                   <button type="button" onClick={() => customInvoicePdf(a)}>
                     {" "}
                     <svg
@@ -1874,7 +1885,7 @@ const Test = () => {
                     </svg>
                   </button>
                 )}
-                {+a.Status === 2 && (
+                {(+a.Status === 4 || +a.Status === 5) && (
                   <button
                     type="button"
                     data-bs-toggle="modal"
@@ -1885,10 +1896,7 @@ const Test = () => {
                     <i className="mdi mdi-note-outline" />
                   </button>
                 )}
-                {(+a.Status === 2 ||
-                  +a.Status === 3 ||
-                  +a.Status === 4 ||
-                  +a.Status === 5) && (
+                {(+a.Status === 4 || +a.Status === 5 || +a.Status >= 6) && (
                   <button
                     type="button"
                     style={{
@@ -1897,12 +1905,17 @@ const Test = () => {
                       fontSize: "22px",
                       marginTop: "10px",
                     }}
-                    onClick={() => handleEditClick(a.Order_ID)}
+                    onClick={() => handleEditClick1(a.Order_ID)}
                   >
-                    <i className="mdi mdi-content-copy" />
+                    <i
+                      className="mdi mdi-content-copy"
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#consigneeOne"
+                    />{" "}
                   </button>
                 )}
-                {(+a.Status === 2 || +a.Status === 3) && (
+                {(+a.Status === 4 || +a.Status === 5 || +a.Status === 6) && (
                   <button
                     type="button"
                     onClick={() => openModal(a.Order_ID, a.Consignee_ID)}
@@ -1910,7 +1923,7 @@ const Test = () => {
                     <i className="mdi mdi-airplane-clock" />
                   </button>
                 )}
-                {(+a.Status === 1 || +a.Status === 2) && (
+                {(+a.Status === 3 || +a.Status === 4 || +a.Status === 5) && (
                   <button
                     type="button"
                     data-bs-toggle="modal"
@@ -1921,7 +1934,7 @@ const Test = () => {
                   </button>
                 )}
 
-                {+a.Status === 1 && (
+                {+a.Status === 3 && (
                   <button type="button" onClick={() => CheckBox(a.Order_ID)}>
                     <i
                       className="mdi mdi-check"
@@ -1945,8 +1958,59 @@ const Test = () => {
 
   return (
     <>
+      <div
+        className="modal fade"
+        id="consigneeOne"
+        tabIndex={-1}
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modalShipTo ">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">
+                Order Copy
+              </h1>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <i className="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <label htmlFor="">Recalculate</label>
+              <br />
+              <label className="toggleSwitch large">
+                <input
+                  type="checkbox"
+                  name="Charge_Volume"
+                  checked={chargeVolume}
+                  onChange={handleAgreedPricingChange1}
+                />
+                <span>
+                  <span>No</span>
+                  <span>Yes</span>
+                </span>
+                <a></a>
+              </label>
+            </div>
+            <div className="modal-footer justify-content-right">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => handleEditClick()}
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <Card
-        title="Order Test Management"
+        title="Order  Management"
         endElement={
           <button
             type="button"

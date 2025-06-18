@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../Url/Api";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,6 +31,7 @@ const Invoice = () => {
   const [unitPrices, setUnitPrices] = useState({});
   const [itemDetails, setItemDetails] = useState(false);
   const [itemDetails1, setItemDetails1] = useState(""); // Default state
+  const [useAgreedPricing, setUseAgreedPricing] = useState(false);
 
   const [companyAddress, setCompanyAddress] = useState("");
   const [data3, setData3] = useState("");
@@ -37,10 +39,11 @@ const Invoice = () => {
   const [totalDetails, setTotalDetails] = useState("");
   const [headerData, setHeaderData] = useState("");
   const [invoiceData, setInvoiceData] = useState("");
-  const [messageSet1, setMassageSet1] = useState("");
+  // const [messageSet1, setMassageSet1] = useState("");
   const [messageSet2, setMassageSet2] = useState("");
 
   const [messageSet, setMassageSet] = useState("");
+  const [filterData1, setFilterData1] = useState("");
 
   const [quantity, setQuantity] = useState("");
   const [invoiceID, setInvoiceId] = useState("");
@@ -58,11 +61,16 @@ const Invoice = () => {
   const [show, setShow] = useState(false);
   const [notes, setNotes] = useState("");
   const [massageShow, setMassageShow] = useState("");
-
+  const [cbm, setCbm] = useState(true);
+  const [selectedInvoice, setSelectedInvoice] = useState("Client");
+  const [exchangeRate, setExchangeRate] = useState(false);
+  const [selectedDeliveryTerm, setSelectedDeliveryTerm] = useState(null);
   const [uploadImage, setUploadImage] = useState("");
   const [data, setData] = useState([]);
   const [invImage, setInvImage] = useState(null);
   const { data: unit } = useQuery("getAllUnit");
+  const { data: deliveryList } = useQuery("DropdownDelivery");
+  console.log(deliveryList);
   const { data: details, refetch: getOrdersDetails } = useQuery(
     `GetinvoiceDetails?invoice_id=${invoiceID2}`,
     {
@@ -86,6 +94,33 @@ const Invoice = () => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  const handleAgreedPricingChange = (e) => {
+    setUseAgreedPricing(e.target.checked);
+    console.log(useAgreedPricing);
+    // pdfAllData();
+  };
+  const handleAgreedPricingChange1 = (e) => {
+    setItemDetails(e.target.checked);
+    console.log(itemDetails);
+    // pdfAllData();
+  };
+  const handleAgreedPricingChange2 = (e) => {
+    setCbm(e.target.checked);
+    console.log(cbm);
+    // pdfAllData();
+  };
+
+  const handleAgreedPricingChange3 = (e) => {
+    setExchangeRate(e.target.checked);
+    console.log(exchangeRate);
+    // pdfAllData();
+  };
+  const handleRadioChange = (event) => {
+    setSelectedInvoice(event.target.value);
+  };
+  const handleChangeDelivery = (event) => {
+    setSelectedDeliveryTerm(Number(event.target.value)); // store ID
+  };
   const handleFileChangeInv = (event) => {
     const fileInv = event.target.files[0];
     if (fileInv) {
@@ -530,13 +565,18 @@ const Invoice = () => {
           const yIncrementRight = 1; // Adjust this value based on your spacing requirements
 
           function formatDate(dateString) {
+            if (!dateString || isNaN(new Date(dateString).getTime())) {
+              return "";
+            }
+
             const date = new Date(dateString);
             const day = date.getDate();
             const month = date.getMonth() + 1;
             const year = date.getFullYear();
-            // Add leading zeros if needed
+
             const formattedDay = day < 10 ? `0${day}` : day;
             const formattedMonth = month < 10 ? `0${month}` : month;
+
             return `${formattedDay}-${formattedMonth}-${year}`;
           }
 
@@ -2598,27 +2638,27 @@ const Invoice = () => {
     () => [
       {
         Header: "Invoice Number",
-        accessor: "Invoice_number",
+        accessor: "Invoice_Number",
       },
       {
         Header: "Order Number",
-        accessor: "Order_number",
+        accessor: "Order_Number",
       },
       {
         Header: "Shipment Ref",
         accessor: "Shipment_ref",
       },
       {
-        Header: "ConsigneeName",
+        Header: "Consignee Name",
         accessor: "Consignee_name",
       },
       {
         Header: "Client Ref",
-        accessor: "Client_reference",
+        accessor: "Customer_ref",
       },
       {
         Header: "AWB/BL",
-        accessor: "bl",
+        accessor: "BL",
       },
 
       {
@@ -2632,7 +2672,7 @@ const Invoice = () => {
       },
       {
         Header: "Status",
-        accessor: (a) => ({ 2: "Confirmed" }[a.Status] || "Pending"),
+        accessor: "status_name",
       },
 
       {
@@ -2645,17 +2685,17 @@ const Invoice = () => {
                 <i className="mdi mdi-eye" />
               </Link>
               {/* {+a.Status < 2 && ( */}
-                <>
-                  <Link to="/invoice_edit" state={{ from: { ...a } }}>
-                    <i className="mdi mdi-pencil" />
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => restoreEanPackage(a.Invoice_id)}
-                  >
-                    <i className="mdi mdi-restore" />
-                  </button>
-                </>
+              <>
+                <Link to="/invoice_edit1" state={{ from: { ...a } }}>
+                  <i className="mdi mdi-pencil" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => restoreEanPackage(a.Order_ID)}
+                >
+                  <i className="mdi mdi-restore" />
+                </button>
+              </>
               {/* )} */}
               <Link
                 className="SvgAnchor"
@@ -2671,7 +2711,7 @@ const Invoice = () => {
                   <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
                 </svg>
               </Link>
-              <Link
+              {/* <Link
                 className="SvgAnchor"
                 to="/invoice_pdf"
                 state={{ from: { ...a } }}
@@ -2684,7 +2724,23 @@ const Invoice = () => {
                   <title>invoice-text-check-outline</title>
                   <path d="M12 20L13.3 20.86C13.1 20.28 13 19.65 13 19C13 18.76 13 18.5 13.04 18.29L12 17.6L9 19.6L6 17.6L5 18.26V5H19V13C19.7 13 20.37 13.12 21 13.34V3H3V22L6 20L9 22L12 20M17 9V7H7V9H17M15 13V11H7V13H15M15.5 19L18.25 22L23 17.23L21.84 15.82L18.25 19.41L16.66 17.82L15.5 19Z"></path>
                 </svg>
-              </Link>
+              </Link> */}
+
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                onClick={() => setFilterData1(a)}
+                data-bs-target="#exampleModalCustomization"
+              >
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <title>invoice-text-check-outline</title>
+                  <path d="M12 20L13.3 20.86C13.1 20.28 13 19.65 13 19C13 18.76 13 18.5 13.04 18.29L12 17.6L9 19.6L6 17.6L5 18.26V5H19V13C19.7 13 20.37 13.12 21 13.34V3H3V22L6 20L9 22L12 20M17 9V7H7V9H17M15 13V11H7V13H15M15.5 19L18.25 22L23 17.23L21.84 15.82L18.25 19.41L16.66 17.82L15.5 19Z"></path>
+                </svg>
+              </button>
               {/* <button onClick={invoiceFirstpdf}>
             <i className="mdi mdi-file-account-outline" />
             </button> */}
@@ -2706,119 +2762,119 @@ const Invoice = () => {
               {/* <Link to="/invoicethirdpdf">
               <i className="mdi mdi-file-code-outline" />
             </Link> */}
-              {a.Status < 3 && (
-                <button
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal2"
-                  onClick={() => quotationCopy(a.Invoice_id)}
-                >
-                  <i className="mdi mdi-note-outline" />
-                </button>
-              )}
+              {/* {a.Status < 3 && ( */}
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal2"
+                onClick={() => quotationCopy(a.Invoice_id)}
+              >
+                <i className="mdi mdi-note-outline" />
+              </button>
+              {/* )} */}
 
-              {+a.Status == 0 && (
-                <button
-                  type="button"
-                  onClick={() => quotationConfirmation(a.Invoice_id)}
+              {/* {+a.Status == 0 && ( */}
+              <button
+                type="button"
+                onClick={() => quotationConfirmation(a.Invoice_id)}
+              >
+                {" "}
+                <i
+                  className="mdi mdi-check"
+                  style={{
+                    width: "20px",
+                    color: "#203764",
+                    fontSize: "22px",
+                    marginTop: "10px",
+                  }}
+                />
+              </button>
+              {/* )} */}
+              {/* {+a.Status == 1 && ( */}
+              <button
+                data-bs-toggle="modal"
+                data-bs-target="#modalAdjustBox"
+                type="button"
+                onClick={() => inventoryBoxes(a.Invoice_id)}
+              >
+                {/* <i className="ps-2 mdi mdi-pencil" /> */}
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
                 >
-                  {" "}
-                  <i
-                    className="mdi mdi-check"
-                    style={{
-                      width: "20px",
-                      color: "#203764",
-                      fontSize: "22px",
-                      marginTop: "10px",
-                    }}
-                  />
-                </button>
-              )}
-              {+a.Status == 1 && (
-                <button
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalAdjustBox"
-                  type="button"
-                  onClick={() => inventoryBoxes(a.Invoice_id)}
+                  <title>truck-check-outline</title>
+                  <path d="M18 18.5C18.83 18.5 19.5 17.83 19.5 17C19.5 16.17 18.83 15.5 18 15.5C17.17 15.5 16.5 16.17 16.5 17C16.5 17.83 17.17 18.5 18 18.5M19.5 9.5H17V12H21.46L19.5 9.5M6 18.5C6.83 18.5 7.5 17.83 7.5 17C7.5 16.17 6.83 15.5 6 15.5C5.17 15.5 4.5 16.17 4.5 17C4.5 17.83 5.17 18.5 6 18.5M20 8L23 12V17H21C21 18.66 19.66 20 18 20C16.34 20 15 18.66 15 17H9C9 18.66 7.66 20 6 20C4.34 20 3 18.66 3 17H1V6C1 4.89 1.89 4 3 4H17V8H20M3 6V15H3.76C4.31 14.39 5.11 14 6 14C6.89 14 7.69 14.39 8.24 15H15V6H3M5 10.5L6.5 9L8 10.5L11.5 7L13 8.5L8 13.5L5 10.5Z" />
+                </svg>
+              </button>
+              {/* )} */}
+              {/* {+a.Status == 2 && ( */}
+              <button
+                data-bs-toggle="modal"
+                data-bs-target="#modalAdjustBox1"
+                type="button"
+                onClick={() => inventoryBoxes(a.Invoice_id)}
+              >
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
                 >
-                  {/* <i className="ps-2 mdi mdi-pencil" /> */}
-                  <svg
-                    className="SvgQuo"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <title>truck-check-outline</title>
-                    <path d="M18 18.5C18.83 18.5 19.5 17.83 19.5 17C19.5 16.17 18.83 15.5 18 15.5C17.17 15.5 16.5 16.17 16.5 17C16.5 17.83 17.17 18.5 18 18.5M19.5 9.5H17V12H21.46L19.5 9.5M6 18.5C6.83 18.5 7.5 17.83 7.5 17C7.5 16.17 6.83 15.5 6 15.5C5.17 15.5 4.5 16.17 4.5 17C4.5 17.83 5.17 18.5 6 18.5M20 8L23 12V17H21C21 18.66 19.66 20 18 20C16.34 20 15 18.66 15 17H9C9 18.66 7.66 20 6 20C4.34 20 3 18.66 3 17H1V6C1 4.89 1.89 4 3 4H17V8H20M3 6V15H3.76C4.31 14.39 5.11 14 6 14C6.89 14 7.69 14.39 8.24 15H15V6H3M5 10.5L6.5 9L8 10.5L11.5 7L13 8.5L8 13.5L5 10.5Z" />
-                  </svg>
-                </button>
-              )}
-              {+a.Status == 2 && (
-                <button
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalAdjustBox1"
-                  type="button"
-                  onClick={() => inventoryBoxes(a.Invoice_id)}
+                  <title>airport</title>
+                  <path d="M14.97,5.92C14.83,5.41 14.3,5.1 13.79,5.24L10.39,6.15L5.95,2.03L4.72,2.36L7.38,6.95L4.19,7.8L2.93,6.82L2,7.07L3.66,9.95L14.28,7.11C14.8,6.96 15.1,6.43 14.97,5.92M21,10L20,12H15L14,10L15,9H17V7H18V9H20L21,10M22,20V22H2V20H15V13H20V20H22Z" />
+                </svg>
+              </button>
+              {/* // )} */}
+              {/* {+a.Status == 4 && ( */}
+              <button
+                // data-bs-toggle="modal"
+                // data-bs-target="#modalAdjustBox1"
+                // type="button"
+                onClick={() => openPdf(a.document)}
+              >
+                <i class="mdi mdi-download"></i>
+              </button>
+              {/* )} */}
+              {/* {+a.Status == 3 && ( */}
+              <button
+                onClick={() => handleEditClick1(a.Invoice_id)}
+                // data-bs-toggle="modal"
+                // data-bs-target="#modalAdjustBox3"
+                type="button"
+              >
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
                 >
-                  <svg
-                    className="SvgQuo"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <title>airport</title>
-                    <path d="M14.97,5.92C14.83,5.41 14.3,5.1 13.79,5.24L10.39,6.15L5.95,2.03L4.72,2.36L7.38,6.95L4.19,7.8L2.93,6.82L2,7.07L3.66,9.95L14.28,7.11C14.8,6.96 15.1,6.43 14.97,5.92M21,10L20,12H15L14,10L15,9H17V7H18V9H20L21,10M22,20V22H2V20H15V13H20V20H22Z" />
-                  </svg>
-                </button>
-              )}
-              {+a.Status == 4 && (
-                <button
-                  // data-bs-toggle="modal"
-                  // data-bs-target="#modalAdjustBox1"
-                  // type="button"
-                  onClick={() => openPdf(a.document)}
+                  <title>airplane-check</title>
+                  <path d="M15.97 13.83C15.08 14.35 14.34 15.09 13.82 16L11.55 11.63L7.66 15.5L8 18L6.95 19.06L5.18 15.87L2 14.11L3.06 13.05L5.54 13.4L9.43 9.5L2 5.62L3.41 4.21L12.61 6.33L16.5 2.44C17.08 1.85 18.03 1.85 18.62 2.44C19.2 3.03 19.2 4 18.62 4.56L14.73 8.45L15.97 13.83M21.34 15.84L17.75 19.43L16.16 17.84L15 19L17.75 22L22.5 17.25L21.34 15.84Z" />
+                </svg>
+              </button>
+              {/* // )} */}
+              {/* {+a.Status >= 2 && ( */}
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#modalClaim"
+                onClick={() => boxMinutes(a.Order_ID, a)}
+              >
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
                 >
-                  <i class="mdi mdi-download"></i>
-                </button>
-              )}
-              {+a.Status == 3 && (
-                <button
-                  onClick={() => handleEditClick1(a.Invoice_id)}
-                  // data-bs-toggle="modal"
-                  // data-bs-target="#modalAdjustBox3"
-                  type="button"
-                >
-                  <svg
-                    className="SvgQuo"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <title>airplane-check</title>
-                    <path d="M15.97 13.83C15.08 14.35 14.34 15.09 13.82 16L11.55 11.63L7.66 15.5L8 18L6.95 19.06L5.18 15.87L2 14.11L3.06 13.05L5.54 13.4L9.43 9.5L2 5.62L3.41 4.21L12.61 6.33L16.5 2.44C17.08 1.85 18.03 1.85 18.62 2.44C19.2 3.03 19.2 4 18.62 4.56L14.73 8.45L15.97 13.83M21.34 15.84L17.75 19.43L16.16 17.84L15 19L17.75 22L22.5 17.25L21.34 15.84Z" />
-                  </svg>
-                </button>
-              )}
-              {+a.Status >= 2 && (
-                <button
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalClaim"
-                  onClick={() => boxMinutes(a.Invoice_id, a)}
-                >
-                  <svg
-                    className="SvgQuo"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <title>text-box-minus</title>
-                    <path d="M22,17V19H14V17H22M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z" />
-                  </svg>
-                </button>
-              )}
-              {+a.Status >= 3 && (
-                <button
-                  type="button"
-                  onClick={() => pdfSelectedType(a.Consignee_id, a)}
-                >
-                  {/* <svg
+                  <title>text-box-minus</title>
+                  <path d="M22,17V19H14V17H22M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z" />
+                </svg>
+              </button>
+              {/* )} */}
+              {/* {+a.Status >= 3 && ( */}
+              <button
+                type="button"
+                onClick={() => pdfSelectedType(a.Consignee_id, a)}
+              >
+                {/* <svg
                     className="SvgQuo"
                     fill="#203764"
                     height="200px"
@@ -2833,30 +2889,30 @@ const Invoice = () => {
                       <polygon points="201.489,123.976 201.489,0 30.418,0 30.418,355.919 325.503,355.919 325.503,123.976" />
                     </g>
                   </svg> */}
-                  <svg
-                    className=" "
-                    version="1.0"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22px"
-                    height="22px"
-                    viewBox="0 0 350 350"
-                    preserveAspectRatio="xMidYMid meet"
+                <svg
+                  className=" "
+                  version="1.0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22px"
+                  height="22px"
+                  viewBox="0 0 350 350"
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  <g
+                    transform="translate(0.000000,344.000000) scale(0.100000,-0.100000)"
+                    fill="#203764"
+                    stroke="none"
                   >
-                    <g
-                      transform="translate(0.000000,344.000000) scale(0.100000,-0.100000)"
-                      fill="#203764"
-                      stroke="none"
-                    >
-                      <path d="M1291 2913 c-19 -16 -21 -30 -23 -132 l-3 -115 -219 -37 c-270 -47 -265 -44 -249 -156 6 -43 11 -78 10 -79 -1 0 -96 -33 -212 -73 -203 -70 -245 -92 -245 -127 0 -33 274 -780 292 -796 15 -14 24 -15 39 -8 10 6 19 17 19 24 0 8 -61 184 -136 391 -74 208 -134 378 -132 380 2 1 90 32 196 68 135 47 194 63 197 54 2 -6 65 -372 140 -811 75 -440 141 -808 146 -817 5 -10 18 -20 28 -24 11 -3 167 19 346 50 180 31 332 54 338 52 5 -1 -165 -66 -378 -143 -213 -76 -391 -140 -394 -142 -4 -1 -71 179 -151 400 -79 222 -148 409 -153 416 -13 17 -42 15 -57 -3 -11 -13 13 -86 135 -428 81 -226 154 -422 161 -434 7 -12 22 -24 33 -28 12 -4 253 78 658 223 733 264 727 262 1016 262 181 0 186 1 201 22 14 20 16 118 16 859 l0 836 -175 167 -174 166 -625 0 c-579 0 -625 -1 -645 -17z m1189 -177 c0 -195 12 -206 220 -206 l130 0 0 -790 0 -790 -745 0 -745 0 -2 376 c-3 339 -5 378 -20 387 -12 8 -21 7 -32 -2 -14 -12 -16 -60 -16 -407 0 -344 2 -395 16 -408 13 -14 61 -16 367 -17 215 0 342 -4 327 -9 -32 -11 -801 -143 -806 -138 -2 2 -72 403 -155 892 -119 691 -150 889 -140 895 7 5 88 20 179 35 92 15 177 30 189 33 l23 5 2 -383 3 -384 30 0 30 0 3 513 2 512 570 0 570 0 0 -114z m260 -80 l44 -46 -112 0 -112 0 0 106 0 106 68 -60 c37 -33 87 -81 112 -106z" />
-                      <path d="M1529 2364 c-9 -11 -10 -20 -2 -32 9 -16 58 -17 568 -17 510 0 559 1 568 17 8 12 7 21 -2 32 -12 14 -74 16 -566 16 -492 0 -554 -2 -566 -16z" />
-                      <path d="M1536 2104 c-19 -19 -20 -36 -4 -52 17 -17 1109 -17 1126 0 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
-                      <path d="M1530 1835 c-16 -19 -4 -52 23 -59 29 -8 1055 -8 1084 0 27 7 39 40 23 59 -18 22 -1112 22 -1130 0z" />
-                      <path d="M1529 1564 c-9 -11 -10 -20 -2 -32 9 -16 60 -17 565 -20 597 -2 589 -3 573 48 -6 20 -11 20 -564 20 -497 0 -560 -2 -572 -16z" />
-                      <path d="M1536 1304 c-9 -8 -16 -19 -16 -24 0 -5 7 -16 16 -24 14 -14 79 -16 563 -16 412 0 550 3 559 12 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
-                    </g>
-                  </svg>
-                </button>
-              )}
+                    <path d="M1291 2913 c-19 -16 -21 -30 -23 -132 l-3 -115 -219 -37 c-270 -47 -265 -44 -249 -156 6 -43 11 -78 10 -79 -1 0 -96 -33 -212 -73 -203 -70 -245 -92 -245 -127 0 -33 274 -780 292 -796 15 -14 24 -15 39 -8 10 6 19 17 19 24 0 8 -61 184 -136 391 -74 208 -134 378 -132 380 2 1 90 32 196 68 135 47 194 63 197 54 2 -6 65 -372 140 -811 75 -440 141 -808 146 -817 5 -10 18 -20 28 -24 11 -3 167 19 346 50 180 31 332 54 338 52 5 -1 -165 -66 -378 -143 -213 -76 -391 -140 -394 -142 -4 -1 -71 179 -151 400 -79 222 -148 409 -153 416 -13 17 -42 15 -57 -3 -11 -13 13 -86 135 -428 81 -226 154 -422 161 -434 7 -12 22 -24 33 -28 12 -4 253 78 658 223 733 264 727 262 1016 262 181 0 186 1 201 22 14 20 16 118 16 859 l0 836 -175 167 -174 166 -625 0 c-579 0 -625 -1 -645 -17z m1189 -177 c0 -195 12 -206 220 -206 l130 0 0 -790 0 -790 -745 0 -745 0 -2 376 c-3 339 -5 378 -20 387 -12 8 -21 7 -32 -2 -14 -12 -16 -60 -16 -407 0 -344 2 -395 16 -408 13 -14 61 -16 367 -17 215 0 342 -4 327 -9 -32 -11 -801 -143 -806 -138 -2 2 -72 403 -155 892 -119 691 -150 889 -140 895 7 5 88 20 179 35 92 15 177 30 189 33 l23 5 2 -383 3 -384 30 0 30 0 3 513 2 512 570 0 570 0 0 -114z m260 -80 l44 -46 -112 0 -112 0 0 106 0 106 68 -60 c37 -33 87 -81 112 -106z" />
+                    <path d="M1529 2364 c-9 -11 -10 -20 -2 -32 9 -16 58 -17 568 -17 510 0 559 1 568 17 8 12 7 21 -2 32 -12 14 -74 16 -566 16 -492 0 -554 -2 -566 -16z" />
+                    <path d="M1536 2104 c-19 -19 -20 -36 -4 -52 17 -17 1109 -17 1126 0 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
+                    <path d="M1530 1835 c-16 -19 -4 -52 23 -59 29 -8 1055 -8 1084 0 27 7 39 40 23 59 -18 22 -1112 22 -1130 0z" />
+                    <path d="M1529 1564 c-9 -11 -10 -20 -2 -32 9 -16 60 -17 565 -20 597 -2 589 -3 573 48 -6 20 -11 20 -564 20 -497 0 -560 -2 -572 -16z" />
+                    <path d="M1536 1304 c-9 -8 -16 -19 -16 -24 0 -5 7 -16 16 -24 14 -14 79 -16 563 -16 412 0 550 3 559 12 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
+                  </g>
+                </svg>
+              </button>
+              {/* )} */}
             </div>
           </>
         ),
@@ -2867,6 +2923,550 @@ const Invoice = () => {
   // const invoiceFirstpdf=()=>{
   //   navigate("/invoicefirsttpdf")
   // }
+  const clearData = () => {
+    setUseAgreedPricing(false);
+    setItemDetails(false);
+    setCbm(true);
+    setExchangeRate(false);
+    setSelectedInvoice("Client");
+  };
+  const generatePdf = async () => {
+    const invoiceResponse = await axios.post(
+      `${API_BASE_URL}/InvoicePdfDetails`,
+      {
+        order_id: filterData1?.Order_ID,
+        AgreedPrice: useAgreedPricing ? 1 : 0,
+        CustomName: itemDetails ? 1 : 0,
+        SHOWGWCBM: cbm ? 1 : 0,
+        InvoiceName: selectedInvoice,
+        ShowFXRate: exchangeRate ? 1 : 0,
+        DeliveryTerms: selectedDeliveryTerm,
+      }
+    );
+    console.log(invoiceResponse.data);
+    const headers = invoiceResponse?.data?.tableHeaders || {};
+    const rowsData = invoiceResponse?.data?.tableRow1 || [];
+    const head = [Object.values(headers)];
+    const body = rowsData.map((row) => {
+      const sortedKeys = Object.keys(row)
+        .filter((key) => key.startsWith("COL"))
+        .sort(
+          (a, b) => Number(a.replace("COL", "")) - Number(b.replace("COL", ""))
+        );
+      return sortedKeys.map((key) => row[key]);
+    });
+    const doc = new jsPDF();
+    doc.addFileToVFS("Roboto-Regular.ttf", RobotoRegular);
+    doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+    doc.setFont("Roboto");
+    // Convert image to base64
+    const convertImageToBase64 = (url) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = url;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          const dataURL = canvas.toDataURL("image/png");
+          resolve(dataURL);
+        };
+        img.onerror = (error) => reject(error);
+      });
+    };
+
+    // Add a logo with Proforma Address and Proforma Invoice
+    const addLogoWithDetails = async () => {
+      const logoData = await convertImageToBase64(logo);
+      doc.addImage(logoData, "PNG", 6, 3, 20, 20); // Adjust the position and size as needed
+      // logo end
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${invoiceResponse?.data?.Company_Address?.Line_1}`, 30, 8);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${invoiceResponse?.data?.Company_Address?.Line_2}`, 30, 12);
+      const longTextOne = `${invoiceResponse?.data?.Company_Address?.Line_3}`;
+      const maxWidthOne = 59;
+      const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
+      let startXOne = 30;
+      let startYOne = 16;
+      linesOne.forEach((lineOne, index) => {
+        doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
+      });
+      // end company
+      doc.setFillColor(32, 55, 100);
+      doc.setFontSize(12);
+      doc.setTextColor(255, 255, 255);
+      doc.rect(95, 5, 107, 7, "FD");
+      // Place text inside the rectangle
+      const invoiceNumber =
+        invoiceResponse?.data?.invoiceHeader?.Invoice_Number || "";
+      doc.text(invoiceNumber, 130, 9.5);
+      // **************************************************
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      const maxWidthLeft = 30; // Maximum width in pixels
+      let yLeft = 16;
+      const yIncrementLeft = 1; // Adjust this value based on your spacing requirements
+      const textDataLeft = [
+        {
+          label: invoiceResponse?.data?.orderMetaLabels["Order : "],
+          value: `${invoiceResponse?.data?.orderMetaValues.Order_Number}`,
+        },
+        {
+          label: invoiceResponse?.data?.orderMetaLabels["TT Ref : "],
+          value: `${invoiceResponse?.data?.orderMetaValues.Shipment_ref}`,
+        },
+        {
+          label: invoiceResponse?.data?.orderMetaLabels["PO Number : "],
+          value: `${invoiceResponse?.data?.orderMetaValues.Customer_ref}`,
+        },
+        {
+          label: invoiceResponse?.data?.transportTypeLabel?.awb,
+          value: ``,
+        },
+      ];
+
+      textDataLeft.forEach((item) => {
+        const labelXLeft = 94.5;
+        const valueXLeft = 123;
+
+        // Split the value text if it exceeds maxWidth
+        const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+
+        // Print the label
+        doc.text(item.label, labelXLeft, yLeft);
+
+        // Print the value, split into multiple lines if needed
+        valueLinesLeft.forEach((line, index) => {
+          doc.text(line, valueXLeft, yLeft + index * 4); // Adjust y position for each line of value
+        });
+
+        // Increment y to move to the next section
+        yLeft += valueLinesLeft.length * 4 + yIncrementLeft; // Adjust spacing between sections
+      });
+
+      // Second part (right side)
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      const maxWidthRight = 32; // Maximum width in pixels
+      let yRight = 16;
+      const yIncrementRight = 1; // Adjust this value based on your spacing requirements
+
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        // Add leading zeros if needed
+        const formattedDay = day < 10 ? `0${day}` : day;
+        const formattedMonth = month < 10 ? `0${month}` : month;
+        return `${formattedDay}-${formattedMonth}-${year}`;
+      }
+
+      const textDataRight = [
+        {
+          label: `${invoiceResponse?.data?.dateLabels["Date : "]}`,
+          value: `${formatDate(invoiceResponse?.data?.dateValues.created)}`,
+        },
+        {
+          label: `${invoiceResponse?.data?.dateLabels["Due Date : "]}`,
+          value: invoiceResponse?.data?.dateValues?.["Due Date"]
+            ? formatDate(invoiceResponse.data.dateValues["Due Date"])
+            : "",
+        },
+        {
+          label: `${invoiceResponse?.data?.dateLabels["Ship Date : "]}`,
+          value: `${formatDate(invoiceResponse?.data?.dateValues.Ship_date)}`,
+        },
+        {
+          label: "Delivery By :",
+          value: invoiceResponse?.data?.transportInfo?.Delivery_By || "",
+        },
+      ];
+
+      textDataRight.forEach((item) => {
+        const labelXRight = 155;
+        const valueXRight = 175;
+        const valueLinesRight = doc.splitTextToSize(item.value, maxWidthRight);
+        doc.text(item.label, labelXRight, yRight);
+
+        valueLinesRight.forEach((line, index) => {
+          doc.text(line, valueXRight, yRight + index * 4);
+        });
+
+        yRight += valueLinesRight.length * 4 + yIncrementRight;
+      });
+
+      // **********************************************
+      // Client and Consignee rectangles
+      const rectHeight = 7; // Height of the rectangle
+      const dynamicY = Math.min(yLeft, yRight); // Dynamic Y based on the largest y value
+
+      // Client rectangle
+      doc.setFillColor(32, 55, 100);
+      doc.setFontSize(12);
+      doc.setTextColor(255, 255, 255);
+      doc.rect(7, dynamicY, 96, rectHeight, "FD");
+      doc.text("Client", 50, dynamicY + rectHeight / 2 + 1.5);
+
+      // Consignee rectangle
+      doc.setFillColor(32, 55, 100);
+      doc.setFontSize(12);
+      doc.setTextColor(255, 255, 255);
+      doc.rect(106, dynamicY, 96, rectHeight, "FD");
+      doc.text("Consignee", 145, dynamicY + rectHeight / 2 + 1.5);
+      // Reset font size and color
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+    };
+    function renderWrappedText(
+      doc,
+      text,
+      startX,
+      startY,
+      maxWidth,
+      lineHeight
+    ) {
+      const lines = doc.splitTextToSize(text, maxWidth);
+      lines.forEach((line, index) => {
+        doc.text(line, startX, startY + index * lineHeight);
+      });
+      return startY + lines.length * lineHeight;
+    }
+    const commonStartY = 48;
+    const lineHeight = 4.2;
+    // Block 1: Left Side
+    const maxWidth1 = 72;
+    const startX1 = 7;
+    const textBlock1 = [
+      selectedInvoice === "Consignee"
+        ? `${filterData1?.Consignee_name} (${filterData1?.consignee_tax_number})`
+        : `${filterData1?.Client_name} (${filterData1?.client_tax_number})`,
+      selectedInvoice === "Consignee"
+        ? `${filterData1?.consignee_address}`
+        : `${filterData1?.client_address}`,
+      selectedInvoice === "Consignee"
+        ? `${filterData1?.consignee_email}/${filterData1?.consignee_phone}`
+        : `${filterData1?.client_email} / ${filterData1?.client_phone}`,
+    ];
+
+    let currentY1 = commonStartY;
+    doc.setFontSize(11);
+    textBlock1.forEach((text, index) => {
+      currentY1 = renderWrappedText(
+        doc,
+        text,
+        startX1,
+        currentY1,
+        maxWidth1,
+        lineHeight
+      );
+      if (index === 0) doc.setFontSize(10); // Adjust font size after the first text
+    });
+    // Block 2: Right Side
+    const maxWidth2 = 72;
+    const startX2 = 106;
+    const textBlock2 = [
+      `${filterData1?.Consignee_name}(${filterData1?.consignee_tax_number})`,
+      `${filterData1?.consignee_address}`,
+      `${filterData1?.consignee_email}/${filterData1?.consignee_phone}`,
+    ];
+    let currentY2 = commonStartY;
+    doc.setFontSize(11);
+    textBlock2.forEach((text, index) => {
+      currentY2 = renderWrappedText(
+        doc,
+        text,
+        startX2,
+        currentY2,
+        maxWidth2,
+        lineHeight
+      );
+      if (index === 0) doc.setFontSize(10);
+    });
+    const tableStartY = Math.max(currentY1, currentY2);
+    await addLogoWithDetails();
+    const formatterThree = new Intl.NumberFormat("en-US", {
+      style: "decimal",
+      minimumFractionDigits: 3,
+    });
+    const formatterNo = new Intl.NumberFormat("en-US", {
+      style: "decimal",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+
+    const maxRowsPerPageNew = 23;
+    let remainingRows = [...body];
+    let tableStartYNew = tableStartY;
+    while (remainingRows.length > 0) {
+      const rowsToAdd = remainingRows.slice(0, maxRowsPerPageNew);
+      remainingRows = remainingRows.slice(maxRowsPerPageNew);
+      doc.autoTable({
+        head,
+        body: rowsToAdd,
+        startY: tableStartYNew, // Dynamically set the startY based on the content above the table
+        margin: {
+          left: 7,
+          right: 7,
+        },
+        columnStyles: {
+          0: { halign: "center" },
+          1: { halign: "right" },
+          2: { halign: "right" },
+          3: { halign: "right" },
+          4: { halign: "left", cellWidth: 60 },
+          5: { halign: "right" },
+          6: { halign: "center" },
+          7: { halign: "right" },
+          8: { halign: "right" },
+        },
+        tableWidth: "auto",
+        headStyles: {
+          fillColor: [32, 55, 100], // Set the header background color
+          textColor: [255, 255, 255], // Set the header text color
+        },
+        styles: {
+          textColor: [0, 0, 0], // Text color for body cells
+          cellWidth: "wrap",
+          valign: "middle",
+          lineWidth: 0.1,
+          lineColor: [32, 55, 100],
+        },
+        didParseCell: function (data) {
+          if (data.section === "body") {
+            // Apply alternate row coloring
+            const rowIndex = data.row.index;
+            if (rowIndex % 2 === 0) {
+              data.cell.styles.fillColor = [250, 248, 248]; // Light gray for even rows
+            } else {
+              data.cell.styles.fillColor = [255, 255, 255]; // White for odd rows
+            }
+          }
+        },
+      });
+
+      // Check if there are more rows to be printed and add a new page if necessary
+      if (remainingRows.length > 0) {
+        doc.addPage(); // Add a new page if there are more rows to display
+        tableStartYNew = 5; // Reset Y position to 7 for the new page
+      }
+    }
+    const yTop = doc.autoTable.previous.finalY + 1;
+    const finalY = doc.autoTable.previous.finalY + 4;
+    doc.text("Total Box : ", 7, finalY + 1);
+    doc.text(
+      `${formatterNo.format(invoiceResponse?.data?.TotalDetails?.total_box)}`,
+      38,
+      finalY + 1
+    );
+    doc.text("Total Packages :", 7, finalY + 5.5);
+    doc.text(
+      `${formatterNo.format(invoiceResponse?.data?.TotalDetails?.packages)}`,
+      38,
+      finalY + 5.5
+    );
+    doc.text("Total Items :", 7, finalY + 10);
+    doc.text(
+      `${formatterNo.format(invoiceResponse?.data?.TotalDetails?.Items)}`,
+      38,
+      finalY + 10
+    );
+    if (exchangeRate) {
+      doc.text("Exchange Rate : ", 7, finalY + 14.5);
+      doc.text(`${newFormatter.format(data?.fx_rate)}`, 38, finalY + 14.5);
+    }
+    doc.text(`Total Net Weight : `, 72, finalY + 1);
+    doc.text(
+      `${formatterThree.format(
+        invoiceResponse?.data?.TotalDetails?.Net_Weight
+      )}`,
+      110,
+      finalY + 1
+    );
+    if (cbm) {
+      doc.text("Total Gross Weight :", 72, finalY + 5.5);
+      doc.text(
+        `${formatterNo.format(
+          invoiceResponse?.data?.TotalDetails?.Gross_weight
+        )}`,
+        110,
+        finalY + 5.5
+      );
+      doc.text("Total CBM : ", 72, finalY + 10);
+      doc.text(`${invoiceResponse?.data?.TotalDetails?.CBM}`, 110, finalY + 10);
+    }
+    let modalElement = document.getElementById("exampleModalCustomization");
+    let modalInstance = bootstrap.Modal.getInstance(modalElement);
+    if (modalInstance) {
+      setUseAgreedPricing(false);
+      setItemDetails(false);
+      setCbm(true);
+      setExchangeRate(false);
+      setSelectedInvoice("Client");
+      modalInstance.hide();
+    }
+    // total part
+
+    const MARGIN = 6.8;
+    const PAGE_WIDTH = doc.internal.pageSize.getWidth();
+    const xLeft = 147; // Position from the left
+    const maxValueWidth = 50; // Maximum width for the value
+
+    // Helper function to truncate text if it exceeds the max width
+    function fitText(value, maxWidth) {
+      let truncatedValue = value;
+      while (doc.getTextWidth(truncatedValue) > maxWidth) {
+        truncatedValue = truncatedValue.slice(0, -1); // Remove last character
+      }
+      return truncatedValue;
+    }
+
+    // Setting the first label and value
+    doc.setTextColor(0, 0, 0);
+    const label = "Total";
+    let value = useAgreedPricing
+      ? `${newFormatter.format(invoiceData)}`
+      : `${newFormatter.format(data?.CNF_FX)}`;
+
+    value = fitText(value, maxValueWidth); // Ensure value fits within the max width
+    const valueWidth = doc.getTextWidth(value);
+    const xValue = PAGE_WIDTH - MARGIN - valueWidth; // Position value to the right side of the page
+
+    // Draw label and value
+    doc.setFillColor(32, 55, 100);
+    // doc.rect(xLeft, finalY + 2, 55.5, 0.2, "FD");
+    doc.text(label, xLeft, finalY + 1);
+    doc.text(value, xValue, finalY + 1);
+    // Setting the second label and value
+    const label1 = "Discount";
+    const label2 = "Payable";
+    // Handle value1
+    let value1 = useAgreedPricing ? "0" : data?.Rounding_FX || "0";
+    value1 = fitText(value1, maxValueWidth); // Ensure value fits within the max width
+    const valueWidth1 = doc.getTextWidth(value1);
+    const xValue1 = PAGE_WIDTH - MARGIN - valueWidth1; // Position value to the right side of the page
+
+    // Draw first label and value
+    doc.setFillColor(32, 55, 100);
+    // doc.rect(xLeft, finalY + 8, 55.5, 0.2, "FD");
+    doc.text(label1, xLeft, finalY + 5);
+    doc.text(value1, xValue1, finalY + 5);
+
+    // Handle value2
+    let value2 = `${newFormatter.format(
+      (useAgreedPricing ? invoiceData : data?.CNF_FX) -
+        (useAgreedPricing ? 0 : data?.Rounding_FX || 0)
+    )}`;
+
+    value2 = fitText(value2, maxValueWidth); // Ensure value fits within the max width
+    const valueWidth2 = doc.getTextWidth(value2);
+    const xValue2 = PAGE_WIDTH - MARGIN - valueWidth2; // Position value to the right side of the page
+
+    // Draw second label and value
+    doc.setFillColor(32, 55, 100);
+    doc.rect(xLeft, finalY + 11.5, 55.5, 0.5, "FD");
+    doc.text(label2, xLeft, finalY + 9);
+    doc.text(value2, xValue2, finalY + 9);
+    //note
+    function addTextWithPagination(doc, longText, x, y, maxWidth) {
+      const lineHeight = 5; // Adjust line height if needed
+      const pageHeight = doc.internal.pageSize.height;
+      const textLines = doc.splitTextToSize(longText, maxWidth);
+      let currentY = y;
+
+      for (let i = 0; i < textLines.length; i++) {
+        if (currentY + lineHeight > pageHeight) {
+          doc.addPage();
+          currentY = 10;
+        }
+
+        doc.text(textLines[i], x, currentY);
+        currentY += lineHeight; // Move Y position down for next line
+      }
+      return currentY;
+    }
+    function drawRoundedRect(doc, x, y, width, height, radius) {
+      doc.roundedRect(x, y, width, height, radius, radius); // Using jsPDF method for rounded rectangles
+    }
+    // Example usage
+    const longText = messageSet; // Assume messageSet contains your long text
+    const x = 7;
+    const initialY = doc.autoTable.previous.finalY + 25; // Adjust initial Y coordinate if needed
+    const maxWidth = 180;
+
+    // Add long text with pagination handling and get the final Y position
+    const finalY1 = addTextWithPagination(doc, longText, x, initialY, maxWidth);
+    const inputFieldValue = invoiceResponse.data?.deliveryNote.deliveryNote; // Get input field value
+    if (inputFieldValue && inputFieldValue.trim() !== "") {
+      const inputX = 7; // Adjust as needed
+      const inputY = finalY1 + 4; // Adjust as needed
+      const inputWidth = 196; // Adjust as needed
+      const padding = 3; // Adjust as needed
+      const borderRadius = 3; // Adjust border radius as needed
+      // Calculate text dimensions
+      const textMetrics = doc.getTextWidth(inputFieldValue);
+      const inputHeight = textMetrics + padding * 2 - 35; //
+      doc.text("note:", inputX + 5, finalY1); // Label position
+      drawRoundedRect(
+        doc,
+        inputX,
+        inputY,
+        inputWidth,
+        inputHeight,
+        borderRadius
+      );
+      doc.text(inputFieldValue, inputX + padding, inputY + padding + 5); // Adjust position for padding
+    }
+
+    // note end
+    console.log(">>>>>>>>>>>>>>>>>>>>>>");
+    // Draw the value
+    const addPageNumbers = (doc) => {
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
+      }
+    };
+    // Add page numbers
+    addPageNumbers(doc);
+    const pdfBlob = doc.output("blob");
+    console.log(pdfBlob);
+    await uploadPDF1(pdfBlob);
+  };
+  const uploadPDF1 = async (pdfBlob) => {
+    // Generate a unique date-time string
+    const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
+
+    const formData = new FormData();
+    formData.append(
+      "document",
+      pdfBlob,
+      `${filterData1?.Invoice_Number || "default"}_Invoice_${dateTime}.pdf`
+    );
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
+      console.log(response);
+      if (response.data.success) {
+        console.log("PDF uploaded successfully");
+        window.open(
+          `${API_IMAGE_URL}${
+            filterData1?.Invoice_Number || "default"
+          }_Invoice_${dateTime}.pdf`
+        );
+      } else {
+        console.log("Failed to upload PDF");
+      }
+    } catch (error) {
+      console.error("Error uploading PDF:", error);
+    }
+  };
   return (
     <>
       <Card
@@ -3262,6 +3862,235 @@ const Invoice = () => {
           </div>
         </div>
       </Modal>
+
+      <div
+        className="modal fade"
+        id="exampleModalCustomization"
+        tabIndex={-1}
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className=" modal-dialog  modalShipTo modalInvoice">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">
+                Invoice Modal
+              </h1>
+              <button
+                onClick={clearData}
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <i class="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="formCreate">
+                <div className="row">
+                  <div className="form-group col-lg-12">
+                    <div className="invoiceModal d-flex justify-content-between">
+                      <h6> Use Agreed pricing ?</h6>
+                      <div>
+                        <label
+                          className="toggleSwitch large"
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 10,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            name="Commission_Currency"
+                            checked={useAgreedPricing}
+                            onChange={handleAgreedPricingChange}
+                          />
+                          <span>
+                            <span>No</span>
+                            <span> Yes</span>
+                          </span>
+                          <a> </a>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="invoiceModal d-flex justify-content-between">
+                      <h6>Use custom name? </h6>
+                      <div>
+                        <label
+                          className="toggleSwitch large"
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 10,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            name="Commission_Currency"
+                            checked={itemDetails}
+                            onChange={handleAgreedPricingChange1}
+                          />
+                          <span>
+                            <span>No</span>
+                            <span> Yes</span>
+                          </span>
+                          <a> </a>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="invoiceModal d-flex justify-content-between">
+                      <h6>Show Gross weight and CBM ? </h6>
+                      <div>
+                        <label
+                          className="toggleSwitch large"
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 10,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            name="Commission_Currency"
+                            checked={cbm}
+                            onChange={handleAgreedPricingChange2}
+                          />
+                          <span>
+                            <span>No</span>
+                            <span> Yes</span>
+                          </span>
+                          <a> </a>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="invoiceModal">
+                      <h6>Invoice Name Can be -</h6>
+                      <input
+                        type="radio"
+                        id="html1"
+                        name="fav_language"
+                        value="Client"
+                        checked={selectedInvoice === "Client"}
+                        onChange={handleRadioChange}
+                      />
+                      <label htmlFor="html1">Client</label>
+
+                      <input
+                        type="radio"
+                        id="css1"
+                        name="fav_language"
+                        value="Consignee"
+                        checked={selectedInvoice === "Consignee"}
+                        onChange={handleRadioChange}
+                      />
+                      <label htmlFor="css1">Consignee</label>
+                    </div>
+                    <div className="invoiceModal d-flex justify-content-between">
+                      <h6>Show exchange rate ? </h6>
+                      <div>
+                        <label
+                          className="toggleSwitch large"
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 10,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            name="Commission_Currency"
+                            checked={exchangeRate}
+                            onChange={handleAgreedPricingChange3}
+                          />
+                          <span>
+                            <span>No</span>
+                            <span> Yes</span>
+                          </span>
+                          <a> </a>
+                        </label>
+                      </div>
+                    </div>
+                    {/* <div className="invoiceModal">
+                      <h6>Delivery Terms - </h6>
+                      <input
+                        type="radio"
+                        id="cif"
+                        name="delivery_term"
+                        value="CIF"
+                        checked={selectedDeliveryTerm === "CIF"}
+                        onChange={handleChangeDelivery}
+                      />
+                      <label htmlFor="cif">CIF</label>
+                      <input
+                        type="radio"
+                        id="cnf"
+                        name="delivery_term"
+                        value="CNF"
+                        checked={selectedDeliveryTerm === "CNF"}
+                        onChange={handleChangeDelivery}
+                      />
+                      <label htmlFor="cnf">CNF</label>
+                      <input
+                        type="radio"
+                        id="dap"
+                        name="delivery_term"
+                        value="DAP"
+                        checked={selectedDeliveryTerm === "DAP"}
+                        onChange={handleChangeDelivery}
+                      />
+                      <label htmlFor="dap">DAP</label>
+                      <input
+                        type="radio"
+                        id="fob"
+                        name="delivery_term"
+                        value="FOB"
+                        checked={selectedDeliveryTerm === "FOB"}
+                        onChange={handleChangeDelivery}
+                      />
+                      <label htmlFor="fob">FOB</label>
+                    </div> */}
+                    <div className="invoiceModal">
+                      <h6>Delivery Terms - </h6>
+                      {deliveryList?.map((term) => (
+                        <div key={term.id}>
+                          <input
+                            type="radio"
+                            id={`term-${term.id}`}
+                            name="delivery_term"
+                            value={term.id}
+                            checked={selectedDeliveryTerm === term.id}
+                            onChange={handleChangeDelivery}
+                          />
+                          <label htmlFor={`term-${term.id}`}>
+                            {term.Incoterms}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                onClick={generatePdf}
+                className="btn btn-primary mb-4"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

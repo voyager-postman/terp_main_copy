@@ -199,8 +199,9 @@
 //     </>
 //   );
 // };
-
 import React, { useState, useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
@@ -208,8 +209,52 @@ import { Card } from "../../card";
 import { TableView } from "../table";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import { format } from "date-fns";
 
 export const AdjustEan = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { from } = location.state || {};
+
+  //  const [data, setData] = useState("");
+  console.log(from);
+  const [tableData, setTableData] = useState([]);
+  const [totalDetails, setTotalDetails] = useState("");
+  const [dataId, setDataId] = useState("");
+
+  const adjustView = () => {
+    axios
+      .post(`${API_BASE_URL}/getAdjustEanView`, {
+        packing_common_id: dataId?.packing_common_id,
+      })
+      .then((response) => {
+        console.log(response);
+        setTotalDetails(response?.data?.details);
+        // setData(response?.data?.data);
+
+        setTableData(response?.data?.tableData);
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Network Error", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+        return false;
+      });
+  };
+
+  useEffect(() => {
+    adjustView();
+  }, []);
+  const { data: details, refetch: getOrdersDetails } = useQuery(
+    `getOrdersDetails?id=${dataId?.order_id}`,
+    {
+      enabled: !!dataId?.order_id,
+    }
+  );
+  // for view
+
   const [data, setData] = useState([]);
   const [restoredRows, setRestoredRows] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -313,6 +358,47 @@ export const AdjustEan = () => {
       })
       .catch((error) => [console.log(error)]);
   };
+  useEffect(() => {
+    if (dataId) {
+      console.log("Updated dataId:", dataId); // ✅ Logs updated value after state changes
+    }
+  }, [dataId]);
+
+  const { data: orderDetails, refetch: getOrdersDetail } = useQuery(
+    ["getOrdersDetails", dataId?.order_id],
+    () =>
+      axios
+        .get(`${API_BASE_URL}/getOrdersDetails?id=${dataId?.order_id}`)
+        .then((res) => res.data),
+    {
+      enabled: false, // prevent automatic fetch
+    }
+  );
+
+  const viewPacking = (a) => {
+    setDataId(a); // update state
+
+    axios
+      .post(`${API_BASE_URL}/getAdjustEanView`, {
+        packing_common_id: a?.packing_common_id,
+      })
+      .then((response) => {
+        console.log(response);
+        setTotalDetails(response?.data?.details);
+        setTableData(response?.data?.tableData);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Network Error", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      });
+
+    if (a?.order_id) {
+      getOrdersDetail(); // manually trigger the query
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -352,10 +438,14 @@ export const AdjustEan = () => {
         Header: "Actions",
         accessor: (a) => (
           <div className="editIcon gap-2">
-            <Link to="/adjustView" state={{ from: { ...a } }}>
-              <i className="mdi mdi-eye"></i>
-            </Link>
-
+            <button onClick={() => viewPacking(a)}>
+              <i
+                type="button"
+                className="mdi mdi-eye"
+                data-bs-toggle="modal"
+                data-bs-target="#adjustEanView"
+              ></i>
+            </button>
             <button onClick={() => deleteAdjustEan(a.packing_ean_id)}>
               <i className="mdi mdi-delete" />
             </button>
@@ -383,9 +473,193 @@ export const AdjustEan = () => {
     ],
     [restoredRows]
   );
-  console.log;
   return (
     <>
+      {/* view modal */}
+
+      <div
+        className="modal fade"
+        id="adjustEanView"
+        tabIndex={-1}
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-xl modalShipTo">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">
+                Adjust Ean View
+              </h1>
+              <button
+                type="button"
+                className="btn-close btnCloseAdjust"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <i className="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div>
+                {/* End databaseTableSection */}
+
+                <div className="tab-content pt-0 pb-0">
+                  <div className="tab-pane active" id="header" role="tabpanel">
+                    <div
+                      id="datatable_wrapper"
+                      className="information_dataTables dataTables_wrapper dt-bootstrap4 "
+                    >
+                      {/*---------------------------table data---------------------*/}
+
+                      <div className="adjustEanQuan">
+                        <div className="row">
+                          <div className="col-lg-3">
+                            <p>
+                              <span>Used Quantity :</span>
+                              <strong>{totalDetails?.Qty}</strong>
+                            </p>
+
+                            <p>
+                              {" "}
+                              <span>Number of Staff :</span>{" "}
+                              <strong>{totalDetails?.Staff} </strong>
+                            </p>
+
+                            <p>
+                              <span>Start Time :</span>
+                              <strong>
+                                {totalDetails?.Start_Time
+                                  ? format(
+                                      new Date(totalDetails?.Start_Time),
+                                      "HH:mm dd-MM-yyyy"
+                                    )
+                                  : "N/A"}{" "}
+                              </strong>
+                            </p>
+
+                            <p>
+                              {" "}
+                              <span>End Time :</span>{" "}
+                              <strong>
+                                {totalDetails?.End_Time
+                                  ? format(
+                                      new Date(totalDetails?.End_Time),
+                                      "HH:mm dd-MM-yyyy"
+                                    )
+                                  : "N/A"}{" "}
+                              </strong>
+                            </p>
+                          </div>
+                          <div className="col-lg-3">
+                            <p>
+                              <span>Name :</span>
+                              <strong>{dataId?.name}</strong>
+                            </p>
+
+                            <p>
+                              {" "}
+                              <span>Brand :</span>{" "}
+                              <strong>{dataId?.brand} </strong>
+                            </p>
+
+                            <p>
+                              <span>Quantity:</span>
+                              <strong>{dataId?.Qty}</strong>
+                            </p>
+
+                            <p>
+                              {" "}
+                              <span>Unit :</span>
+                              <strong>{dataId?.unit}</strong>
+                            </p>
+                          </div>
+                          {/* <div className="col-lg-3">
+                                            <p>
+                                              {" "}
+                                              <span> Name :</span> <strong>{from?.name}</strong>
+                                            </p>
+                                            <p>
+                                              {" "}
+                                              <span> Quantity :</span>{" "}
+                                              <strong>{from?.qty_available}</strong>
+                                            </p>
+                                            <p>
+                                              {" "}
+                                              <span>Unit :</span> <strong></strong>
+                                            </p>
+                                          </div> */}
+                        </div>
+                      </div>
+                      <div
+                        id="datatable_wrapper"
+                        className="information_dataTables dataTables_wrapper dt-bootstrap4 table-responsive mt-"
+                      >
+                        <table
+                          id="example"
+                          className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
+                          style={{ width: "100%" }}
+                        >
+                          <thead>
+                            <tr>
+                              <th>EAN</th>
+                              <th>Quantity</th>
+                              <th>Unit</th>
+                              <th>EAN Cost</th>
+                              <th>Average Weight</th>
+                              <th>EAN Per Kg</th>
+                              <th>EAN Per Hour </th>
+                              <th>Wastage </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {tableData?.map((item, i) => {
+                              return (
+                                <tr
+                                  className="rowCursorPointer"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#myModal"
+                                >
+                                  <td>{item.ean_name_en}</td>
+                                  <td>{item.Qty}</td>
+                                  <td>{item.unit_name}</td>
+                                  <td>{item.EAN_COST}</td>
+                                  <td>{item.average_weight}</td>
+                                  <td>{item.EanPerKg}</td>
+                                  <td>{item.EanPerHour}</td>
+                                  <td>{item.Wasted}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-footer">
+                    {/* <button className="btn btn-primary" type="submit" name="signup">
+                                      Create
+                                    </button> */}
+                    <Link
+                      className="btn btn-danger"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      Close
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              {/* <button type="button" className="btn btn-primary">
+                          Save changes
+                        </button> */}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* view modal  end*/}
       <Card title={"EAN"}>
         <TableView columns={columns} data={data} />
       </Card>
