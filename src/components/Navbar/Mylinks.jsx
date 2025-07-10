@@ -101,6 +101,7 @@ const additionalLinks = [
           { name: "Packing", link: "/eanPacking" },
           { name: "EAN", link: "/adjustEan" },
           { name: "Order Packing", link: "/orderPackaging" },
+          { name: "Wastage", link: "/wastage" },
         ],
       },
     ],
@@ -125,10 +126,11 @@ const additionalLinks = [
     sublinks: [
       {
         sublink: [
-          { name: "Quotation", link: "/quotation_test" },
-          { name: "Orders", link: "/test" },
+          { name: "Quotation", link: "/quotation" },
+          { name: "Orders", link: "/order" },
           { name: "Invoice", link: "/invoice" },
           { name: "Claim", link: "/claim" },
+          { name: "Reciepts", link: "/reciept" },
         ],
       },
     ],
@@ -173,6 +175,7 @@ const additionalLinks = [
           { name: "Currency Exchange Update", link: "/currencyex" },
           { name: "Income Statement", link: "/incomeState" },
           { name: "Accounts", link: "/accounts" },
+          { name: "Accounting Ledger", link: "/accountLedger" },
         ],
       },
     ],

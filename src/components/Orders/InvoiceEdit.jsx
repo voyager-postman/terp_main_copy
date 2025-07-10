@@ -695,7 +695,7 @@ const InvoiceEdit = () => {
           theme: "colored",
         });
 
-        navigate("/test");
+        navigate("/order");
       }
     } catch (e) {
       toast.error("Something went wrong");
@@ -812,7 +812,7 @@ const InvoiceEdit = () => {
           autoClose: 1000,
           theme: "colored",
         });
-        navigate("/test");
+        navigate("/order");
       }
       await getOrdersDetails(data.data.data);
       MySwal.close();

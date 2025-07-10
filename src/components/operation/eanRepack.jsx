@@ -591,7 +591,7 @@ const EanRepack = () => {
                     disablePortal
                     options={
                       unitType
-                        ? unitType.map((item) => ({
+                        ? unitType?.slice(0, 3).map((item) => ({
                             id: item.ID,
                             name: item.Name_EN,
                           }))

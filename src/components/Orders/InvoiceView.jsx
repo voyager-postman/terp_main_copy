@@ -389,7 +389,7 @@ const InvoiceView = () => {
                                       {twoDecimal.format(item.Final_price)}
                                     </td>
                                     <td>
-                                      {twoDecimal.format(item.Calculated_Price)}
+                                      {twoDecimal.format(item.Adjusted_Price)}
                                     </td>
 
                                     {!(

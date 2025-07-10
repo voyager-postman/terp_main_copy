@@ -415,6 +415,7 @@ const AddShipTo = () => {
     setDataCustomization({
       Consignee_id: "",
       ITF: "",
+      brand: "",
       Custom_Name: "",
       Dummy_Price: "",
       Barcode: "",
@@ -1204,7 +1205,10 @@ const AddShipTo = () => {
     consignee_tax_number: from?.consignee_tax_number || "",
     consignee_email: from?.consignee_email || "",
     consignee_phone: from?.consignee_phone || "",
-    consignee_address: from?.consignee_address || "",
+    consignee_address: from?.Address1 || "",
+    consignee_address1: from?.Address2 || "",
+    consignee_address2: from?.Address3 || "",
+    consignee_address3: from?.Address4 || "",
     Default_location: from?.Default_location || "",
     currency: from?.currency || "",
     port_of_orign: from?.port_of_orign || "",
@@ -1424,7 +1428,7 @@ const AddShipTo = () => {
             Consignee_id: from?.consignee_id || "",
             Client_ID: from?.client_id || "",
             ITF: "",
-            ITF: "",
+            brand: "",
             Custom_Name: "",
             Dummy_Price: "",
             Unit: from?.Invoice_Unit,
@@ -1556,6 +1560,7 @@ const AddShipTo = () => {
           Consignee_id: from?.consignee_id || "",
           Client_ID: from?.client_id || "",
           ITF: "",
+          brand: "",
           Custom_Name: "",
           Dummy_Price: "",
         });
@@ -1695,6 +1700,7 @@ const AddShipTo = () => {
       ...prevData,
       Consignee_Customize_id: contactId || "",
       ITF: selectedUser?.ITF || "",
+      brand: selectedUser?.Brand || "",
       Custom_Name: selectedUser?.Custom_Name || "",
       Dummy_Price: selectedUser?.Dummy_Price || "",
       Unit: selectedUser?.Unit || "",
@@ -2175,7 +2181,7 @@ const AddShipTo = () => {
                 >
                   <div className="formCreate">
                     <form action="">
-                       <div className="row">
+                      <div className="row">
                         <div className="form-group col-lg-4 autoComplete">
                           <h6> Client</h6>
                           <div className=" ">
@@ -2243,26 +2249,26 @@ const AddShipTo = () => {
                           </div>
                           <div>
                             <input
-                              name="consignee_address"
+                              name="consignee_address1"
                               className="border-2 rounded-md border-[#203764] w-full"
                               onChange={handleChange}
-                              value={state.consignee_address}
+                              value={state.consignee_address1}
                             />
                           </div>
                           <div>
                             <input
-                              name="consignee_address"
+                              name="consignee_address2"
                               className="border-2 rounded-md border-[#203764] w-full"
                               onChange={handleChange}
-                              value={state.consignee_address}
+                              value={state.consignee_address2}
                             />
                           </div>
                           <div>
                             <input
-                              name="consignee_address"
+                              name="consignee_address3"
                               className="border-2 rounded-md border-[#203764] w-full"
                               onChange={handleChange}
-                              value={state.consignee_address}
+                              value={state.consignee_address3}
                             />
                           </div>
                         </div>
@@ -2468,7 +2474,7 @@ const AddShipTo = () => {
                             />
                           </div>
                         </div>
-                       
+
                         <div className="col-lg-12">
                           <h6
                             className="mt-4"
@@ -3097,6 +3103,7 @@ const AddShipTo = () => {
                       <th> ITF Name</th>
                       <th>Custom Name</th>
                       <th>Dummy Price</th>
+                      <th>Brand</th>
                       <th>Unit</th>
                       <th>Barcode</th>
                       <th>Action</th>
@@ -3107,6 +3114,7 @@ const AddShipTo = () => {
                           <td>{item.Name_EN}</td>
                           <td>{item.Custom_Name}</td>
                           <td>{item.Dummy_Price}</td>
+                          <td>{item.brand_name}</td>
                           <td>{item.unit_name}</td>
                           <td>{item.Barcode}</td>
                           <td>
@@ -3234,6 +3242,46 @@ const AddShipTo = () => {
                                               />
                                             </div>
                                           </div>
+                                          <div className="form-group col-lg-12 ">
+                                            <h6>Brand </h6>
+                                            <div className="ceateTransport autoComplete">
+                                              <Autocomplete
+                                                options={brands || []} // List of brand options
+                                                getOptionLabel={(option) =>
+                                                  option.Name_EN || ""
+                                                } // Label to display
+                                                onChange={(event, newValue) => {
+                                                  handleChange2({
+                                                    target: {
+                                                      name: "brand",
+                                                      value: newValue
+                                                        ? newValue.ID
+                                                        : "",
+                                                    }, // Update selected brand_id
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder="Select Brand"
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  brands?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      dataCustomization.brand
+                                                  ) || null
+                                                } // Set value based on selected brand_id
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID} // Option comparison
+                                              />
+                                            </div>
+                                          </div>
+
                                           <div className="form-group col-lg-12 ">
                                             <h6>Unit </h6>
                                             <div className="ceateTransport autoComplete">
@@ -3409,6 +3457,41 @@ const AddShipTo = () => {
                                   onChange={handleChange2}
                                   value={dataCustomization.Dummy_Price}
                                   placeholder="Custom Name"
+                                />
+                              </div>
+                            </div>
+                            <div className="form-group col-lg-12 ">
+                              <h6>Brand </h6>
+                              <div className="ceateTransport autoComplete">
+                                <Autocomplete
+                                  options={brands || []} // List of brand options
+                                  getOptionLabel={(option) =>
+                                    option.Name_EN || ""
+                                  } // Label to display
+                                  onChange={(event, newValue) => {
+                                    handleChange2({
+                                      target: {
+                                        name: "brand",
+                                        value: newValue ? newValue.ID : "",
+                                      }, // Update selected brand_id
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select Brand"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    brands?.find(
+                                      (item) =>
+                                        item.ID === dataCustomization.brand
+                                    ) || null
+                                  } // Set value based on selected brand_id
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  } // Option comparison
                                 />
                               </div>
                             </div>

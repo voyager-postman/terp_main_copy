@@ -399,16 +399,18 @@ export const AdjustEan = () => {
       getOrdersDetail(); // manually trigger the query
     }
   };
-
   const columns = useMemo(
     () => [
       {
         Header: "Date",
         accessor: "date_",
+        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
+
       {
         Header: "Code",
         accessor: "pod_code",
+        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
         Header: "Name",
@@ -417,22 +419,27 @@ export const AdjustEan = () => {
       {
         Header: "Brand",
         accessor: "brand",
+        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
         Header: "Quantity Available",
         accessor: "qty_available",
+        Cell: ({ value }) => <div style={{ textAlign: "end" }}>{value}</div>,
       },
       {
         Header: "Unit",
         accessor: "unit",
+        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
         Header: "Average Weight(g)",
         accessor: "average_weight",
+        Cell: ({ value }) => <div style={{ textAlign: "end" }}>{value}</div>,
       },
       {
         Header: "Average Cost",
         accessor: "avg_cost",
+        Cell: ({ value }) => <div style={{ textAlign: "end" }}>{value}</div>,
       },
       {
         Header: "Actions",

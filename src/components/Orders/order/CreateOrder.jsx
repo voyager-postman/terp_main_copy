@@ -21,7 +21,6 @@ const CreateOrder = () => {
   console.log(from);
   const isReadOnly = from?.isReadOnly;
   const [data, setData] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
   const [orderErr, setOrderErr] = useState(true);
   const [deleteOrderId, setDeleteOrderId] = useState("");
@@ -106,7 +105,7 @@ const CreateOrder = () => {
   const { data: currency } = useQuery("getCurrency");
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
-  const { data: quote } = useQuery("getAllQuotation");
+  // const { data: quote } = useQuery("getAllQuotation");
   const { data: summary, refetch: getSummary } = useQuery(
     `getOrderSummary?quote_id=${state.order_id}`,
     {
@@ -153,14 +152,14 @@ const CreateOrder = () => {
     if (state.order_id) getOrdersDetails();
   }, [orderId]);
   const computedState = useMemo(() => {
-    console.log(state.quote_id);
-    const quoteFind = quote?.find((v) => v.quote_id == state.quote_id);
-    console.log(quoteFind);
+    // console.log(state.quote_id);
+    // const quoteFind = quote?.find((v) => v.quote_id == state.quote_id);
+    // console.log(quoteFind);
     console.log( state);
     const r = {
       ...state,
-      consignee_id: state.consignee_id || quoteFind?.consignee_id,
-      client_id: state.client_id || quoteFind?.client_id,
+      consignee_id: state.consignee_id,
+      client_id: state.client_id ,
     };
     console.log(r);
     const consigneeFind = consignee?.find(
@@ -174,43 +173,40 @@ console.log(consigneeFind);
     const portOriginFind = ports?.find(
       (v) => v.port_id == (r.from_port_ || consigneeFind?.port_of_orign)
     );
-    r.fx_id = r.fx_id || consigneeFind?.currency || quoteFind?.fx_id;
+    r.fx_id = r.fx_id || consigneeFind?.currency;
     r.fx_rate =
       state.fx_rate ||
       currency?.find((v) => +v.currency_id == +r.fx_id)?.fx_rate ||
       currency?.[
         consignee?.findIndex((v) => +v.consignee_id == +r.consignee_id)
-      ]?.fx_rate ||
-      quoteFind?.fx_rate ||
+      ]?.fx_rate  ||
       0;
-    r.rebate = r.rebate || consigneeFind?.rebate || quoteFind?.rebate;
+    r.rebate = r.rebate || consigneeFind?.rebate ;
     r.Clearance_provider =
       r.Clearance_provider ||
       portOriginFind?.preferred_clearance ||
-      consigneeFind?.Clearance_provider ||
-      quoteFind?.Clearance_provider;
+      consigneeFind?.Clearance_provider ;
     r.loading_location =
       r.loading_location ||
-      consigneeFind?.Default_location ||
-      quoteFind?.loading_location;
-    r.brand_id = state.brand_id || consigneeFind?.brand || quoteFind?.brand_id;
-    r.mark_up = r.mark_up || consigneeFind?.profit || quoteFind?.profit;
+      consigneeFind?.Default_location ;
+    r.brand_id = state.brand_id || consigneeFind?.brand ;
+    r.mark_up = r.mark_up || consigneeFind?.profit ;
     r.Transportation_provider =
       r.Transportation_provider ||
-      portOriginFind?.preferred_transport ||
-      quoteFind?.Transportation_provider;
+      portOriginFind?.preferred_transport 
+     ;
     r.from_port_ =
-      r.from_port_ || consigneeFind?.port_of_orign || quoteFind?.port_of_orign;
+      r.from_port_ || consigneeFind?.port_of_orign ;
     r.destination_port_id =
       r.destination_port_id ||
-      consigneeFind?.destination_port ||
-      quoteFind?.destination_port_id;
+      consigneeFind?.destination_port 
+     ;
     r.liner_id =
-      r.liner_id || portDestinationFind?.prefered_liner || quoteFind?.liner_id;
+      r.liner_id || portDestinationFind?.prefered_liner ;
     r.Freight_provider_ =
       state.Freight_provider_ ||
-      liners?.find((v) => v.liner_id == r.liner_id)?.preffered_supplier ||
-      quoteFind?.Freight_provider_;
+      liners?.find((v) => v.liner_id == r.liner_id)?.preffered_supplier 
+     ;
     return r;
   }, [
     state,

@@ -504,7 +504,7 @@ const QuotaionPdfTest = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${from?.Order_ID || "default"}_Quotation_Test_${dateTime}.pdf`
+      `${from?.Order_ID || "default"}_Quotation_${dateTime}.pdf`
     );
     setIsLoading(true);
     loadingModal.fire();
@@ -514,7 +514,7 @@ const QuotaionPdfTest = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${from?.Order_ID}_Quotation_Test_${dateTime}.pdf`
+          `${API_IMAGE_URL}${from?.Order_ID}_Quotation_${dateTime}.pdf`
         );
       } else {
         console.log("Failed to upload PDF");

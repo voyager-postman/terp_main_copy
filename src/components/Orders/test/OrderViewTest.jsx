@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { format } from "date-fns";
 import { API_BASE_URL } from "../../../Url/Url";
+import { format } from "date-fns";
 const OrderViewTest = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -12,20 +12,17 @@ const OrderViewTest = () => {
   const [data1, setData1] = useState("");
 
   console.log(from);
-  useEffect(() => {
-    setData(from);
-  }, []);
+
   const oneQoutationDAta = () => {
     axios
-      .get(`${API_BASE_URL}/NewgetOrdersById`, {
-        params: {
-          order_id: from?.Order_ID,
-        },
+      .post(`${API_BASE_URL}/OrderTopView`, {
+        order_id: from?.Order_ID,
+        user_id: localStorage.getItem("id"),
       })
       .then((response) => {
-        console.log(response.data.data);
+        console.log(response);
 
-        setData1(response.data.data);
+        setData(response.data);
       })
       .catch((e) => {
         console.log(e);
@@ -34,14 +31,24 @@ const OrderViewTest = () => {
   useEffect(() => {
     oneQoutationDAta();
   }, [from?.Order_ID]);
-  const { data: details, refetch: getOrdersDetails } = useQuery(
-    `NewgetOrdersDetails?id=${from?.Order_ID}`,
-    {
-      enabled: !!from?.Order_ID,
-    }
-  );
-  console.log(details);
+  const oneQoutationDAta1 = () => {
+    axios
+      .post(`${API_BASE_URL}/OrderBottomView`, {
+        order_id: from?.Order_ID,
+        user_id: localStorage.getItem("id"),
+      })
+      .then((response) => {
+        console.log(response);
 
+        setData1(response.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+  useEffect(() => {
+    oneQoutationDAta1();
+  }, [from?.Order_ID]);
   const twoDecimal = new Intl.NumberFormat("en-US", {
     style: "decimal",
     minimumFractionDigits: 2,
@@ -57,6 +64,7 @@ const OrderViewTest = () => {
     minimumFractionDigits: 3,
     maximumFractionDigits: 3,
   });
+  console.log(data.Section1_Labels);
   return (
     <div>
       <div className="databaseTableSection pt-0">
@@ -74,7 +82,7 @@ const OrderViewTest = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <h6 className="font-weight-bolder mb-0 pt-2">
-                        Orders / View Form
+                        Quotation / View Form
                       </h6>
                     </div>
                   </div>
@@ -86,11 +94,13 @@ const OrderViewTest = () => {
                       <div className="parentPurchaseView">
                         <div className="me-3">
                           <strong>
-                            Code <span>:</span>{" "}
+                            <strong>
+                              {data?.Section1_Labels?.["Code : "] || "Code :"}
+                            </strong>{" "}
                           </strong>
                         </div>
                         <div>
-                          <p>{data1?.Order_Number}</p>
+                          <p>{data?.section1_Values?.Row1 || ""}</p>{" "}
                         </div>
                       </div>
                     </div>
@@ -98,11 +108,12 @@ const OrderViewTest = () => {
                       <div className="parentPurchaseView">
                         <div className="me-3">
                           <strong>
-                            Create By <span>:</span>{" "}
+                            {data?.Section1_Labels?.["Created By : "] ||
+                              "Created By : "}
                           </strong>
                         </div>
                         <div>
-                          <p>{data1?.created_by}</p>
+                          <p>{data?.section1_Values?.User_name || ""}</p>{" "}
                         </div>
                       </div>
                     </div>
@@ -114,47 +125,43 @@ const OrderViewTest = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Client <span>:</span>{" "}
+                          {data?.section2_Labels?.["Client :"] || "Client :"}
                         </strong>
                       </div>
                       <div>
-                        <p>{data1?.client_name}</p>
+                        <p>{data?.section2_Values?.Row1 || ""}</p>{" "}
                       </div>
                     </div>
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Ship To <span>:</span>
+                          {data?.section2_Labels?.["Consignee : "] ||
+                            "Consignee : "}
                         </strong>
                       </div>
                       <div>
-                        <p>{data1?.consignee_name}</p>
+                        <p>{data?.section2_Values?.Row2 || ""}</p>{" "}
                       </div>
                     </div>
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Airport <span>:</span>
+                          {data?.section2_Labels?.["Airport : "] ||
+                            "Airport : "}
                         </strong>
                       </div>
                       <div>
-                        <p>
-                          {" "}
-                          {data1?.Airport} [{data1?.Airport_IATA_code}]{" "}
-                        </p>
+                        <p>{data?.section2_Values?.Row3 || ""}</p>{" "}
                       </div>
                     </div>
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Airline <span>:</span>
+                          {data?.section2_Labels?.["Airline :"] || "Airline :"}
                         </strong>
                       </div>
                       <div>
-                        <p>
-                          {" "}
-                          {data1?.Airline} [{data1?.Airline_liner_code}]{" "}
-                        </p>
+                        <p>{data?.section2_Values?.Row4 || ""}</p>{" "}
                       </div>
                     </div>
                   </div>
@@ -162,94 +169,91 @@ const OrderViewTest = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Currency <span>:</span>{" "}
+                          {data?.section2_Labels?.["Currency : "] ||
+                            "Currency : "}
                         </strong>
                       </div>
                       <div>
-                        <p>{data1?.currency}</p>
+                        <p>{data?.section3_Values?.Row1 || ""}</p>{" "}
                       </div>
                     </div>
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          EX Rate <span>:</span>
+                          {data?.section2_Labels?.["Invoice Value : "] ||
+                            "Invoice Value : "}
                         </strong>
                       </div>
                       <div>
-                        <p> {twoDecimal.format(data1?.O_FX_Rate)}</p>
+                        <p>
+                          {" "}
+                          {twoDecimal.format(+data?.section3_Values?.Row2)}
+                        </p>
                       </div>
                     </div>
-                    {localStorage.getItem("level") !== "Level 5" && (
-                      <>
-                        <div className="parentPurchaseView">
-                          <div className="me-3">
-                            <strong>
-                              Markup Rate <span>:</span>
-                            </strong>
-                          </div>
-                          <div>
-                            <p> {twoDecimal.format(data1?.O_Markup)}</p>
-                          </div>
-                        </div>
-                        <div className="parentPurchaseView">
-                          <div className="me-3">
-                            <strong>
-                              Rebate <span>:</span>
-                            </strong>
-                          </div>
-                          <div>
-                            <p>{data1?.O_Rebate}</p>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                    {/* <div className="parentPurchaseView">
+                      <div className="me-3">
+                        <strong>
+                          Markup Rate <span>:</span>
+                        </strong>
+                      </div>
+                      <div>
+                        <p> {data?.Q_Markup}</p>
+                      </div>
+                    </div> */}
 
+                    {localStorage.getItem("level") !== "Level 5" && (
+                      <div className="parentPurchaseView">
+                        <div className="me-3">
+                          <strong>
+                            {data?.section2_Labels?.["Commissopn Value :"] ||
+                              "Commissopn Value :"}
+                          </strong>
+                        </div>
+                        <div>
+                          <p>{data?.section3_Values?.Row3}</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="parentPurchaseView">
+                      <div className="me-3">
+                        <strong>
+                          {data?.section2_Labels?.["Rebate Value : "] ||
+                            "Rebate Value : "}
+                        </strong>
+                      </div>
+                      <div>
+                        <p>{data?.section3_Values?.Row4}</p>
+                      </div>
+                    </div>
+                  </div>
                   <div className="col-lg-4">
-                    <div className="parentPurchaseView">
-                      <div className="me-3">
-                        <strong>
-                          Clearance<span>:</span>{" "}
-                        </strong>
-                      </div>
-                      <div>
-                        <p>{data1?.clearance_name}</p>
-                      </div>
-                    </div>
-                    <div className="parentPurchaseView">
-                      <div className="me-3">
-                        <strong>
-                          Palletized <span>:</span>
-                        </strong>
-                      </div>
-                      <div>
-                        <p>{data1?.palletized}</p>
-                      </div>
-                    </div>
-                    <div className="parentPurchaseView">
-                      <div className="me-3">
-                        <strong>
-                          CO from Chamber <span>:</span>
-                        </strong>
-                      </div>
-                      <div>
-                        <p>{data1?.Chamber}</p>
-                      </div>
-                    </div>
-                    <div className="parentPurchaseView">
-                      <div className="me-3">
-                        <strong>
-                          Ship Date <span>:</span>
-                        </strong>
-                      </div>
-                      <div>
-                        <p>
-                          {data1?.Ship_date
-                            ? format(new Date(data1.Ship_date), "dd/MM/yyyy")
-                            : ""}
-                        </p>
-                      </div>
-                    </div>
+                    {Object.entries(data?.section4_Labels || {}).map(
+                      ([labelKey, labelValue], index) => {
+                        const value = data?.section4_Values?.[labelKey];
+
+                        // ✅ Skip rendering if value is null, undefined, or an empty string
+                        if (!value || value.toString().trim() === "")
+                          return null;
+
+                        return (
+                          <div className="parentPurchaseView" key={index}>
+                            <div className="me-3">
+                              <strong>
+                                {labelValue?.replace(" :", "")} <span>:</span>{" "}
+                              </strong>
+                            </div>
+                            <div>
+                              <p>
+                                {labelKey.includes("Ship Date")
+                                  ? format(new Date(value), "dd/MM/yyyy")
+                                  : value}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
                   </div>
                 </div>
 
@@ -267,136 +271,263 @@ const OrderViewTest = () => {
                       style={{ width: "100%" }}
                     >
                       <thead>
-                        <tr role="row " className="borderTh">
-                          <th>ITF</th>
-                          <th>Brand Name</th>
-                          <th>Quantity</th>
-                          <th> Unit</th>
-                          <th>Number of Box</th>
-                          <th>NW</th>
-                          <th> Unit Price</th>
-                          <th> Adjust Price</th>
-                          {!(
-                            (localStorage.getItem("level") === "Level 1" &&
-                              localStorage.getItem("role") === "Admin") ||
-                            localStorage.getItem("level") === "Level 5"
-                          ) && <th>Profit</th>}
+                        <tr role="row" className="borderTh">
+                          {Object.entries(data1.section5_Labels2 || {}).map(
+                            ([key, label]) => {
+                              if (
+                                key === "Profit" &&
+                                ((localStorage.getItem("level") === "Level 1" &&
+                                  localStorage.getItem("role") === "Admin") ||
+                                  localStorage.getItem("level") === "Level 5")
+                              ) {
+                                return null; // Hide "Profit" for Level 1 Admin and Level 5
+                              }
+
+                              return <th key={key}>{label}</th>;
+                            }
+                          )}
                         </tr>
                       </thead>
-                      {details?.map((item, i) => {
-                        return (
+
+                      <tbody>
+                        {data1.section5_Values?.map((item, i) => (
                           <tr
+                            key={i}
                             className="rowCursorPointer orderViewRoew"
                             data-bs-toggle="modal"
                             data-bs-target="#myModal"
                           >
-                            <td>{item.ITF_Name}</td>
-                            <td>{item.Brand_name}</td>
-                            <td>{threeDecimal.format(item.OD_QTY)}</td>
-                            <td>{item.Unit_Name}</td>
-                            <td>{NoDecimal.format(item.OD_Box)}</td>
-                            <td>{threeDecimal.format(item.OD_NW)}</td>
-                            <td> {twoDecimal.format(item.unit_price)}</td>
-                            <td>
-                              {item.OD_Adjusted_Price
-                                ? twoDecimal.format(item.OD_Adjusted_Price)
-                                : ""}
-                            </td>
+                            {Object.keys(data1.section5_Labels2).map((key) => {
+                              if (
+                                key === "Profit" &&
+                                ((localStorage.getItem("level") === "Level 1" &&
+                                  localStorage.getItem("role") === "Admin") ||
+                                  localStorage.getItem("level") === "Level 5")
+                              ) {
+                                return null; // Skip rendering "Profit"
+                              }
 
-                            {!(
-                              (localStorage.getItem("level") === "Level 1" &&
-                                localStorage.getItem("role") === "Admin") ||
-                              localStorage.getItem("level") === "Level 5"
-                            ) && <td>{item.OD_Profit_Percentage}%</td>}
+                              // Map API field names to object keys
+                              const keyMap = {
+                                Item: "ITF_Name",
+                                Brand: "Brand_name",
+                                Quantity: "QTY",
+                                Unit: "Unit_Name",
+                                boxes: "Box",
+                                "Net Weight": "NW",
+                                "Calculated Price": "Calculated_Price",
+                                Price: "Adjusted_Price",
+                                Profit: "Profit_Percentage",
+                              };
+
+                              const value = item[keyMap[key]];
+
+                              return (
+                                <td key={key}>
+                                  {key === "Profit" && value != null
+                                    ? `${value}%`
+                                    : value ?? ""}
+                                </td>
+                              );
+                            })}
                           </tr>
-                        );
-                      })}
+                        ))}
+                      </tbody>
                     </table>
                     <div className="row py-4 px-4">
                       <div className="col-lg-3">
                         <div>
-                          <b> Total NW : </b>
-                          {(+data1?.O_NW || 0).toLocaleString()}
+                          <b>
+                            {data1?.section6_Labels?.["Total Net Weight :"] ||
+                              "Total Net Weight :"}
+                          </b>
+                          {(
+                            +data1?.section6_Values?.Row1 || 0
+                          ).toLocaleString()}
                         </div>
-                        <div>
-                          <b> Total GW : </b>
-                          {(+data1?.O_GW || 0).toLocaleString()}
+                        <div className="">
+                          <b>
+                            {data1?.section6_Labels?.["Total Gross Weight :"] ||
+                              "Total Gross Weight :"}
+                          </b>
+
+                          {(
+                            +data1?.section6_Values?.Row2 || 0
+                          ).toLocaleString()}
                         </div>
-                        <div>
-                          <b> Total Box : </b>
-                          {(+data1?.O_Box || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b> Total CBM : </b>
-                          {(+data1?.O_CBM || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b> Total ITF : </b>
-                          {(+data1?.O_Items || 0).toLocaleString()}
-                        </div>
-                      </div>
-                      <div className="col-lg-3">
-                        <div>
-                          <b>Freight : </b>
-                          {(+data1?.O_Freight || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b>TransPort : </b>
-                          {(+data1?.O_Transport || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b>Clearance : </b>
-                          {(+data1?.O_Clearance || 0).toLocaleString()}
-                        </div>
-                        {localStorage.getItem("level") !== "Level 5" && (
-                          <div>
-                            <b>Extra : </b>
-                            {(+data1?.O_Extra || 0).toLocaleString()}
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-lg-3">
-                        <div>
-                          <b> Total FOB : </b>
-                          {(+data1?.O_FOB || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b> Total CNF : </b>
-                          {(+data1?.O_CNF || 0).toLocaleString()}
-                        </div>
-                        {!(
-                          (localStorage.getItem("level") === "Level 1" &&
-                            localStorage.getItem("role") === "Admin") ||
-                          localStorage.getItem("level") === "Level 5"
-                        ) && (
-                          <div className="">
-                            <b> Total Profit : </b>
-                            {(+data1?.O_Profit || 0).toLocaleString()}
-                          </div>
-                        )}
-                        {localStorage.getItem("level") !== "Level 5" && (
-                          <div style={{ marginLeft: "2px" }}>
-                            <b> Profit % : </b>
+                        <div className="">
+                          <b>
+                            {data1?.section6_Labels?.["Total Box :"] ||
+                              "Total Box :"}
                             {(
-                              +data1?.O_Profit_Percentage || 0
+                              +data1?.section6_Values?.Row3 || 0
                             ).toLocaleString()}
-                          </div>
-                        )}
+                          </b>
+                        </div>
+
+                        <div className="">
+                          <b>
+                            {data1?.section6_Labels?.["Total Volume :"] ||
+                              "Total Volume :"}
+                          </b>
+                          {(
+                            +data1?.section6_Values?.Row4 || 0
+                          ).toLocaleString()}
+                        </div>
+
+                        <b>
+                          {data1?.section6_Labels?.["Total Items :"] ||
+                            "Total Items :"}
+                        </b>
+                        {(+data1?.section6_Values?.Row5 || 0).toLocaleString()}
+                      </div>
+
+                      <div className="col-lg-3">
+                        <div>
+                          <b>
+                            {data1?.section7_Labels?.["Freight :"] ||
+                              "Freight :"}
+                          </b>
+                          {(
+                            +data1?.section7_Values?.Row1 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>
+                            {data1?.section7_Labels?.["Transport :"] ||
+                              "Transport :"}
+                          </b>
+
+                          {(
+                            +data1?.section7_Values?.Row2 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>
+                            {data1?.section7_Labels?.["Clearance :"] ||
+                              "Clearance :"}
+                            {(
+                              +data1?.section7_Values?.Row3 || 0
+                            ).toLocaleString()}
+                          </b>
+                        </div>
+
+                        <div className="">
+                          <b>
+                            {data1?.section7_Labels?.["Extra :"] || "Extra :"}
+                          </b>
+                          {(
+                            +data1?.section7_Values?.Row4 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>
+                            {data1?.section7_Labels?.["Pre Cooling"] ||
+                              "Pre Cooling"}
+                          </b>
+                          {(
+                            +data1?.section7_Values?.Row5 || 0
+                          ).toLocaleString()}
+                        </div>
+                        {/* <b>
+                          {data1?.section7_Labels?.[""] ||
+                            ""}
+                        </b>
+                        {(+data1?.section7_Values?.Row5 || 0).toLocaleString()} */}
                       </div>
                       <div className="col-lg-3">
                         <div>
-                          <b> Total CNF FX : </b>
-                          {(+data1?.O_CNF_FX || 0).toLocaleString()}
+                          <b>
+                            {data1?.section8_Labels?.["Total CNF :"] ||
+                              "Total CNF :"}
+                          </b>
+                          {(
+                            +data1?.section8_Values?.Row1 || 0
+                          ).toLocaleString()}
                         </div>
+                        <div className="">
+                          <b>
+                            {data1?.section8_Labels?.["Total FOB :"] ||
+                              "Total FOB :"}
+                          </b>
+
+                          {(
+                            +data1?.section8_Values?.Row2 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>
+                            {data1?.section8_Labels?.["Total Commission :"] ||
+                              "Total Commission :"}
+                            {(
+                              +data1?.section8_Values?.Row3 || 0
+                            ).toLocaleString()}
+                          </b>
+                        </div>
+
+                        <div className="">
+                          <b>
+                            {data1?.section8_Labels?.["Total Rebate :"] ||
+                              "Total Rebate :"}
+                          </b>
+                          {(
+                            +data1?.section8_Values?.Row4 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>{data1?.section8_Labels?.["Row5"] || "Row5"}</b>
+                          {(
+                            +data1?.section8_Values?.Row5 || 0
+                          ).toLocaleString()}
+                        </div>
+
+                        {/* <b>
+                          {data1?.section8_Labels?.[""] ||
+                            ""}
+                        </b>
+                        {(+data1?.section8_Values?.Row5 ).toLocaleString()}
+                      */}
+                      </div>
+
+                      <div className="col-lg-3">
                         <div>
-                          <div>
-                            <b> Total Commission FX: </b>
-                            {(+data1?.O_Commission_FX || 0).toLocaleString()}
-                          </div>
-                          <div>
-                            <b> Total Rebate FX : </b>
-                            {(+data1?.O_Rebate_FX || 0).toLocaleString()}
-                          </div>
+                          <b>
+                            {data1?.section9_Labels?.["Profit :"] || "Profit :"}
+                          </b>
+                          {(
+                            +data1?.section9_Values?.Row1 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>
+                            {data1?.section9_Labels?.["Profit % :"] ||
+                              "Profit % :"}
+                          </b>
+
+                          {(
+                            +data1?.section9_Values?.Row2 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>{data1?.section9_Labels?.["Row3"] || "Row3"}</b>
+
+                          {(
+                            +data1?.section9_Values?.Row4 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>{data1?.section9_Labels?.["Row4"] || "Row4"}</b>
+
+                          {(
+                            +data1?.section9_Values?.Row4 || 0
+                          ).toLocaleString()}
+                        </div>
+                        <div className="">
+                          <b>{data1?.section9_Labels?.["Row5"] || "Row5"}</b>
+
+                          {(
+                            +data1?.section9_Values?.Row5 || 0
+                          ).toLocaleString()}
                         </div>
                       </div>
                     </div>
@@ -408,7 +539,7 @@ const OrderViewTest = () => {
               {/* <button className="btn btn-primary" type="submit" name="signup">
                 Create
               </button> */}
-              <Link className="btn btn-danger" to={"/test"}>
+              <Link className="btn btn-danger" to={"/quotation"}>
                 Close
               </Link>
             </div>

@@ -213,7 +213,6 @@ background-color: var(--bs-pink);
   padding: 10px;
   text-transform: uppercase;
 }
-
 ::placeholder {
   font-size: 15px;
   text-transform: uppercase;
@@ -860,7 +859,7 @@ button.btn.btn-primary {
 }
 
 .top-space-search-reslute table td {
-  padding: 5px 10px;
+  padding: 2px 10px;
 }
 
 .top-space-search-reslute {
@@ -2132,7 +2131,7 @@ button.swal2-confirm.swal2-styled {
 .exampleQuo .modal-content {
   background: #631f37;
   border-radius: 5px;
-  height: 170px;
+  min-height: 170px;
 }
 
 /* 19 */
@@ -3941,7 +3940,7 @@ g#SvgjsG4264 {
   position: absolute;
   right: 6%;
   top: 1px;
-  color: #203764;
+  color: #03b524 !important;
   font-weight: 900;
   font-size: 20px;
   cursor: pointer;
@@ -3962,4 +3961,39 @@ g#SvgjsG4264 {
 }
 .mdi-pencil {
   cursor: pointer;
+}
+.eanReq .mdi-close {
+  position: absolute;
+  right: 33px;
+  top: 3px;
+  color: #f44d3e !important;
+  font-size: 17px;
+  cursor: pointer;
+}
+td {
+  vertical-align: middle;
+}
+.eanCheck.errorMessage p {
+  background: url();
+  color: #fff;
+  padding: unset;
+  text-align: center;
+}
+.addBtnEan .MuiButtonBase-root{
+padding: 0px !important;
+background-color: unset !important;
+margin-top: unset;
+}
+.IncludeClaim>div {
+    padding-right: 40px;
+}
+.IncludeClaim {
+    display: flex;
+    flex-wrap: wrap;
+}
+.tableEditInv td:first-child{
+  text-align: left !important;
+}
+.parentInsideUp input {
+    cursor: pointer;
 }

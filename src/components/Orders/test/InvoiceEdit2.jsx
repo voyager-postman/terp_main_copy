@@ -15,6 +15,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 const InvoiceEdit2 = () => {
+  const { data: RoundingDataList } = useQuery("GetRoundingTable");
+  const [state5, setState5] = useState({
+    Rounding: "", // Initial state
+  });
+  // round
   const [color, setColor] = useState(false);
   const [show1, setShow1] = useState(false);
   const handleClose1 = () => setShow1(false);
@@ -79,7 +84,12 @@ const InvoiceEdit2 = () => {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
+  const handleChange5 = (e) => {
+    setState5((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
   const loadingModal = MySwal.mixin({
     title: "Loading...",
     didOpen: () => {
@@ -122,24 +132,50 @@ const InvoiceEdit2 = () => {
   const [exchangeRate2, setExchangeRate2] = useState("");
   const [exchangeRate3, setExchangeRate3] = useState("");
   const [exchangeRate4, setExchangeRate4] = useState("");
-
+  const [exchangeRate5, setExchangeRate5] = useState("");
   console.log(state);
+  // const handleChange = async (event) => {
+  //   if (isReadOnly || isLoading) return;
+  //   const { name, value } = event.target;
+  //   setState((prevState) => {
+  //     return {
+  //       ...prevState,
+  //       [name]: value,
+  //       fx_rate_manually_set:
+  //         name === "fx_rate" ? true : prevState.fx_rate_manually_set,
+  //     };
+  //   });
+
+  //   if (["mark_up", "rebate", "load_date", "fx_rate"].includes(name)) {
+  //     try {
+  //       await axios.post(`${API_BASE_URL}/updateInvoiceValues`, {
+  //         id: state.order_id, // ensure state.id is initialized
+  //         [name]: value,
+  //       });
+  //       console.log(`${name} updated successfully`);
+  //     } catch (error) {
+  //       console.error(`Error updating ${name}:`, error);
+  //     }
+  //   }
+  // };
   const handleChange = async (event) => {
     if (isReadOnly || isLoading) return;
-    const { name, value } = event.target;
-    setState((prevState) => {
-      return {
-        ...prevState,
-        [name]: value,
-        fx_rate_manually_set:
-          name === "fx_rate" ? true : prevState.fx_rate_manually_set,
-      };
-    });
 
-    if (["mark_up", "rebate", "load_date"].includes(name)) {
+    const { name, value } = event.target;
+
+    setState((prevState) => ({
+      ...prevState,
+      [name]: value,
+      fx_rate_manually_set:
+        name === "fx_rate" ? true : prevState.fx_rate_manually_set,
+    }));
+
+    const updatableFields = ["mark_up", "rebate", "load_date", "fx_rate"];
+
+    if (updatableFields.includes(name)) {
       try {
         await axios.post(`${API_BASE_URL}/updateInvoiceValues`, {
-          id: state.order_id, // ensure state.id is initialized
+          id: state.order_id,
           [name]: value,
         });
         console.log(`${name} updated successfully`);
@@ -161,7 +197,7 @@ const InvoiceEdit2 = () => {
   const { data: currency } = useQuery("getCurrency");
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
-  const { data: quote } = useQuery("getAllQuotation");
+  // const { data: quote } = useQuery("getAllQuotation");
 
   const [orderId, setOrderId] = useState("");
   const [gross, setGross] = useState(false);
@@ -243,6 +279,7 @@ const InvoiceEdit2 = () => {
           setExchangeRate2(newData.palletized || 0);
           setExchangeRate3(newData.Chamber || 0);
           setExchangeRate4(newData.PreCooling || 0);
+          setExchangeRate5(newData.Include_claims || 0);
         }
       })
       .catch((e) => {
@@ -254,17 +291,13 @@ const InvoiceEdit2 = () => {
     oneQoutationDAta();
   }, []);
 
-  useEffect(() => {
-    if (state.order_id) grossTransspotationErr();
-    orderCrossFreight();
-  }, [state.order_id]);
   const computedState = useMemo(() => {
     console.log(consigneesNew);
-    const quoteFind = quote?.find((v) => v.quote_id == state.quote_id);
+    // const quoteFind = quote?.find((v) => v.quote_id == state.quote_id);
     const r = {
       ...state,
-      consignee_id: state.consignee_id || quoteFind?.consignee_id,
-      client_id: state.client_id || quoteFind?.client_id,
+      consignee_id: state.consignee_id,
+      client_id: state.client_id,
     };
     const consigneeFind = consigneesNew?.find(
       (v) => v.consignee_id == state.consignee_id
@@ -277,8 +310,8 @@ const InvoiceEdit2 = () => {
     const portOriginFind = ports?.find(
       (v) => v.port_id == (r.from_port_ || consigneeFind?.port_of_orign)
     );
-    r.fx_id = r.fx_id || consigneeFind?.currency || quoteFind?.fx_id;
-    r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost || quoteFind?.O_Extra;
+    r.fx_id = r.fx_id || consigneeFind?.currency;
+    r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost;
     // r.fx_rate =
     //   !state.fx_rate_manually_set && r.fx_id
     //     ? currency?.find((v) => +v.ID === +r.fx_id)?.fx_rate || 0
@@ -290,34 +323,23 @@ const InvoiceEdit2 = () => {
       return matchedCurrency?.fx_rate || state.fx_rate || 0;
     })();
 
-    r.rebate = r.rebate || consigneeFind?.O_Rebate || quoteFind?.rebate;
+    r.rebate = r.rebate || consigneeFind?.O_Rebate;
     r.Clearance_provider =
       r.Clearance_provider ||
       portOriginFind?.preferred_clearance ||
-      consigneeFind?.Clearance_provider ||
-      quoteFind?.Clearance_provider;
-    r.loading_location =
-      r.loading_location ||
-      consigneeFind?.Default_location ||
-      quoteFind?.loading_location;
-    r.brand_id = state.brand_id || consigneeFind?.brand || quoteFind?.brand_id;
-    r.mark_up = r.mark_up || consigneeFind?.O_Markup || quoteFind?.profit;
+      consigneeFind?.Clearance_provider;
+    r.loading_location = r.loading_location || consigneeFind?.Default_location;
+    r.brand_id = state.brand_id || consigneeFind?.brand;
+    r.mark_up = r.mark_up || consigneeFind?.O_Markup;
     r.Transportation_provider =
-      r.Transportation_provider ||
-      portOriginFind?.preferred_transport ||
-      quoteFind?.Transportation_provider;
-    r.from_port_ =
-      r.from_port_ || consigneeFind?.port_of_orign || quoteFind?.port_of_orign;
+      r.Transportation_provider || portOriginFind?.preferred_transport;
+    r.from_port_ = r.from_port_ || consigneeFind?.port_of_orign;
     r.destination_port_id =
-      r.destination_port_id ||
-      consigneeFind?.destination_port ||
-      quoteFind?.destination_port_id;
-    r.liner_id =
-      r.liner_id || portDestinationFind?.prefered_liner || quoteFind?.liner_id;
+      r.destination_port_id || consigneeFind?.destination_port;
+    r.liner_id = r.liner_id || portDestinationFind?.prefered_liner;
     r.Freight_provider_ =
       state.Freight_provider_ ||
-      liners?.find((v) => v.liner_id == r.liner_id)?.preffered_supplier ||
-      quoteFind?.Freight_provider_;
+      liners?.find((v) => v.liner_id == r.liner_id)?.preffered_supplier;
     r.Q_Markup = consigneeNew2;
 
     return r;
@@ -343,16 +365,23 @@ const InvoiceEdit2 = () => {
   //   }
   // );
   const { data: details, refetch: getOrdersDetails } = useQuery(
-    `getInvoiceDeatilsTable?invoice_id=${from?.Order_ID}`,
+    ["OrderBottomView", state.order_id, localStorage.getItem("id")],
+    async () => {
+      const response = await axios.post(`${API_BASE_URL}/OrderBottomView`, {
+        order_id: state.order_id,
+        user_id: localStorage.getItem("id"),
+      });
+      return response.data;
+    },
     {
-      enabled: !!from?.Order_ID,
+      enabled: !!state.order_id && !!localStorage.getItem("id"),
     }
   );
   console.log(details);
 
   const isError = useMemo(() => {
-    return (details || []).some((v) => {
-      return +v.OD_Box % 1 != 0;
+    return (details?.section5_Values || []).some((v) => {
+      return +v.Box % 1 !== 0;
     });
   }, [details]);
   // const isMinWeightError = useMemo(() => {
@@ -387,42 +416,25 @@ const InvoiceEdit2 = () => {
   // }, [freights, summary]);
   // console.log(isMinWeightError);
   // console.log(isMinTransportError);
-  const newItfList1 = async () => {
-    if (state.consignee_id) {
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/OrderMarkupandRebate`,
-          {
-            Consignee_ID: state.consignee_id,
-          }
-        );
-        console.log(response.data);
-        setConsigneeNew(response.data.Consignee_Order_Markup);
-        setConsigneeNew1(response.data.Consignee_Rebate);
-        setConsigneeNew2(response.data.Consignee_Quotation_Markup);
-      } catch (e) {
-        console.log("Error:", e);
-      }
-    }
-  };
-  const grossTransspotationErr = async () => {
-    // if (state.order_id) {
-    //   try {
-    //     const response = await axios.post(
-    //       `${API_BASE_URL}/OrderGrossTransportError`,
-    //       { order_id: state.order_id }
-    //     );
-    //     console.log(response);
-    //     if (response.data.success == true) {
-    //       setGross(true);
-    //       setGrossMass(response.data.message);
-    //     }
-    //     toast.success(response);
-    //   } catch (e) {
-    //     console.error("Something went wrong", e);
-    //   }
-    // }
-  };
+  // const newItfList1 = async () => {
+  //   if (state.consignee_id) {
+  //     try {
+  //       const response = await axios.post(
+  //         `${API_BASE_URL}/OrderMarkupandRebate`,
+  //         {
+  //           Consignee_ID: state.consignee_id,
+  //         }
+  //       );
+  //       console.log(response.data);
+  //       setConsigneeNew(response.data.Consignee_Order_Markup);
+  //       setConsigneeNew1(response.data.Consignee_Rebate);
+  //       setConsigneeNew2(response.data.Consignee_Quotation_Markup);
+  //     } catch (e) {
+  //       console.log("Error:", e);
+  //     }
+  //   }
+  // };
+
   const calculateList = async () => {
     if (from?.Order_ID) {
       try {
@@ -435,6 +447,63 @@ const InvoiceEdit2 = () => {
       } catch (e) {
         console.error("Something went wrong", e);
       }
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/InvoicePriceRounding`,
+        {
+          Order_ID: from?.Order_ID,
+          RCondition: state5.Rounding || 0,
+          Is_Invoice: 1,
+          Is_Quotation: 0,
+          Is_Recalculate: 0,
+        }
+      );
+      console.log(response);
+      getOrdersDetails();
+      const modalEl = document.getElementById("exampleModal");
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      if (modalInstance) modalInstance.hide();
+      setState5("");
+      toast.success("Invoice Price updated  successfully");
+    } catch (e) {
+      console.error("Something went wrong", e);
+    }
+  };
+  const handleSubmit2 = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/AgreedPrice`, {
+        order_id: from?.Order_ID,
+      });
+      console.log(response);
+      getOrdersDetails();
+
+      toast.success("Agreed Price updated  successfully");
+    } catch (e) {
+      console.error("Something went wrong", e);
+    }
+  };
+  const handleSubmit1 = async () => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/InvoicePriceRounding`,
+        {
+          Order_ID: from?.Order_ID,
+          RCondition: 0,
+          Is_Invoice: 1,
+          Is_Quotation: 0,
+          Is_Recalculate: 0,
+        }
+      );
+      console.log(response);
+      getOrdersDetails();
+
+      toast.success("Invoice Price updated  successfully");
+    } catch (e) {
+      console.error("Something went wrong", e);
     }
   };
   // const calculateList = async () => {
@@ -485,13 +554,41 @@ const InvoiceEdit2 = () => {
   useEffect(() => {
     newItfList();
     newBrandList();
-    newItfList1();
+    // newItfList1();
   }, [state.consignee_id]);
   const handleAgreedPricingChange4 = async (e) => {
     const { name, checked } = e.target;
     const newValue = checked ? 1 : 0;
 
     setExchangeRate1(newValue);
+
+    try {
+      const response = await updateAllOrderStatuses({
+        id: state.order_id,
+        field: name,
+        value: newValue,
+      });
+
+      console.log("API success:", response);
+      if (response?.data?.message) {
+        toast.success(response.data.message, {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      }
+    } catch (error) {
+      console.error("API error:", error);
+      toast.error("Failed to update status", {
+        autoClose: 1500,
+        theme: "colored",
+      });
+    }
+  };
+  const handleAgreedPricingChange8 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate5(newValue);
 
     try {
       const response = await updateAllOrderStatuses({
@@ -606,23 +703,6 @@ const InvoiceEdit2 = () => {
       value,
     });
   };
-  const orderCrossFreight = async () => {
-    // if (state.order_id) {
-    //   try {
-    //     const response = await axios.post(
-    //       `${API_BASE_URL}/OrderGrossFreightError`,
-    //       { order_id: state.order_id }
-    //     );
-    //     console.log(response); // Log the response to the console
-    //     if (response.data.success == true) {
-    //       setFreight(true);
-    //       setFreightMass(response.data.message);
-    //     }
-    //   } catch (e) {
-    //     console.error("Something went wrong", e); // Log the error to the console
-    //   }
-    // }
-  };
 
   const deleteOrder = (id) => {
     console.log(id);
@@ -693,7 +773,7 @@ const InvoiceEdit2 = () => {
           theme: "colored",
         });
 
-        navigate("/test");
+        navigate("/order");
       }
     } catch (e) {
       toast.error("Something went wrong");
@@ -729,6 +809,7 @@ const InvoiceEdit2 = () => {
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
             Precooling: exchangeRate4 ? 1 : 0,
+            Include_claims: exchangeRate5 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
           },
           details: reai,
@@ -788,6 +869,7 @@ const InvoiceEdit2 = () => {
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
             Precooling: exchangeRate4 ? 1 : 0,
+            Include_claims: exchangeRate5 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
           },
           details: reai,
@@ -810,7 +892,7 @@ const InvoiceEdit2 = () => {
           autoClose: 1000,
           theme: "colored",
         });
-        navigate("/test");
+        navigate("/order");
       }
       await getOrdersDetails(data.data.data);
       MySwal.close();
@@ -844,6 +926,7 @@ const InvoiceEdit2 = () => {
             palletized: exchangeRate2 ? 1 : 0,
             Chamber: exchangeRate3 ? 1 : 0,
             Precooling: exchangeRate4 ? 1 : 0,
+            Include_claims: exchangeRate5 ? 1 : 0,
             Charge_Volume: exchangeRate1 ? 1 : 0,
           },
           details: reai,
@@ -1002,7 +1085,7 @@ const InvoiceEdit2 = () => {
           palletized: exchangeRate2 ? 1 : 0,
           Chamber: exchangeRate3 ? 1 : 0,
           Precooling: exchangeRate4 ? 1 : 0,
-
+          Include_claims: exchangeRate5 ? 1 : 0,
           Charge_Volume: exchangeRate1 ? 1 : 0,
           is_quotation: 0,
         },
@@ -1012,8 +1095,6 @@ const InvoiceEdit2 = () => {
       setOrderId(data?.order_id);
       console.log(data);
       getOrdersDetails();
-      grossTransspotationErr();
-      orderCrossFreight();
       toast.success("Order detail added successfully");
       setState((prevState) => {
         return {
@@ -1081,7 +1162,7 @@ const InvoiceEdit2 = () => {
     if (computedState.client_id) {
       fetchConsigneesNew();
     }
-  }, [computedState.client_id]);
+  }, [computedState.client_id, computedState.consignee_id]);
 
   const reCalculate = () => {
     setIsLoading(true);
@@ -1233,6 +1314,7 @@ const InvoiceEdit2 = () => {
         palletized: exchangeRate2 ? 1 : 0,
         Chamber: exchangeRate3 ? 1 : 0,
         Precooling: exchangeRate4 ? 1 : 0,
+        Include_claims: exchangeRate5 ? 1 : 0,
         Charge_Volume: exchangeRate1 ? 1 : 0,
         is_quotation: 0,
       },
@@ -1336,7 +1418,7 @@ const InvoiceEdit2 = () => {
   // };
   useEffect(() => {
     oneQoutationDAta();
-  }, [from?.Invoice_id]);
+  }, [from?.Order_ID]);
 
   // const calculateList = async () => {
   //   if (from?.Invoice_id) {
@@ -1380,7 +1462,7 @@ const InvoiceEdit2 = () => {
       const response = await axios.post(
         `${API_BASE_URL}/InvoiceCalculatedPrice`,
         {
-          Invoice_ID: from?.Invoice_id,
+          Invoice_ID: from?.Order_ID,
         }
       );
       console.log(response);
@@ -1398,7 +1480,7 @@ const InvoiceEdit2 = () => {
   const reduceRebate = async () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/RebateReduceInvoice`, {
-        Invoice_id: from?.Invoice_id,
+        Invoice_id: from?.Order_ID,
       });
       console.log(response);
       getOrdersDetails();
@@ -1415,7 +1497,7 @@ const InvoiceEdit2 = () => {
   const recordRebate = async () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/RebateRecord`, {
-        Invoice_id: from?.Invoice_id,
+        Invoice_id: from?.Order_ID,
       });
       console.log(response);
       getOrdersDetails();
@@ -1436,7 +1518,7 @@ const InvoiceEdit2 = () => {
     // Then call the API
     axios
       .post(`${API_BASE_URL}/calculateInvoice`, {
-        Invoice_id: from?.Invoice_id,
+        Invoice_id: from?.Order_ID,
       })
       .then((response) => {
         console.log(response);
@@ -1529,21 +1611,21 @@ const InvoiceEdit2 = () => {
   //   }
   // };
 
-  const handleEditClick = async (id_id) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/EditInvoiceDetails`, {
-        id_id: id_id,
-        Invoice_id: from?.Order_ID,
-        // Other data you may need to pass
-      });
-      console.log("API response:", response);
-      getOrdersDetails();
-      toast.success("Invoice updated successfully");
-    } catch (error) {
-      console.error("API call error:", error);
-      toast.error("Failed to update Invoice");
-    }
-  };
+  // const handleEditClick = async (id_id) => {
+  //   try {
+  //     const response = await axios.post(`${API_BASE_URL}/EditInvoiceDetails`, {
+  //       id_id: id_id,
+  //       Invoice_id: from?.Order_ID,
+  //       // Other data you may need to pass
+  //     });
+  //     console.log("API response:", response);
+  //     getOrdersDetails();
+  //     toast.success("Invoice updated successfully");
+  //   } catch (error) {
+  //     console.error("API call error:", error);
+  //     toast.error("Failed to update Invoice");
+  //   }
+  // };
 
   // const handleEditEanUnit = async (event, id_id) => {
   //     const newValue = event.target.value;
@@ -1593,6 +1675,27 @@ const InvoiceEdit2 = () => {
     }
 
     setEditUnit(null); // exit edit mode
+  };
+  const resetAdjust = async (id) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/EditInvoiceDetails`, {
+        id_id: id,
+        Invoice_id: from?.Order_ID,
+        adjusted_price: "0.00",
+      });
+
+      console.log("Adjustment removed:", response.data);
+
+      getOrdersDetails();
+
+      setEditAdjust(null);
+      setAdjustedPrices((prev) => ({
+        ...prev,
+        [id]: "",
+      }));
+    } catch (error) {
+      console.error("Failed to reset adjustment:", error);
+    }
   };
 
   return (
@@ -1644,523 +1747,192 @@ const InvoiceEdit2 = () => {
                             )}
                           </div>
                           <div className="row formEan quotationRowDro">
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Client</h6>
-                              <Autocomplete
-                                options={
-                                  clients?.map((v) => ({
-                                    id: v.client_id,
-                                    name: v.client_name,
-                                  })) || []
-                                }
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                } // Ensure proper comparison by `id`
-                                value={
-                                  clients
-                                    ?.map((v) => ({
-                                      id: v.client_id,
-                                      name: v.client_name,
-                                    }))
-                                    .find(
-                                      (client) => client.id === state.client_id
-                                    ) || null // Adjust to match the option structure
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    client_id: value?.id || null,
-                                  }); // Update state with selected `id`
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select client"
-                                  />
-                                )}
-                              />
+                            <div className="col-lg-4 form-group mb-3 quotationSelectSer">
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Client :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {clients?.find(
+                                      (client) =>
+                                        client.client_id === state.client_id
+                                    )?.client_name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Consignee :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {" "}
+                                    {consigneesNew?.find(
+                                      (v) =>
+                                        v.consignee_id ===
+                                        computedState.consignee_id
+                                    )?.consignee_name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Brand :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {" "}
+                                    {brands?.find(
+                                      (brand) =>
+                                        brand.ID === computedState.brand_id
+                                    )?.Name_EN || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Port of Destination :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {ports?.find(
+                                      (port) =>
+                                        port.port_id ===
+                                        computedState.destination_port_id
+                                    )?.port_name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Currency :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {currency?.find(
+                                      (c) => c.ID === computedState.fx_id
+                                    )?.FX || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>EX Rate :</strong>
+                                </div>
+                                <div>
+                                  <p>{computedState.fx_rate}</p>
+                                </div>
+                              </div>
                             </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Consignee</h6>
-                              <Autocomplete
-                                options={consigneesNew || []} // Ensure consignees is an array
-                                getOptionLabel={(option) =>
-                                  option.consignee_name || ""
-                                } // Display the consignee name
-                                value={
-                                  consigneesNew?.find(
-                                    (v) =>
-                                      v.consignee_id ===
-                                      computedState.consignee_id
-                                  ) || null
-                                } // Find the selected consignee by consignee_id
-                                onChange={(event, newValue) => {
-                                  // Handle the change and reset multiple fields in the state
-                                  setState({
-                                    ...state,
-                                    rebate: "",
-                                    Clearance_provider: "",
-                                    Freight_provider_: "",
-                                    Transportation_provider: "",
-                                    brand_id: "",
-                                    fx_id: "",
-                                    mark_up: "",
-                                    fx_rate: "",
-                                    from_port_: "",
-                                    destination_port_id: "",
-                                    liner_id: "",
-                                    loading_location: "",
-                                    consignee_id: newValue
-                                      ? newValue.consignee_id
-                                      : "", // Set consignee_id from the selected consignee
-                                    consignee_name: newValue
-                                      ? newValue.consignee_name
-                                      : "",
-                                  });
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select Consignee"
-                                    variant="outlined"
-                                  />
-                                )}
-                                isOptionEqualToValue={(option, value) =>
-                                  option.consignee_id === value?.consignee_id
-                                } // Compare based on consignee_id
-                              />
-                            </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Brands</h6>
-                              <Autocomplete
-                                options={
-                                  brands?.map((v) => ({
-                                    id: v.ID,
-                                    name: v.Name_EN,
-                                  })) || []
-                                }
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""}
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                }
-                                value={
-                                  computedState.brand_id
-                                    ? brands
-                                        ?.map((v) => ({
-                                          id: v.ID,
-                                          name: v.Name_EN,
-                                        }))
-                                        .find(
-                                          (brand) =>
-                                            brand.id === computedState.brand_id
-                                        ) || null
-                                    : null
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    brand_id: value?.id || null,
-                                  });
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select brand"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Currency</h6>
 
-                              <Autocomplete
-                                options={
-                                  currency?.map((v) => ({
-                                    id: v.ID,
-                                    name: v.FX,
-                                  })) || []
-                                }
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""}
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                }
-                                value={
-                                  computedState.fx_id
-                                    ? currency
-                                        ?.map((v) => ({
-                                          id: v.ID,
-                                          name: v.FX,
-                                        }))
-                                        .find(
-                                          (cur) =>
-                                            cur.id === computedState.fx_id
-                                        ) || null
-                                    : null
-                                }
-                                onChange={(event, value) => {
-                                  const selectedFxRate =
-                                    currency.find((c) => c.ID === value?.id)
-                                      ?.fx_rate || 0;
-                                  setState({
-                                    ...state,
-                                    fx_id: value?.id || null,
-                                    fx_rate: selectedFxRate, // update fx_rate with selected currency's rate
-                                  });
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select currency"
-                                  />
-                                )}
-                              />
+                            <div className="col-lg-4 form-group mb-3 quotationSelectSer">
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Loading Date :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {computedState.load_date
+                                      ? new Date(
+                                          computedState.load_date
+                                        ).toLocaleDateString("en-GB")
+                                      : "Not selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Loading Location :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {locations?.find(
+                                      (loc) =>
+                                        loc.id ===
+                                        computedState.loading_location
+                                    )?.name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Port of Origin :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {ports?.find(
+                                      (port) =>
+                                        port.port_id ===
+                                        computedState.from_port_
+                                    )?.port_name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Airline :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {liners?.find(
+                                      (liner) =>
+                                        liner.liner_id ===
+                                        computedState.liner_id
+                                    )?.liner_name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
                             </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Loading Location</h6>
-                              <Autocomplete
-                                options={
-                                  locations?.map((v) => ({
-                                    id: v.id,
-                                    name: v.name,
-                                  })) || []
-                                } // Ensure options is always an array
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                } // Compare by `id`
-                                value={
-                                  locations?.find(
-                                    (loc) =>
-                                      loc.id === computedState.loading_location
-                                  )
-                                    ? {
-                                        id: locations.find(
-                                          (loc) =>
-                                            loc.id ===
-                                            computedState.loading_location
-                                        ).id,
-                                        name: locations.find(
-                                          (loc) =>
-                                            loc.id ===
-                                            computedState.loading_location
-                                        ).name,
-                                      }
-                                    : null // Ensure value matches the structure of options
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    loading_location: value?.id || null,
-                                  }); // Update state with selected `id`
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select location"
-                                  />
-                                )}
-                              />
+
+                            <div className="col-lg-4 form-group mb-3 quotationSelectSer">
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Transportation :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {transport?.find(
+                                      (provider) =>
+                                        provider.Transportation_provider ===
+                                        computedState.Transportation_provider
+                                    )?.name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Clearance :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {" "}
+                                    {clearance?.find(
+                                      (provider) =>
+                                        provider.Clearance_provider ===
+                                        computedState.Clearance_provider
+                                    )?.name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="parentPurchaseView">
+                                <div className="me-3">
+                                  <strong>Freight Provider :</strong>
+                                </div>
+                                <div>
+                                  <p>
+                                    {" "}
+                                    {freights?.find(
+                                      (provider) =>
+                                        provider.Freight_provider ===
+                                        computedState.Freight_provider_
+                                    )?.name || "None selected"}
+                                  </p>
+                                </div>
+                              </div>
                             </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Port of Origin</h6>
-                              <Autocomplete
-                                options={
-                                  ports?.map((v) => ({
-                                    id: v.port_id,
-                                    name: v.port_name,
-                                  })) || []
-                                } // Ensure options is always an array
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                } // Compare by `id`
-                                value={
-                                  ports?.find(
-                                    (port) =>
-                                      port.port_id === computedState.from_port_
-                                  )
-                                    ? {
-                                        id: ports.find(
-                                          (port) =>
-                                            port.port_id ===
-                                            computedState.from_port_
-                                        ).port_id,
-                                        name: ports.find(
-                                          (port) =>
-                                            port.port_id ===
-                                            computedState.from_port_
-                                        ).port_name,
-                                      }
-                                    : null // Ensure value matches the structure of options
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    from_port_: value?.id || null,
-                                  }); // Update state with selected `id`
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select port"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="col-lg-3 form-group quotationSelectSer">
-                              <h6>Port of Destination</h6>
-                              <Autocomplete
-                                options={
-                                  ports?.map((v) => ({
-                                    id: v.port_id,
-                                    name: v.port_name,
-                                  })) || []
-                                } // Ensure options is always an array
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                } // Compare by `id`
-                                value={
-                                  ports?.find(
-                                    (port) =>
-                                      port.port_id ===
-                                      computedState.destination_port_id
-                                  )
-                                    ? {
-                                        id: ports.find(
-                                          (port) =>
-                                            port.port_id ===
-                                            computedState.destination_port_id
-                                        ).port_id,
-                                        name: ports.find(
-                                          (port) =>
-                                            port.port_id ===
-                                            computedState.destination_port_id
-                                        ).port_name,
-                                      }
-                                    : null // Ensure value matches the structure of options
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    destination_port_id: value?.id || null,
-                                  }); // Update state with selected `id`
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select destination port"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Airline</h6>
-                              <Autocomplete
-                                options={
-                                  liners?.map((v) => ({
-                                    id: v.liner_id,
-                                    name: v.liner_name,
-                                  })) || []
-                                } // Ensure options is always an array
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                } // Compare by `id`
-                                value={
-                                  liners?.find(
-                                    (liner) =>
-                                      liner.liner_id === computedState.liner_id
-                                  )
-                                    ? {
-                                        id: liners.find(
-                                          (liner) =>
-                                            liner.liner_id ===
-                                            computedState.liner_id
-                                        ).liner_id,
-                                        name: liners.find(
-                                          (liner) =>
-                                            liner.liner_id ===
-                                            computedState.liner_id
-                                        ).liner_name,
-                                      }
-                                    : null // Ensure value matches the structure of options
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    liner_id: value?.id || null,
-                                  }); // Update state with selected `id`
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select Liner"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Transportation</h6>
-                              <Autocomplete
-                                options={
-                                  transport?.map((v) => ({
-                                    id: v.Transportation_provider,
-                                    name: v.name,
-                                  })) || []
-                                } // Ensure options is always an array
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                } // Compare by `id`
-                                value={
-                                  transport?.find(
-                                    (provider) =>
-                                      provider.Transportation_provider ===
-                                      computedState.Transportation_provider
-                                  )
-                                    ? {
-                                        id: transport.find(
-                                          (provider) =>
-                                            provider.Transportation_provider ===
-                                            computedState.Transportation_provider
-                                        ).Transportation_provider,
-                                        name: transport.find(
-                                          (provider) =>
-                                            provider.Transportation_provider ===
-                                            computedState.Transportation_provider
-                                        ).name,
-                                      }
-                                    : null // Ensure value matches the structure of options
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    Transportation_provider: value?.id || null,
-                                  }); // Update state with selected `id`
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select Transportation Provider"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Clearance</h6>
-                              <Autocomplete
-                                options={
-                                  clearance?.map((v) => ({
-                                    id: v.Clearance_provider,
-                                    name: v.name,
-                                  })) || []
-                                } // Ensure options is always an array
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                } // Compare by `id`
-                                value={
-                                  clearance?.find(
-                                    (provider) =>
-                                      provider.Clearance_provider ===
-                                      computedState.Clearance_provider
-                                  )
-                                    ? {
-                                        id: clearance.find(
-                                          (provider) =>
-                                            provider.Clearance_provider ===
-                                            computedState.Clearance_provider
-                                        ).Clearance_provider,
-                                        name: clearance.find(
-                                          (provider) =>
-                                            provider.Clearance_provider ===
-                                            computedState.Clearance_provider
-                                        ).name,
-                                      }
-                                    : null // Ensure value matches the structure of options
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    Clearance_provider: value?.id || null,
-                                  }); // Update state with selected `id`
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select Clearance Provider"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                              <h6>Freight Provider</h6>
-                              <Autocomplete
-                                options={
-                                  freights?.map((v) => ({
-                                    id: v.Freight_provider,
-                                    name: v.name,
-                                  })) || []
-                                } // Ensure options is always an array
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => option?.name || ""} // Display name of the option
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value?.id
-                                } // Compare by `id`
-                                value={
-                                  freights?.find(
-                                    (provider) =>
-                                      provider.Freight_provider ===
-                                      computedState.Freight_provider_
-                                  )
-                                    ? {
-                                        id: freights.find(
-                                          (provider) =>
-                                            provider.Freight_provider ===
-                                            computedState.Freight_provider_
-                                        ).Freight_provider,
-                                        name: freights.find(
-                                          (provider) =>
-                                            provider.Freight_provider ===
-                                            computedState.Freight_provider_
-                                        ).name,
-                                      }
-                                    : null
-                                }
-                                onChange={(event, value) => {
-                                  setState({
-                                    ...state,
-                                    Freight_provider_: value?.id || null,
-                                  }); // Update state with selected `id`
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select Freight Provider"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="col-lg-3 form-group  ">
-                              <h6>EX Rate</h6>
-                              <input
-                                type="number"
-                                value={computedState.fx_rate}
-                                onChange={handleChange}
-                                name="fx_rate"
-                              />
-                            </div>
+
                             <div className="col-lg-2 form-group  ">
                               <h6>Markup Rate</h6>
                               <div className="parentShip">
@@ -2206,108 +1978,105 @@ const InvoiceEdit2 = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="col-lg-2 form-group">
-                              <h6>Charge Volume</h6>
-                              <div className="flex gap-2 items-center">
-                                <label
-                                  className="toggleSwitch large"
-                                  onclick=""
-                                >
-                                  <input
-                                    type="checkbox"
-                                    name="Charge_Volume"
-                                    checked={exchangeRate1 == 1}
-                                    onChange={handleAgreedPricingChange4}
-                                  />
-                                  <span>
-                                    <span>OFF</span>
-                                    <span>ON</span>
-                                  </span>
-                                  <a></a>
-                                </label>
+                            <div className="col-lg-8">
+                              <div className="IncludeClaim">
+                                <div>
+                                  <h6>Include Claim</h6>
+                                  <div className="flex gap-2 items-center">
+                                    <label
+                                      className="toggleSwitch large"
+                                      onclick=""
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Include_claims"
+                                        checked={exchangeRate5 == 1}
+                                        onChange={handleAgreedPricingChange8}
+                                      />
+                                      <span>
+                                        <span>OFF</span>
+                                        <span>ON</span>
+                                      </span>
+                                      <a></a>
+                                    </label>
+                                  </div>
+                                </div>
+                                <div>
+                                  <h6>Charge Volume</h6>
+                                  <div className="flex gap-2 items-center">
+                                    <label
+                                      className="toggleSwitch large"
+                                      onclick=""
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Charge_Volume"
+                                        checked={exchangeRate1 == 1}
+                                        onChange={handleAgreedPricingChange4}
+                                      />
+                                      <span>
+                                        <span>OFF</span>
+                                        <span>ON</span>
+                                      </span>
+                                      <a></a>
+                                    </label>
+                                  </div>
+                                </div>
+                                <div>
+                                  <h6>Palletized</h6>
+                                  <div className="flex gap-2 items-center">
+                                    <label className="toggleSwitch large">
+                                      <input
+                                        type="checkbox"
+                                        name="palletized"
+                                        checked={exchangeRate2 == 1}
+                                        onChange={handleAgreedPricingChange5}
+                                      />
+                                      <span>
+                                        <span>OFF</span>
+                                        <span>ON</span>
+                                      </span>
+                                      <a></a>
+                                    </label>
+                                  </div>
+                                </div>
+                                <div>
+                                  <h6>CO from Chamber</h6>
+                                  <div className="flex gap-2 items-center">
+                                    <label className="toggleSwitch large">
+                                      <input
+                                        type="checkbox"
+                                        name="Chamber"
+                                        checked={exchangeRate3 == 1}
+                                        onChange={handleAgreedPricingChange6}
+                                      />
+                                      <span>
+                                        <span>OFF</span>
+                                        <span>ON</span>
+                                      </span>
+                                      <a></a>
+                                    </label>
+                                  </div>
+                                </div>
+                                <div>
+                                  <h6>Precooling</h6>
+                                  <div className="flex gap-2 items-center">
+                                    <label className="toggleSwitch large">
+                                      <input
+                                        type="checkbox"
+                                        name="PreCooling"
+                                        checked={exchangeRate4 == 1}
+                                        onChange={handleAgreedPricingChange7}
+                                      />
+                                      <span>
+                                        <span>OFF</span>
+                                        <span>ON</span>
+                                      </span>
+                                      <a></a>
+                                    </label>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                            <div className="col-lg-2 form-group">
-                              <h6>Palletized</h6>
-                              <div className="flex gap-2 items-center">
-                                <label className="toggleSwitch large">
-                                  <input
-                                    type="checkbox"
-                                    name="palletized"
-                                    checked={exchangeRate2 == 1}
-                                    onChange={handleAgreedPricingChange5}
-                                  />
-                                  <span>
-                                    <span>OFF</span>
-                                    <span>ON</span>
-                                  </span>
-                                  <a></a>
-                                </label>
-                              </div>
-                            </div>
-                            <div className="col-lg-2 form-group">
-                              <h6>CO from Chamber</h6>
-                              <div className="flex gap-2 items-center">
-                                <label className="toggleSwitch large">
-                                  <input
-                                    type="checkbox"
-                                    name="Chamber"
-                                    checked={exchangeRate3 == 1}
-                                    onChange={handleAgreedPricingChange6}
-                                  />
-                                  <span>
-                                    <span>OFF</span>
-                                    <span>ON</span>
-                                  </span>
-                                  <a></a>
-                                </label>
-                              </div>
-                            </div>
-                            <div className="col-lg-2 form-group">
-                              <h6>Precooling</h6>
-                              <div className="flex gap-2 items-center">
-                                <label className="toggleSwitch large">
-                                  <input
-                                    type="checkbox"
-                                    name="PreCooling"
-                                    checked={exchangeRate4 == 1}
-                                    onChange={handleAgreedPricingChange7}
-                                  />
-                                  <span>
-                                    <span>OFF</span>
-                                    <span>ON</span>
-                                  </span>
-                                  <a></a>
-                                </label>
-                              </div>
-                            </div>
-                            <div className="col-lg-3 form-group">
-                              <h6>Loading Date</h6>
-                              {/* <input
-                                           type="date"
-                                           onChange={handleChange}
-                                           value={computedState.load_date}
-                                           name="load_date"
-                                         /> */}
-                              <DatePicker
-                                selected={
-                                  computedState.load_date
-                                    ? new Date(computedState.load_date)
-                                    : null
-                                }
-                                onChange={(date) =>
-                                  handleChange({
-                                    target: {
-                                      name: "load_date",
-                                      value: date,
-                                    },
-                                  })
-                                }
-                                name="load_date"
-                                dateFormat="dd/MM/yyyy"
-                                placeholderText="dd/MM/yyyy"
-                                customInput={<CustomInput />} // Optional: only include if you have a custom input
-                              />
                             </div>
                           </div>
                           <div className="row mt-4 mb-3">
@@ -2327,9 +2096,18 @@ const InvoiceEdit2 = () => {
                                     <button
                                       type="button"
                                       className="me-2"
-                                      onClick={invoicePrice}
+                                      onClick={handleSubmit1}
                                     >
                                       Use Invoice Price
+                                    </button>
+                                  </div>
+                                  <div>
+                                    <button
+                                      type="button"
+                                      className="me-2"
+                                      onClick={handleSubmit2}
+                                    >
+                                      Agreed Price
                                     </button>
                                   </div>
                                   <div>
@@ -2352,11 +2130,95 @@ const InvoiceEdit2 = () => {
                                   <div>
                                     <button
                                       type="button"
-                                      className="me-2"
-                                      onClick={reduceRebate}
+                                      className="  me-2"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#exampleModal"
                                     >
                                       Round Price
                                     </button>
+
+                                    {/* Button trigger modal */}
+
+                                    {/* Modal */}
+                                    <div
+                                      className="modal fade"
+                                      id="exampleModal"
+                                      tabIndex={-1}
+                                      aria-labelledby="exampleModalLabel"
+                                      aria-hidden="true"
+                                    >
+                                      <div className="modal-dialog modalShipTo">
+                                        <div className="modal-content">
+                                          <div className="modal-header">
+                                            <h1
+                                              className="modal-title fs-5"
+                                              id="exampleModalLabel"
+                                            >
+                                              Price Rounding
+                                            </h1>
+                                            <button
+                                              type="button"
+                                              className="btn-close"
+                                              data-bs-dismiss="modal"
+                                              aria-label="Close"
+                                              onClick={() =>
+                                                setState5({
+                                                  Rounding: "",
+                                                })
+                                              }
+                                            >
+                                              <i className="mdi mdi-close"></i>
+                                            </button>
+                                          </div>
+                                          <div className="modal-body">
+                                            <div className="col-lg-12 form-group autoComplete">
+                                              <h6>Rounding</h6>
+                                              <Autocomplete
+                                                options={RoundingDataList || []}
+                                                getOptionLabel={(option) =>
+                                                  option?.DropDown || ""
+                                                }
+                                                value={
+                                                  (RoundingDataList || []).find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      state5?.Rounding
+                                                  ) || null
+                                                }
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID}
+                                                onChange={(event, newValue) => {
+                                                  handleChange5({
+                                                    target: {
+                                                      name: "Rounding",
+                                                      value: newValue?.ID || "",
+                                                    },
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder="Select Rounding"
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                              />
+                                            </div>
+                                          </div>
+                                          <div className="modal-footer">
+                                            <button
+                                              type="button"
+                                              className="btn btn-primary"
+                                              onClick={handleSubmit}
+                                            >
+                                              Submit
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
                                   </div>
                                   {!isReadOnly && (
                                     <div className="addBtnEan flex flex-wrap gap-3 items-center mb-4">
@@ -2485,307 +2347,251 @@ const InvoiceEdit2 = () => {
                           >
                             <table
                               id="example"
-                              className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
+                              className="tableEditInv display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
                               style={{ width: "100%" }}
                             >
-                              <thead>
-                                <tr>
-                                  <th>ITF</th>
-                                  <th>Brand</th>
-                                  <th>Quantity</th>
-                                  <th>Unit</th>
-                                  <th> Box</th>
-                                  <th>NW</th>
-                                  <th>Order Price</th>
-                                  <th>Calculate Price</th>
-                                  {/* <th>Unit Price</th> */}
-                                  <th>Adjust Price</th>
-                                  {!(
-                                    (localStorage.getItem("level") ===
-                                      "Level 1" &&
-                                      localStorage.getItem("role") ===
-                                        "Admin") ||
-                                    localStorage.getItem("level") === "Level 5"
-                                  ) && <th>Profit</th>}
-                                  {/* <th>Action</th> */}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {details?.map((v, i) => (
-                                  <tr
-                                    className={[
-                                      "rowCursorPointer",
-                                      +v.Box % 1 != 0
-                                        ? "bg-red-500/50 [&>td]:!text-red-900"
-                                        : "",
-                                    ].join(" ")}
-                                  >
-                                    <td>{v.ITF_Name}</td>
-                                    <td className="text-center">
-                                      {v.Brand_name}
-                                    </td>
-                                    <td className="text-end">
-                                      {threeDecimal.format(v.QTY)}
-                                    </td>
-                                    {/* <td className="text-center">{v.Unit_Name}</td> */}
-                                    <td className="text-center">
-                                      <div className="selectInvoiceView selectEdit d-flex justify-content-center">
-                                        {editUnit === v.OD_ID ? (
-                                          <select
-                                            className="mb-0"
-                                            name="unit_id"
-                                            value={unitPrices[v.OD_ID] || ""}
-                                            onChange={(e) =>
-                                              handleEditEan(e, v.OD_ID)
-                                            }
-                                          >
-                                            {unit?.map((unit) => (
-                                              <option
-                                                key={unit.ID}
-                                                value={unit.ID}
-                                              >
-                                                {unit.Name_EN}
-                                              </option>
-                                            ))}
-                                          </select>
-                                        ) : (
-                                          <p>
-                                            {unit?.find(
-                                              (u) =>
-                                                u.ID ===
-                                                Number(unitPrices[v.OD_ID])
-                                            )?.Name_EN || ""}
-                                          </p>
-                                        )}
+                              {details?.section5_Labels2 && (
+                                <thead>
+                                  <tr>
+                                    {Object.entries(
+                                      details.section5_Labels2
+                                    ).map(([key, label]) => {
+                                      if (
+                                        key === "Profit" &&
+                                        ((localStorage.getItem("level") ===
+                                          "Level 1" &&
+                                          localStorage.getItem("role") ===
+                                            "Admin") ||
+                                          localStorage.getItem("level") ===
+                                            "Level 5")
+                                      ) {
+                                        return null;
+                                      }
 
-                                        {editUnit === v.OD_ID ? (
-                                          <i
-                                            onClick={updateUnit}
-                                            className="mdi mdi-check ms-3"
-                                            style={{
-                                              fontSize: "20px",
-                                              color: "#203764",
-                                            }}
-                                          ></i>
-                                        ) : (
-                                          <i
-                                            onClick={() => showUnit(v.OD_ID)}
-                                            className="mdi mdi-pencil ms-3"
-                                          ></i>
-                                        )}
-                                      </div>
-                                    </td>
-                                    <td className="text-end">
-                                      {NoDecimal.format(v.Box)}
-                                    </td>
-                                    <td className="text-end">
-                                      {" "}
-                                      {threeDecimal.format(v.NW)}
-                                    </td>
-                                    <td className="text-end">
-                                      {twoDecimal.format(v.Order_Price)}
-                                    </td>
-                                    <td className="text-end">
-                                      {twoDecimal.format(v.Calculated_Price)}
-                                    </td>
-
-                                    <td className="text-end">
-                                     
-                                      <div className="selectInvoiceView eanReq d-flex justify-content-end">
-                                        {editAdjust === v.OD_ID ? (
-                                          <input
-                                            type="number"
-                                            placeholder="123"
-                                            className="mb-0"
-                                            value={
-                                              adjustedPrices[v.OD_ID] || ""
-                                            }
-                                            onChange={(e) =>
-                                              handleAdjustedPriceChange(
-                                                e,
-                                                v.OD_ID
-                                              )
-                                            }
-                                          />
-                                        ) : (
-                                          <p>
-                                            {twoDecimal.format(
-                                              adjustedPrices[v.OD_ID]
-                                            ) || ""}
-                                          </p>
-                                        )}
-
-                                        {editAdjust === v.OD_ID ? (
-                                          <i
-                                            onClick={updateAdjust}
-                                            className="mdi mdi-check ms-3"
-                                            style={{
-                                              fontSize: "20px",
-                                              color: "#203764",
-                                            }}
-                                          ></i>
-                                        ) : (
-                                          <i
-                                            onClick={() => showAdjust(v.OD_ID)}
-                                            className="mdi mdi-pencil ms-3"
-                                          ></i>
-                                        )}
-                                      </div>
-                                    </td>
-                                    {!(
-                                      (localStorage.getItem("level") ===
-                                        "Level 1" &&
-                                        localStorage.getItem("role") ===
-                                          "Admin") ||
-                                      localStorage.getItem("level") ===
-                                        "Level 5"
-                                    ) && <td>{v.Profit_Percentage}%</td>}
-                                    {/* <td>
-                                      <>
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            handleEditClick(v.OD_ID)
-                                          }
-                                          style={{
-                                            background: "none",
-                                            border: "none",
-                                            cursor: "pointer",
-                                            padding: 0,
-                                          }}
-                                        >
-                                          <i
-                                            className="mdi mdi-autorenew"
-                                            style={{
-                                              width: "20px",
-                                              color: "#203764",
-                                              fontSize: "22px",
-                                              marginTop: "10px",
-                                            }}
-                                          />
-                                        </button>
-                                       
-                                      </>
-                                    </td> */}
+                                      return <th key={key}>{label}</th>;
+                                    })}
                                   </tr>
-                                ))}
+                                </thead>
+                              )}
+
+                              <tbody>
+                                {details?.section5_Values?.map((v, i) => {
+                                  const isRed = +v.Box % 1 !== 0;
+
+                                  return (
+                                    <tr
+                                      key={i}
+                                      className={[
+                                        "rowCursorPointer",
+                                        isRed
+                                          ? "bg-red-500/50 [&>td]:!text-red-900"
+                                          : "",
+                                      ].join(" ")}
+                                    >
+                                      {Object.keys(
+                                        details.section5_Labels2 || {}
+                                      ).map((key) => {
+                                        // Skip "Profit" column conditionally
+                                        if (
+                                          key === "Profit" &&
+                                          ((localStorage.getItem("level") ===
+                                            "Level 1" &&
+                                            localStorage.getItem("role") ===
+                                              "Admin") ||
+                                            localStorage.getItem("level") ===
+                                              "Level 5")
+                                        ) {
+                                          return null;
+                                        }
+
+                                        // Map API keys to value field names
+                                        const valueMap = {
+                                          Item: "ITF_Name",
+                                          Brand: "Brand_name",
+                                          Quantity: "QTY",
+                                          Unit: "Unit_Name",
+                                          boxes: "Box",
+                                          "Net Weight": "NW",
+                                          "Order Price": "Order_Price",
+                                          "Calculated Price":
+                                            "Calculated_Price",
+                                          "Adjust Price": "Adjusted_Price",
+                                          Price: "Adjusted_Price",
+                                          Profit: "Profit_Percentage",
+                                        };
+
+                                        const field = valueMap[key] || key;
+                                        const rawValue = v[field];
+
+                                        // Render editable Unit column
+                                        if (key === "Unit") {
+                                          return (
+                                            <td
+                                              key={key}
+                                              className="text-center"
+                                            >
+                                              <div className="selectInvoiceView selectEdit d-flex justify-content-center">
+                                                {editUnit === v.OD_ID ? (
+                                                  <select
+                                                    className="mb-0"
+                                                    name="unit_id"
+                                                    value={
+                                                      String(
+                                                        unitPrices[v.OD_ID] ??
+                                                          v.Unit ??
+                                                          ""
+                                                      ) // <-- fallback correctly
+                                                    }
+                                                    onChange={(e) =>
+                                                      handleEditEan(e, v.OD_ID)
+                                                    }
+                                                  >
+                                                    {unit
+                                                      ?.slice(0, 4)
+                                                      ?.map((unit) => (
+                                                        <option
+                                                          key={unit.ID}
+                                                          value={String(
+                                                            unit.ID
+                                                          )}
+                                                        >
+                                                          {unit.Name_EN}
+                                                        </option>
+                                                      ))}
+                                                  </select>
+                                                ) : (
+                                                  <p>
+                                                    {unit?.find(
+                                                      (u) =>
+                                                        String(u.ID) ===
+                                                        String(
+                                                          unitPrices[v.OD_ID] ??
+                                                            v.Unit
+                                                        )
+                                                    )?.Name_EN || ""}
+                                                  </p>
+                                                )}
+
+                                                {editUnit === v.OD_ID ? (
+                                                  <i
+                                                    onClick={updateUnit}
+                                                    className="mdi mdi-check ms-3"
+                                                    style={{
+                                                      fontSize: "20px",
+                                                      color: "#203764",
+                                                    }}
+                                                  ></i>
+                                                ) : (
+                                                  <i
+                                                    onClick={() =>
+                                                      showUnit(v.OD_ID)
+                                                    }
+                                                    className="mdi mdi-pencil ms-3"
+                                                  ></i>
+                                                )}
+                                              </div>
+                                            </td>
+                                          );
+                                        }
+
+                                        // Render editable Adjusted Price column
+                                        if (
+                                          key === "Adjust Price" ||
+                                          key === "Price"
+                                        ) {
+                                          return (
+                                            <td key={key} className="text-end">
+                                              <div className="selectInvoiceView eanReq d-flex justify-content-end">
+                                                {editAdjust === v.OD_ID ? (
+                                                  <input
+                                                    type="number"
+                                                    placeholder="123"
+                                                    className="mb-0"
+                                                    value={
+                                                      adjustedPrices[v.OD_ID] ||
+                                                      ""
+                                                    }
+                                                    onChange={(e) =>
+                                                      handleAdjustedPriceChange(
+                                                        e,
+                                                        v.OD_ID
+                                                      )
+                                                    }
+                                                  />
+                                                ) : (
+                                                  <p>
+                                                    {twoDecimal.format(
+                                                      adjustedPrices[v.OD_ID] ??
+                                                        v.Adjusted_Price
+                                                    ) || ""}
+                                                  </p>
+                                                )}
+
+                                                {editAdjust === v.OD_ID ? (
+                                                  <div>
+                                                    <i
+                                                      onClick={updateAdjust}
+                                                      className="mdi mdi-check ms-3"
+                                                      style={{
+                                                        fontSize: "20px",
+                                                        color: "#203764",
+                                                      }}
+                                                    ></i>
+                                                    <span
+                                                      onClick={() =>
+                                                        resetAdjust(v.OD_ID)
+                                                      }
+                                                      className="mdi mdi-close"
+                                                    ></span>
+                                                  </div>
+                                                ) : (
+                                                  <i
+                                                    onClick={() =>
+                                                      showAdjust(v.OD_ID)
+                                                    }
+                                                    className="mdi mdi-pencil ms-3"
+                                                  ></i>
+                                                )}
+                                              </div>
+                                            </td>
+                                          );
+                                        }
+
+                                        // Render all other fields with formatting
+                                        const formattedValue = (() => {
+                                          if (["QTY", "NW"].includes(field))
+                                            return threeDecimal.format(
+                                              rawValue
+                                            );
+                                          if (field === "Box")
+                                            return NoDecimal.format(rawValue);
+                                          if (
+                                            [
+                                              "Order_Price",
+                                              "Calculated_Price",
+                                            ].includes(field)
+                                          )
+                                            return twoDecimal.format(rawValue);
+                                          if (field === "Profit_Percentage")
+                                            return `${rawValue}%`;
+                                          return rawValue;
+                                        })();
+
+                                        return (
+                                          <td key={key} className="text-end">
+                                            {formattedValue}
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  );
+                                })}
                               </tbody>
                             </table>
                           </div>
-                          {/* <div className="grid md:grid-cols-3 grid-cols-1 my-4">
-                                       <div>
-                                         Total NW :
-                                         <b>
-                                           {" "}
-                                           {threeDecimal
-                                             .format(+data?.O_NW || 0)
-                                             .toLocaleString()}
-                                         </b>
-                                       </div>
-                                       <div>
-                                         Total FOB :{" "}
-                                         <b>
-                                           {" "}
-                                           {twoDecimal
-                                             .format(+data?.O_FOB || 0)
-                                             .toLocaleString()}
-                                         </b>
-                                       </div>
-                                       <div>
-                                         Total Commission :
-                                         <b>
-                                           {" "}
-                                           {twoDecimal
-                                             .format(+data?.O_Commission_FX || 0)
-                                             .toLocaleString()}
-                                         </b>
-                                       </div>
-                                       <div>
-                                         Total GW :
-                                         <b>
-                                           {" "}
-                                           {NoDecimal.format(+data?.O_GW || 0).toLocaleString()}
-                                         </b>
-                                       </div>
-                                       <div>
-                                         Total Freight :
-                                         <b>
-                                           {" "}
-                                           {NoDecimal.format(
-                                             +data?.O_Freight || 0
-                                           ).toLocaleString()}
-                                         </b>
-                                       </div>
-                                       <div>
-                                         Total Rebate :
-                                         <b>{(+data?.O_Rebate || 0).toLocaleString()}</b>
-                                       </div>
-                                       <div>
-                                         Total Box :
-                                         <b>
-                                           {" "}
-                                           {NoDecimal.format(+data?.O_Box || 0).toLocaleString()}
-                                         </b>
-                                       </div>
-                                       <div>
-                                         Total CNF :{" "}
-                                         <b>
-                                           {" "}
-                                           {twoDecimal
-                                             .format(+data?.O_CNF || 0)
-                                             .toLocaleString()}
-                                         </b>
-                                       </div>
-                                       {!(
-                                         localStorage.getItem("level") === "Level 1" &&
-                                         localStorage.getItem("role") === "Admin"
-                                       ) && (
-                                         <div>
-                                           Total Profit :
-                                           <b>
-                                             {" "}
-                                             {twoDecimal
-                                               .format(+data?.O_Profit_Percentage || 0)
-                                               .toLocaleString()}
-                                           </b>
-                                         </div>
-                                       )}
-                                       <div>
-                                         Total CBM :{" "}
-                                         <b>
-                                           {" "}
-                                           {threeDecimal
-                                             .format(+data?.O_CBM || 0)
-                                             .toLocaleString()}
-                                         </b>
-                                       </div>
-                                       <div>
-                                         Total CNF FX :
-                                         <b>
-                                           {" "}
-                                           {twoDecimal
-                                             .format(+data?.O_CNF_FX || 0)
-                                             .toLocaleString()}
-                                         </b>
-                                       </div>
-                                       {!(
-                                         localStorage.getItem("level") === "Level 1" &&
-                                         localStorage.getItem("role") === "Admin"
-                                       ) && (
-                                         <div>
-                                           Total Profit Percentage
-                                           <b>
-                                             {(+data?.O_Profit_Percentage || 0).toLocaleString()}
-                                           </b>
-                                         </div>
-                                       )}
-                                     </div> */}
-                          <div className="row py-4 px-4">
+
+                          {/* <div className="row py-4 px-4">
                             <div className="col-lg-3">
-                              {/* <div>
-                                           <b> Total Item : </b>
-                                           {(+data?.O_NW || 0).toLocaleString()}
-                                         </div> */}
                               <div>
                                 <b> Total NW : </b>
                                 {(+newdata?.NW || 0).toLocaleString()}
@@ -2884,14 +2690,241 @@ const InvoiceEdit2 = () => {
                                 </div>
                               </div>
                             </div>
-                          </div>
+                          </div> */}
+                          {details?.section6_Labels && (
+                            <div className="row py-4 px-4">
+                              <div className="col-lg-3">
+                                <div>
+                                  <b>
+                                    {details?.section6_Labels?.[
+                                      "Total Net Weight :"
+                                    ] || "Total Net Weight :"}
+                                  </b>
+                                  {(
+                                    +details?.section6_Values?.Row1 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section6_Labels?.[
+                                      "Total Gross Weight :"
+                                    ] || "Total Gross Weight :"}
+                                  </b>
+
+                                  {(
+                                    +details?.section6_Values?.Row2 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section6_Labels?.[
+                                      "Total Box :"
+                                    ] || "Total Box :"}
+                                  </b>
+                                  {(
+                                    +details?.section6_Values?.Row3 || 0
+                                  ).toLocaleString()}
+                                </div>
+
+                                <div className="">
+                                  <b>
+                                    {details?.section6_Labels?.[
+                                      "Total Volume :"
+                                    ] || "Total Volume :"}
+                                  </b>
+                                  {(
+                                    +details?.section6_Values?.Row4 || 0
+                                  ).toLocaleString()}
+                                </div>
+
+                                <b>
+                                  {details?.section6_Labels?.[
+                                    "Total Items :"
+                                  ] || "Total Items :"}
+                                </b>
+                                {(
+                                  +details?.section6_Values?.Row5 || 0
+                                ).toLocaleString()}
+                              </div>
+
+                              <div className="col-lg-3">
+                                <div>
+                                  <b>
+                                    {details?.section7_Labels?.["Freight :"] ||
+                                      "Freight :"}
+                                  </b>
+                                  {(
+                                    +details?.section7_Values?.Row1 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section7_Labels?.[
+                                      "Transport :"
+                                    ] || "Transport :"}
+                                  </b>
+
+                                  {(
+                                    +details?.section7_Values?.Row2 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section7_Labels?.[
+                                      "Clearance :"
+                                    ] || "Clearance :"}
+                                  </b>
+                                  {(
+                                    +details?.section7_Values?.Row3 || 0
+                                  ).toLocaleString()}
+                                </div>
+
+                                <div className="">
+                                  <b>
+                                    {details?.section7_Labels?.["Extra :"] ||
+                                      "Extra :"}
+                                  </b>
+                                  {(
+                                    +details?.section7_Values?.Row4 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section7_Labels?.[
+                                      "Pre Cooling"
+                                    ] || "Pre Cooling"}
+                                  </b>
+                                  {(
+                                    +details?.section7_Values?.Row5 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                {/* <b>
+                          {details?.section7_Labels?.[""] ||
+                            ""}
+                        </b>
+                        {(+details?.section7_Values?.Row5 || 0).toLocaleString()} */}
+                              </div>
+                              <div className="col-lg-3">
+                                <div>
+                                  <b>
+                                    {details?.section8_Labels?.[
+                                      "Total CNF :"
+                                    ] || "Total CNF :"}
+                                  </b>
+                                  {(
+                                    +details?.section8_Values?.Row1 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section8_Labels?.[
+                                      "Total FOB :"
+                                    ] || "Total FOB :"}
+                                  </b>
+
+                                  {(
+                                    +details?.section8_Values?.Row2 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section8_Labels?.[
+                                      "Total Commission :"
+                                    ] || "Total Commission :"}
+                                    {(
+                                      +details?.section8_Values?.Row3 || 0
+                                    ).toLocaleString()}
+                                  </b>
+                                </div>
+
+                                <div className="">
+                                  <b>
+                                    {details?.section8_Labels?.[
+                                      "Total Rebate :"
+                                    ] || "Total Rebate :"}
+                                  </b>
+                                  {(
+                                    +details?.section8_Values?.Row4 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section8_Labels?.["Row5"] ||
+                                      "Row5"}
+                                  </b>
+                                  {(
+                                    +details?.section8_Values?.Row5 || 0
+                                  ).toLocaleString()}
+                                </div>
+
+                                {/* <b>
+                          {details?.section8_Labels?.[""] ||
+                            ""}
+                        </b>
+                        {(+details?.section8_Values?.Row5 ).toLocaleString()}
+                      */}
+                              </div>
+
+                              <div className="col-lg-3">
+                                <div>
+                                  <b>
+                                    {details?.section9_Labels?.["Profit :"] ||
+                                      "Profit :"}
+                                  </b>
+                                  {(
+                                    +details?.section9_Values?.Row1 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section9_Labels?.["Profit % :"] ||
+                                      "Profit % :"}
+                                  </b>
+
+                                  {(
+                                    +details?.section9_Values?.Row2 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section9_Labels?.["Row3"] ||
+                                      "Row3"}
+                                  </b>
+
+                                  {(
+                                    +details?.section9_Values?.Row4 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section9_Labels?.["Row4"] ||
+                                      "Row4"}
+                                  </b>
+
+                                  {(
+                                    +details?.section9_Values?.Row4 || 0
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="">
+                                  <b>
+                                    {details?.section9_Labels?.["Row5"] ||
+                                      "Row5"}
+                                  </b>
+
+                                  {(
+                                    +details?.section9_Values?.Row5 || 0
+                                  ).toLocaleString()}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </form>
                       </div>
                     </div>
                   </div>
                   <div className="card-footer">
                     <button className="btn btn-danger" onClick={closeFunction}>
-                      Cancel
+                      Close
                     </button>
                   </div>
                 </div>

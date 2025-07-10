@@ -21,7 +21,9 @@ const QuotationTest = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(false);
-
+  const [useAgreedPricing, setUseAgreedPricing] = useState(false);
+  const [itemDetails, setItemDetails] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState("Client");
   const loadingModal = MySwal.mixin({
     title: "Loading...",
     didOpen: () => {
@@ -72,7 +74,7 @@ const QuotationTest = () => {
         },
       })
       .then((res) => {
-        setData(res.data.data || []);
+        // setData(res.data.data || []);
       })
       .catch((error) => {
         console.error("Error fetching orders:", error);
@@ -90,6 +92,20 @@ const QuotationTest = () => {
     setExchangeRate(e.target.checked);
     console.log(exchangeRate);
     // pdfAllData();
+  };
+
+  const handleAgreedPricingChange2 = (e) => {
+    setUseAgreedPricing(e.target.checked);
+    console.log(useAgreedPricing);
+    // pdfAllData();
+  };
+  const handleAgreedPricingChange4 = (e) => {
+    setItemDetails(e.target.checked);
+    console.log(itemDetails);
+    // pdfAllData();
+  };
+  const handleRadioChange = (event) => {
+    setSelectedInvoice(event.target.value);
   };
   const deleteOrder = (id) => {
     console.log(id);
@@ -226,40 +242,6 @@ const QuotationTest = () => {
       console.log(filterData?.data?.data);
 
       // Third API Call: Fetch PDF delivery details
-      try {
-        const deliveryApi = await axios.post(
-          `${API_BASE_URL}/newquotation_pdf_delivery_by`,
-          {
-            quotation_id: a?.Order_ID,
-          }
-        );
-
-        console.log(deliveryApi.status);
-        if (deliveryApi.data.success === true) {
-          messageSet = deliveryApi.data.message;
-        }
-      } catch (error) {
-        console.log(error);
-        if (error.response?.status === 400) {
-          messageSet = error.response.data.message;
-        }
-      }
-      console.log(messageSet);
-      try {
-        const pdfResponse = await axios.post(
-          `${API_BASE_URL}/Quotation_delivery_terms_new`,
-          {
-            quotation_id: a?.Order_ID,
-          }
-        );
-
-        console.log(pdfResponse);
-      } catch (error) {
-        console.log(error);
-        if (error.response?.status === 400) {
-          messageNote = error.response.data.message;
-        }
-      }
 
       const doc = new jsPDF();
       const convertImageToBase64 = (url) => {
@@ -303,25 +285,41 @@ const QuotationTest = () => {
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
         doc.text(
-          `Order: ${
-            filterData?.data?.data?.Quotation_Number
-              ? filterData?.data?.data?.Quotation_Number
+          `${invoiceResponse.data.Section1_Labels.Row1} ${
+            invoiceResponse.data.section1_Values.Row1
+              ? invoiceResponse.data.section1_Values.Row1
               : ""
           }`,
           127,
           12
         );
-        doc.text(`TT Ref: `, 127, 16.5);
         doc.text(
-          `Loading Date: ${
-            filterData?.data?.data?.load_date
-              ? format(new Date(filterData?.data?.data.load_date), "dd-MM-yyyy")
+          `${invoiceResponse.data.Section1_Labels.Row2} ${
+            invoiceResponse.data.section1_Values.Row2
+              ? invoiceResponse.data.section1_Values.Row2
+              : ""
+          }`,
+          127,
+          16.5
+        );
+        doc.text(
+          `${invoiceResponse.data.Section1_Labels.Row3} ${
+            invoiceResponse.data.section1_Values.Row3
+              ? invoiceResponse.data.section1_Values.Row3
               : ""
           }`,
           127,
           20
         );
-        doc.text(`Delivery By: ${messageNote}`, 127, 24.5);
+        doc.text(
+          `${invoiceResponse.data.Section1_Labels.Row4} ${
+            invoiceResponse.data.section1_Values.Row4
+              ? invoiceResponse.data.section1_Values.Row4
+              : ""
+          }`,
+          127,
+          24.5
+        );
       };
       doc.setFillColor(32, 55, 100);
       doc.rect(7, 27, doc.internal.pageSize.width - 15, 0.5, "FD");
@@ -357,72 +355,59 @@ const QuotationTest = () => {
       const maxWidth1 = 72;
       const startX1 = 7;
       const lineHeight1 = 4.2;
-      const longText1_1 = `${filterData?.data?.data?.client_name}(${filterData?.data?.data?.client_tax_number})`;
-      const longText1_2 = `${filterData?.data?.data?.client_address}`;
-      const longText1_3 = `${filterData?.data?.data?.client_email} / ${filterData?.data?.data?.client_phone}`;
-
-      // Render the first block of text
       let currentY1 = commonStartY; // Use the common starting Y position
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_1,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
-      );
+      const clientAddress = invoiceResponse.data?.section2_Values || {};
+      const longTexts = [
+        clientAddress.client_name,
+        clientAddress.client_tax_number,
+        clientAddress.Address1,
+        clientAddress.Address2,
+        clientAddress.Address3,
+        clientAddress.Address4,
+        clientAddress.client_phone,
+      ].filter((text) => text && text.toString().trim() !== "");
+      longTexts.forEach((line) => {
+        currentY1 = renderWrappedText(
+          doc,
+          line,
+          startX1,
+          currentY1,
+          maxWidth1,
+          lineHeight1
+        );
+      });
+      // Render the first block of text
+
       doc.setFontSize(10);
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_2,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
-      );
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_3,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
-      );
 
       const maxWidth2 = 72;
       const startX2 = 127.2;
       let currentY2 = commonStartY; // Use the same starting Y position for the second block
 
       doc.setFontSize(11);
-      const longText2_1 = `${filterData?.data?.data?.consignee_name}(${filterData?.data?.data?.consignee_tax_number})`;
-      const longText2_2 = `${filterData?.data?.data?.consignee_address}`;
-      const longText2_3 = `${filterData?.data?.data?.consignee_email}/${filterData?.data?.data?.consignee_phone}`;
+      const textBlock2 = [
+        invoiceResponse.data?.section3_Values.consignee_name,
+        invoiceResponse.data?.section3_Values.consignee_tax_number,
+        invoiceResponse.data?.section3_Values.Address1,
+        invoiceResponse.data?.section3_Values.Address2,
+        invoiceResponse.data?.section3_Values.Address3,
+        invoiceResponse.data?.section3_Values.Address4,
+        invoiceResponse.data?.section3_Values.consignee_email,
+      ].filter((text) => text && text.toString().trim() !== "");
 
-      currentY2 = renderWrappedText(
-        doc,
-        longText2_1,
-        startX2,
-        currentY2,
-        maxWidth2,
-        lineHeight1
-      );
+      doc.setFontSize(11);
+      textBlock2.forEach((text, index) => {
+        currentY2 = renderWrappedText(
+          doc,
+          text,
+          startX2,
+          currentY2,
+          maxWidth2,
+          lineHeight1
+        );
+        if (index === 0) doc.setFontSize(10);
+      });
       doc.setFontSize(10);
-      currentY2 = renderWrappedText(
-        doc,
-        longText2_2,
-        startX2,
-        currentY2,
-        maxWidth2,
-        lineHeight1
-      );
-      currentY2 = renderWrappedText(
-        doc,
-        longText2_3,
-        startX2,
-        currentY2,
-        maxWidth2,
-        lineHeight1
-      );
 
       const formatterNg = new Intl.NumberFormat("en-US", {
         style: "decimal",
@@ -509,23 +494,29 @@ const QuotationTest = () => {
       doc.setTextColor(0, 0, 0);
 
       doc.text(
-        `Total Box: ${formatterNo.format(
-          invoiceResponse?.data?.quotationFinance?.O_Box
-        )}`,
+        `${invoiceResponse.data.section6_Labels.Row1} ${
+          invoiceResponse.data.section6_Values.Row1
+            ? invoiceResponse.data.section6_Values.Row1
+            : ""
+        }`,
         7,
         finalY + 1
       );
       doc.text(
-        `Total Items: ${formatterNo.format(
-          invoiceResponse?.data?.quotationFinance?.O_Items
-        )}`,
+        `${invoiceResponse.data.section6_Labels.Row2} ${
+          invoiceResponse.data.section6_Values.Row2
+            ? invoiceResponse.data.section6_Values.Row2
+            : ""
+        }`,
         7,
         finalY + 5
       );
       doc.text(
-        `Total Net Weight: ${threeDecimal.format(
-          invoiceResponse?.data?.quotationFinance?.O_NW
-        )}`,
+        `${invoiceResponse.data.section6_Labels.Row3} ${
+          invoiceResponse.data.section6_Values.Row3
+            ? invoiceResponse.data.section6_Values.Row3
+            : ""
+        }`,
         7,
         finalY + 9
       );
@@ -538,9 +529,12 @@ const QuotationTest = () => {
         minimumFractionDigits: 2,
       });
       // Set the text and value
-      const label = "Total USD CNF : ";
+      const label = invoiceResponse.data.section5_Labels.Row1;
+
       const value = `${twoDecimal.format(
-        invoiceResponse?.data?.quotationFinance?.O_CNF_FX
+        invoiceResponse.data.section5_Values[
+          "SUM(Order_Details.Final_price*Order_Details.QTY)"
+        ]
       )}`;
 
       // Calculate the width of the label and the value
@@ -565,25 +559,74 @@ const QuotationTest = () => {
       doc.text(value, xRight, finalY + 1);
 
       doc.rect(147, finalY + 2, 55.5, 0.5, "FD");
-      const longText = messageSet ? messageSet : "";
-      const textX = 7;
-      const textY = finalY + 15;
 
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
-      doc.text(doc.splitTextToSize(longText, 201), textX, textY);
+      // ****************************************** note and delivery note part
+      function addTextWithPagination(doc, longText, x, y, maxWidth) {
+        const lineHeight = 5; // Adjust line height if needed
+        const pageHeight = doc.internal.pageSize.height;
+        const textLines = doc.splitTextToSize(longText, maxWidth);
+        let currentY = y;
 
-      const inputX = 20; // X position of the input field
-      const inputY = textY + 8; // Y position of the input field
-      const inputWidth = 180; // Width of the input field
-      const inputHeight = 10; // Height of the input field
-      doc.setDrawColor(123, 128, 154); // Set the color of the rectangle
-      const inputFieldValue = data?.NOTES;
-      if (inputFieldValue && inputFieldValue.trim() !== "") {
-        // Add the input field value inside the rectangle
-        doc.rect(inputX, inputY, inputWidth, inputHeight); // Draw the rectangle
-        doc.text(inputFieldValue, inputX + 2, inputY + 7); // Adjust position for padding
+        for (let i = 0; i < textLines.length; i++) {
+          if (currentY + lineHeight > pageHeight) {
+            doc.addPage();
+            currentY = 10;
+          }
+
+          doc.text(textLines[i], x, currentY);
+          currentY += lineHeight; // Move Y position down for next line
+        }
+        return currentY;
       }
+
+      // note end
+      const longText =
+        invoiceResponse.data?.section7_Values.Delivery_Terms || "";
+      const x = 7;
+      const initialY = doc.autoTable.previous.finalY + 24;
+      const maxWidth = 180;
+
+      let finalY1 = initialY;
+
+      // 🔹 Step 1: Render longText first (if exists)
+      const hasLongText = longText.trim() !== "";
+      if (hasLongText) {
+        finalY1 = addTextWithPagination(doc, longText, x, finalY1, maxWidth);
+      }
+
+      const inputFieldValue =
+        invoiceResponse.data?.section8_Values?.NOTES || "";
+
+      if (inputFieldValue && inputFieldValue.trim() !== "") {
+        const inputX = 7;
+        const inputWidth = 196;
+        const padding = 3;
+        const maxTextWidth = inputWidth - padding * 2;
+
+        const noteLabelY = finalY1 + 3; // Leave space after longText
+
+        // 🔹 Only draw line if longText was present
+        if (hasLongText) {
+          const lineY = noteLabelY - 4;
+          doc.setDrawColor(0);
+          doc.setLineWidth(0.3);
+          doc.line(inputX, lineY, inputX + inputWidth, lineY);
+        }
+
+        // 🔹 Render "Notes here" label
+        doc.text(
+          `${invoiceResponse.data?.section8_Labels.Notes}:`,
+          inputX,
+          noteLabelY + 2
+        );
+
+        // 🔹 Wrapped note text
+        const lines = doc.splitTextToSize(inputFieldValue, maxTextWidth);
+        const textY = noteLabelY + 5;
+        doc.text(lines, inputX, textY + 2);
+      }
+
+      // ****************************************** note and delivery note part end
       const addPageNumbers = (doc) => {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
@@ -619,7 +662,7 @@ const QuotationTest = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${a?.Order_ID || "default"}_Proforma_Test_${dateTime}.pdf`
+      `${a?.Order_ID || "default"}_Proforma_${dateTime}.pdf`
     );
     setIsLoading(true);
     loadingModal.fire();
@@ -628,9 +671,7 @@ const QuotationTest = () => {
       console.log(response);
       if (response.data.success) {
         console.log("PDF uploaded successfully");
-        window.open(
-          `${API_IMAGE_URL}${a?.Order_ID}_Proforma_Test_${dateTime}.pdf`
-        );
+        window.open(`${API_IMAGE_URL}${a?.Order_ID}_Proforma_${dateTime}.pdf`);
       } else {
         console.log("Failed to upload PDF");
       }
@@ -650,6 +691,7 @@ const QuotationTest = () => {
   };
 
   const generatePdf = async () => {
+    const isConsignee = selectedInvoice === "Consignee" ? 1 : 0;
     const formatterNg = new Intl.NumberFormat("en-US", {
       style: "decimal",
       minimumFractionDigits: 3,
@@ -661,57 +703,27 @@ const QuotationTest = () => {
       maximumFractionDigits: 2,
     });
     try {
-      let messageSet = "";
-      let messageNote = "";
       // First API Call: Invoice Procedure
       const invoiceResponse = await axios.post(
         `${API_BASE_URL}/NewQuotationPDF`,
         {
           quotation_id: filterData1?.Order_ID,
+          AgreedPrice: useAgreedPricing ? 1 : 0,
+          CustomName: itemDetails ? 1 : 0,
+          InvoiceName: isConsignee,
         }
       );
       console.log(invoiceResponse);
-
+      const { header, quotationDetails } = invoiceResponse?.data || {};
+      const columnKeys = Object.keys(header); // ["Item", "Scientific_Name", "HS Code", "Unit Price", "ITF Code"]
+      const headerLabels = Object.values(header); // ["Item", "Scientific_Name", "HS Code", "Unit Price", "ITF Code"]
       const filterData = await axios.get(`${API_BASE_URL}/NewgetOrdersById`, {
         params: { order_id: filterData1?.Order_ID },
       });
       console.log(filterData1?.data?.data);
 
       // Third API Call: Fetch PDF delivery details
-      try {
-        const deliveryApi = await axios.post(
-          `${API_BASE_URL}/newquotation_pdf_delivery_by`,
-          {
-            quotation_id: filterData1?.Order_ID,
-          }
-        );
 
-        console.log(deliveryApi.status);
-        if (deliveryApi.data.success === true) {
-          messageSet = deliveryApi.data.message;
-        }
-      } catch (error) {
-        console.log(error);
-        if (error.response?.status === 400) {
-          messageSet = error.response.data.message;
-        }
-      }
-      console.log(messageSet);
-      try {
-        const pdfResponse = await axios.post(
-          `${API_BASE_URL}/Quotation_delivery_terms_new`,
-          {
-            quotation_id: filterData1?.Order_ID,
-          }
-        );
-
-        console.log(pdfResponse);
-      } catch (error) {
-        console.log(error);
-        if (error.response?.status === 400) {
-          messageNote = error.response.data.message;
-        }
-      }
       let modalElement = document.getElementById("exampleModalCustomization");
       let modalInstance = bootstrap.Modal.getInstance(modalElement);
       if (modalInstance) {
@@ -762,57 +774,74 @@ const QuotationTest = () => {
         // rect end
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
-        doc.text("Quotation :", 95, 16);
-        doc.text("date :", 95, 20);
-        doc.text("Valid Before :", 95, 24);
-        doc.text("Min Weight :", 95, 28);
+        doc.text(invoiceResponse?.data?.orderMetaLabels?.Row1, 95, 16);
+        doc.text(invoiceResponse?.data?.orderMetaLabels?.Row2, 95, 20);
+        doc.text(invoiceResponse?.data?.orderMetaLabels?.Row3, 95, 24);
+        doc.text(invoiceResponse?.data?.transportTypeLabel?.Delivery, 95, 32);
+
         doc.text(
           `${
-            filterData?.data?.data?.Quotation_Number
-              ? filterData?.data?.data?.Quotation_Number
+            invoiceResponse?.data?.orderMetaValues.Row1
+              ? invoiceResponse?.data?.orderMetaValues.Row1
               : ""
           }`,
           117,
           16
         );
-        doc.text(`${formatDate(filterData?.data?.data?.created)}`, 117, 20);
         doc.text(
           `${
-            filterData?.data?.data?.load_date
-              ? format(new Date(filterData?.data?.data.load_date), "dd-MM-yyyy")
+            invoiceResponse?.data?.orderMetaValues.Row2
+              ? invoiceResponse?.data?.orderMetaValues.Row2
               : ""
-          } `,
+          }`,
+          117,
+          20
+        );
+        doc.text(
+          `${
+            invoiceResponse?.data?.orderMetaValues.Row3
+              ? invoiceResponse?.data?.orderMetaValues.Row3
+              : ""
+          }`,
           117,
           24
         );
         doc.text(
-          `${formatterNg.format(
-            invoiceResponse?.data?.quotationFinance[0]?.O_NW
-          )}`,
+          `${
+            invoiceResponse?.data?.transportInfo[
+              "Seller's Choice with 2 Days of Agreed ETA"
+            ]
+              ? invoiceResponse?.data?.transportInfo[
+                  "Seller's Choice with 2 Days of Agreed ETA"
+                ]
+              : ""
+          }`,
           117,
-          28
+          32
         );
-        doc.text("Destination:", 143, 16);
-        doc.text("Origin:", 143, 20);
-        doc.text("Liner:", 143, 24);
+        doc.text(invoiceResponse?.data?.dateLabels?.Row1, 143, 16);
+        doc.text(invoiceResponse?.data?.dateLabels?.Row2, 143, 20);
+        doc.text(invoiceResponse?.data?.dateLabels?.Row3, 143, 24);
+        doc.text(invoiceResponse?.data?.dateLabels?.Row4, 143, 28);
         // doc.text("Destination:",143,28)
-        doc.text(`${filterData?.data?.data?.Airport}`, 165, 16);
-        doc.text("Thailand", 165, 20);
-        doc.text("Sellers'Choice", 165, 24);
+        doc.text(`${invoiceResponse?.data?.dateValues.Row1 || ""}`, 170, 16);
+        doc.text(`${invoiceResponse?.data?.dateValues.Row2}`, 165, 20);
+        doc.text(`${invoiceResponse?.data?.dateValues.Row3}`, 165, 24);
+        doc.text(`${invoiceResponse?.data?.dateValues.Row4}`, 172, 28);
         // ******************
         // client
         doc.setFillColor(32, 55, 100);
         doc.setFontSize(12);
         doc.setTextColor(255, 255, 255);
-        doc.rect(7, 30, 96, 7, "FD");
-        doc.text("Client", 50, 35);
+        doc.rect(7, 35, 96, 7, "FD");
+        doc.text("Client", 50, 40);
         // consignee
         doc.setFillColor(32, 55, 100);
         doc.setFontSize(12);
         doc.setTextColor(255, 255, 255);
-        doc.rect(106, 30, 96, 7, "FD");
+        doc.rect(106, 35, 96, 7, "FD");
         // Place text inside the rectangle
-        doc.text("Consignee", 145, 35);
+        doc.text("Consignee", 145, 40);
         // client under text
         doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
@@ -831,78 +860,68 @@ const QuotationTest = () => {
         });
         return startY + lines.length * lineHeight; // Return the new Y position after rendering the text
       }
-      const commonStartY = 43; // Set common starting Y position for both blocks
+      const commonStartY = 47; // Set common starting Y position for both blocks
 
       // First set of texts (left side)
       const maxWidth1 = 72;
       const startX1 = 7;
       const lineHeight1 = 4.2;
       doc.setFontSize(11);
-      const longText1_1 = `${filterData?.data?.data.client_name}(${filterData?.data?.data.client_tax_number})`;
-      const longText1_2 = `${filterData?.data?.data?.client_address}`;
-      const longText1_3 = `${filterData?.data?.data?.client_email} / ${filterData?.data?.data?.client_phone}`;
-      // Render the first block of text
-      let currentY1 = commonStartY; // Use the common starting Y position
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_1,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
-      );
-      doc.setFontSize(10);
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_2,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
-      );
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_3,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
-      );
+      const clientAddress = invoiceResponse.data?.client_address || {};
+      const longTexts = [
+        clientAddress.client_name,
+        clientAddress.client_tax_number,
+        clientAddress.Address1,
+        clientAddress.Address2,
+        clientAddress.Address3,
+        clientAddress.Address4,
+        clientAddress.client_phone,
+      ].filter((text) => text && text.toString().trim() !== "");
+      let currentY1 = commonStartY;
+      doc.setFontSize(10); // Set font size once before rendering
+
+      longTexts.forEach((line) => {
+        currentY1 = renderWrappedText(
+          doc,
+          line,
+          startX1,
+          currentY1,
+          maxWidth1,
+          lineHeight1
+        );
+      });
+
       // Reset the starting Y position for the second block (right side) to be the same as the first block
       const maxWidth2 = 72;
       const startX2 = 106;
       let currentY2 = commonStartY; // Use the same starting Y position as the first block
 
       doc.setFontSize(11);
-      const longText2_1 = `${filterData?.data?.data?.consignee_name}(${filterData?.data?.data?.consignee_tax_number})`;
-      const longText2_2 = `${filterData?.data?.data?.consignee_address}`;
-      const longText2_3 = `${filterData?.data?.data?.consignee_email}/${filterData?.data?.data?.consignee_phone}`;
-      // Use the same Y position for all the text in the second block
-      currentY2 = renderWrappedText(
-        doc,
-        longText2_1,
-        startX2,
-        currentY2,
-        maxWidth2,
-        lineHeight1
-      );
-      doc.setFontSize(10);
-      currentY2 = renderWrappedText(
-        doc,
-        longText2_2,
-        startX2,
-        currentY2,
-        maxWidth2,
-        lineHeight1
-      );
-      currentY2 = renderWrappedText(
-        doc,
-        longText2_3,
-        startX2,
-        currentY2,
-        maxWidth2,
-        lineHeight1
-      );
+      const consigneeAddress = invoiceResponse.data?.consignee_address || {};
+
+      const longTexts2 = [
+        consigneeAddress.consignee_name,
+        consigneeAddress.consignee_tax_number,
+        consigneeAddress.Address1,
+        consigneeAddress.Address2,
+        consigneeAddress.Address3,
+        consigneeAddress.Address4,
+        consigneeAddress.consignee_email,
+      ].filter((text) => text && text.toString().trim() !== "");
+
+      // Render the second block of filtered text
+      doc.setFontSize(10); // Set font size once
+      longTexts2.forEach((line) => {
+        currentY2 = renderWrappedText(
+          doc,
+          line,
+          startX2,
+          currentY2,
+          maxWidth2,
+          lineHeight1
+        );
+      });
+
       const tableStartY = Math.max(currentY1, currentY2);
       await addLogoWithDetails();
       const includeImage = exchangeRate;
@@ -910,22 +929,16 @@ const QuotationTest = () => {
         "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D";
       const imgWidth = 47;
       const imgHeight = 47;
-      const rows = invoiceResponse?.data?.quotationDetails.map((item) => ({
-        ITF_Name: item.col1,
-        ITF_Scientific_name: item.col2,
-        ITF_HSCODE: item.col3,
-        quotation_price_unit: item.col4,
-      }));
+      const rows = quotationDetails.map((item) => {
+        return columnKeys.map((_, index) => {
+          return item[`col${index + 1}`] || item[`COL${index + 1}`] || ""; // covers both "col1" and "COL1"
+        });
+      });
       const renderTable = (rowsData, startY) => {
         console.log(startY);
         doc.autoTable({
-          head: [["Item", "Scientific Name", "Hs Code", "Price & Unit"]],
-          body: rowsData.map((row) => [
-            row.ITF_Name,
-            row.ITF_Scientific_name,
-            row.ITF_HSCODE,
-            row.quotation_price_unit,
-          ]),
+          head: [headerLabels], // Dynamic headers
+          body: rowsData,
           startY: tableStartY,
           willDrawCell: (data) => {
             if (data.section === "body") {
@@ -1055,12 +1068,12 @@ const QuotationTest = () => {
       }
       const lastY = doc.previousAutoTable?.finalY;
       doc.setFont("helvetica", "bold"); // Set font to bold
-
-      if (messageSet) {
-        doc.text("note:", 7, lastY + 5);
+      const noteData = invoiceResponse.data?.notesValue.NOTES;
+      if (noteData) {
+        doc.text(invoiceResponse.data?.notesLabel.Notes, 7, lastY + 5);
         doc.setFont("helvetica", "normal");
         const maxWidth = doc.internal.pageSize.getWidth() - 14; // Total page width minus 7px left & 7px right margin
-        const text = messageSet ? messageSet : "";
+        const text = noteData;
 
         // Split the text to fit within the max width
         const lines = doc.splitTextToSize(text, maxWidth);
@@ -1107,7 +1120,7 @@ const QuotationTest = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${a?.Order_ID || "default"}_Quotation_Test_${dateTime}.pdf`
+      `${a?.Order_ID || "default"}_Quotation_${dateTime}.pdf`
     );
 
     setIsLoading(true);
@@ -1117,9 +1130,7 @@ const QuotationTest = () => {
       console.log(response);
       if (response.data.success) {
         console.log("PDF uploaded successfully");
-        window.open(
-          `${API_IMAGE_URL}${a?.Order_ID}_Quotation_Test_${dateTime}.pdf`
-        );
+        window.open(`${API_IMAGE_URL}${a?.Order_ID}_Quotation_${dateTime}.pdf`);
       } else {
         console.log("Failed to upload PDF");
       }
@@ -1177,63 +1188,8 @@ const QuotationTest = () => {
       {
         Header: "Load date",
         accessor: "load_Before_date",
-        // accessor: (a) => {
-        //   return a?.load_Before_date
-        //     ? new Date(a?.load_Before_date).toLocaleDateString()
-        //     : "NA";
-        // },
       },
-      // {
-      //   Header: "Precooling",
-      //   accessor: (a) => (
-      //     <label
-      //       style={{
-      //         display: "flex",
-      //         justifyContent: "center",
-      //         alignItems: "center",
-      //         marginBottom: "10px",
-      //       }}
-      //       className="toggleSwitch large"
-      //       onclick=""
-      //     >
-      //       <input
-      //         onClick={(e) => {
-      //           e.stopPropagation();
-      //           updateBankStatus(a.ID);
-      //         }}
-      //         checked={a.Available == "1" ? true : false}
-      //         type="checkbox"
-      //         style={{
-      //           width: "20px",
-      //           height: "20px",
-      //           cursor: "pointer",
-      //         }}
-      //       />
-      //       <span
-      //         style={{
-      //           pointerEvents: "none",
-      //         }}
-      //       >
-      //         <span>OFF</span>
-      //         <span>ON</span>
-      //       </span>
-      //       <a></a>
-      //     </label>
-      //   ),
-      // },
 
-      // {
-      //   Header: "Status",
-      //   accessor: (a) =>
-      //     ({
-      //       1: "Pending",
-      //       2: "Active",
-      //       3: "Packed",
-      //       4: "Shipped",
-      //       5: "Cancelled",
-      //       6: "Expired",
-      //     }[a.Status] || "Unknown"),
-      // },
       {
         Header: "Status",
         accessor: "status_name",
@@ -1242,53 +1198,36 @@ const QuotationTest = () => {
         Header: "Actions",
         accessor: (a) => (
           <div className="editIcon">
-            {(+a.Status === 1 ||
-              +a.Status === 2 ||
-              +a.Status === 6 ||
-              (a.Is_quotation === 0 &&
-                +a.Status >= 2 &&
-                a.Quotation_Number != null &&
-                a.Quotation_Number !== "")) && (
-              <Link to="/quotation_view_test" state={{ from: { ...a } }}>
-                <i className="mdi mdi-eye" />
-              </Link>
-            )}
-            {/* {(+a.Status === 1 || +a.Status === 2) && (
-              <Link to="/updateTestQuotation" state={{ from: { ...a } }}>
+            <Link to="/quotation_view" state={{ from: { ...a } }}>
+              <i className="mdi mdi-eye" />
+            </Link>
+
+            {(+a.Status === 1 || +a.Status === 2) && (
+              <Link to="/update_Quotation" state={{ from: { ...a } }}>
                 <i className="mdi mdi-pencil" />
               </Link>
-            )} */}
-            {(+a.Status === 1 || +a.Status === 2) &&
-              !([2, 3, 4, 5].includes(+a.Status) && +a.Is_quotation === 0) && (
-                <Link to="/updateTestQuotation" state={{ from: { ...a } }}>
-                  <i className="mdi mdi-pencil" />
-                </Link>
-              )}
+            )}
+
+            <button
+              type="button"
+              data-bs-toggle="modal"
+              onClick={() => setFilterData1(a)}
+              data-bs-target="#exampleModalCustomization"
+            >
+              <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <title>Quotation</title>
+                <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
+              </svg>
+            </button>
 
             {(+a.Status === 1 ||
               +a.Status === 2 ||
-              +a.Status === 6 ||
-              (a.Is_quotation === 0 &&
-                +a.Status >= 2 &&
-                a.Quotation_Number != null &&
-                a.Quotation_Number !== "")) && (
-              <button
-                type="button"
-                data-bs-toggle="modal"
-                onClick={() => setFilterData1(a)}
-                data-bs-target="#exampleModalCustomization"
-              >
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>Quotation</title>
-                  <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
-                </svg>
-              </button>
-            )}
-            {(+a.Status === 1 || +a.Status === 2) && (
+              +a.Status === 3 ||
+              +a.Status === 4) && (
               <button
                 type="button"
                 style={{
@@ -1302,12 +1241,8 @@ const QuotationTest = () => {
                 <i className="fi fi-sr-square-p" />
               </button>
             )}
-            {(+a.Status === 2 ||
-              +a.Status === 6 ||
-              (a.Is_quotation === 0 &&
-                +a.Status >= 2 &&
-                a.Quotation_Number != null &&
-                a.Quotation_Number !== "")) && (
+
+            {+a.Status > 2 && (
               <button
                 type="button"
                 style={{
@@ -1326,13 +1261,7 @@ const QuotationTest = () => {
                 />{" "}
               </button>
             )}
-
-            {(+a.Status === 2 ||
-              (a.Is_quotation === 0 &&
-                +a.Status >= 2 &&
-                +a.Status < 6 &&
-                a.Quotation_Number != null &&
-                a.Quotation_Number !== "")) && (
+            {+a.Status === 3 && (
               <button
                 type="button"
                 onClick={() => quotationConfirmation(a.Order_ID)}
@@ -1340,27 +1269,21 @@ const QuotationTest = () => {
                 <i className="mdi mdi-check-circle" />
               </button>
             )}
+            {(+a.Status === 1 || +a.Status === 2) && (
+              <button
+                type="button"
+                style={{
+                  width: "20px",
+                  color: "#203764",
+                  fontSize: "22px",
+                  marginTop: "10px",
+                }}
+                onClick={() => deleteOrder(a.Order_ID)}
+              >
+                <i className="mdi mdi-delete" />
+              </button>
+            )}
 
-            {(+a.Status === 1 ||
-              +a.Status === 2 ||
-              (a.Is_quotation === 0 &&
-                +a.Status === 2 &&
-                a.Quotation_Number != null &&
-                a.Quotation_Number !== "")) &&
-              !([2, 3, 4, 5].includes(+a.Status) && +a.Is_quotation === 0) && (
-                <button
-                  type="button"
-                  style={{
-                    width: "20px",
-                    color: "#203764",
-                    fontSize: "22px",
-                    marginTop: "10px",
-                  }}
-                  onClick={() => deleteOrder(a.Order_ID)}
-                >
-                  <i className="mdi mdi-delete " />
-                </button>
-              )}
             {+a.Status === 1 && (
               <button
                 type="button"
@@ -1377,7 +1300,7 @@ const QuotationTest = () => {
                 />
               </button>
             )}
-            {+a.Status == 1 && (
+            {(+a.Status === 1 || +a.Status === 2) && (
               <button
                 type="button"
                 style={{
@@ -1399,6 +1322,9 @@ const QuotationTest = () => {
   );
   const clearData = () => {
     setExchangeRate(false);
+    setUseAgreedPricing(false);
+    setItemDetails(false);
+    setSelectedInvoice("Client");
   };
   return (
     <>
@@ -1458,7 +1384,7 @@ const QuotationTest = () => {
         endElement={
           <button
             type="button"
-            onClick={() => navigate("/createTestQuotation")}
+            onClick={() => navigate("/create_Quotation")}
             className="btn button btn-info"
           >
             Create
@@ -1512,6 +1438,81 @@ const QuotationTest = () => {
               <div className="formCreate">
                 <div className="row">
                   <div className="form-group col-lg-12">
+                    <div className="invoiceModal d-flex justify-content-between">
+                      <h6> Use Agreed pricing ?</h6>
+                      <div>
+                        <label
+                          className="toggleSwitch large"
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 10,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            name="Commission_Currency"
+                            checked={useAgreedPricing}
+                            onChange={handleAgreedPricingChange2}
+                          />
+                          <span>
+                            <span>No</span>
+                            <span> Yes</span>
+                          </span>
+                          <a> </a>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="invoiceModal d-flex justify-content-between">
+                      <h6>Use custom name? </h6>
+                      <div>
+                        <label
+                          className="toggleSwitch large"
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 10,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            name="Commission_Currency"
+                            checked={itemDetails}
+                            onChange={handleAgreedPricingChange4}
+                          />
+                          <span>
+                            <span>No</span>
+                            <span> Yes</span>
+                          </span>
+                          <a> </a>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="invoiceModal">
+                      <h6>Invoice Name Can be -</h6>
+                      <input
+                        type="radio"
+                        id="html1"
+                        name="fav_language"
+                        value="Client"
+                        checked={selectedInvoice === "Client"}
+                        onChange={handleRadioChange}
+                      />
+                      <label htmlFor="html1">Client</label>
+
+                      <input
+                        type="radio"
+                        id="css1"
+                        name="fav_language"
+                        value="Consignee"
+                        checked={selectedInvoice === "Consignee"}
+                        onChange={handleRadioChange}
+                      />
+                      <label htmlFor="css1">Consignee</label>
+                    </div>
+
                     <div className="invoiceModal d-flex justify-content-between">
                       <h6>Do you want image ? </h6>
                       <div>

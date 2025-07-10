@@ -985,7 +985,7 @@ const Test = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${a?.Order_Number || "default"}_Custom_Test_${dateTime}.pdf`
+      `${a?.Order_Number || "default"}_Custom_${dateTime}.pdf`
     );
 
     setIsLoading(true);
@@ -996,7 +996,7 @@ const Test = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${a?.Order_Number}_Custom_Test_${dateTime}.pdf`
+          `${API_IMAGE_URL}${a?.Order_Number}_Custom_${dateTime}.pdf`
         );
       } else {
         console.log("Failed to upload PDF");
@@ -1008,348 +1008,535 @@ const Test = () => {
       loadingModal.close();
     }
   };
-  const performaOrder = async (a) => {
-    try {
-      let messageSet = "";
-      let messageNote = "";
-      // First API Call: Invoice Procedure
-      const invoiceResponse = await axios.get(
-        `${API_BASE_URL}/NewproformaMain_Order`,
-        {
-          params: { order_id: a?.Order_ID },
-        }
-      );
-      console.log(invoiceResponse);
+  const generatePdf2 = async (a) => {
+    console.log(a);
+    const invoiceResponse = await axios.post(
+      `${API_BASE_URL}/CustomeInvoicePdfDetails`,
+      {
+        order_id: a?.Order_ID,
+        invoice_id: a?.Invoice_id,
+      }
+    );
 
-      // Second API Call: Fetch Order Data
-      const filterData = await axios.get(`${API_BASE_URL}/NewgetOrdersById`, {
-        params: { order_id: a?.Order_ID },
+    const tableData = invoiceResponse?.data?.tableRow1 || [];
+    const tableHeader = invoiceResponse?.data?.tableHeaders || {};
+
+    // Get keys from header in correct order (e.g., ["#", "Item", ...])
+    const orderedHeaders = Object.keys(tableHeader); // e.g. ["#", "Item", "HS CODE", ...]
+    const headRow = orderedHeaders.map((key) => tableHeader[key]); // ["#", "Item", "HS CODE", ...]
+
+    // Create body rows based on COL1, COL2, ... mapping to each header key
+    const dynamicBody = tableData.map((row) => {
+      return orderedHeaders.map((_, index) => row[`COL${index + 1}`] ?? "");
+    });
+
+    console.log(invoiceResponse.data);
+    const companyAddress = invoiceResponse?.data?.Company_Address;
+    const currency = invoiceResponse?.data?.currencyResults;
+
+    const noFormatter = new Intl.NumberFormat("en-US", {
+      style: "decimal",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    const newFormatter1 = new Intl.NumberFormat("en-US", {
+      style: "decimal",
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3,
+    });
+    const fourFormatter2 = new Intl.NumberFormat("en-US", {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const fourFormatter4 = new Intl.NumberFormat("en-US", {
+      style: "decimal",
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 4,
+    });
+    const formatDate1 = (dateString) => {
+      if (!dateString) return "";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-GB"); // 'en-GB' format is DD/MM/YYYY
+    };
+    const doc = new jsPDF();
+    // Convert image to base64
+    const convertImageToBase64 = (url) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = url;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          const dataURL = canvas.toDataURL("image/png");
+          resolve(dataURL);
+        };
+        img.onerror = (error) => reject(error);
       });
-      console.log(filterData?.data?.data);
+    };
 
-      // Third API Call: Fetch PDF delivery details
-      try {
-        const deliveryApi = await axios.post(
-          `${API_BASE_URL}/Newpdf_delivery_by`,
-          {
-            order_id: a?.Order_ID,
-          }
-        );
-
-        console.log(deliveryApi.status);
-        if (deliveryApi.data.success === true) {
-          messageSet = deliveryApi.data.message;
-        }
-      } catch (error) {
-        console.log(error);
-        if (error.response?.status === 400) {
-          messageSet = error.response.data.message;
-        }
-      }
-      console.log(messageSet);
-      // Fourth API Call: Fetch Invoice PDF Details
-      try {
-        const pdfResponse = await axios.post(
-          `${API_BASE_URL}/order_delivery_terms`,
-          {
-            Order_id: a?.Order_ID,
-          }
-        );
-
-        console.log(pdfResponse);
-      } catch (error) {
-        console.log(error);
-        if (error.response?.status === 400) {
-          messageNote = error.response.data.message;
-        }
-      }
-
-      // Generate the PDF (if needed)
-      const doc = new jsPDF();
-      const convertImageToBase64 = (url) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = "Anonymous";
-          img.src = url;
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0);
-            const dataURL = canvas.toDataURL("image/png");
-            resolve(dataURL);
-          };
-          img.onerror = (error) => reject(error);
-        });
-      };
-
-      const addLogoWithDetails = async () => {
-        const logoData = await convertImageToBase64(logo);
-        doc.addImage(logoData, "PNG", 6, 3, 20, 20); // Adjust the position and size as needed
-        // logo end
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`${invoiceResponse?.data?.Company_Address.Line_1}`, 30, 8);
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`${invoiceResponse?.data?.Company_Address.Line_2}`, 30, 12);
-        const longTextOne = `${invoiceResponse?.data?.Company_Address.Line_3}`;
-        const maxWidthOne = 90;
-        const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
-        let startXOne = 30;
-        let startYOne = 16;
-        linesOne.forEach((lineOne, index) => {
-          doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
-        });
-
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Proforma Invoice`, 127, 7.5);
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Order: ${filterData?.data?.data?.Order_Number}`, 127, 12);
-        doc.text(`TT Ref: ${filterData?.data?.data.Shipment_ref}`, 127, 16.5);
-        doc.text(
-          `Loading Date: ${formatDate(filterData?.data?.data.load_date)}`,
-          127,
-          20
-        );
-        doc.text(`Delivery By: ${messageSet ? messageSet : ""}`, 127, 24.5);
-      };
+    // Add a logo with Proforma Address and Proforma Invoice
+    const addLogoWithDetails = async () => {
+      const logoData = await convertImageToBase64(logo);
+      doc.addImage(logoData, "PNG", 6, 3, 20, 20); // Adjust the position and size as needed
+      // logo end
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${companyAddress?.Line_1}`, 30, 8);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${companyAddress?.Line_2}`, 30, 12);
+      const longTextOne = `${companyAddress?.Line_3}`;
+      const maxWidthOne = 90;
+      const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
+      let startXOne = 30;
+      let startYOne = 16;
+      linesOne.forEach((lineOne, index) => {
+        doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
+      });
+      // two line
       doc.setFillColor(32, 55, 100);
-      doc.rect(7, 27, doc.internal.pageSize.width - 15, 0.5, "FD");
-      doc.setFontSize(12);
+      doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
-      doc.text("Invoice to", 7, 31.5);
-      doc.text("Consignee Details", 127.2, 31.5);
+      doc.text("Packing List / Invoice", 83, 27.5);
       doc.setFillColor(32, 55, 100);
-      doc.setFontSize(11);
+      doc.rect(7, 29, doc.internal.pageSize.width - 15, 0.5, "FD");
+      // order part left
+      doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
-      function renderWrappedText(
+      const maxWidthLeft = 72; // Maximum width in pixels
+      let yLeft = 33;
+      const yIncrementLeft = 1; // Adjust this value based on your spacing requirements
+      const textDataLeft = [
+        {
+          label: invoiceResponse?.data?.orderMetaLabels["Order : "],
+          value: `${invoiceResponse?.data?.invoiceHeader.Order_Number || ""}`,
+        },
+        {
+          label: invoiceResponse?.data?.dateLabels["Loading Date : "],
+          value:
+            invoiceResponse?.data?.dateValues[
+              'DATE_FORMAT(Orders.load_date, "%d-%m-%Y")'
+            ] || "",
+        },
+        {
+          label: invoiceResponse?.data?.orderMetaLabels["Shipment Ref "],
+          value: `${invoiceResponse?.data?.invoiceHeader.Shipment_ref || ""}`,
+        },
+      ];
+
+      textDataLeft.forEach((item) => {
+        const labelXLeft = 7;
+        const valueXLeft = 40;
+        const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+        doc.text(item.label, labelXLeft, yLeft);
+
+        // Print the value, split into multiple lines if needed
+        valueLinesLeft.forEach((line, index) => {
+          doc.text(line, valueXLeft, yLeft + index * 4); // Adjust y position for each line of value
+        });
+        yLeft += valueLinesLeft.length * 4 + yIncrementLeft; // Adjust spacing between sections
+      });
+
+      // Second part (right side)
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      const maxWidthRight = 72; // Maximum width in pixels
+      let yRight = 33;
+      const yIncrementRight = 1; // Adjust this value based on your spacing requirements
+
+      const textDataRight = [
+        // { label: "AWB/BL:", value: `${a?.bl}` },
+        // { label: "Ship Date: ", value: `${formatDate1(a?.Ship_date)}` },
+        // { label: "Delivery By:", value: `` },
+
+        {
+          label: `${invoiceResponse?.data?.transportTypeLabel.AWB}`,
+          value: `${invoiceResponse?.data?.transportInfo.AWB}`,
+        },
+        {
+          label: `${invoiceResponse?.data?.dateLabels["Shipment Date : "]}`,
+          value:
+            invoiceResponse?.data?.dateValues[
+              'DATE_FORMAT(Orders.Ship_date, "%d-%m-%Y")'
+            ] || "",
+        },
+       
+      ];
+
+      textDataRight.forEach((item) => {
+        const labelXRight = 100;
+        const valueXRight = 127;
+
+        // Split the value text if it exceeds maxWidth
+        const valueLinesRight = doc.splitTextToSize(item.value, maxWidthRight);
+
+        // Print the label
+        doc.text(item.label, labelXRight, yRight);
+        valueLinesRight.forEach((line, index) => {
+          doc.text(line, valueXRight, yRight + index * 4);
+        });
+        yRight += valueLinesRight.length * 4 + yIncrementRight;
+      });
+
+      // invoice to
+      doc.setFontSize(12);
+      doc.text("Invoice to", 7, 48.5);
+      doc.text("Consignee Details", 100, 48.5);
+    };
+    doc.setFillColor(32, 55, 100);
+    doc.rect(7, 50.5, doc.internal.pageSize.width - 15, 0.5, "FD");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    function renderWrappedText(
+      doc,
+      text,
+      startX,
+      startY,
+      maxWidth,
+      lineHeight
+    ) {
+      const lines = doc.splitTextToSize(text, maxWidth);
+      lines.forEach((line, index) => {
+        doc.text(line, startX, startY + index * lineHeight);
+      });
+      return startY + lines.length * lineHeight;
+    }
+    const commonStartY = 56;
+    const lineHeight = 4.2;
+    const maxWidth1 = 72;
+    const startX1 = 7;
+    const textBlock1 = [
+      invoiceResponse.data?.client_address.client_name,
+      invoiceResponse.data?.client_address.client_tax_number,
+      invoiceResponse.data?.client_address.Address1,
+      invoiceResponse.data?.client_address.Address2,
+      invoiceResponse.data?.client_address.Address3,
+      invoiceResponse.data?.client_address.Address4,
+      invoiceResponse.data?.client_address.client_address3,
+      a.client_email,
+    ].filter((text) => text && text.toString().trim() !== "");
+
+    let currentY1 = commonStartY;
+    doc.setFontSize(11);
+    textBlock1.forEach((text, index) => {
+      currentY1 = renderWrappedText(
         doc,
         text,
-        startX,
-        startY,
-        maxWidth,
+        startX1,
+        currentY1,
+        maxWidth1,
         lineHeight
-      ) {
-        const lines = doc.splitTextToSize(text, maxWidth);
-        lines.forEach((line, index) => {
-          doc.text(line, startX, startY + index * lineHeight);
-        });
-        return startY + lines.length * lineHeight; // Return the new Y position after rendering the text
-      }
-
-      const commonStartY = 36.3;
-
-      // First set of texts (left side)
-      const maxWidth1 = 72;
-      const startX1 = 7;
-      const lineHeight1 = 4.2;
-      const longText1_1 = `${filterData?.data?.data.client_name}(${filterData?.data?.data.client_tax_number})`;
-      const longText1_2 = `${filterData?.data?.data?.client_address}`;
-      const longText1_3 = `${filterData?.data?.data?.client_email} / ${filterData?.data?.data?.client_phone}`;
-
-      // Render the first block of text
-      let currentY1 = commonStartY; // Use the common starting Y position
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_1,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
       );
-      doc.setFontSize(10);
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_2,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
-      );
-      currentY1 = renderWrappedText(
-        doc,
-        longText1_3,
-        startX1,
-        currentY1,
-        maxWidth1,
-        lineHeight1
-      );
+      if (index === 0) doc.setFontSize(10); // Adjust font size after the first text
+    });
 
-      // Reset the starting Y position for the second block (right side) to be the same as the first block
-      const maxWidth2 = 72;
-      const startX2 = 127.2;
-      let currentY2 = commonStartY; // Use the same starting Y position as the first block
-      doc.setFontSize(11);
-      const longText2_1 = `${filterData?.data?.data?.consignee_name}(${filterData?.data?.data?.consignee_tax_number})`;
-      const longText2_2 = `${filterData?.data?.data?.consignee_address}`;
-      const longText2_3 = `${filterData?.data?.data?.consignee_email}/${filterData?.data?.data?.consignee_phone}`;
+    const maxWidth2 = 72;
+    const startX2 = 100;
 
-      // Use the same Y position for all the text in the second block
+    const textBlock2 = [
+      invoiceResponse.data?.consignee_address.consignee_name,
+      invoiceResponse.data?.consignee_address.consignee_tax_number,
+      invoiceResponse.data?.consignee_address.Address1,
+      invoiceResponse.data?.consignee_address.Address2,
+      invoiceResponse.data?.consignee_address.Address3,
+      invoiceResponse.data?.consignee_address.Address4,
+      invoiceResponse.data?.consignee_address.consignee_email,
+    ].filter((text) => text && text.toString().trim() !== "");
+    let currentY2 = commonStartY;
+    doc.setFontSize(11);
+    textBlock2.forEach((text, index) => {
       currentY2 = renderWrappedText(
         doc,
-        longText2_1,
+        text,
         startX2,
         currentY2,
         maxWidth2,
-        lineHeight1
+        lineHeight
       );
-      doc.setFontSize(10);
-      currentY2 = renderWrappedText(
-        doc,
-        longText2_2,
-        startX2,
-        currentY2,
-        maxWidth2,
-        lineHeight1
-      );
-      currentY2 = renderWrappedText(
-        doc,
-        longText2_3,
-        startX2,
-        currentY2,
-        maxWidth2,
-        lineHeight1
-      );
-      const tableStartY = Math.max(currentY1, currentY2);
-      await addLogoWithDetails(); // Wait for logo and details to be added
-      const { orderDetails = [], header = {} } = invoiceResponse?.data || {};
+      if (index === 0) doc.setFontSize(10);
+    });
+    const tableStartY = Math.max(currentY1, currentY2);
 
-      // 1. Get column keys from the first item (e.g., "COL1", "COL2", ...)
-      const columnKeys = Object.keys(orderDetails[0] || {});
+    await addLogoWithDetails(); // Wait for logo and details to be added
+    //  ***************************************************************************************
 
-      // 2. Get display headers from the `header` object
-      const headerLabels = Object.values(header); // ["#", "HS Code", "N.W.(KG)", ..., "Line Total"]
+    const startY = 83;
+    doc.autoTable({
+      head: [headRow],
+      body: dynamicBody,
+      startX: 0,
+      columnStyles: {
+        0: { halign: "center" },
+        1: { halign: "left" },
+        2: { halign: "center" },
+        3: { halign: "right" },
+        4: { halign: "center" },
+        5: { halign: "right" },
+        6: { halign: "right" },
+      },
+      startX: 0, // Start the table from the left edge
+      startY: tableStartY, // Start Y position of the table
+      margin: {
+        left: 7,
+        right: 7,
+      },
+      tableWidth: "auto", // Make the table width adjust to the available space
+      headStyles: {
+        fillColor: "#203764", // Set the header background color
+        textColor: "#FFFFFF",
+        halign: "center", // Set the header text color
+      },
+      styles: {
+        textColor: "#000000", // Text color for body cells
+        cellWidth: "wrap",
+        valign: "middle",
+        lineWidth: 0.1, // Adjust the border width
+        lineColor: "#203764", // Border color
+      },
+    });
+    const endY = doc.autoTable.previous.finalY + 1;
+    // doc.rect(7, endY, doc.internal.pageSize.width - 15, 0.5, "FD");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    const maxWidthLeft = 45;
+    let yLeft = endY + 4;
+    const yIncrementLeft = 1;
 
-      // 3. Build body rows based on orderDetails and columnKeys
-      const bodyRows = orderDetails.map((item) =>
-        columnKeys.map((key) => item[key])
-      );
+    const textDataLeft = [
+      {
+        label: `${
+          invoiceResponse?.data?.summaryLabels?.["Total Box : "] ||
+          "Total Box : "
+        }`,
+        value: `${
+          invoiceResponse?.data?.summaryValues?.Box
+            ? invoiceResponse?.data?.summaryValues?.Box
+            : ""
+        } Boxes / ${
+          invoiceResponse?.data?.summaryValues?.Items
+            ? invoiceResponse?.data?.summaryValues?.Items
+            : ""
+        } Item`,
+      },
+      {
+        label: invoiceResponse?.data?.weightLabels["Total Net Weight : "]
+          ? invoiceResponse?.data?.weightLabels?.["Total Net Weight : "]
+          : "",
+        value: invoiceResponse?.data?.weightValues?.total_nw
+          ? `${newFormatter1.format(
+              parseFloat(
+                invoiceResponse.data.weightValues.total_nw.replace(
+                  /[^\d.]/g,
+                  ""
+                )
+              )
+            )} `
+          : "",
+      },
+      {
+        label: invoiceResponse?.data?.weightLabels["Total Gross Weight : "]
+          ? invoiceResponse?.data?.weightLabels["Total Gross Weight : "]
+          : "",
+        value: invoiceResponse?.data?.weightValues?.total_gw
+          ? `${newFormatter1.format(
+              parseFloat(
+                invoiceResponse.data.weightValues.total_gw.replace(
+                  /[^\d.]/g,
+                  ""
+                )
+              )
+            )} `
+          : "",
+      },
+      {
+        label: invoiceResponse?.data?.weightLabels["Total CBM : "]
+          ? invoiceResponse?.data?.weightLabels["Total CBM : "]
+          : "",
+        value: invoiceResponse?.data?.weightValues?.total_cbm
+          ? `${newFormatter1.format(
+              parseFloat(
+                invoiceResponse.data.weightValues.total_cbm.replace(
+                  /[^\d.]/g,
+                  ""
+                )
+              )
+            )} `
+          : "",
+      },
+    ];
+    textDataLeft.forEach((item) => {
+      const labelXLeft = 7;
+      const valueXLeft = 43;
+      const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+      doc.text(item.label, labelXLeft, yLeft);
+      valueLinesLeft.forEach((line, index) => {
+        doc.text(line, valueXLeft, yLeft + index * 4); // Adjust y position for each line of value
+      });
+      yLeft += valueLinesLeft.length * 4 + yIncrementLeft; // Adjust spacing between sections
+    });
 
-      doc.autoTable({
-        head: [headerLabels],
-        body: bodyRows,
-        startY: tableStartY,
-        headStyles: {
-          fillColor: "#203764",
-          textColor: "#FFFFFF",
-        },
-        bodyStyles: { valign: "top" },
-        styles: {
-          textColor: "#000000",
-          cellWidth: "wrap",
-          valign: "middle",
-          lineWidth: 0.1,
-          lineColor: "#203764",
-          overflow: "linebreak",
-          fontSize: 10, // Reduce font size if data is large
-          minCellHeight: 8, // Ensures rows have a minimum height
-        },
-        columnStyles: {
-          1: { halign: "center" },
-          2: { halign: "right" },
-          3: { halign: "right" },
-          5: { halign: "right" },
-          6: { halign: "center" },
-          7: { halign: "right" },
-          8: { halign: "right" },
-        },
-        margin: {
-          left: 7,
-          right: 7,
-          top: 10,
-          bottom: 10,
-        },
-        tableWidth: "auto", // Adjusts the table width to fit within the page
-        pageBreak: "auto", // Automatically adds a new page if content exceeds page height
+    // Draw the text for the order part (right side)
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    const maxWidthRight = 40; // Maximum width in pixels
+    let yRight = endY + 4; // Start below the table
+    const yIncrementRight = 1; // Adjust this value based on your spacing requirements
+
+    const textDataRight = [
+      {
+        label:
+          invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
+          "Total Packages : ",
+        value: invoiceResponse?.data?.summaryValues?.Packages
+          ? `${noFormatter.format(
+              invoiceResponse.data.summaryValues.Packages
+            )} `
+          : "",
+      },
+      {
+        label:
+          invoiceResponse?.data?.dummyTotalLabels?.["FOB (THB) : "] ||
+          "FOB (THB) : ",
+        value: invoiceResponse?.data?.dummyTotalCalc?.FOB
+          ? `${fourFormatter2.format(
+              parseFloat(
+                invoiceResponse.data.dummyTotalCalc.FOB.replace(/[^\d.]/g, "")
+              )
+            )} `
+          : "",
+      },
+      {
+        label:
+          invoiceResponse?.data?.summaryLabels?.["Freight : "] || "Freight : ",
+        value: invoiceResponse?.data?.dummyTotalCalc?.Freight
+          ? `${fourFormatter2.format(
+              parseFloat(
+                invoiceResponse.data.dummyTotalCalc.Freight.replace(
+                  /[^\d.]/g,
+                  ""
+                )
+              )
+            )} `
+          : "",
+      },
+      {
+        label:
+          invoiceResponse?.data?.summaryLabels?.["Exchange Rate "] ||
+          "Exchange Rate ",
+        value: invoiceResponse?.data?.dummyTotalCalc?.Daily_FX_Rate
+          ? `${fourFormatter4.format(
+              parseFloat(
+                invoiceResponse.data.dummyTotalCalc.Daily_FX_Rate.replace(
+                  /[^\d.]/g,
+                  ""
+                )
+              )
+            )} `
+          : "",
+      },
+    ];
+
+    textDataRight.forEach((item) => {
+      const labelXRight = 85;
+      const valueXRight = 117;
+
+      // Split the value text if it exceeds maxWidth
+      const valueLinesRight = doc.splitTextToSize(item.value, maxWidthRight);
+
+      // Print the label
+      doc.text(item.label, labelXRight, yRight);
+      valueLinesRight.forEach((line, index) => {
+        doc.text(line, valueXRight, yRight + index * 4);
       });
 
-      const finalY = doc.autoTable.previous.finalY + 4;
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
-      doc.text(
-        `Total Box: ${formatterNo.format(filterData?.data?.data?.O_Box)}`,
-        7,
-        finalY + 1
-      );
-      doc.text(
-        `Total Items: ${formatterNo.format(filterData?.data?.data?.O_Items)}`,
-        7,
-        finalY + 5
-      );
-      doc.text(
-        `Total Net Weight: ${formatterNg.format(filterData?.data?.data?.O_NW)}`,
-        7,
-        finalY + 9
-      );
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(0, 0, 0);
-      const PAGE_WIDTH = 210; // A4 page width in mm
-      const MARGIN = 10; // margin from the right edge
-      const label = "Total USD  CNF: ";
-      const value = `${formatter5.format(filterData?.data?.data?.O_CNF_FX)}`;
-      const labelWidth = doc.getTextWidth(label);
-      const valueWidth = doc.getTextWidth(value);
-      const xRight = PAGE_WIDTH - MARGIN - valueWidth;
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(0, 0, 0);
-      doc.text(
-        label,
-        PAGE_WIDTH - MARGIN - labelWidth - valueWidth - 5,
-        finalY + 1
-      );
-      // Draw the value
-      doc.text(value, xRight, finalY + 1);
-      doc.rect(147, finalY + 2, 55.5, 0.5, "FD");
-      const longText = messageNote;
-      const textX = 7;
-      const textY = finalY + 15;
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
-      doc.text(doc.splitTextToSize(longText, 201), textX, textY);
+      yRight += valueLinesRight.length * 4 + yIncrementRight;
+    });
 
-      const inputX = 20; // X position of the input field
-      const inputY = textY + 8; // Y position of the input field
-      const inputWidth = 180; // Width of the input field
-      const inputHeight = 10; // Height of the input field
-      doc.setDrawColor(123, 128, 154); // Set the color of the rectangle
-      const inputFieldValue = data?.NOTES;
-      if (inputFieldValue && inputFieldValue.trim() !== "") {
-        // Add the input field value inside the rectangle
-        doc.rect(inputX, inputY, inputWidth, inputHeight); // Draw the rectangle
-        doc.text(inputFieldValue, inputX + 2, inputY + 7); // Adjust position for padding
+    const cnfText = invoiceResponse?.data?.paymentValues?.CNF;
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    const cnfFXText = invoiceResponse?.data?.paymentValues?.CNF_FX;
+    const textWidthCNF = doc.getTextWidth(cnfText);
+    const textWidthCNFFX = doc.getTextWidth(cnfFXText);
+    const rightAlignX = 200;
+    doc.text(
+      invoiceResponse?.data?.paymentLabels?.["Total (THB) : "] ||
+        "Total (THB) : ",
+      147,
+      endY + 4
+    );
+    doc.text(cnfText, rightAlignX - textWidthCNF, endY + 4);
+
+    // Separator line
+    doc.rect(147, endY + 6, 55.5, 0.5, "FD");
+
+    // Total with currency
+    doc.text(
+      invoiceResponse?.data?.paymentLabels?.["total"] || "total",
+      147,
+      endY + 11
+    );
+    doc.text(cnfFXText, rightAlignX - textWidthCNFFX, endY + 11);
+    doc.setFillColor(32, 55, 100);
+    doc.rect(147, endY + 12, 55.5, 0.5, "FD");
+    //*****************************************************************************************
+
+    // Custom page number function
+    const addPageNumbers = (doc) => {
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
       }
-      const addPageNumbers = (doc) => {
-        const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pageCount; i++) {
-          doc.setPage(i);
-          doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
-        }
-      };
+    };
 
-      // Add page numbers
-      addPageNumbers(doc);
-      const pdfBlob = doc.output("blob");
+    // Add page numbers
+    addPageNumbers(doc);
 
-      // Upload the PDF to the server
-      await uploadPDF(pdfBlob, a);
+    // Open the PDF in a new tab
+
+    // Generate PDF Blob
+    const pdfBlob = doc.output("blob");
+
+    // Create a URL for the PDF Blob
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+
+    // Open the PDF in a new window or tab
+
+    // Upload the PDF to the server
+
+    await uploadPDF5(pdfBlob, a);
+  };
+  const uploadPDF5 = async (pdfBlob, a) => {
+    // Generate a unique date-time string
+    const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
+
+    const formData = new FormData();
+    formData.append(
+      "document",
+      pdfBlob,
+      `${a?.Order_Number || "default"}_Custom_${dateTime}.pdf`
+    );
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
+      console.log(response);
+      if (response.data.success) {
+        console.log("PDF uploaded successfully");
+        window.open(
+          `${API_IMAGE_URL}${
+            a?.Order_Number || "default"
+          }_Custom_${dateTime}.pdf`
+        );
+      } else {
+        console.log("Failed to upload PDF");
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
-
-      // Handle network errors
-      toast.error("Network Error", {
-        autoClose: 1000,
-        theme: "colored",
-      });
-
-      // Handle API errors
-      if (error.response?.status === 400) {
-        console.error(error.response.data.message);
-      }
+      console.error("Error uploading PDF:", error);
     }
   };
   const formatDate = (dateString) => {
@@ -1388,7 +1575,7 @@ const Test = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${a?.Order_Number || "default"}_Test_Proforma_${dateTime}.pdf`
+      `${a?.Order_Number || "default"}_Proforma_${dateTime}.pdf`
     );
 
     setIsLoading(true);
@@ -1399,7 +1586,7 @@ const Test = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${a?.Order_Number}_Test_Proforma_${dateTime}.pdf`
+          `${API_IMAGE_URL}${a?.Order_Number}_Proforma_${dateTime}.pdf`
         );
       } else {
         console.log("Failed to upload PDF");
@@ -1571,7 +1758,11 @@ const Test = () => {
           },
           {
             label: "Delivery By :",
-            value: `${messageNote ? messageNote : ""}`,
+            value: `${
+              deliveryApi?.data?.orderDetails[0]?.journey_number
+                ? deliveryApi?.data?.orderDetails[0]?.journey_number
+                : ""
+            }`,
           },
         ];
 
@@ -1703,7 +1894,7 @@ const Test = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${a?.Order_Number || "default"}_Operation_Test_${dateTime}.pdf`
+      `${a?.Order_Number || "default"}_Operation_${dateTime}.pdf`
     );
 
     setIsLoading(true);
@@ -1714,7 +1905,7 @@ const Test = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${a?.Order_Number}_Operation_Test_${dateTime}.pdf`
+          `${API_IMAGE_URL}${a?.Order_Number}_Operation_${dateTime}.pdf`
         );
       } else {
         console.log("Failed to upload PDF");
@@ -1728,6 +1919,408 @@ const Test = () => {
   };
   const inventoryBoxes = (order_id) => {
     setOrderId(order_id);
+  };
+  const performaOrder = async (a) => {
+    try {
+      let messageSet = "";
+      let messageNote = "";
+      // First API Call: Invoice Procedure
+      const invoiceResponse = await axios.get(
+        `${API_BASE_URL}/NewproformaMain_Order`,
+        {
+          params: { order_id: a?.Order_ID },
+        }
+      );
+      console.log(invoiceResponse);
+
+      // Second API Call: Fetch Order Data
+      const filterData = await axios.get(`${API_BASE_URL}/NewgetOrdersById`, {
+        params: { order_id: a?.Order_ID },
+      });
+      console.log(filterData?.data?.data);
+
+      const doc = new jsPDF();
+      const convertImageToBase64 = (url) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "Anonymous";
+          img.src = url;
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL("image/png");
+            resolve(dataURL);
+          };
+          img.onerror = (error) => reject(error);
+        });
+      };
+
+      const addLogoWithDetails = async () => {
+        const logoData = await convertImageToBase64(logo);
+        doc.addImage(logoData, "PNG", 6, 3, 20, 20); // Adjust the position and size as needed
+        // logo end
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${invoiceResponse?.data?.Company_Address.Line_1}`, 30, 8);
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${invoiceResponse?.data?.Company_Address.Line_2}`, 30, 12);
+        const longTextOne = `${invoiceResponse?.data?.Company_Address.Line_3}`;
+        const maxWidthOne = 90;
+        const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
+        let startXOne = 30;
+        let startYOne = 16;
+        linesOne.forEach((lineOne, index) => {
+          doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
+        });
+
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Proforma Invoice`, 127, 7.5);
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text(
+          `${invoiceResponse.data.Section1_Labels.Row1} ${
+            invoiceResponse.data.section1_Values.Row1
+              ? invoiceResponse.data.section1_Values.Row1
+              : ""
+          }`,
+          127,
+          12
+        );
+        doc.text(
+          `${invoiceResponse.data.Section1_Labels.Row2} ${
+            invoiceResponse.data.section1_Values.Row2
+              ? invoiceResponse.data.section1_Values.Row2
+              : ""
+          }`,
+          127,
+          16.5
+        );
+        doc.text(
+          `${invoiceResponse.data.Section1_Labels.Row3} ${
+            invoiceResponse.data.section1_Values.Row3
+              ? invoiceResponse.data.section1_Values.Row3
+              : ""
+          }`,
+          127,
+          20
+        );
+        doc.text(
+          `${invoiceResponse.data.Section1_Labels.Row4} ${
+            invoiceResponse.data.section1_Values.Row4
+              ? invoiceResponse.data.section1_Values.Row4
+              : ""
+          }`,
+          127,
+          24.5
+        );
+      };
+      doc.setFillColor(32, 55, 100);
+      doc.rect(7, 27, doc.internal.pageSize.width - 15, 0.5, "FD");
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(12);
+      doc.text("Invoice to", 7, 31.5);
+      doc.text("Consignee Details", 127.2, 31.5);
+      doc.setFillColor(32, 55, 100);
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      function renderWrappedText(
+        doc,
+        text,
+        startX,
+        startY,
+        maxWidth,
+        lineHeight
+      ) {
+        const lines = doc.splitTextToSize(text, maxWidth);
+        lines.forEach((line, index) => {
+          doc.text(line, startX, startY + index * lineHeight);
+        });
+        return startY + lines.length * lineHeight; // Return the new Y position after rendering the text
+      }
+
+      const commonStartY = 36.3;
+
+      // First set of texts (left side)
+      const maxWidth1 = 72;
+      const startX1 = 7;
+      const lineHeight1 = 4.2;
+      let currentY1 = commonStartY; // Use the common starting Y position
+
+      const clientAddress = invoiceResponse.data?.section2_Values || {};
+      const longTexts = [
+        clientAddress.client_name,
+        clientAddress.client_tax_number,
+        clientAddress.Address1,
+        clientAddress.Address2,
+        clientAddress.Address3,
+        clientAddress.Address4,
+        clientAddress.client_phone,
+      ].filter((text) => text && text.toString().trim() !== "");
+      longTexts.forEach((line) => {
+        currentY1 = renderWrappedText(
+          doc,
+          line,
+          startX1,
+          currentY1,
+          maxWidth1,
+          lineHeight1
+        );
+      });
+      // Reset the starting Y position for the second block (right side) to be the same as the first block
+      const maxWidth2 = 72;
+      const startX2 = 127.2;
+      let currentY2 = commonStartY; // Use the same starting Y position as the first block
+      doc.setFontSize(11);
+      const textBlock2 = [
+        invoiceResponse.data?.section3_Values.consignee_name,
+        invoiceResponse.data?.section3_Values.consignee_tax_number,
+        invoiceResponse.data?.section3_Values.Address1,
+        invoiceResponse.data?.section3_Values.Address2,
+        invoiceResponse.data?.section3_Values.Address3,
+        invoiceResponse.data?.section3_Values.Address4,
+        invoiceResponse.data?.section3_Values.consignee_email,
+      ].filter((text) => text && text.toString().trim() !== "");
+
+      doc.setFontSize(11);
+      textBlock2.forEach((text, index) => {
+        currentY2 = renderWrappedText(
+          doc,
+          text,
+          startX2,
+          currentY2,
+          maxWidth2,
+          lineHeight1
+        );
+        if (index === 0) doc.setFontSize(10);
+      });
+      const tableStartY = Math.max(currentY1, currentY2);
+      await addLogoWithDetails(); // Wait for logo and details to be added
+      const { orderDetails = [], header = {} } = invoiceResponse?.data || {};
+
+      // 1. Get column keys from the first item (e.g., "COL1", "COL2", ...)
+      const columnKeys = Object.keys(orderDetails[0] || {});
+
+      // 2. Get display headers from the `header` object
+      const headerLabels = Object.values(header); // ["#", "HS Code", "N.W.(KG)", ..., "Line Total"]
+
+      // 3. Build body rows based on orderDetails and columnKeys
+      const bodyRows = orderDetails.map((item) =>
+        columnKeys.map((key) => item[key])
+      );
+
+      doc.autoTable({
+        head: [headerLabels],
+        body: bodyRows,
+        startY: tableStartY,
+        headStyles: {
+          fillColor: "#203764",
+          textColor: "#FFFFFF",
+        },
+        bodyStyles: { valign: "top" },
+        styles: {
+          textColor: "#000000",
+          cellWidth: "wrap",
+          valign: "middle",
+          lineWidth: 0.1,
+          lineColor: "#203764",
+          overflow: "linebreak",
+          fontSize: 10, // Reduce font size if data is large
+          minCellHeight: 8, // Ensures rows have a minimum height
+        },
+        columnStyles: {
+          1: { halign: "center" },
+          2: { halign: "right" },
+          3: { halign: "right" },
+          5: { halign: "right" },
+          6: { halign: "center" },
+          7: { halign: "right" },
+          8: { halign: "right" },
+        },
+        margin: {
+          left: 7,
+          right: 7,
+          top: 10,
+          bottom: 10,
+        },
+        tableWidth: "auto", // Adjusts the table width to fit within the page
+        pageBreak: "auto", // Automatically adds a new page if content exceeds page height
+      });
+
+      const finalY = doc.autoTable.previous.finalY + 4;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.text(
+        `${invoiceResponse.data.section6_Labels.Row1} ${
+          invoiceResponse.data.section6_Values.Row1
+            ? invoiceResponse.data.section6_Values.Row1
+            : ""
+        }`,
+        7,
+        finalY + 1
+      );
+      doc.text(
+        `${invoiceResponse.data.section6_Labels.Row2} ${
+          invoiceResponse.data.section6_Values.Row2
+            ? invoiceResponse.data.section6_Values.Row2
+            : ""
+        }`,
+        7,
+        finalY + 5
+      );
+      doc.text(
+        `${invoiceResponse.data.section6_Labels.Row3} ${
+          invoiceResponse.data.section6_Values.Row3
+            ? invoiceResponse.data.section6_Values.Row3
+            : ""
+        }`,
+        7,
+        finalY + 9
+      );
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
+      const PAGE_WIDTH = 210; // A4 page width in mm
+      const MARGIN = 10; // margin from the right edge
+      const label = invoiceResponse.data.section5_Labels.Row1;
+      const value = `${twoDecimal.format(
+        invoiceResponse.data.section5_Values[
+          "SUM(Order_Details.Final_price*Order_Details.QTY)"
+        ]
+      )}`;
+
+      const labelWidth = doc.getTextWidth(label);
+      const valueWidth = doc.getTextWidth(value);
+      const xRight = PAGE_WIDTH - MARGIN - valueWidth;
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(0, 0, 0);
+      doc.text(
+        label,
+        PAGE_WIDTH - MARGIN - labelWidth - valueWidth - 5,
+        finalY + 1
+      );
+      // Draw the value
+      doc.text(value, xRight, finalY + 1);
+      doc.rect(147, finalY + 2, 55.5, 0.5, "FD");
+      // const longText = messageNote;
+      // const textX = 7;
+      // const textY = finalY + 15;
+      // doc.setFontSize(10);
+      // doc.setTextColor(0, 0, 0);
+      // doc.text(doc.splitTextToSize(longText, 201), textX, textY);
+
+      // const inputX = 20; // X position of the input field
+      // const inputY = textY + 8; // Y position of the input field
+      // const inputWidth = 180; // Width of the input field
+      // const inputHeight = 10; // Height of the input field
+      // doc.setDrawColor(123, 128, 154); // Set the color of the rectangle
+      // const inputFieldValue = data?.NOTES;
+      // if (inputFieldValue && inputFieldValue.trim() !== "") {
+      //   // Add the input field value inside the rectangle
+      //   doc.rect(inputX, inputY, inputWidth, inputHeight); // Draw the rectangle
+      //   doc.text(inputFieldValue, inputX + 2, inputY + 7); // Adjust position for padding
+      // }
+
+
+      // ****************************************** note and delivery note part
+    function addTextWithPagination(doc, longText, x, y, maxWidth) {
+      const lineHeight = 5; // Adjust line height if needed
+      const pageHeight = doc.internal.pageSize.height;
+      const textLines = doc.splitTextToSize(longText, maxWidth);
+      let currentY = y;
+ 
+      for (let i = 0; i < textLines.length; i++) {
+        if (currentY + lineHeight > pageHeight) {
+          doc.addPage();
+          currentY = 10;
+        }
+ 
+        doc.text(textLines[i], x, currentY);
+        currentY += lineHeight; // Move Y position down for next line
+      }
+      return currentY;
+    }
+ 
+ 
+    // note end
+    const longText = invoiceResponse.data?.section7_Values.Delivery_Terms || "";
+    const x = 7;
+    const initialY = doc.autoTable.previous.finalY + 24;
+    const maxWidth = 180;
+ 
+    let finalY1 = initialY;
+ 
+    // 🔹 Step 1: Render longText first (if exists)
+    const hasLongText = longText.trim() !== "";
+    if (hasLongText) {
+      finalY1 = addTextWithPagination(doc, longText, x, finalY1, maxWidth);
+    }
+ 
+    const inputFieldValue = invoiceResponse.data?.section8_Values?.NOTES || "";
+ 
+    if (inputFieldValue && inputFieldValue.trim() !== "") {
+      const inputX = 7;
+      const inputWidth = 196;
+      const padding = 3;
+      const maxTextWidth = inputWidth - padding * 2;
+ 
+      const noteLabelY = finalY1 + 3; // Leave space after longText
+ 
+      // 🔹 Only draw line if longText was present
+      if (hasLongText) {
+        const lineY = noteLabelY - 4;
+        doc.setDrawColor(0);
+        doc.setLineWidth(0.3);
+        doc.line(inputX, lineY, inputX + inputWidth, lineY);
+      }
+ 
+      // 🔹 Render "Notes here" label
+      doc.text(`${invoiceResponse.data?.section8_Labels.Notes}:`, inputX, noteLabelY + 2);
+ 
+      // 🔹 Wrapped note text
+      const lines = doc.splitTextToSize(inputFieldValue, maxTextWidth);
+      const textY = noteLabelY + 5;
+      doc.text(lines, inputX, textY + 2);
+    }
+ 
+ // ****************************************** note and delivery note part end
+     
+      const addPageNumbers = (doc) => {
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
+        }
+      };
+
+ 
+ 
+    
+
+      // Add page numbers
+      addPageNumbers(doc);
+      const pdfBlob = doc.output("blob");
+
+      // Upload the PDF to the server
+      await uploadPDF(pdfBlob, a);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+
+      // Handle network errors
+      toast.error("Network Error", {
+        autoClose: 1000,
+        theme: "colored",
+      });
+
+      // Handle API errors
+      if (error.response?.status === 400) {
+        console.error(error.response.data.message);
+      }
+    }
   };
 
   const updateBankStatus = (bankID) => {
@@ -1759,16 +2352,20 @@ const Test = () => {
         accessor: "Order_Number",
       },
       {
+        Header: "Client Name",
+        accessor: "client_name",
+      },
+      {
+        Header: "Destination port ",
+        accessor: "port_name",
+      },
+      {
         Header: "Consignee Name",
         accessor: "Consignee_name",
       },
       {
-        Header: "TT REF",
-        accessor: "Shipment_ref",
-      },
-      {
         Header: "Location",
-        accessor: (row) => row?.Location_name || row?.location_name || "NA",
+        accessor: "Location_name",
       },
       {
         Header: "Load Date",
@@ -1779,53 +2376,9 @@ const Test = () => {
         },
       },
       {
-        Header: "Load Time",
-        accessor: (a) => {
-          return a?.Load_time || "NA";
-        },
-      },
-      {
         Header: "Status",
         accessor: "status_name",
       },
-      // {
-      //   Header: "Precooling",
-      //   accessor: (a) => (
-      //     <label
-      //       style={{
-      //         display: "flex",
-      //         justifyContent: "center",
-      //         alignItems: "center",
-      //         marginBottom: "10px",
-      //       }}
-      //       className="toggleSwitch large"
-      //       onclick=""
-      //     >
-      //       <input
-      //         onClick={(e) => {
-      //           e.stopPropagation();
-      //           updateBankStatus(a.ID);
-      //         }}
-      //         checked={a.Available == "1" ? true : false}
-      //         type="checkbox"
-      //         style={{
-      //           width: "20px",
-      //           height: "20px",
-      //           cursor: "pointer",
-      //         }}
-      //       />
-      //       <span
-      //         style={{
-      //           pointerEvents: "none",
-      //         }}
-      //       >
-      //         <span>OFF</span>
-      //         <span>ON</span>
-      //       </span>
-      //       <a></a>
-      //     </label>
-      //   ),
-      // },
       {
         Header: "Actions",
         accessor: (a) => (
@@ -1841,7 +2394,7 @@ const Test = () => {
               </button>
             ) : (
               <Link
-                to="/order_view_test"
+                to="/order_view"
                 state={{ from: { ...a, isReadOnly: true } }}
               >
                 <i className="mdi mdi-eye" />
@@ -1850,9 +2403,12 @@ const Test = () => {
 
             {+a.is_deleted !== 1 && (
               <>
-                {(+a.Status === 3 || +a.Status === 4 || +a.Status === 5) && (
+                {(+a.Status === 3 ||
+                  +a.Status === 4 ||
+                  +a.Status === 5 ||
+                  +a.Status === 6) && (
                   <>
-                    <Link to="/updateTestOrder" state={{ from: { ...a } }}>
+                    <Link to="/update_Order" state={{ from: { ...a } }}>
                       <i className="mdi mdi-pencil" />
                     </Link>
                   </>
@@ -1872,8 +2428,8 @@ const Test = () => {
                     <i class="fi fi-sr-square-o"></i>
                   </button>
                 )}
-                {(+a.Status === 4 || +a.Status === 5) && (
-                  <button type="button" onClick={() => customInvoicePdf(a)}>
+                {(+a.Status === 4 || +a.Status === 5 || +a.Status === 6) && (
+                  <button type="button" onClick={() => generatePdf2(a)}>
                     {" "}
                     <svg
                       className="SvgQuo"
@@ -1885,7 +2441,7 @@ const Test = () => {
                     </svg>
                   </button>
                 )}
-                {(+a.Status === 4 || +a.Status === 5) && (
+                {(+a.Status === 4 || +a.Status === 5 || +a.Status === 6) && (
                   <button
                     type="button"
                     data-bs-toggle="modal"
@@ -1923,7 +2479,10 @@ const Test = () => {
                     <i className="mdi mdi-airplane-clock" />
                   </button>
                 )}
-                {(+a.Status === 3 || +a.Status === 4 || +a.Status === 5) && (
+                {(+a.Status === 3 ||
+                  +a.Status === 4 ||
+                  +a.Status === 5 ||
+                  +a.Status === 6) && (
                   <button
                     type="button"
                     data-bs-toggle="modal"
@@ -2014,7 +2573,7 @@ const Test = () => {
         endElement={
           <button
             type="button"
-            onClick={() => navigate("/createTestOrder")}
+            onClick={() => navigate("/create_Order")}
             className="btn button btn-info"
           >
             Create

@@ -4,8 +4,6 @@ import autoTable from "jspdf-autotable";
 import html2canvas from "html2canvas";
 import logo from "../../assets/logoT.jpg";
 import "../../components/Orders/order/PdfSec.css";
-
-// import { usePDF } from "react-to-pdf";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useId, useState } from "react";
 import axios from "axios";
@@ -581,13 +579,13 @@ const InvoiceSecPdf = () => {
     <div>
       <button
         data-bs-toggle="modal"
-        data-bs-target="#exampleModalCustomization"
+        data-bs-target="#exampleModalCustomization5"
       >
         Generate PDF
       </button>
       <div
         className="modal fade"
-        id="exampleModalCustomization"
+        id="exampleModalCustomization5"
         tabIndex={-1}
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"

@@ -127,7 +127,6 @@ import UpdateOrder from "./components/Orders/order/UpdateOrder";
 import UpdatePrice from "./components/updatePrice/UpdatePrice";
 import InvoiceThird from "./components/Orders/InvoiceThird";
 import InvoiceView from "./components/Orders/InvoiceView";
-import InvoiceEdit from "./components/Orders/InvoiceEdit";
 import CurrencyExchange from "./components/Accounting/CurrencyExchange";
 import ProformaInvoice from "./components/Orders/ProformaInvoice";
 import ProformaInvoiceTest from "./components/Orders/test/ProformaInvoiceTest";
@@ -155,7 +154,6 @@ import { API_BASE_URL } from "./Url/Url";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Test from "./components/Orders/test/Test";
-import { CreateTwoTone } from "@mui/icons-material";
 import CreateTest from "./components/Orders/test/CreateTest";
 import UpdateTest from "./components/Orders/test/UpdateTest";
 import QuotationTest from "./components/Orders/test/QuotationTest";
@@ -180,7 +178,8 @@ import Contract from "./components/hr/Contract";
 import UserHr from "./components/hr/UserHr";
 import MenuManagement from "./components/hr/MenuManagement";
 import InvoiceEdit2 from "./components/Orders/test/InvoiceEdit2";
-
+import AccountLedger from "./components/Accounting/AccountLedger";
+import Wastage from "./components/operation/Wastage";
 function App() {
   const location = useLocation(); // Hook to get the current URL location
   const navigate = useNavigate();
@@ -320,12 +319,14 @@ function App() {
                 <Route path="/add_vendor" element={<AddVendor />} />
                 <Route path="/update_vendor" element={<AddVendor />} />
                 <Route path="/packing" element={<Packing />} />
+                <Route path="/accountLedger" element={<AccountLedger />} />
                 <Route path="/packing_details" element={<PackingDetails />} />
                 <Route path="/add_packing" element={<AddPacking />} />
                 <Route path="/hpl_details" element={<HplDetails />} />
                 <Route path="/purchase_orders" element={<PurchaseOrder />} />
                 <Route path="/purchaseview" element={<PurchaseView />} />
                 <Route path="/receiving" element={<Receiving />} />
+                <Route path="/wastage" element={<Wastage />} />
                 <Route path="/ship_to" element={<ShipTo />} />
                 <Route path="/add_ship_to" element={<AddShipTo />} />
                 <Route path="/edit_ship_to" element={<AddShipTo />} />
@@ -354,7 +355,7 @@ function App() {
                 <Route path="/hpl" element={<Hpl />} />
 
                 <Route path="/orderview" element={<OrderView />} />
-                <Route path="/order_view_test" element={<OrderViewTest />} />
+                <Route path="/order_view" element={<OrderViewTest />} />
                 <Route path="/sorting" element={<Sorting />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/language" element={<Language />} />
@@ -369,8 +370,7 @@ function App() {
                 <Route path="/boxes" element={<BoxesNew />} />
                 <Route path="/packagingNew" element={<PackagingNew />} />
                 <Route path="updatePackaging" element={<UpdatePackaging />} />
-                <Route path="/invoice_edit" element={<InvoiceEdit />} />
-                <Route path="/invoice_edit1" element={<InvoiceEdit2 />} />
+                <Route path="/invoice_edit" element={<InvoiceEdit2 />} />
 
                 <Route path="/airlineNew" element={<AirlineNew />} />
                 <Route path="/airportNew" element={<AirportNew />} />
@@ -402,7 +402,7 @@ function App() {
                 <Route path="/invoiceview" element={<InvoiceView />} />
 
                 <Route
-                  path="/quotation_view_test"
+                  path="/quotation_view"
                   element={<Quotation_View_Test />}
                 />
                 <Route path="/adjustView" element={<AdjudtEanView />} />
@@ -438,16 +438,16 @@ function App() {
 
                 <Route path="/createOrder" element={<CreateOrder />} />
                 <Route path="/updateOrder" element={<UpdateOrder />} />
-                <Route path="/test" element={<Test />} />
-                <Route path="/createTestOrder" element={<CreateTest />} />
-                <Route path="/updateTestOrder" element={<UpdateTest />} />
-                <Route path="/quotation_test" element={<QuotationTest />} />
+                <Route path="/order" element={<Test />} />
+                <Route path="/create_Order" element={<CreateTest />} />
+                <Route path="/update_Order" element={<UpdateTest />} />
+                <Route path="/quotation" element={<QuotationTest />} />
                 <Route
-                  path="/createTestQuotation"
+                  path="/create_Quotation"
                   element={<CreateQuotationTest />}
                 />
                 <Route
-                  path="/updateTestQuotation"
+                  path="/update_Quotation"
                   element={<UpdateQuotationTest />}
                 />
                 <Route path="/trend" element={<Trends />} />

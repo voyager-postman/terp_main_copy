@@ -23,7 +23,7 @@ const CreateClient = () => {
   const [fromDate, setFromDate] = useState("");
   const [orderItem, setOrderItem] = useState([]);
   const [paymentTable1, setPaymentTable1] = useState([]);
-  
+
   const [paidAmounts, setPaidAmounts] = useState({});
   const [totalPaidAmount, setTotalPaidAmount] = useState(0);
   const [clientId, setClientId] = useState("");
@@ -614,7 +614,10 @@ const CreateClient = () => {
     client_tax_number: from?.client_tax_number || "",
     client_email: from?.client_email || "",
     client_phone: from?.client_phone || "",
-    client_address: from?.client_address || "",
+    client_address: from?.Address1 || "",
+    client_address1: from?.Address2 || "",
+    client_address2: from?.Address3 || "",
+    client_address3: from?.Address4 || "",
     Default_location: from?.Default_location || "",
     currency: from?.currency || "",
     port_of_orign: from?.port_of_orign || "",
@@ -655,6 +658,7 @@ const CreateClient = () => {
     Client_ID: from?.client_id || "",
     Consignee_id: from?.consignee_id || null,
     ITF: "",
+    brand: "",
     Custom_Name: "",
     Dummy_Price: "",
     Barcode: "",
@@ -979,6 +983,7 @@ const CreateClient = () => {
   const dataClear1 = () => {
     setDataCustomization({
       Consignee_id: "",
+      brand: "",
       ITF: "",
       Custom_Name: "",
       Dummy_Price: "",
@@ -1018,6 +1023,7 @@ const CreateClient = () => {
         getAllCustomization();
         setDataCustomization({
           Consignee_id: from?.consignee_id || "",
+          brand: "",
           ITF: "",
           Custom_Name: "",
           Dummy_Price: "",
@@ -1077,6 +1083,7 @@ const CreateClient = () => {
       });
       return;
     }
+
     console.log(dataCustomization);
     e.preventDefault();
     axios
@@ -1101,6 +1108,7 @@ const CreateClient = () => {
         setDataCustomization({
           Consignee_id: from?.consignee_id || "",
           ITF: "",
+          brand: "",
           Custom_Name: "",
           Dummy_Price: "",
         });
@@ -1405,6 +1413,7 @@ const CreateClient = () => {
       ...prevData,
       Consignee_Customize_id: contactId || "",
       ITF: selectedUser?.ITF || "",
+      brand: selectedUser?.Brand || "",
       Custom_Name: selectedUser?.Custom_Name || "",
       Dummy_Price: selectedUser?.Dummy_Price || "",
       Unit: selectedUser?.Unit || "",
@@ -1530,8 +1539,7 @@ const CreateClient = () => {
                 >
                   <div className="formCreate">
                     <form action="">
-                        <div className="row">
-                       
+                      <div className="row">
                         <div className="form-group col-lg-4">
                           <h6>Name</h6>
                           <input
@@ -1596,26 +1604,26 @@ const CreateClient = () => {
                           </div>
                           <div>
                             <input
-                              name="client_address"
+                              name="client_address1"
                               className="border-2 rounded-md border-[#203764] w-full"
-                              // onChange={handleChange}
-                              // value={state.client_address}
+                              onChange={handleChange}
+                              value={state.client_address1}
                             />
                           </div>
                           <div>
                             <input
-                              name="client_address"
+                              name="client_address2"
                               className="border-2 rounded-md border-[#203764] w-full"
-                              // onChange={handleChange}
-                              // value={state.client_address}
+                              onChange={handleChange}
+                              value={state.client_address2}
                             />
                           </div>
                           <div>
                             <input
-                              name="client_address"
+                              name="client_address3"
                               className="border-2 rounded-md border-[#203764] w-full"
-                              // onChange={handleChange}
-                              // value={state.client_address}
+                              onChange={handleChange}
+                              value={state.client_address3}
                             />
                           </div>
                         </div>
@@ -1641,7 +1649,7 @@ const CreateClient = () => {
                             />
                           </div>
                         </div>
- 
+
                         <div className="col-lg-12">
                           <h6
                             className="mt-4"
@@ -1656,7 +1664,7 @@ const CreateClient = () => {
                           <div className="row ">
                             <div className="form-group col-lg-4">
                               <h6>Bank Name</h6>
- 
+
                               <input
                                 onChange={handleChange}
                                 type="text"
@@ -1694,7 +1702,6 @@ const CreateClient = () => {
                           </div>
                         </div>
                       </div>
- 
                     </form>
                   </div>
                   <div className="card-footer text-center">
@@ -2715,6 +2722,7 @@ const CreateClient = () => {
                       <th> ITF Name</th>
                       <th>Custom Name</th>
                       <th>Dummy Price</th>
+                      <th>Brand</th>
                       <th>Unit</th>
                       <th>Barcode</th>
                       <th>Action</th>
@@ -2725,6 +2733,7 @@ const CreateClient = () => {
                           <td>{item.Name_EN}</td>
                           <td>{item.Custom_Name}</td>
                           <td>{item.Dummy_Price}</td>
+                          <td>{item.brand_name}</td>
                           <td>{item.unit_name}</td>
                           <td>{item.Barcode}</td>
                           <td>
@@ -2852,6 +2861,47 @@ const CreateClient = () => {
                                               />
                                             </div>
                                           </div>
+
+                                          <div className="form-group col-lg-12 ">
+                                            <h6>Brand </h6>
+                                            <div className="ceateTransport autoComplete">
+                                              <Autocomplete
+                                                options={brands || []} // List of brand options
+                                                getOptionLabel={(option) =>
+                                                  option.Name_EN || ""
+                                                } // Label to display
+                                                onChange={(event, newValue) => {
+                                                  handleChange2({
+                                                    target: {
+                                                      name: "brand",
+                                                      value: newValue
+                                                        ? newValue.ID
+                                                        : "",
+                                                    }, // Update selected brand_id
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder="Select Brand"
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  brands?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      dataCustomization.brand
+                                                  ) || null
+                                                } // Set value based on selected brand_id
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID} // Option comparison
+                                              />
+                                            </div>
+                                          </div>
+
                                           <div className="form-group col-lg-12 ">
                                             <h6>Unit </h6>
                                             <div className="ceateTransport autoComplete">
@@ -3026,6 +3076,41 @@ const CreateClient = () => {
                                   onChange={handleChange2}
                                   value={dataCustomization.Dummy_Price}
                                   placeholder="Custom Name"
+                                />
+                              </div>
+                            </div>
+                            <div className="form-group col-lg-12 ">
+                              <h6>Brand </h6>
+                              <div className="ceateTransport autoComplete">
+                                <Autocomplete
+                                  options={brands || []} // List of brand options
+                                  getOptionLabel={(option) =>
+                                    option.Name_EN || ""
+                                  } // Label to display
+                                  onChange={(event, newValue) => {
+                                    handleChange2({
+                                      target: {
+                                        name: "brand",
+                                        value: newValue ? newValue.ID : "",
+                                      }, // Update selected brand_id
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select Brand"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    brands?.find(
+                                      (item) =>
+                                        item.ID === dataCustomization.brand
+                                    ) || null
+                                  } // Set value based on selected brand_id
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  } // Option comparison
                                 />
                               </div>
                             </div>

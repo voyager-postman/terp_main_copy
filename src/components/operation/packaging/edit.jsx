@@ -606,27 +606,30 @@ export const OrderPackagingEdit = () => {
         </div>
         <div className="card-footer">
           <Link className="btn btn-danger" to={"/orderPackaging"}>
-            Cancel
+         Close
           </Link>
         </div>
         <Modal className="modalError" show={show} onHide={handleClose}>
           <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
+            <div className="modal-header" style={{borderBottom:"unset"}}>
+              <h1 className="modal-title text-center fs-5 w-100" id="exampleModalLabel">
                 Stock Check
               </h1>
-              <button
+              {/* <button
                 style={{ color: "#fff", fontSize: "30px" }}
                 type="button"
                 onClick={() => setShow(false)}
               >
                 <i class="mdi mdi-close"></i>
-              </button>
+              </button> */}
             </div>
             <div className="modal-body">
               <div className="eanCheck errorMessage">
                 <p>{stock.message ? stock.message : "NULL"}</p>
                 <p>{stock.message2 ? stock.message2 : "NULL"}</p>
+                <div className="closeBtnRece mt-3">
+                <button  onClick={() => setShow(false)}>Close</button>
+              </div>
                 {/* <p>{stock.message3 ? stock.message3 : "NULL"}</p> */}
               </div>
             </div>

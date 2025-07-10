@@ -1112,7 +1112,7 @@ const NewEanPacking = () => {
                     <label>Unit</label>
 
                     <Autocomplete
-                      options={unitType || []}
+                      options={unitType?.slice(0, 3) || []}
                       getOptionLabel={(option) => option.Name_EN}
                       onChange={(event, newValue) => {
                         if (newValue) {
@@ -1243,7 +1243,10 @@ const NewEanPacking = () => {
       <Modal show={show} onHide={handleClose} className="exampleQuo newError">
         <div className="modal-content">
           <div className="modal-header">
-            <h1 className="modal-title fs-5" id="exampleModalLabel">
+            <h1
+              className="modal-title fs-5 w-100 text-center"
+              id="exampleModalLabel"
+            >
               ตรวจสอบการแพ็ค
             </h1>
             <button
@@ -1254,9 +1257,14 @@ const NewEanPacking = () => {
               <i class="mdi mdi-close"></i>
             </button>
           </div>
-          <div className="modal-body">
+          <div className="modal-body ">
             <div className="eanCheck">
-              <p className="">{massageShow}</p>
+              <p className="text-center">{massageShow}</p>
+              <div className="closeBtnRece">
+                <button className="mb-3" onClick={closeIcon}>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

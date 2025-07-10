@@ -24,11 +24,46 @@ const UpdateTest = () => {
   const [color, setColor] = useState(false);
   const [show1, setShow1] = useState(false);
   const handleClose1 = () => setShow1(false);
+  const [data1, setData1] = useState("");
+  const [copyData, setCopyData] = useState("");
+
   const closeIcon1 = () => {
     setShow1(false);
   };
-
+  const { data: RoundingDataList } = useQuery("GetRoundingTable");
+  const [state5, setState5] = useState({
+    Rounding: "", // Initial state
+  });
   // new selct
+  const handleChange5 = (e) => {
+    setState5((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/InvoicePriceRounding`,
+        {
+          Order_ID: from?.Order_ID,
+          RCondition: state5.Rounding || 0,
+          Is_Invoice: 0,
+          Is_Quotation: 0,
+          Is_Recalculate: 1,
+        }
+      );
+      console.log(response);
+      getOrdersDetails();
+      const modalEl = document.getElementById("exampleModal");
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      if (modalInstance) modalInstance.hide();
+      setState5("");
+      toast.success(" Price updated  successfully");
+    } catch (e) {
+      console.error("Something went wrong", e);
+    }
+  };
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -129,21 +164,51 @@ const UpdateTest = () => {
   const [exchangeRate2, setExchangeRate2] = useState("");
   const [exchangeRate3, setExchangeRate3] = useState("");
   const [exchangeRate4, setExchangeRate4] = useState("");
+  const [exchangeRate5, setExchangeRate5] = useState("");
 
   console.log(state);
-  const handleChange = (event) => {
+  // const handleChange = (event) => {
+  //   if (isReadOnly || isLoading) return;
+  //   const { name, value } = event.target;
+  //   setState((prevState) => {
+  //     return {
+  //       ...prevState,
+  //       [name]: value,
+  //       fx_rate_manually_set:
+  //         name === "fx_rate" ? true : prevState.fx_rate_manually_set,
+  //     };
+  //   });
+  // };
+  const handleChange = async (event) => {
     if (isReadOnly || isLoading) return;
-    const { name, value } = event.target;
-    setState((prevState) => {
-      return {
-        ...prevState,
-        [name]: value,
-        fx_rate_manually_set:
-          name === "fx_rate" ? true : prevState.fx_rate_manually_set,
-      };
-    });
-  };
 
+    const { name, value } = event.target;
+
+    setState((prevState) => ({
+      ...prevState,
+      [name]: value,
+      fx_rate_manually_set:
+        name === "fx_rate" ? true : prevState.fx_rate_manually_set,
+    }));
+
+    const updatableFields = ["mark_up", "rebate", "load_date", "fx_rate"];
+
+    if (updatableFields.includes(name)) {
+      try {
+        await axios.post(`${API_BASE_URL}/updateOrdersValues`, {
+          id: state.order_id,
+          [name]: value,
+        });
+        console.log(`${name} updated successfully`);
+        toast.success(" updated successfully!", {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      } catch (error) {
+        console.error(`Error updating ${name}:`, error);
+      }
+    }
+  };
   const { data: clients } = useQuery("getClientDataAsOptions");
   const { data: brands } = useQuery("getBrand");
   const { data: locations } = useQuery("getLocation");
@@ -156,7 +221,6 @@ const UpdateTest = () => {
   const { data: currency } = useQuery("getCurrency");
   const { data: unit } = useQuery("getAllUnit");
   const { data: itf } = useQuery("getItf");
-  const { data: quote } = useQuery("getAllQuotation");
 
   const [orderId, setOrderId] = useState("");
   const [gross, setGross] = useState(false);
@@ -209,7 +273,7 @@ const UpdateTest = () => {
             loading_location:
               newData.loading_location || prevState.loading_location,
             Freight_provider_:
-              newData.O_Freight_Provider || prevState.Freight_provider_,
+              newData.Freight_Provider || prevState.Freight_provider_,
             liner_id: newData.Liner_ID || prevState.liner_id,
             from_port_: newData.Origin_Port || prevState.from_port_,
             destination_port_id:
@@ -238,6 +302,7 @@ const UpdateTest = () => {
           setExchangeRate2(newData.palletized || 0);
           setExchangeRate3(newData.Chamber || 0);
           setExchangeRate4(newData.Precooling || 0);
+          setExchangeRate5(newData.Include_claims || 0);
         }
       })
       .catch((e) => {
@@ -248,23 +313,37 @@ const UpdateTest = () => {
   useEffect(() => {
     oneQoutationDAta();
   }, []);
-
+  console.log(state);
   useEffect(() => {
-    if (state.order_id) grossTransspotationErr();
-    orderCrossFreight();
+    if (state.order_id) orderCrossFreight();
   }, [state.order_id]);
+  const { data: details, refetch: getOrdersDetails } = useQuery(
+    ["OrderBottomView", state.order_id, localStorage.getItem("id")],
+    async () => {
+      const response = await axios.post(`${API_BASE_URL}/OrderBottomView`, {
+        order_id: state.order_id,
+        user_id: localStorage.getItem("id"),
+      });
+      return response.data;
+    },
+    {
+      enabled: !!state.order_id && !!localStorage.getItem("id"),
+    }
+  );
+  console.log(details);
   const computedState = useMemo(() => {
     console.log(consigneesNew);
-    const quoteFind = quote?.find((v) => v.quote_id == state.quote_id);
+
     const r = {
       ...state,
-      consignee_id: state.consignee_id || quoteFind?.consignee_id,
-      client_id: state.client_id || quoteFind?.client_id,
+      consignee_id: state.consignee_id,
+      client_id: state.client_id,
     };
     const consigneeFind = consigneesNew?.find(
       (v) => v.consignee_id == state.consignee_id
     );
     console.log(consigneeFind);
+    setCopyData(consigneeFind);
     const portDestinationFind = ports?.find(
       (v) =>
         v.port_id == (r.destination_port_id || consigneeFind?.destination_port)
@@ -272,8 +351,8 @@ const UpdateTest = () => {
     const portOriginFind = ports?.find(
       (v) => v.port_id == (r.from_port_ || consigneeFind?.port_of_orign)
     );
-    r.fx_id = r.fx_id || consigneeFind?.currency || quoteFind?.fx_id;
-    r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost || quoteFind?.O_Extra;
+    r.fx_id = r.fx_id || consigneeFind?.currency;
+    r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost;
     // r.fx_rate =
     //   !state.fx_rate_manually_set && r.fx_id
     //     ? currency?.find((v) => +v.ID === +r.fx_id)?.fx_rate || 0
@@ -285,34 +364,23 @@ const UpdateTest = () => {
       return matchedCurrency?.fx_rate || state.fx_rate || 0;
     })();
 
-    r.rebate = r.rebate || consigneeFind?.O_Rebate || quoteFind?.rebate;
+    r.rebate = r.rebate || consigneeFind?.O_Rebate;
     r.Clearance_provider =
       r.Clearance_provider ||
       portOriginFind?.preferred_clearance ||
-      consigneeFind?.Clearance_provider ||
-      quoteFind?.Clearance_provider;
-    r.loading_location =
-      r.loading_location ||
-      consigneeFind?.Default_location ||
-      quoteFind?.loading_location;
-    r.brand_id = state.brand_id || consigneeFind?.brand || quoteFind?.brand_id;
-    r.mark_up = r.mark_up || consigneeFind?.O_Markup || quoteFind?.profit;
+      consigneeFind?.Clearance_provider;
+    r.loading_location = r.loading_location || consigneeFind?.Default_location;
+    r.brand_id = state.brand_id || consigneeFind?.brand;
+    r.mark_up = r.mark_up || consigneeFind?.O_Markup;
     r.Transportation_provider =
-      r.Transportation_provider ||
-      portOriginFind?.preferred_transport ||
-      quoteFind?.Transportation_provider;
-    r.from_port_ =
-      r.from_port_ || consigneeFind?.port_of_orign || quoteFind?.port_of_orign;
+      r.Transportation_provider || portOriginFind?.preferred_transport;
+    r.from_port_ = r.from_port_ || consigneeFind?.port_of_orign;
     r.destination_port_id =
-      r.destination_port_id ||
-      consigneeFind?.destination_port ||
-      quoteFind?.destination_port_id;
-    r.liner_id =
-      r.liner_id || portDestinationFind?.prefered_liner || quoteFind?.liner_id;
+      r.destination_port_id || consigneeFind?.destination_port;
+    r.liner_id = r.liner_id || portDestinationFind?.prefered_liner;
     r.Freight_provider_ =
       state.Freight_provider_ ||
-      liners?.find((v) => v.liner_id == r.liner_id)?.preffered_supplier ||
-      quoteFind?.Freight_provider_;
+      liners?.find((v) => v.liner_id == r.liner_id)?.preffered_supplier;
     r.Q_Markup = consigneeNew2;
 
     return r;
@@ -331,19 +399,13 @@ const UpdateTest = () => {
     itf,
   ]);
   console.log(computedState);
-  const { data: details, refetch: getOrdersDetails } = useQuery(
-    `NewgetOrdersDetails?id=${state.order_id}`,
-    {
-      enabled: !!state.order_id,
-    }
-  );
-  console.log(details);
 
   const isError = useMemo(() => {
-    return (details || []).some((v) => {
-      return +v.OD_Box % 1 != 0;
+    return (details?.section5_Values || []).some((v) => {
+      return +v.Box % 1 !== 0;
     });
   }, [details]);
+
   // const isMinWeightError = useMemo(() => {
   //   return (
   //     (+summary?.Gross_weight || 0) <
@@ -376,42 +438,32 @@ const UpdateTest = () => {
   // }, [freights, summary]);
   // console.log(isMinWeightError);
   // console.log(isMinTransportError);
-  const newItfList1 = async () => {
-    if (state.consignee_id) {
+  const consigneeValueFilter = async (consigneeId, orderId) => {
+    console.log(consigneeId);
+    console.log(orderId);
+    if (consigneeId && orderId) {
       try {
         const response = await axios.post(
-          `${API_BASE_URL}/OrderMarkupandRebate`,
+          `${API_BASE_URL}/OrderConsigneePopulate`,
           {
-            Consignee_ID: state.consignee_id,
+            Consignee_ID: consigneeId,
+            Order_ID: orderId,
+            input: copyData,
           }
         );
-        console.log(response.data);
-        setConsigneeNew(response.data.Consignee_Order_Markup);
-        setConsigneeNew1(response.data.Consignee_Rebate);
-        setConsigneeNew2(response.data.Consignee_Quotation_Markup);
-      } catch (e) {
-        console.log("Error:", e);
+        toast.success(" updated  successfully");
+
+        console.log("Consignee Response:", response.data);
+      } catch (error) {
+        console.error("Error fetching consignee data:", error);
+        // toast.error("Something went wrong"); // Optional user feedback
       }
     }
   };
-  const grossTransspotationErr = async () => {
-    // if (state.order_id) {
-    //   try {
-    //     const response = await axios.post(
-    //       `${API_BASE_URL}/OrderGrossTransportError`,
-    //       { order_id: state.order_id }
-    //     );
-    //     console.log(response);
-    //     if (response.data.success == true) {
-    //       setGross(true);
-    //       setGrossMass(response.data.message);
-    //     }
-    //     toast.success(response);
-    //   } catch (e) {
-    //     console.error("Something went wrong", e);
-    //   }
-    // }
-  };
+
+  useEffect(() => {
+    consigneeValueFilter(state.consignee_id, state.order_id);
+  }, [state.consignee_id, state.order_id]);
 
   const calculateList = async () => {
     if (state.order_id) {
@@ -461,8 +513,35 @@ const UpdateTest = () => {
   useEffect(() => {
     newItfList();
     newBrandList();
-    newItfList1();
   }, [state.consignee_id]);
+  const handleAgreedPricingChange8 = async (e) => {
+    const { name, checked } = e.target;
+    const newValue = checked ? 1 : 0;
+
+    setExchangeRate5(newValue);
+
+    try {
+      const response = await updateAllOrderStatuses({
+        id: state.order_id,
+        field: name,
+        value: newValue,
+      });
+
+      console.log("API success:", response);
+      if (response?.data?.message) {
+        toast.success(response.data.message, {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      }
+    } catch (error) {
+      console.error("API error:", error);
+      toast.error("Failed to update status", {
+        autoClose: 1500,
+        theme: "colored",
+      });
+    }
+  };
   const handleAgreedPricingChange4 = async (e) => {
     const { name, checked } = e.target;
     const newValue = checked ? 1 : 0;
@@ -669,7 +748,7 @@ const UpdateTest = () => {
           theme: "colored",
         });
 
-        navigate("/test");
+        navigate("/order");
       }
     } catch (e) {
       toast.error("Something went wrong");
@@ -688,10 +767,13 @@ const UpdateTest = () => {
     console.log(isRecalculateClicked);
     setIsRecalculateClicked(isClicked);
     console.log(isRecalculateClicked);
+    const reai = details?.section5_Values?.filter(
+      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+    );
+    console.log("Filtered details:", reai);
 
-    const reai = details?.filter((v) => v.ITF && v.OD_QTY && v.OD_Unit);
-    console.log(reai);
-    if (reai.length == 0) return;
+    if (!reai || reai.length === 0) return;
+
     setIsLoading(true);
     loadingModal.fire();
 
@@ -748,9 +830,13 @@ const UpdateTest = () => {
     }
   };
   const updateOrderTest = async () => {
-    const reai = details?.filter((v) => v.ITF && v.OD_QTY && v.OD_Unit);
-    console.log(reai);
-    if (reai.length == 0) return;
+    const reai = details?.section5_Values?.filter(
+      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+    );
+    console.log("Filtered details:", reai);
+
+    if (!reai || reai.length === 0) return;
+
     setIsLoading(true);
     loadingModal.fire();
 
@@ -786,7 +872,7 @@ const UpdateTest = () => {
           autoClose: 1000,
           theme: "colored",
         });
-        navigate("/test");
+        navigate("/order");
       }
       await getOrdersDetails(data.data.data);
       MySwal.close();
@@ -803,10 +889,13 @@ const UpdateTest = () => {
     console.log(isRecalculateClicked);
     setIsRecalculateClicked(isClicked);
     console.log(isRecalculateClicked);
+    const reai = details?.section5_Values?.filter(
+      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+    );
+    console.log("Filtered details:", reai);
 
-    const reai = details?.filter((v) => v.ITF && v.OD_QTY && v.OD_Unit);
-    console.log(reai);
-    if (reai.length == 0) return;
+    if (!reai || reai.length === 0) return;
+
     setIsLoading(true);
     loadingModal.fire();
 
@@ -862,15 +951,22 @@ const UpdateTest = () => {
       setIsLoading(false);
     }
   };
+  const [toEditDetails, setToEditDetails] = useState({});
+
   const [selectedDetails, setSelectedDetails] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const defaultDetailsValue = useMemo(() => {
-    return details?.[selectedDetails] || null;
-  }, [selectedDetails]);
-  console.log(defaultDetailsValue);
-  const [toEditDetails, setToEditDetails] = useState({});
-  console.log(toEditDetails);
-  console.log(defaultDetailsValue?.brand_id);
+    if (
+      selectedDetails === null ||
+      !Array.isArray(details?.section5_Values) ||
+      typeof selectedDetails !== "number"
+    ) {
+      return null;
+    }
+
+    return details.section5_Values[selectedDetails] || null;
+  }, [selectedDetails, details]);
+
   console.log(defaultDetailsValue);
   const closeModal = () => {
     setIsOpenModal(false);
@@ -946,11 +1042,11 @@ const UpdateTest = () => {
         toEditDetails?.HSCODE ?? defaultDetailsValue?.HS_Code ?? undefined,
       ITF_Name:
         toEditDetails?.itf_name ?? defaultDetailsValue?.ITF_Name ?? undefined,
-      itf_quantity: toEditDetails?.itf_quantity ?? defaultDetailsValue?.OD_QTY,
-      itf_unit: toEditDetails?.itf_unit ?? defaultDetailsValue?.OD_Unit,
+      itf_quantity: toEditDetails?.itf_quantity ?? defaultDetailsValue?.QTY,
+      itf_unit: toEditDetails?.itf_unit ?? defaultDetailsValue?.Unit,
       adjusted_price:
         toEditDetails?.adjusted_price ??
-        defaultDetailsValue?.OD_Adjusted_Price ??
+        defaultDetailsValue?.Adjusted_Price ??
         0,
       od_id: defaultDetailsValue?.OD_ID || undefined,
       // od_id:"91",
@@ -963,7 +1059,7 @@ const UpdateTest = () => {
         defaultDetailsValue?.Unit_Name ??
         undefined,
       brand_id:
-        toEditDetails?.brand_id ?? defaultDetailsValue?.OD_Brand ?? undefined,
+        toEditDetails?.brand_id ?? defaultDetailsValue?.Brand ?? undefined,
       is_changed: true,
     };
     if (!values.ITF || !values.itf_quantity || !values.itf_unit)
@@ -988,7 +1084,6 @@ const UpdateTest = () => {
       setOrderId(data?.order_id);
       console.log(data);
       getOrdersDetails();
-      grossTransspotationErr();
       orderCrossFreight();
       toast.success("Order detail added successfully");
       setState((prevState) => {
@@ -1057,7 +1152,7 @@ const UpdateTest = () => {
     if (computedState.client_id) {
       fetchConsigneesNew();
     }
-  }, [computedState.client_id]);
+  }, [computedState.client_id, computedState.consignee_id]);
 
   const reCalculate = () => {
     setIsLoading(true);
@@ -1144,7 +1239,52 @@ const UpdateTest = () => {
       },
     }),
   };
+  const handleSubmit1 = async () => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/InvoicePriceRounding`,
+        {
+          Order_ID: from?.Order_ID,
+          RCondition: 0,
+          Is_Invoice: 0,
+          Is_Quotation: 1,
+          Is_Recalculate: 0,
+        }
+      );
+      console.log(response);
+      getOrdersDetails();
 
+      toast.success("Invoice Price updated  successfully");
+    } catch (e) {
+      console.error("Something went wrong", e);
+    }
+  };
+  const handleSubmit2 = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/AgreedPrice`, {
+        order_id: from?.Order_ID,
+      });
+      console.log(response);
+      getOrdersDetails();
+
+      toast.success("Agreed Price updated  successfully");
+    } catch (e) {
+      console.error("Something went wrong", e);
+    }
+  };
+  const handleSubmit3 = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/LASTPrice`, {
+        Order_ID: state.order_id,
+      });
+      console.log(response);
+      getOrdersDetails();
+
+      toast.success("Last Price updated  successfully");
+    } catch (e) {
+      console.error("Something went wrong", e);
+    }
+  };
   const DropdownIndicator = (props) => {
     return (
       <components.DropdownIndicator {...props}>
@@ -1675,6 +1815,60 @@ const UpdateTest = () => {
                               id: v.liner_id,
                               name: v.liner_name,
                             })) || []
+                          }
+                          getOptionLabel={(option) => option.name || ""}
+                          value={
+                            computedState.liner_id
+                              ? liners
+                                  ?.map((v) => ({
+                                    id: v.liner_id,
+                                    name: v.liner_name,
+                                  }))
+                                  .find(
+                                    (v) => v.id === computedState.liner_id
+                                  ) || null
+                              : null
+                          }
+                          onChange={async (e, newValue) => {
+                            const newId = newValue?.id || null;
+                            setState((prev) => ({ ...prev, liner_id: newId }));
+
+                            try {
+                              await axios.post(
+                                `${API_BASE_URL}/updateOrdersValues`,
+                                {
+                                  id: state.order_id,
+                                  liner_id: newId,
+                                  Freight_provider_: state.Freight_provider_,
+                                }
+                              );
+                              toast.success(" updated successfully!", {
+                                autoClose: 1000,
+                                theme: "colored",
+                              });
+                              console.log("liner_id updated successfully");
+                            } catch (error) {
+                              console.error("Error updating liner_id:", error);
+                            }
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Airline"
+                              variant="outlined"
+                            />
+                          )}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === value?.id
+                          }
+                        />
+
+                        {/* <Autocomplete
+                          options={
+                            liners?.map((v) => ({
+                              id: v.liner_id,
+                              name: v.liner_name,
+                            })) || []
                           } // Ensure options is always an array
                           sx={{ width: 300 }}
                           getOptionLabel={(option) => option?.name || ""} // Display name of the option
@@ -1704,7 +1898,7 @@ const UpdateTest = () => {
                           renderInput={(params) => (
                             <TextField {...params} placeholder="Select Liner" />
                           )}
-                        />
+                        /> */}
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
                         <h6>Transportation</h6>
@@ -1804,7 +1998,7 @@ const UpdateTest = () => {
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
                         <h6>Freight Provider</h6>
-                        <Autocomplete
+                        {/* <Autocomplete
                           options={
                             freights?.map((v) => ({
                               id: v.Freight_provider,
@@ -1848,6 +2042,60 @@ const UpdateTest = () => {
                               placeholder="Select Freight Provider"
                             />
                           )}
+                        /> */}
+                        <Autocomplete
+                          options={freights?.map((v) => ({
+                            id: v.Freight_provider,
+                            name: v.name,
+                          }))}
+                          getOptionLabel={(option) => option.name}
+                          value={
+                            computedState.Freight_provider_
+                              ? freights?.find(
+                                  (v) =>
+                                    v.Freight_provider ===
+                                    computedState.Freight_provider_
+                                ) || null
+                              : null
+                          }
+                          onChange={async (e, newValue) => {
+                            const newId = newValue?.id || null;
+                            setState((prev) => ({
+                              ...prev,
+                              Freight_provider_: newId,
+                            }));
+
+                            try {
+                              await axios.post(
+                                `${API_BASE_URL}/updateOrdersValues`,
+                                {
+                                  id: state.order_id,
+                                  Freight_provider_: newId,
+                                }
+                              );
+                              toast.success(" updated successfully!", {
+                                autoClose: 1000,
+                                theme: "colored",
+                              });
+                              console.log(
+                                "Freight_provider_ updated successfully"
+                              );
+                            } catch (error) {
+                              console.error(
+                                "Error updating Freight_provider_:",
+                                error
+                              );
+                            }
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Freight Provider"
+                            />
+                          )}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === value?.id
+                          }
                         />
                       </div>
                       <div className="col-lg-3 form-group  ">
@@ -1915,76 +2163,98 @@ const UpdateTest = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="col-lg-2 form-group">
-                        <h6>Charge Volume</h6>
-                        <div className="flex gap-2 items-center">
-                          <label className="toggleSwitch large" onclick="">
-                            <input
-                              type="checkbox"
-                              name="Charge_Volume"
-                              checked={exchangeRate1 == 1}
-                              onChange={handleAgreedPricingChange4}
-                            />
-                            <span>
-                              <span>OFF</span>
-                              <span>ON</span>
-                            </span>
-                            <a></a>
-                          </label>
-                        </div>
-                      </div>
-                      <div className="col-lg-2 form-group">
-                        <h6>Palletized</h6>
-                        <div className="flex gap-2 items-center">
-                          <label className="toggleSwitch large">
-                            <input
-                              type="checkbox"
-                              name="palletized"
-                              checked={exchangeRate2 == 1}
-                              onChange={handleAgreedPricingChange5}
-                            />
-                            <span>
-                              <span>OFF</span>
-                              <span>ON</span>
-                            </span>
-                            <a></a>
-                          </label>
-                        </div>
-                      </div>
-                      <div className="col-lg-2 form-group">
-                        <h6>CO from Chamber</h6>
-                        <div className="flex gap-2 items-center">
-                          <label className="toggleSwitch large">
-                            <input
-                              type="checkbox"
-                              name="Chamber"
-                              checked={exchangeRate3 == 1}
-                              onChange={handleAgreedPricingChange6}
-                            />
-                            <span>
-                              <span>OFF</span>
-                              <span>ON</span>
-                            </span>
-                            <a></a>
-                          </label>
-                        </div>
-                      </div>
-                      <div className="col-lg-2 form-group">
-                        <h6>Precooling</h6>
-                        <div className="flex gap-2 items-center">
-                          <label className="toggleSwitch large">
-                            <input
-                              type="checkbox"
-                              name="PreColling"
-                              checked={exchangeRate4 == 1}
-                              onChange={handleAgreedPricingChange7}
-                            />
-                            <span>
-                              <span>OFF</span>
-                              <span>ON</span>
-                            </span>
-                            <a></a>
-                          </label>
+                      <div className="col-lg-8 form-group">
+                        <div className="IncludeClaim">
+                          <div>
+                            <h6>Include Claim</h6>
+                            <div className="flex gap-2 items-center">
+                              <label className="toggleSwitch large" onclick="">
+                                <input
+                                  type="checkbox"
+                                  name="Include_claims"
+                                  checked={exchangeRate5 == 1}
+                                  onChange={handleAgreedPricingChange8}
+                                />
+                                <span>
+                                  <span>OFF</span>
+                                  <span>ON</span>
+                                </span>
+                                <a></a>
+                              </label>
+                            </div>
+                          </div>
+                          <div>
+                            <h6>Charge Volume</h6>
+                            <div className="flex gap-2 items-center">
+                              <label className="toggleSwitch large" onclick="">
+                                <input
+                                  type="checkbox"
+                                  name="Charge_Volume"
+                                  checked={exchangeRate1 == 1}
+                                  onChange={handleAgreedPricingChange4}
+                                />
+                                <span>
+                                  <span>OFF</span>
+                                  <span>ON</span>
+                                </span>
+                                <a></a>
+                              </label>
+                            </div>
+                          </div>
+                          <div>
+                            <h6>Palletized</h6>
+                            <div className="flex gap-2 items-center">
+                              <label className="toggleSwitch large">
+                                <input
+                                  type="checkbox"
+                                  name="palletized"
+                                  checked={exchangeRate2 == 1}
+                                  onChange={handleAgreedPricingChange5}
+                                />
+                                <span>
+                                  <span>OFF</span>
+                                  <span>ON</span>
+                                </span>
+                                <a></a>
+                              </label>
+                            </div>
+                          </div>
+                          <div>
+                            <h6>CO from Chamber</h6>
+                            <div className="flex gap-2 items-center">
+                              <label className="toggleSwitch large">
+                                <input
+                                  type="checkbox"
+                                  name="Chamber"
+                                  checked={exchangeRate3 == 1}
+                                  onChange={handleAgreedPricingChange6}
+                                />
+                                <span>
+                                  <span>OFF</span>
+                                  <span>ON</span>
+                                </span>
+                                <a></a>
+                              </label>
+                            </div>
+                          </div>
+                          <div>
+                            <h6>Precooling</h6>
+                            <div className="flex gap-2 items-center">
+                              <label className="toggleSwitch large">
+                                <input
+                                  type="checkbox"
+                                  name="PreColling"
+                                  checked={exchangeRate4 == 1}
+                                  onChange={handleAgreedPricingChange7}
+                                />
+                                <span>
+                                  <span>OFF</span>
+                                  <span>ON</span>
+                                </span>
+                                <a></a>
+                              </label>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       <div className="col-lg-3 form-group">
@@ -2108,6 +2378,124 @@ const UpdateTest = () => {
                               </div>
                             </div>
                           </div>
+                          <div>
+                            <button
+                              type="button"
+                              className="  me-2"
+                              data-bs-toggle="modal"
+                              data-bs-target="#exampleModal"
+                            >
+                              Round Price
+                            </button>
+
+                            {/* Button trigger modal */}
+
+                            {/* Modal */}
+                            <div
+                              className="modal fade"
+                              id="exampleModal"
+                              tabIndex={-1}
+                              aria-labelledby="exampleModalLabel"
+                              aria-hidden="true"
+                            >
+                              <div className="modal-dialog modalShipTo">
+                                <div className="modal-content">
+                                  <div className="modal-header">
+                                    <h1
+                                      className="modal-title fs-5"
+                                      id="exampleModalLabel"
+                                    >
+                                      Price Rounding
+                                    </h1>
+                                    <button
+                                      type="button"
+                                      className="btn-close"
+                                      data-bs-dismiss="modal"
+                                      aria-label="Close"
+                                      onClick={() =>
+                                        setState5({
+                                          Rounding: "",
+                                        })
+                                      }
+                                    >
+                                      <i className="mdi mdi-close"></i>
+                                    </button>
+                                  </div>
+                                  <div className="modal-body">
+                                    <div className="col-lg-12 form-group autoComplete">
+                                      <h6>Rounding</h6>
+                                      <Autocomplete
+                                        options={RoundingDataList || []}
+                                        getOptionLabel={(option) =>
+                                          option?.DropDown || ""
+                                        }
+                                        value={
+                                          (RoundingDataList || []).find(
+                                            (item) =>
+                                              item.ID === state5?.Rounding
+                                          ) || null
+                                        }
+                                        isOptionEqualToValue={(option, value) =>
+                                          option.ID === value.ID
+                                        }
+                                        onChange={(event, newValue) => {
+                                          handleChange5({
+                                            target: {
+                                              name: "Rounding",
+                                              value: newValue?.ID || "",
+                                            },
+                                          });
+                                        }}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            placeholder="Select Rounding"
+                                            variant="outlined"
+                                          />
+                                        )}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="modal-footer">
+                                    <button
+                                      type="button"
+                                      className="btn btn-primary"
+                                      onClick={handleSubmit}
+                                    >
+                                      Submit
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <button
+                              type="button"
+                              className="me-2"
+                              onClick={handleSubmit1}
+                            >
+                              Use Invoice Price
+                            </button>
+                          </div>
+                          <div>
+                            <button
+                              type="button"
+                              className="me-2"
+                              onClick={handleSubmit2}
+                            >
+                              Agreed Price
+                            </button>
+                          </div>
+                          <div>
+                            <button
+                              type="button"
+                              className="me-1"
+                              onClick={handleSubmit3}
+                            >
+                              Last Price
+                            </button>
+                          </div>
                         </div>
                       )}
                       {isError && (
@@ -2131,75 +2519,126 @@ const UpdateTest = () => {
                         className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
                         style={{ width: "100%" }}
                       >
-                        <thead>
-                          <tr>
-                            <th>ITF</th>
-                            <th>Brand Name</th>
-                            <th>Quantity</th>
-                            <th>Unit</th>
-                            <th> Number of Box</th>
-                            <th>NW</th>
-                            <th>Unit Price</th>
-                            <th>Adjust Price</th>
-                            {!(
-                              (localStorage.getItem("level") === "Level 1" &&
-                                localStorage.getItem("role") === "Admin") ||
-                              localStorage.getItem("level") === "Level 5"
-                            ) && <th>Profit</th>}
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {details?.map((v, i) => (
-                            <tr
-                              className={[
-                                "rowCursorPointer",
-                                +v.OD_Box % 1 != 0
-                                  ? "bg-red-500/50 [&>td]:!text-red-900"
-                                  : "",
-                              ].join(" ")}
-                            >
-                              <td>{v.ITF_Name}</td>
-                              <td>{v.Brand_name}</td>
-                              <td>{threeDecimal.format(v.OD_QTY)}</td>
-                              <td>{v.Unit_Name}</td>
-                              <td>{NoDecimal.format(v.OD_Box)}</td>
-                              <td>{threeDecimal.format(v.OD_NW)}</td>
-                              <td>{twoDecimal.format(v.unit_price)}</td>
-                              <td>
-                                {v.OD_Adjusted_Price
-                                  ? twoDecimal.format(v.OD_Adjusted_Price)
-                                  : ""}
-                              </td>
-                              {!(
-                                (localStorage.getItem("level") === "Level 1" &&
-                                  localStorage.getItem("role") === "Admin") ||
-                                localStorage.getItem("level") === "Level 5"
-                              ) && <td>{v.OD_Profit_Percentage}%</td>}
-                              <td>
-                                {!isReadOnly && v.Order_Details_Edit_Status !== 0 && (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setDetailsEdit(i);
-                                        setToEditDetails({});
-                                        openModal();
-                                      }}
-                                    >
-                                      <i className="mdi mdi-pencil text-2xl" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => deleteOrder(v.OD_ID)}
-                                    >
-                                      <i className="mdi mdi-minus text-2xl" />
-                                    </button>
-                                  </>
-                                )}
-                              </td>
+                        {details?.section5_Labels2 && (
+                          <thead>
+                            <tr role="row" className="borderTh">
+                              {Object.entries(details.section5_Labels2).map(
+                                ([key, label]) => {
+                                  if (
+                                    key === "Profit" &&
+                                    ((localStorage.getItem("level") ===
+                                      "Level 1" &&
+                                      localStorage.getItem("role") ===
+                                        "Admin") ||
+                                      localStorage.getItem("level") ===
+                                        "Level 5")
+                                  ) {
+                                    return null; // Hide "Profit"
+                                  }
+
+                                  return <th key={key}>{label}</th>;
+                                }
+                              )}
+                              <th>Action</th>
                             </tr>
-                          ))}
+                          </thead>
+                        )}
+
+                        <tbody>
+                          {details?.section5_Values?.map((v, i) => {
+                            const isRed = +v.Box % 1 !== 0; // Apply red styling if Box is decimal
+
+                            return (
+                              <tr
+                                key={i}
+                                className={[
+                                  "rowCursorPointer",
+                                  isRed
+                                    ? "bg-red-500/50 [&>td]:!text-red-900"
+                                    : "",
+                                ].join(" ")}
+                              >
+                                {Object.keys(
+                                  details.section5_Labels2 || {}
+                                ).map((key) => {
+                                  // Handle Profit visibility
+                                  if (
+                                    key === "Profit" &&
+                                    ((localStorage.getItem("level") ===
+                                      "Level 1" &&
+                                      localStorage.getItem("role") ===
+                                        "Admin") ||
+                                      localStorage.getItem("level") ===
+                                        "Level 5")
+                                  ) {
+                                    return null;
+                                  }
+
+                                  const valueMap = {
+                                    Item: "ITF_Name",
+                                    Brand: "Brand_name",
+                                    Quantity: "QTY",
+                                    Unit: "Unit_Name",
+                                    boxes: "Box",
+                                    "Net Weight": "NW",
+                                    "Calculated Price": "Calculated_Price",
+                                    Price: "Adjusted_Price",
+                                    Profit: "Profit_Percentage",
+                                  };
+
+                                  const field = valueMap[key] || key;
+                                  const rawValue = v[field];
+
+                                  // Format values conditionally
+                                  const displayValue = (() => {
+                                    if (["QTY", "NW"].includes(field))
+                                      return threeDecimal.format(rawValue);
+                                    if (field === "Box")
+                                      return NoDecimal.format(rawValue);
+                                    if (
+                                      [
+                                        "Calculated_Price",
+                                        "Adjusted_Price",
+                                      ].includes(field)
+                                    ) {
+                                      return rawValue
+                                        ? twoDecimal.format(rawValue)
+                                        : "";
+                                    }
+                                    if (field === "Profit_Percentage")
+                                      return `${rawValue}%`;
+                                    return rawValue;
+                                  })();
+
+                                  return <td key={key}>{displayValue}</td>;
+                                })}
+
+                                {/* Action Buttons */}
+                                <td>
+                                  {!isReadOnly && v.status !== 0 && (
+                                    <>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setDetailsEdit(i);
+                                          setToEditDetails({});
+                                          openModal();
+                                        }}
+                                      >
+                                        <i className="mdi mdi-pencil text-2xl" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => deleteOrder(v.OD_ID)}
+                                      >
+                                        <i className="mdi mdi-minus text-2xl" />
+                                      </button>
+                                    </>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
@@ -2311,107 +2750,220 @@ const UpdateTest = () => {
                         </div>
                       )}
                     </div> */}
-                    <div className="row py-4 px-4">
-                      <div className="col-lg-3">
-                        {/* <div>
-                          <b> Total Item : </b>
-                          {(+data?.O_NW || 0).toLocaleString()}
-                        </div> */}
-                        <div>
-                          <b> Total NW : </b>
-                          {(+newdata?.O_NW || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b> Total GW : </b>
-                          {(+newdata?.O_GW || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b> Total Box : </b>
-                          {(+newdata?.O_Box || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b> Total CBM : </b>
-                          {(+newdata?.O_CBM || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b> Total ITF : </b>
-                          {(+newdata?.O_Items || 0).toLocaleString()}
-                        </div>
-                      </div>
-                      <div className="col-lg-3">
-                        <div>
-                          <b>Transport : </b>
-                          {(+newdata?.O_Transport || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b>Clearance : </b>
-                          {(+newdata?.O_Clearance || 0).toLocaleString()}
-                        </div>
-                        {localStorage.getItem("level") !== "Level 5" && (
+                    {details?.section6_Labels && (
+                      <div className="row py-4 px-4">
+                        <div className="col-lg-3">
                           <div>
-                            <b>Extra : </b>
-                            {(+newdata?.O_Extra || 0).toLocaleString()}
-                          </div>
-                        )}
-                        <div>
-                          <b>Commission : </b>
-
-                          {(+newdata?.O_Commision_THB || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b>Rebate : </b>
-                          {(+newdata?.O_Rebate_THB || 0).toLocaleString()}
-                        </div>
-                      </div>
-                      <div className="col-lg-3">
-                        <div>
-                          <b> Total FOB : </b>
-                          {(+newdata?.O_FOB || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b>Freight : </b>
-                          {(+newdata?.O_Freight || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <b> Total CNF : </b>
-                          {(+newdata?.O_CNF || 0).toLocaleString()}
-                        </div>
-                        {!(
-                          (localStorage.getItem("level") === "Level 1" &&
-                            localStorage.getItem("role") === "Admin") ||
-                          localStorage.getItem("level") === "Level 5"
-                        ) && (
-                          <div className="">
-                            <b> Total Profit : </b>
-                            {(+newdata?.O_Profit || 0).toLocaleString()}
-                          </div>
-                        )}
-                        {localStorage.getItem("level") !== "Level 5" && (
-                          <div style={{ marginLeft: "2px" }}>
-                            <b> Profit % : </b>
+                            <b>
+                              {details?.section6_Labels?.[
+                                "Total Net Weight :"
+                              ] || "Total Net Weight :"}
+                            </b>
                             {(
-                              +newdata?.O_Profit_Percentage || 0
+                              +details?.section6_Values?.Row1 || 0
                             ).toLocaleString()}
                           </div>
-                        )}
-                      </div>
-                      <div className="col-lg-3">
-                        <div>
-                          <b> Total CNF FX : </b>
-                          {(+newdata?.O_CNF_FX || 0).toLocaleString()}
-                        </div>
-                        <div>
-                          <div>
-                            <b> Total Commission FX: </b>
-                            {(+newdata?.O_Commission_FX || 0).toLocaleString()}
+                          <div className="">
+                            <b>
+                              {details?.section6_Labels?.[
+                                "Total Gross Weight :"
+                              ] || "Total Gross Weight :"}
+                            </b>
+
+                            {(
+                              +details?.section6_Values?.Row2 || 0
+                            ).toLocaleString()}
                           </div>
+                          <div className="">
+                            <b>
+                              {details?.section6_Labels?.["Total Box :"] ||
+                                "Total Box :"}
+                            </b>
+                            {(
+                              +details?.section6_Values?.Row3 || 0
+                            ).toLocaleString()}
+                          </div>
+
+                          <div className="">
+                            <b>
+                              {details?.section6_Labels?.["Total Volume :"] ||
+                                "Total Volume :"}
+                            </b>
+                            {(
+                              +details?.section6_Values?.Row4 || 0
+                            ).toLocaleString()}
+                          </div>
+
+                          <b>
+                            {details?.section6_Labels?.["Total Items :"] ||
+                              "Total Items :"}
+                          </b>
+                          {(
+                            +details?.section6_Values?.Row5 || 0
+                          ).toLocaleString()}
+                        </div>
+
+                        <div className="col-lg-3">
                           <div>
-                            <b> Total Rebate FX : </b>
-                            {(+newdata?.O_Rebate_FX || 0).toLocaleString()}
+                            <b>
+                              {details?.section7_Labels?.["Freight :"] ||
+                                "Freight :"}
+                            </b>
+                            {(
+                              +details?.section7_Values?.Row1 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section7_Labels?.["Transport :"] ||
+                                "Transport :"}
+                            </b>
+
+                            {(
+                              +details?.section7_Values?.Row2 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section7_Labels?.["Clearance :"] ||
+                                "Clearance :"}
+                            </b>
+                            {(
+                              +details?.section7_Values?.Row3 || 0
+                            ).toLocaleString()}
+                          </div>
+
+                          <div className="">
+                            <b>
+                              {details?.section7_Labels?.["Extra :"] ||
+                                "Extra :"}
+                            </b>
+                            {(
+                              +details?.section7_Values?.Row4 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section7_Labels?.["Pre Cooling"] ||
+                                "Pre Cooling"}
+                            </b>
+                            {(
+                              +details?.section7_Values?.Row5 || 0
+                            ).toLocaleString()}
+                          </div>
+                          {/* <b>
+                          {details?.section7_Labels?.[""] ||
+                            ""}
+                        </b>
+                        {(+details?.section7_Values?.Row5 || 0).toLocaleString()} */}
+                        </div>
+                        <div className="col-lg-3">
+                          <div>
+                            <b>
+                              {details?.section8_Labels?.["Total CNF :"] ||
+                                "Total CNF :"}
+                            </b>
+                            {(
+                              +details?.section8_Values?.Row1 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section8_Labels?.["Total FOB :"] ||
+                                "Total FOB :"}
+                            </b>
+
+                            {(
+                              +details?.section8_Values?.Row2 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section8_Labels?.[
+                                "Total Commission :"
+                              ] || "Total Commission :"}
+                              {(
+                                +details?.section8_Values?.Row3 || 0
+                              ).toLocaleString()}
+                            </b>
+                          </div>
+
+                          <div className="">
+                            <b>
+                              {details?.section8_Labels?.["Total Rebate :"] ||
+                                "Total Rebate :"}
+                            </b>
+                            {(
+                              +details?.section8_Values?.Row4 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section8_Labels?.["Row5"] || "Row5"}
+                            </b>
+                            {(
+                              +details?.section8_Values?.Row5 || 0
+                            ).toLocaleString()}
+                          </div>
+
+                          {/* <b>
+                          {details?.section8_Labels?.[""] ||
+                            ""}
+                        </b>
+                        {(+details?.section8_Values?.Row5 ).toLocaleString()}
+                      */}
+                        </div>
+
+                        <div className="col-lg-3">
+                          <div>
+                            <b>
+                              {details?.section9_Labels?.["Profit :"] ||
+                                "Profit :"}
+                            </b>
+                            {(
+                              +details?.section9_Values?.Row1 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section9_Labels?.["Profit % :"] ||
+                                "Profit % :"}
+                            </b>
+
+                            {(
+                              +details?.section9_Values?.Row2 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section9_Labels?.["Row3"] || "Row3"}
+                            </b>
+
+                            {(
+                              +details?.section9_Values?.Row4 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section9_Labels?.["Row4"] || "Row4"}
+                            </b>
+
+                            {(
+                              +details?.section9_Values?.Row4 || 0
+                            ).toLocaleString()}
+                          </div>
+                          <div className="">
+                            <b>
+                              {details?.section9_Labels?.["Row5"] || "Row5"}
+                            </b>
+
+                            {(
+                              +details?.section9_Values?.Row5 || 0
+                            ).toLocaleString()}
                           </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </form>
                 </div>
               </div>
@@ -2500,7 +3052,7 @@ const UpdateTest = () => {
                     type="number"
                     value={
                       toEditDetails?.itf_quantity ??
-                      defaultDetailsValue?.OD_QTY ??
+                      defaultDetailsValue?.QTY ??
                       0
                     }
                     name="itf_quantity"
@@ -2642,7 +3194,7 @@ const UpdateTest = () => {
                           (item) =>
                             item.id ===
                             (toEditDetails?.brand_id ||
-                              defaultDetailsValue?.OD_Brand)
+                              defaultDetailsValue?.Brand)
                         ) || null
                     }
                     onChange={(event, newValue) => {
@@ -2783,10 +3335,12 @@ const UpdateTest = () => {
                   <Autocomplete
                     disablePortal
                     options={
-                      unit?.map((v) => ({
-                        id: v.ID,
-                        name: v.Name_EN,
-                      })) || []
+                      unit
+                        ?.slice(0, 4) // ✅ Only top 4 units
+                        .map((v) => ({
+                          id: v.ID,
+                          name: v.Name_EN,
+                        })) || []
                     }
                     getOptionLabel={(option) => option?.name || ""}
                     value={
@@ -2799,7 +3353,7 @@ const UpdateTest = () => {
                           (item) =>
                             item.id ===
                             (toEditDetails?.itf_unit ||
-                              defaultDetailsValue?.OD_Unit)
+                              defaultDetailsValue?.Unit)
                         ) || null
                     }
                     onChange={(event, newValue) => {
@@ -2828,7 +3382,7 @@ const UpdateTest = () => {
                     type="number"
                     value={
                       toEditDetails?.adjusted_price ??
-                      defaultDetailsValue?.OD_Adjusted_Price ??
+                      defaultDetailsValue?.Adjusted_Price ??
                       ""
                     }
                     name="adjusted_price"
