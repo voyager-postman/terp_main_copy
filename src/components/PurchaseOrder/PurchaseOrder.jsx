@@ -6,7 +6,7 @@ import { ComboBox } from "../combobox";
 import { Button, Modal } from "react-bootstrap";
 import { Card } from "../../card";
 import { TableView } from "../table";
-import axios from "axios";
+import axios from "../../Url/Api";
 import { API_BASE_URL } from "../../Url/Url";
 import { API_IMAGE_URL } from "../../Url/Url";
 import logo from "../../assets/logoNew.png";
@@ -26,8 +26,11 @@ import Select from "@mui/material/Select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
+
+import { useTranslation } from "react-i18next";
 import moment from "moment";
 const PurchaseOrder = () => {
+  const { t, i18n } = useTranslation("global");
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -61,6 +64,10 @@ const PurchaseOrder = () => {
     paymentDate: null,
     dueDate: null,
   });
+  const [exchangeRate3, setExchangeRate3] = useState(false);
+  const handleAgreedPricingChange9 = (e) => {
+    setExchangeRate3(e.target.checked);
+  };
   const [hasUserChangedValues, setHasUserChangedValues] = useState(false);
   const [basePayment, setBasePayment] = useState(0); // from left_pay
   // const [mode, setMode] = useState("po"); // default is "po"
@@ -218,7 +225,7 @@ const PurchaseOrder = () => {
       setPdfName(fileInv.name);
       setInvImage(null); // clear image
     } else {
-      alert("Please upload a valid image or PDF file");
+      alert(t("invalidFile"));
     }
   };
 
@@ -393,6 +400,7 @@ const PurchaseOrder = () => {
     setClientId(""); // Clear vendor selection
     setFromDate(""); // Clear fromDate field
     setToDate(""); // Clear toDate field
+    setExchangeRate3(false);
   };
   const handleSubmit2 = () => {
     const rowsToSubmit = paymentTable2
@@ -698,7 +706,7 @@ const PurchaseOrder = () => {
         po_id: podId, // Fixed incorrect syntax (wrapped in an object)
       });
       console.log(response);
-      toast.success("Order Cancel Successfully", {
+      toast.success(t("cancelOrderSuccess"), {
         autoClose: 5000,
         theme: "colored",
       });
@@ -706,7 +714,7 @@ const PurchaseOrder = () => {
       navigate("/purchase_orders"); // Navigate after success
     } catch (e) {
       console.error("Error canceling order:", e); // Debugging
-      toast.error("Error has occurred", {
+      toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
@@ -766,7 +774,7 @@ const PurchaseOrder = () => {
           const id = response.data?.po_id || from?.po_id;
           setPodId(response?.data?.po_id);
 
-          toast.success("Create Purchase Orders", {
+          toast.success(t("createPO"), {
             autoClose: 5000,
             theme: "colored",
           });
@@ -776,7 +784,7 @@ const PurchaseOrder = () => {
       }
     } catch (e) {
       setButtonClicked(false);
-      toast.error("An error has occurred", {
+      toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
@@ -1025,7 +1033,10 @@ const PurchaseOrder = () => {
       }
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("An error occurred while accessing the file.");
+      toast.error(t("fileAccessError"), {
+        autoClose: 5000,
+        theme: "colored",
+      });
     }
   };
 
@@ -1466,6 +1477,7 @@ const PurchaseOrder = () => {
       Vendor_ID: clientId, // Use selected client_id
       From_date: fromDate,
       To_date: toDate,
+      Chronological: exchangeRate3 ? 1 : 0,
     };
 
     try {
@@ -1473,56 +1485,38 @@ const PurchaseOrder = () => {
         `${API_BASE_URL}/PurchaseVendorStatement`,
         payload
       );
-      // console.log(response);
-      // const tableHeaders = response?.data?.TableData?.[0] || {}; // Extract header names dynamically
-      // const allData = response?.data?.allData || [];
 
-      // // Extract headers dynamically
-      // const headers = Object.values(tableHeaders); // Header names for display
-      // const keys = Object.keys(tableHeaders); // Keys used in `allData`
-
-      // // Dynamically map data fields to `TableData` keys
-      // const rows = allData.map((item) =>
-      //   keys.map((key, index) => {
-      //     const fieldKey = index === 0 ? "Date" : `column_${index + 1}`; // Map dynamically based on index
-      //     const value = item[fieldKey];
-
-      //     // Format Date Fields Automatically
-      //     if (key.toLowerCase().includes("date")) {
-      //       return formatDate(value);
-      //     }
-      //     return value !== null && value !== undefined ? value : ""; // Handle null/undefined values
-      //   })
-      // );
       console.log(response);
-      const tableHeaders = response?.data?.TableData?.[0] || {}; // Extract header names dynamically
-      const allData = response?.data?.allData || [];
 
-      // Extract headers dynamically
-      const headers = Object.values(tableHeaders); // Header names for display
-      const keys = Object.keys(tableHeaders); // Keys used in `allData`
+      const labels = response?.data?.section5_Labels || {};
+      const tableData = response?.data?.TableData || [];
+      const headers = Object.values(labels);
 
-      // Dynamically map data fields to `TableData` keys
-      const rows = allData.map((item) =>
-        keys.map((key, index) => {
-          let fieldKey = index === 0 ? "Date" : `column_${index + 1}`;
+      // Extract the label keys (Col1, Col2, ...)
+      const keys = Object.keys(labels);
 
-          // Ensure "Invoice Date" correctly maps to column_7
-          if (key === "Invoice Date") {
-            fieldKey = "column_7";
+      // Format date helper
+      const isDate = (val) =>
+        typeof val === "string" && /^\d{4}-\d{2}-\d{2}T/.test(val);
+      const formatDate = (val) => {
+        const date = new Date(val);
+        return `${date.getDate().toString().padStart(2, "0")}-${(
+          date.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, "0")}-${date.getFullYear().toString().slice(2)}`;
+      };
+
+      // Prepare rows
+      const rows = tableData.map((rowItem) =>
+        keys.map((key) => {
+          const val = rowItem[key];
+          if (isDate(val)) {
+            return formatDate(val);
           }
-
-          let value = item[fieldKey];
-
-          // Format Date Fields Automatically
-          if (key.toLowerCase().includes("date")) {
-            return value ? formatDate(value) : ""; // Show only if data exists
-          }
-
-          return value !== null && value !== undefined ? value : ""; // Handle null/undefined values
+          return val !== null && val !== undefined ? val : "";
         })
       );
-
       setClientId("");
       let modalElement = document.getElementById("exampleModal2");
       let modalInstance = bootstrap.Modal.getInstance(modalElement);
@@ -1554,14 +1548,19 @@ const PurchaseOrder = () => {
           doc.setFontSize(10);
           doc.setFont("helvetica", "normal");
           doc.setTextColor(0, 0, 0);
-          doc.text("Start Date:", 252, 9);
-          doc.text("End date:", 252, 13);
-          doc.text("Printed On:", 252, 17);
+          const sectionLabels = response?.data?.Section1_Labels || {};
+          const sectionValues = response?.data?.section1_Values || {};
+          doc.text(`${sectionLabels.Row1}`, 252, 9);
+          doc.text(`${sectionLabels.Row2}`, 252, 13);
+          doc.text(`${sectionLabels.Row3}`, 252, 17);
+          doc.text(`${sectionLabels.Row4}`, 252, 21);
 
-          doc.text(`${formatDate(fromDate)}`, 272.5, 9);
-          doc.text(`${formatDate(toDate)}`, 272, 13);
-          doc.text(`${formatDate(new Date())}`, 272, 17);
+          doc.text(`${sectionValues.Row1}`, 272.5, 9);
+          doc.text(`${sectionValues.Row2}`, 272, 13);
+          doc.text(`${formatDate(sectionValues.Row3)}`, 272, 17);
+          doc.text(`${sectionValues.Row4}`, 272, 21);
         };
+
         doc.setFillColor(32, 55, 100);
         doc.rect(7, 27, doc.internal.pageSize.width - 15, 0.5, "FD");
         doc.setFontSize(12);
@@ -1596,22 +1595,30 @@ const PurchaseOrder = () => {
         const lineHeight1 = 4.2;
 
         const longText1_1 = `${
-          response.data.vendorData?.name ? response.data.vendorData?.name : ""
-        }(${
-          response.data.vendorData?.id_card
-            ? response.data.vendorData?.id_card
+          response.data.section2_Values?.Row1
+            ? response.data.section2_Values?.Row1
             : ""
-        })`;
+        }`;
         doc.setFont("helvetica", "normal");
         const longText1_2 = `${
-          response.data.vendorData?.address
-            ? response.data.vendorData?.address
+          response.data.section2_Values?.Row2
+            ? response.data.section2_Values?.Row2
             : ""
         }`;
         const longText1_3 = `${
-          response.data.vendorData?.email ? response.data.vendorData?.email : ""
-        } / ${
-          response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
+          response.data.section2_Values?.Row3
+            ? response.data.section2_Values?.Row3
+            : ""
+        }`;
+        const longText1_4 = `${
+          response.data.section2_Values?.Row4
+            ? response.data.section2_Values?.Row4
+            : ""
+        }`;
+        const longText1_5 = `${
+          response.data.section2_Values?.Row5
+            ? response.data.section2_Values?.Row5
+            : ""
         }`;
 
         // Render client details
@@ -1642,6 +1649,22 @@ const PurchaseOrder = () => {
           maxWidth1,
           lineHeight1
         );
+        startY = renderWrappedText(
+          doc,
+          longText1_4,
+          startX1,
+          startY,
+          maxWidth1,
+          lineHeight1
+        );
+        startY = renderWrappedText(
+          doc,
+          longText1_5,
+          startX1,
+          startY,
+          maxWidth1,
+          lineHeight1
+        );
 
         const formatterNg = new Intl.NumberFormat("en-US", {
           style: "decimal",
@@ -1654,52 +1677,87 @@ const PurchaseOrder = () => {
         });
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text("Pre Statement", 7, startY + 0.5);
+        doc.text(
+          `${response?.data.section3_Values["Pre Statement"]}`,
+          7,
+          startY + 0.5
+        );
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.text("Invoices : ", 7, startY + 5);
+
         doc.text(
-          formatter.format(response.data.data?.pre_statement_Invoices),
-          24,
+          `${response?.data.section4_Labels?.Col1 || ""}`,
+          7,
           startY + 5
         );
-        doc.text("Claim : ", 58, startY + 5);
         doc.text(
-          formatter.format(response.data.data?.pre_statement_claims),
-          71,
+          `${response?.data.section4_Values?.Col1 || ""}`,
+          22,
           startY + 5
         );
-        doc.text("Payment : ", 100, startY + 5);
         doc.text(
-          formatter.format(response.data.data?.pre_statement_payments),
-          119,
+          `${response?.data.section4_Labels?.Col2 || ""}`,
+          54,
           startY + 5
         );
-        doc.text("Total : ", 150, startY + 5);
         doc.text(
-          formatter.format(response.data.data?.pre_statement_Totals),
-          162,
+          `${response?.data.section4_Values?.Col2 || ""}`,
+          67,
           startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Labels?.Col3 || ""}`,
+          96,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col3 || ""}`,
+          115,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Labels?.Col4 || ""}`,
+          146,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col4 || ""}`,
+          158,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Labels?.Col5 || ""}`,
+          188,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col5 || ""}`,
+          206,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Labels?.Col6 || ""}`,
+          238,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col6 || ""}`,
+          258,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Labels?.Col7 || ""}`,
+          7,
+          startY + 10
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col7 || ""}`,
+          22,
+          startY + 10
         );
         await addLogoWithDetails();
-        let yTop = startY + 7.5;
-        // Format data rows dynamically
+        let yTop = startY + 13;
 
-        // const rows = response?.data?.TableData?.map((item, index) => ({
-        //   index: item.date ? formatDate(item.date) : "",
-        //   AWB: item.PO_Number,
-        //   Transaction_Ref: item.currency,
-        //   Currnecy: item.Amount,
-        //   Invocied_Amount: item.Paid_Amount
-        //     ? newFormatter.format(item.Paid_Amount)
-        //     : "",
-        //   Paid_Amount: item.Vendore_Reference ? item.Vendore_Reference : "",
-        //   Client_Reference:
-        //     item.Invoice_Date && item.Invoice_Date !== "0000-00-00"
-        //       ? formatDate(item.Invoice_Date)
-        //       : "",
-        //   TT_Reference: item.AWB,
-        // }));
         doc.autoTable({
           head: [headers],
           body: rows,
@@ -1752,54 +1810,73 @@ const PurchaseOrder = () => {
         doc.setTextColor(0, 0, 0);
 
         // Invoices
-        doc.text(`Invoices :  `, 75, finalY + 1);
+        doc.text(`${response?.data.section6_Labels.Row1}`, 75, finalY + 1);
         doc.text(
-          formatter.format(response.data.data?.statement_Invoices),
+          `${response?.data.section6_Values.Row1 || ""}`,
           105 +
             valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+            doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
           finalY + 1
         );
 
         // Claims
-        doc.text(`Claims :`, 75, finalY + 5);
+        doc.text(`${response?.data.section6_Labels.Row2}`, 75, finalY + 5);
         doc.text(
-          formatter.format(response.data.data?.statement_claims),
+          `${response?.data.section6_Values.Row2 || ""}`,
           105 +
             valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+            doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
           finalY + 5
         );
 
         // Payments
-        doc.text(`Payments :`, 75, finalY + 9);
+        doc.text(`${response?.data.section6_Labels.Row3}`, 75, finalY + 9);
         doc.text(
-          formatter.format(response.data.data?.statement_payments),
+          `${response?.data.section6_Values.Row3 || ""}`,
           105 +
             valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+            doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
           finalY + 9
+        );
+        // new
+        doc.text(`${response?.data.section6_Labels.Row7}`, 75, finalY + 13);
+        doc.text(
+          `${response?.data.section6_Values.Row7 || ""}`,
+          105 +
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
+          finalY + 13
+        );
+
+        doc.text(`${response?.data.section6_Labels.Row5}`, 75, finalY + 17);
+        doc.text(
+          `${response?.data.section6_Values.Row5 || ""}`,
+          105 +
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
+          finalY + 17
+        );
+
+        doc.text(`${response?.data.section6_Labels.Row6}`, 75, finalY + 21);
+        doc.text(
+          `${response?.data.section6_Values.Row6 || ""}`,
+          105 +
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
+          finalY + 21
         );
 
         // Line
-        doc.rect(75, finalY + 11, 50, 0.5, "FD");
+        doc.rect(75, finalY + 25, 50, 0.5, "FD");
 
         // Total
-        doc.text("Total :", 75, finalY + 16);
+        doc.text(`${response?.data.section6_Labels.Row4}`, 75, finalY + 29);
         doc.text(
-          formatter.format(response.data.data?.statement_Totals),
+          `${response?.data.section6_Values.Row4 || ""}`,
           105 +
             valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
-          finalY + 16
+            doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
+          finalY + 29
         );
 
         // bottom part
@@ -1807,29 +1884,85 @@ const PurchaseOrder = () => {
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text("Total History", 7, finalY + 20);
+        doc.text(
+          `${response?.data.section7_Values["Total History"]}`,
+          7,
+          finalY + 31
+        );
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.text("Invoices : ", 7, finalY + 24);
         doc.text(
-          formatter.format(response.data.data?.Total_Invoices),
+          `${response?.data.section8_Labels.Col1 || ""}`,
+          7,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col1 || ""}`,
           24,
-          finalY + 24
+          finalY + 36
         );
-        doc.text("Claim : ", 58, finalY + 24);
         doc.text(
-          formatter.format(response.data.data?.Total_Claims),
+          `${response?.data.section8_Labels.Col2 || ""}`,
+          58,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col2 || ""}`,
           71,
-          finalY + 24
+          finalY + 36
         );
-        doc.text("Payment : ", 100, finalY + 24);
         doc.text(
-          formatter.format(response.data.data?.Total_Payment),
-          119,
-          finalY + 24
+          `${response?.data.section8_Labels.Col3 || ""}`,
+          100,
+          finalY + 36
         );
-        doc.text("Total : ", 150, finalY + 24);
-        doc.text(formatter.format(response.data.data?.Total), 162, finalY + 24);
+        doc.text(
+          `${response?.data.section8_Values.Col3 || ""}`,
+          119,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section8_Labels.Col4 || ""}`,
+          150,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col4 || ""}`,
+          162,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section8_Labels.Col5 || ""}`,
+          7,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col5 || ""}`,
+          24,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section8_Labels.Col6 || ""}`,
+          58,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col6 || ""}`,
+          75,
+          finalY + 41
+        );
+
+        // Row7 key is mismatched with value Col7, but we’ll assume Col7 is correct
+        doc.text(
+          `${response?.data.section8_Labels.Row7 || ""}`,
+          100,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col7 || ""}`,
+          119,
+          finalY + 41
+        );
         // page number
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
@@ -2039,7 +2172,11 @@ const PurchaseOrder = () => {
       .map(({ isChecked, ...rest }) => rest); // remove isChecked before sending
 
     if (selectedRows.length === 0) {
-      toast.error("Please select at least one record before submitting.");
+      toast.error(t("selectRecordError"), {
+        autoClose: 5000,
+        theme: "colored",
+      });
+
       return;
     }
 
@@ -2100,7 +2237,7 @@ const PurchaseOrder = () => {
           console.error("Error fetching deposit details:", detailErr);
         }
 
-        toast.success("Payment submitted successfully!");
+        toast.success(t("paymentDone"));
         dataAllClearVender();
       } else {
         setShow3(true);
@@ -2108,7 +2245,7 @@ const PurchaseOrder = () => {
       }
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Something went wrong! Please try again.");
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -2128,7 +2265,7 @@ const PurchaseOrder = () => {
       .filter((_, index) => childChecked[index]);
 
     if (selectedRows.length === 0) {
-      toast.error("Please select at least one record before submitting.");
+      toast.error(t("selectRecordError"));
     }
     const payload = {
       vendor_id: clientId2,
@@ -2155,7 +2292,7 @@ const PurchaseOrder = () => {
         setModalErrorMsg(result);
         return;
       }
-      toast.success("Payment submitted successfully!");
+      toast.success(t("paymentDone"));
       dataAllClearVender();
       getPurchaseOrder();
 
@@ -2166,7 +2303,7 @@ const PurchaseOrder = () => {
       }
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Something went wrong! Please try again.");
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -2174,42 +2311,42 @@ const PurchaseOrder = () => {
     console.log("Selected Payment Channel:", paymentChannel);
 
     if (!clientId) {
-      toast.error("Client is required.");
+      toast.error(t("clientRequired"));
       return;
     }
 
     if (!paymentDate) {
-      toast.error("Payment Date is required.");
+      toast.error(t("paymentDateRequired"));
       return;
     }
 
     if (!paymentChannel) {
-      toast.error("Payment Channel is required.");
+      toast.error(t("paymentChannelRequired"));
       return;
     }
 
     if (!fxId) {
-      toast.error("FX is required.");
+      toast.error(t("fxRequired"));
       return;
     }
 
     if (!fxRate || isNaN(Number(fxRate))) {
-      toast.error("Valid FX Rate is required.");
+      toast.error(t("validFxRate"));
       return;
     }
 
     if (!intermittentBankCharges || isNaN(Number(intermittentBankCharges))) {
-      toast.error("Valid Intermittent Bank Charges are required.");
+      toast.error(t("validInterBankCharges"));
       return;
     }
 
     if (!localBankCharges || isNaN(Number(localBankCharges))) {
-      toast.error("Valid Local Bank Charges are required.");
+      toast.error(t("validLocalBankCharges"));
       return;
     }
 
     if (!thbReceived || isNaN(Number(thbReceived))) {
-      toast.error("Valid THB Received value is required.");
+      toast.error(t("validThbReceived"));
       return;
     }
 
@@ -2225,7 +2362,7 @@ const PurchaseOrder = () => {
     console.log("FX Payment:", parsedFxPayment.toFixed(2));
     console.log("Total Paid Amount:", totalPaidAmount.toFixed(2));
     if (parsedFxPayment.toFixed(2) !== totalPaidAmount.toFixed(2)) {
-      toast.error("Total Paid Amount does not match FX Payment value.");
+      toast.error(t("paymentMismatch"));
       return;
     }
     const paymentData = {
@@ -2292,24 +2429,24 @@ const PurchaseOrder = () => {
       setCheckedItems({});
       setPaymentTable2([]); //
       setNotes1("");
-      toast.success("Data submitted successfully.");
+      toast.success(t("paymentSuccess"));
     } catch (error) {
       console.error("Error submitting payment data:", error.message);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("tryAgain"));
     }
   };
 
   const handleSubmit1 = async () => {
     if (!clientId) {
-      toast.error("Vendor  is required.");
+      toast.error(t("vendorRequired"));
       return;
     }
     if (!paymentDate) {
-      toast.error("Payment date is required.");
+      toast.error(t("paymentDateRequired"));
       return;
     }
     if (!paymentChannel) {
-      toast.error("Payment channel is required.");
+      toast.error(t("paymentChannelRequired"));
       return;
     }
     const totalPaidAmount = paymentTable1.reduce((total, item) => {
@@ -2385,14 +2522,14 @@ const PurchaseOrder = () => {
           "Payment details array submitted successfully",
           secondApiResponse
         );
-        toast.success("Payment details submitted successfully");
+        toast.success(t("paymentDetailsSuccess"));
       } catch (secondApiError) {
         console.error("Error submitting payment details", secondApiError);
-        toast.error("Something went wrong");
+        toast.error(t("tryAgain"));
       }
     } catch (error) {
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -2510,7 +2647,7 @@ const PurchaseOrder = () => {
     } catch (error) {
       // Handle error case for first API
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -2543,7 +2680,7 @@ const PurchaseOrder = () => {
       setPaymentNotes("");
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
-      toast.error("An error occurred while closing.");
+      toast.error(t("closingError"));
     }
   };
 
@@ -2605,10 +2742,10 @@ const PurchaseOrder = () => {
         accesstype: 1, // Mark as in use
       });
       console.log(accessResponse);
-      toast.success("Data submitted successfully.");
+      toast.success(t("dataSubmitSuccess"));
     } catch (error) {
       console.error("Error submitting payment data:", error.message);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("genericError"));
     }
   };
   function formatDate(dateString) {
@@ -2756,7 +2893,7 @@ const PurchaseOrder = () => {
             toast.success(response.data.Message_EN);
             toast.success(response.data.Message_TH);
           } catch (e) {
-            toast.error("Something went wrong during delete");
+            toast.error(t("deleteError"));
           }
         } else {
           // If cancelled, release access
@@ -2768,14 +2905,14 @@ const PurchaseOrder = () => {
             });
             getPurchaseOrder();
           } catch (e) {
-            toast.error("Failed to update access file on cancel");
+            toast.error(t("accessUpdateError"));
           }
         }
       } else {
-        toast.warning("This file is being accessed.");
+        toast.warning(t("fileInUse"));
       }
     } catch (e) {
-      toast.error("Failed to check file access.");
+      toast.error(t("fileAccessCheckFailed"));
     }
   };
 
@@ -2956,21 +3093,17 @@ const PurchaseOrder = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "PO Number",
+        Header: t("poNumber"),
         accessor: "POCODE",
       },
-      // {
-      //   Header: "Type",
-      //   accessor: "vendor_Type",
-      // },
 
       {
-        Header: "Vendor",
+        Header: t("vendor"),
         accessor: "Vendor_name",
       },
 
       {
-        Header: "PO Date",
+        Header: t("poDate"),
         accessor: (a) =>
           `${new Date(a.PO_date).getDate().toString().padStart(2, "0")}-${(
             new Date(a.PO_date).getMonth() + 1
@@ -2979,20 +3112,20 @@ const PurchaseOrder = () => {
             .padStart(2, "0")}-${new Date(a.PO_date).getFullYear()}`,
       },
       {
-        Header: "Total",
+        Header: t("total"),
         accessor: (a) =>
           `${(+(a.Total_Before_Tax + a.VAT || "0")).toLocaleString()} THB`,
       },
       {
-        Header: "Invoice",
+        Header: t("invoices"),
         accessor: "supplier_invoice_number",
       },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: "PO_Status",
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="editIcon">
             <>
@@ -3004,44 +3137,45 @@ const PurchaseOrder = () => {
                 <i className="mdi mdi-eye" />
               </button>
 
-              {a.Payment_Status === 1 && a.Receiving_Status === 1 && (
-                <button
-                  onClick={async () => {
-                    try {
-                      const res = await axios.post(
-                        `${API_BASE_URL}/Checkeaccessfile`,
-                        {
-                          id: a.PO_ID,
-                          accesstype: 1, // Mark as in use
-                          edit: 1,
+              {a.Payment_Status === 1 &&
+                (a.Receiving_Status === 1 || a.Receiving_Status === 2) && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await axios.post(
+                          `${API_BASE_URL}/Checkeaccessfile`,
+                          {
+                            id: a.PO_ID,
+                            accesstype: 1, // Mark as in use
+                            edit: 1,
+                          }
+                        );
+
+                        if (res?.data?.success) {
+                          navigate("/updatePurchaseOrder", {
+                            state: { from: a },
+                          });
+                        } else {
+                          toast.warning(res?.data?.message);
                         }
-                      );
-
-                      if (res?.data?.success) {
-                        navigate("/updatePurchaseOrder", {
-                          state: { from: a },
-                        });
-                      } else {
-                        toast.warning(res?.data?.message);
+                      } catch (error) {
+                        console.error("Access API error:", error);
+                        toast.error(
+                          "Something went wrong while checking file access."
+                        );
                       }
-                    } catch (error) {
-                      console.error("Access API error:", error);
-                      toast.error(
-                        "Something went wrong while checking file access."
-                      );
-                    }
-                  }}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className="mdi mdi-pencil pl-2" />
-                </button>
-              )}
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <i className="mdi mdi-pencil pl-2" />
+                  </button>
+                )}
 
-              {a.Payment_Status === 1 && a.Receiving_Status === 1 && (
+              {a.Payment_Status === 1 && a.Receiving_Status === 2 && (
                 <button
                   type="button"
                   onClick={() => deleteOrder(a.PO_ID)}
@@ -3049,7 +3183,7 @@ const PurchaseOrder = () => {
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    color: "red", // optional: make delete icon red
+                    color: "red",
                   }}
                 >
                   <i className="ps-2 mdi mdi-delete" />
@@ -3128,7 +3262,7 @@ const PurchaseOrder = () => {
         ),
       },
     ],
-    []
+    [i18n.language]
   );
   const closeButton = async () => {
     try {
@@ -3156,7 +3290,7 @@ const PurchaseOrder = () => {
       }
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
-      toast.error("An error occurred while closing.");
+      toast.error(t("closingError"));
     }
   };
 
@@ -3398,10 +3532,10 @@ const PurchaseOrder = () => {
 
   return (
     <>
-      <Card title="Purchase Order">
+      <Card title={t("purchase_order")}>
         <div className="row dashCard53 mb-5 mt-5 justify-content-center">
           <div className=" col-lg-3 col-md-4">
-            <h6 className="payableHead"> Payables</h6>
+            <h6 className="payableHead"> {t("payables")}</h6>
 
             <div id="chart">
               <ReactApexChart
@@ -3416,29 +3550,29 @@ const PurchaseOrder = () => {
             <div id="html-dist"></div>
           </div>
           <div className="col-lg-3 col-md-4">
-            <h3 className="itemOrder mt-0 mb-2">Payable Amounts</h3>
+            <h3 className="itemOrder mt-0 mb-2">{t("payableAmounts")}</h3>
             <div className="tableCreateClient">
               <table>
                 <tbody>
                   <tr>
-                    <th>Name</th>
-                    <th>Payable</th>
+                    <th>{t("name")}</th>
+                    <th>{t("payable")}</th>
                   </tr>
 
                   <tr>
-                    <td>Total</td>
+                    <td> {t("total")}</td>
                     <td>{purchaseStatistic1["Format(@Payables,2)"]}</td>
                   </tr>
                   <tr>
-                    <td>Produce</td>
+                    <td> {t("produce")}</td>
                     <td>{purchaseStatistic1["@produce_Payable"]} </td>
                   </tr>
                   <tr>
-                    <td>Freight</td>
+                    <td> {t("freight")}</td>
                     <td> {purchaseStatistic1["@Freight_Payable"]}</td>
                   </tr>
                   <tr data-bs-toggle="modal" data-bs-target="#exampleModal3">
-                    <td>Packaging</td>
+                    <td> {t("packaging")}</td>
                     <td>{purchaseStatistic1["@packaging_Payable"]} </td>
                   </tr>
                   <div
@@ -3452,7 +3586,7 @@ const PurchaseOrder = () => {
                       <div className="modal-content">
                         <div className="modal-header">
                           <h5 className="modal-title" id="exampleModalLabel">
-                            Packaging
+                            {t("packaging")}
                           </h5>
                           <button
                             type="button"
@@ -3467,8 +3601,8 @@ const PurchaseOrder = () => {
                           <div className="row">
                             <table>
                               <tr>
-                                <th>Name</th>
-                                <th>Payable</th>
+                                <th> {t("name")}</th>
+                                <th> {t("payable")} </th>
                               </tr>
                               {packagingTableData?.map((item) => {
                                 return (
@@ -3491,7 +3625,7 @@ const PurchaseOrder = () => {
                             data-bs-dismiss="modal"
                             aria-label="Close"
                           >
-                            Close
+                            {t("close")}
                           </button>
                         </div>
                       </div>
@@ -3503,13 +3637,13 @@ const PurchaseOrder = () => {
           </div>
 
           <div className=" col-lg-3 col-md-4">
-            <h3 className="itemOrder mt-0 mb-2">Top 5 Payable Accounts</h3>
+            <h3 className="itemOrder mt-0 mb-2"> {t("topPayables")}</h3>
             <div className="tableCreateClient">
               <table>
                 <tbody>
                   <tr>
-                    <th> Name</th>
-                    <th>Payable</th>
+                    <th>{t("name")}</th>
+                    <th>{t("payable")}</th>
                   </tr>
                   {purchaseStatistic?.map((item) => {
                     return (
@@ -3524,7 +3658,7 @@ const PurchaseOrder = () => {
             </div>
           </div>
           <div className=" col-lg-3 col-md-4">
-            <h6 className="payableHead">Total Expenses</h6>
+            <h6 className="payableHead"> {t("totalExpenses")}</h6>
             <div id="chart">
               <ReactApexChart
                 options={options}
@@ -3543,7 +3677,7 @@ const PurchaseOrder = () => {
             data-bs-toggle="modal"
             data-bs-target="#modalCombine1"
           >
-            Combined Payment
+            {t("combinedPayment")}
           </button>
           <button
             type="button"
@@ -3551,7 +3685,7 @@ const PurchaseOrder = () => {
             data-bs-toggle="modal"
             data-bs-target="#exampleModal2"
           >
-            Statement
+            {t("statement")}
           </button>
           <button
             type="button"
@@ -3559,14 +3693,14 @@ const PurchaseOrder = () => {
             data-bs-toggle="modal"
             data-bs-target="#exampleModalComm"
           >
-            Record Commission
+            {t("recordCommission")}
           </button>
           <button
             type="button"
             className="btn btn-primary"
             onClick={handleNavigate}
           >
-            Create
+            {t("create")}
           </button>
           <div
             className="modal fade "
@@ -3853,7 +3987,7 @@ const PurchaseOrder = () => {
               <div className="modal-content">
                 <div className="modal-header">
                   <h1 className="modal-title fs-5" id="exampleModalLabel">
-                    Payment
+                    {t("payments")}
                   </h1>
                   <button
                     type="button"
@@ -3871,7 +4005,7 @@ const PurchaseOrder = () => {
                       <div className="row">
                         <div className="col-lg-6">
                           <div className="parentFormPayment">
-                            <p>Payment Date</p>
+                            <p> {t("paymentDate")}</p>
                             <DatePicker
                               selected={selectedPaymentDate}
                               onChange={(date) => setSelectedPaymentDate(date)}
@@ -3884,7 +4018,7 @@ const PurchaseOrder = () => {
 
                         <div className="col-lg-6">
                           <div className="parentFormPayment autoComplete">
-                            <p>Payment Channel</p>
+                            <p> {t("paymentChannel")}</p>
                             <Autocomplete
                               disablePortal
                               options={paymentChannle || []}
@@ -3916,7 +4050,7 @@ const PurchaseOrder = () => {
 
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
-                            <p>Bank Ref</p>
+                            <p> {t("bankRef")}</p>
                             <input
                               type="text"
                               value={bankReference}
@@ -3927,7 +4061,7 @@ const PurchaseOrder = () => {
 
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
-                            <p>Bank Charges</p>
+                            <p> {t("bankCharges")}</p>
                             <input
                               type="text"
                               value={bankChargeAmount}
@@ -3940,7 +4074,7 @@ const PurchaseOrder = () => {
 
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
-                            <p>Available Deposit</p>
+                            <p> {t("availableDeposit")}</p>
                             <input
                               type="number"
                               value={depositAvailableNew}
@@ -3951,7 +4085,7 @@ const PurchaseOrder = () => {
                         </div>
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
-                            <p>Rounding</p>
+                            <p> {t("rounding")}</p>
                             <input
                               type="text"
                               value={roundingNew}
@@ -3964,7 +4098,7 @@ const PurchaseOrder = () => {
                         </div>
 
                         <div className="parentFormPayment col-lg-6 mt-3">
-                          <p>Payment Amount</p>
+                          <p> {t("paymentAmount")}</p>
                           <input
                             type="text"
                             value={paymentAmmountNew}
@@ -3977,7 +4111,7 @@ const PurchaseOrder = () => {
 
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
-                            <p>Notes</p>
+                            <p> {t("notes")}</p>
                             <textarea
                               type="text"
                               value={paymentNotes}
@@ -3992,7 +4126,7 @@ const PurchaseOrder = () => {
                         <div className="pe-3" style={{ width: "85%" }}>
                           <div className="flexBefore">
                             <div>
-                              <strong>Total Before Tax : </strong>
+                              <strong> {t("totalBeforeTax")} </strong>
                             </div>
                             <div>
                               <span>
@@ -4003,7 +4137,7 @@ const PurchaseOrder = () => {
                           </div>
                           <div className="flexBefore">
                             <div>
-                              <strong>VAT : </strong>
+                              <strong> {t("vat")}: </strong>
                             </div>
                             <div>
                               <span>
@@ -4019,7 +4153,7 @@ const PurchaseOrder = () => {
 
                           <div className="flexBefore">
                             <div>
-                              <strong>WHT : </strong>
+                              <strong> {t("wht")} : </strong>
                             </div>
                             <div>
                               <span>
@@ -4035,7 +4169,7 @@ const PurchaseOrder = () => {
                           <div className=" form-group">
                             <div className="flexBefore">
                               <div>
-                                <strong>Rounding : </strong>
+                                <strong> {t("rounding")} : </strong>
                               </div>
                               <div>
                                 <span>
@@ -4045,7 +4179,7 @@ const PurchaseOrder = () => {
                             </div>
                             <div className="flexBefore">
                               <div>
-                                <strong>Deposit : </strong>
+                                <strong> {t("deposit")} : </strong>
                               </div>
                               <div>
                                 <span>{Number(depositAvailableNew)}</span>
@@ -4054,7 +4188,7 @@ const PurchaseOrder = () => {
 
                             <div className="flexBefore">
                               <div>
-                                <strong>Amount to Pay : </strong>{" "}
+                                <strong> {t("amountToPay")} : </strong>{" "}
                               </div>
 
                               <div>
@@ -4074,7 +4208,7 @@ const PurchaseOrder = () => {
                             </div>
                             <div className="flexBefore">
                               <div>
-                                <strong>Remainder : </strong>{" "}
+                                <strong>{t("remainder")} : </strong>{" "}
                               </div>
 
                               <div>
@@ -4101,7 +4235,7 @@ const PurchaseOrder = () => {
                     onClick={submitPaymentData}
                     className="btn btn-primary"
                   >
-                    Submit
+                    {t("submit")}
                   </button>
                 </div>
               </div>
@@ -4355,7 +4489,7 @@ const PurchaseOrder = () => {
               <div className="modal-content">
                 <div className="modal-header">
                   <h5 className="modal-title" id="exampleModalLabel">
-                    Statement
+                    {t("statement")}
                   </h5>
                   <button
                     type="button"
@@ -4370,24 +4504,8 @@ const PurchaseOrder = () => {
                 <div className="modal-body">
                   <div className="row">
                     <div className="col-lg-12 form-group mb-2">
-                      <h6>Vendor</h6>
+                      <h6>{t("vendor")}</h6>
                       <div className="ceateTransport">
-                        {/* <Autocomplete
-                                  disablePortal
-                                  options={clients} // Use your clients array as options
-                                  getOptionLabel={(option) => option.name} // Display the client's name
-                                  onChange={(e, newValue) =>
-                                    setClientId(newValue?.vendor_id || "")
-                                  } // Set the selected vendor id
-                                  sx={{ width: 300 }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder="Search Vendor" // Adds a placeholder
-                                      InputLabelProps={{ shrink: false }} // Prevents floating label
-                                    />
-                                  )}
-                                /> */}
                         <Autocomplete
                           disablePortal
                           options={clients || []} // Ensure options is always an array
@@ -4413,7 +4531,7 @@ const PurchaseOrder = () => {
                     </div>
 
                     <div className="col-lg-12 form-group borderInputUnset mb-2">
-                      <h6>From</h6>
+                      <h6>{t("from")}</h6>
                       {/* <input
                         className="form-control"
                         type="date"
@@ -4431,7 +4549,7 @@ const PurchaseOrder = () => {
                       />
                     </div>
                     <div className="col-lg-12 form-group borderInputUnset mb-2">
-                      <h6>To</h6>
+                      <h6>{t("to")}</h6>
                       {/* <input
                         type="date"
                         className="form-control"
@@ -4448,6 +4566,33 @@ const PurchaseOrder = () => {
                         customInput={<CustomInput />}
                       />
                     </div>
+                    <div className="col-lg-12 form-group borderInputUnset mb-2">
+                      <h6>{t("chronological")}</h6>
+
+                      <div>
+                        <label
+                          className="toggleSwitch large"
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 10,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            name="Commission_Currency"
+                            checked={exchangeRate3}
+                            onChange={handleAgreedPricingChange9}
+                          />
+                          <span>
+                            <span>No</span>
+                            <span> Yes</span>
+                          </span>
+                          <a> </a>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="modal-footer justify-content-center">
@@ -4456,7 +4601,7 @@ const PurchaseOrder = () => {
                     className="UpdatePopupBtn btn btn-primary "
                     onClick={handleSubmit}
                   >
-                    Submit
+                    {t("submit")}
                   </button>
                 </div>
               </div>
@@ -4474,7 +4619,7 @@ const PurchaseOrder = () => {
               <div className="modal-content">
                 <div class="modal-header">
                   <h1 class="modal-title fs-5" id="exampleModalLabel">
-                    Combined Payment
+                    {t("combined_payment")}
                   </h1>
                   <button
                     type="button"
@@ -4490,7 +4635,7 @@ const PurchaseOrder = () => {
                   <div className="row">
                     <div className="col-lg-4">
                       <div className="parentFormPayment autoComplete">
-                        <p>Vendor </p>
+                        <p> {t("vendor")} </p>
                         <Autocomplete
                           disablePortal
                           options={
@@ -4525,7 +4670,7 @@ const PurchaseOrder = () => {
                     <div className="col-lg-4">
                       <div className="parentFormPayment">
                         <div>
-                          <p>Combined Payment Date</p>
+                          <p> {t("combinedPaymentDate")} </p>
                         </div>
                         <div>
                           <DatePicker
@@ -4546,7 +4691,7 @@ const PurchaseOrder = () => {
                     <div className="col-lg-4">
                       <div className="parentFormPayment">
                         <div>
-                          <p>Due Date</p>
+                          <p>{t("dueDate")}</p>
                         </div>
                         <div>
                           <DatePicker
@@ -4577,23 +4722,23 @@ const PurchaseOrder = () => {
                             onChange={handleParentChange}
                           />
                         </th>
-                        <th style={{ width: "130px" }}> CPN Number</th>
-                        <th style={{ width: "130px" }}> Issue Date </th>
-                        <th style={{ width: "130px" }}> Due Date</th>
+                        <th style={{ width: "130px" }}> {t("cpnNumber")}</th>
+                        <th style={{ width: "130px" }}>{t("issueDate")} </th>
+                        <th style={{ width: "130px" }}>{t("dueDate")} </th>
                         <th style={{ width: "150px" }} className="text-center">
-                          Total Before Tax
+                          {t("totalBeforeTax")}
                         </th>
                         <th style={{ width: "150px" }} className="text-center">
-                          Past Payment
+                          {t("pastPayment")}
                         </th>
                         <th style={{ width: "150px" }} className="text-center">
-                          Net Payable{" "}
+                          {t("netPayable")}
                         </th>
                         <th className="text-center" style={{ width: "150px" }}>
-                          FX
+                          {t("fx")}
                         </th>
                         <th style={{ width: "150px" }} className="text-center">
-                          Amount To Pay
+                          {t("amountToPay")}
                         </th>
                       </tr>
 
@@ -4662,7 +4807,7 @@ const PurchaseOrder = () => {
                     <div className="pe-3">
                       <div className="flexBefore">
                         <div>
-                          <strong>Total Before Tax : </strong>
+                          <strong>{t("totalBeforeTax")} </strong>
                         </div>
                         <div>
                           <span> {formatNumber(TotalBeforeTaxTotal ?? 0)}</span>
@@ -4670,7 +4815,7 @@ const PurchaseOrder = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>VAT : </strong>{" "}
+                          <strong>{t("vat")}: </strong>{" "}
                         </div>
                         <div>
                           <span>{formatNumber(VATTotal ?? 0)}</span>
@@ -4679,7 +4824,7 @@ const PurchaseOrder = () => {
 
                       <div className="flexBefore">
                         <div>
-                          <strong>WHT : </strong>{" "}
+                          <strong>{t("wht")}: </strong>{" "}
                         </div>
                         <div>
                           <span>{formatNumber(WHTTotal ?? 0)}</span>
@@ -4688,7 +4833,7 @@ const PurchaseOrder = () => {
                       <div className=" form-group">
                         <div className="parentFormPayment d-flex">
                           <div className="me-3">
-                            <strong>Rounding</strong>
+                            <strong>{t("rounding")}:</strong>
                           </div>
 
                           <input
@@ -4701,7 +4846,7 @@ const PurchaseOrder = () => {
                         </div>
                         <div className="flexBefore">
                           <div>
-                            <strong>Amount to Pay : </strong>{" "}
+                            <strong>{t("amountToPay")}: </strong>{" "}
                           </div>
                           <div>
                             <span>
@@ -4724,7 +4869,7 @@ const PurchaseOrder = () => {
                     onClick={handleSubmitVenderData}
                     className="btn btn-primary"
                   >
-                    Submit
+                    {t("submit")}
                   </button>
 
                   <button
@@ -4736,7 +4881,7 @@ const PurchaseOrder = () => {
                     className="btn btn-primary"
                     style={{ width: "125px" }}
                   >
-                    PAY NOW
+                    {t("payNow")}
                   </button>
                 </div>
               </div>
@@ -4891,23 +5036,23 @@ const PurchaseOrder = () => {
             <div className="modal-body">
               <div className="claimParent row">
                 <div className="col-lg-3">
-                  <strong>PO Number : </strong>
+                  <strong> {t("poNumber")} : </strong>
                   <span>{claimPageData.POCODE}</span>
                 </div>
                 <div className="col-lg-3">
-                  <strong>Vendor :</strong>{" "}
+                  <strong>{t("vendor")} :</strong>{" "}
                   <span>{claimPageData.Vendor_name}</span>
                 </div>
 
                 <div className="col-lg-3">
-                  <strong>Currency : </strong>{" "}
+                  <strong> {t("currency")} : </strong>{" "}
                   <span>{claimPageData.currency}</span>
                 </div>
               </div>
               <div className="uploadFileMain">
                 <div className="claimDateMargin">
                   <p>
-                    <strong>Claim Date</strong>
+                    <strong>{t("claimDate")}</strong>
                   </p>
                   {/* <input
                     type="date"
@@ -4954,14 +5099,14 @@ const PurchaseOrder = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>ITF</th>
-                      <th>Quantity</th>
-                      <th>Unit</th>
-                      <th>Number Box</th>
-                      <th>Line Total</th>
-                      <th>Claim Quantity</th>
-                      <th>Unit</th>
-                      <th>Amount</th>
+                      <th> {t("itf")}</th>
+                      <th> {t("quantity")}</th>
+                      <th> {t("unit")}</th>
+                      <th> {t("numberBox")}</th>
+                      <th> {t("lineTotal")}</th>
+                      <th>{t("claimQuantity")}</th>
+                      <th>{t("unit")}</th>
+                      <th> {t("amount")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -5027,7 +5172,7 @@ const PurchaseOrder = () => {
                 className="btn btn-primary"
                 onClick={handleSubmit3}
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -5609,7 +5754,7 @@ const PurchaseOrder = () => {
                     onClick={update}
                     disabled={buttonClicked} // Disable button if it has been clicked
                   >
-                    Create
+                    {t("crate")}
                   </button>
 
                   <button
@@ -5618,7 +5763,7 @@ const PurchaseOrder = () => {
                     name="signup"
                     onClick={cancelOrder}
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                 </div>
               </div>
@@ -5633,7 +5778,7 @@ const PurchaseOrder = () => {
                     style={{ backgroundColor: color ? "#2f423c" : "" }}
                   >
                     <h1 className="modal-title fs-5" id="exampleModalLabel">
-                      Purchase Order Check
+                      {t("purchaseOrderCheck")}
                     </h1>
                     <button
                       style={{ color: "#fff", fontSize: "30px" }}
@@ -5656,7 +5801,7 @@ const PurchaseOrder = () => {
                         {stock.message_th ? stock.message_th : "NULL"}
                       </p>
                       <div className="closeBtnRece">
-                        <button onClick={closeIcon}>Close</button>
+                        <button onClick={closeIcon}> {t("close")}</button>
                       </div>
                     </div>
                   </div>
@@ -5692,7 +5837,7 @@ const PurchaseOrder = () => {
           />
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full ">
             <div className="crossArea">
-              <h3>Edit Details</h3>
+              <h3> {t("editDetails")}</h3>
               <p onClick={handleCloseModalOne}>
                 <CloseIcon />
               </p>
@@ -5703,7 +5848,7 @@ const PurchaseOrder = () => {
 
                 <div className="addMOdalContent formCreate mt-0 px-2">
                   <div className="col-lg-12 autoComplete mb-2 ">
-                    <h6>Select Item</h6>
+                    <h6> {t("selectItem")}</h6>
                     <Autocomplete
                       disablePortal
                       options={Array.isArray(optionItem) ? optionItem : []}
@@ -5717,7 +5862,7 @@ const PurchaseOrder = () => {
                     />
                   </div>
                   <div className="col-lg-12 autoComplete mb-2">
-                    <h6>Unit</h6>
+                    <h6> {t("unit")}</h6>
                     <Autocomplete
                       disablePortal
                       options={Array.isArray(unitItem) ? unitItem : []}
@@ -5731,7 +5876,7 @@ const PurchaseOrder = () => {
                     />
                   </div>
                   <div className="col-lg-12 mb-2">
-                    <h6>Quantity</h6>
+                    <h6> {t("quantity")}</h6>
                     <input
                       className="mb-0"
                       type="text"
@@ -5742,7 +5887,7 @@ const PurchaseOrder = () => {
                     />
                   </div>
                   <div className="col-lg-12 mb-2">
-                    <h6>Crate</h6>
+                    <h6> {t("create")}</h6>
                     <input
                       className="mb-0"
                       type="number"
@@ -5754,7 +5899,7 @@ const PurchaseOrder = () => {
                   </div>
 
                   <div className="col-lg-12 mb-2">
-                    <h6>Price</h6>
+                    <h6> {t("price")}</h6>
                     <input
                       className="mb-0"
                       type="number"
@@ -5767,7 +5912,7 @@ const PurchaseOrder = () => {
 
                   <div className="row mb-2">
                     <div className="col-lg-6">
-                      <h6>VAT</h6>
+                      <h6> {t("vat")}</h6>
                       <input
                         className="mb-0"
                         type="number"
@@ -5779,7 +5924,7 @@ const PurchaseOrder = () => {
                     </div>
 
                     <div className="col-lg-6">
-                      <h6>WHT</h6>
+                      <h6> {t("wht")}</h6>
                       <input
                         className="mb-0"
                         type="number"
@@ -5793,7 +5938,7 @@ const PurchaseOrder = () => {
 
                   <div className="row">
                     <div className="col-lg-12 mb-2">
-                      <h6>Total</h6>
+                      <h6> {t("total")}</h6>
                       <input
                         className="mb-0"
                         type="number"
@@ -5810,7 +5955,7 @@ const PurchaseOrder = () => {
                     className="UpdatePopupBtn btn btn-primary m-0"
                     onClick={() => console.log("Form Data:", formDataAdd)}
                   >
-                    Add
+                    {t("add")}
                   </button>
                 </div>
               </div>
@@ -5833,7 +5978,7 @@ const PurchaseOrder = () => {
           <div className="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="exampleModalLabel">
-                Record Commission
+                {t("recordCommission")}
               </h1>
               <button
                 type="button"
@@ -5849,35 +5994,8 @@ const PurchaseOrder = () => {
               <div className="row">
                 <div className="col-lg-4">
                   <div className="parentFormPayment autoComplete">
-                    <p>Client </p>
-                    {/* <select
-                      onChange={(e) => setClientId(e.target.value)}
-                      value={clientId}
-                    >
-                      <option value="">Select Client</option>
-                      {clientsData?.map((item) => (
-                        <option key={item.client_id} value={item.client_id}>
-                          {item.client_name}
-                        </option>
-                      ))}
-                    </select> */}
+                    <p> {t("clients")} </p>
 
-                    {/* <Autocomplete
-                      disablePortal
-                      options={clientsData} // Use your client list as options
-                      getOptionLabel={(option) => option.client_name || ""} // Display the client name
-                      onChange={
-                        (e, newValue) => setClientId(newValue?.client_id || "") // Set the selected client ID
-                      }
-                      sx={{ width: 300 }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder="Select Client" // Adds a placeholder
-                          InputLabelProps={{ shrink: false }} // Prevents floating label
-                        />
-                      )}
-                    /> */}
                     <Autocomplete
                       disablePortal
                       options={clientsData || []} // Ensure options is always an array
@@ -5903,21 +6021,7 @@ const PurchaseOrder = () => {
                 </div>
                 <div className="col-lg-4">
                   <div className="parentFormPayment autoComplete">
-                    <p>Consignee </p>
-                    {/* <select
-                      value={consigneeId}
-                      onChange={(e) => setConsigneeId(e.target.value)}
-                    >
-                      <option value="">Select Consignee</option>
-                      {consignees?.map((item) => (
-                        <option
-                          key={item.consignee_id}
-                          value={item.consignee_id}
-                        >
-                          {item.consignee_name}
-                        </option>
-                      ))}
-                    </select> */}
+                    <p> {t("consignee")} </p>
 
                     <Autocomplete
                       disablePortal
@@ -5946,7 +6050,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-4">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Payment Date</p>
+                      <p> {t("paymentDate")}</p>
                     </div>
                     <div>
                       <DatePicker
@@ -5963,7 +6067,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Client Payment Ref</p>
+                      <p> {t("clientPaymentRef")}</p>
                     </div>
                     <div>
                       <input
@@ -5976,7 +6080,7 @@ const PurchaseOrder = () => {
                 </div>
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment autoComplete">
-                    <p>Payment Channel </p>
+                    <p>{t("paymentChannel")} </p>
                     <Autocomplete
                       options={paymentChannle || []}
                       getOptionLabel={(option) => option.Bank_nick_name || ""}
@@ -6006,7 +6110,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Bank Ref</p>
+                      <p>{t("bankRef")}</p>
                     </div>
                     <div>
                       <input
@@ -6020,7 +6124,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>FX Payment</p>
+                      <p> {t("fxPayment")}</p>
                     </div>
                     <div>
                       <input
@@ -6032,7 +6136,7 @@ const PurchaseOrder = () => {
                   </div>
                 </div>
                 <div className="parentFormPayment col-lg-4 mt-3 autoComplete">
-                  <p> FX </p>
+                  <p> {t("fx")}</p>
                   <div>
                     <Autocomplete
                       options={currency || []}
@@ -6065,7 +6169,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>FX Rate</p>
+                      <p> {t("fxRate")}</p>
                     </div>
                     <div>
                       <input
@@ -6080,7 +6184,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-6 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Intermittent Bank Charges</p>
+                      <p> {t("interBankCharges")}</p>
                     </div>
                     <div>
                       <input
@@ -6096,7 +6200,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-6 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Local Bank Charges</p>
+                      <p> {t("localBankCharges")}</p>
                     </div>
                     <div>
                       <input
@@ -6110,7 +6214,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-6 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>THB Received</p>
+                      <p> {t("thbReceived")}</p>
                     </div>
                     <div>
                       <input
@@ -6124,7 +6228,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-6 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Loss/Gain on Exchange Rate</p>
+                      <p> {t("lossGain")}</p>
                     </div>
                     <div>
                       <input
@@ -6140,7 +6244,7 @@ const PurchaseOrder = () => {
                 <div className="col-lg-12 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Notes</p>
+                      <p> {t("notes")}</p>
                     </div>
                     <div>
                       <textarea
@@ -6156,15 +6260,15 @@ const PurchaseOrder = () => {
                 <div className="tableCreateClient tablepayment">
                   <table>
                     <tr>
-                      <th>Check</th>
-                      <th>Document Number</th>
-                      <th>Ship Date</th>
-                      <th>TT REF</th>
-                      <th>FX</th>
-                      <th>Invoice Amount</th>
-                      <th>Commission THB</th>
-                      <th>Commission FX</th>
-                      <th> Paid Amount</th>
+                      <th> {t("check")}</th>
+                      <th> {t("documentNumber")}</th>
+                      <th> {t("shipDate")}</th>
+                      <th>{t("ttref")}</th>
+                      <th>{t("fx")}</th>
+                      <th> {t("invoiceAmount")}</th>
+                      <th> {t("commissionThb")}</th>
+                      <th> {t("commissionFx")}</th>
+                      <th> {t("paidAmount")}</th>
                     </tr>
                     {paymentTable2?.map((item) => {
                       return (
@@ -6220,7 +6324,7 @@ const PurchaseOrder = () => {
                 onClick={handleSubmit5}
                 className="btn btn-primary"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -6238,7 +6342,7 @@ const PurchaseOrder = () => {
             style={{ backgroundColor: color ? "#2f423c" : "" }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Purchase Order Check
+              {t("purchaseOrderCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -6261,7 +6365,7 @@ const PurchaseOrder = () => {
                 {stock1.Message_TH ? stock1.Message_TH : "NULL"}
               </p>
               <div className="closeBtnRece">
-                <button onClick={closeIcon1}>Close</button>
+                <button onClick={closeIcon1}>{t("close")} </button>
               </div>
             </div>
           </div>
@@ -6283,12 +6387,11 @@ const PurchaseOrder = () => {
             style={{ backgroundColor: color ? "#2f423c" : "" }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Purchase Payment Check
+              {t("purchasePaymentCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
               type="button"
-              // onClick={() => setShow(false)}
               onClick={closeIcon2}
             >
               <i class="mdi mdi-close"></i>
@@ -6316,7 +6419,7 @@ const PurchaseOrder = () => {
               )}
 
               <div className="closeBtnRece">
-                <button onClick={closeIcon2}>Close</button>
+                <button onClick={closeIcon2}> {t("close")}</button>
               </div>
             </div>
           </div>
@@ -6338,12 +6441,11 @@ const PurchaseOrder = () => {
             style={{ backgroundColor: color ? "#2f423c" : "" }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel5">
-              Combined Payment Check
+              {t("combinedPaymentCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
               type="button"
-              // onClick={() => setShow(false)}
               onClick={closeIcon3}
             >
               <i class="mdi mdi-close"></i>
@@ -6376,7 +6478,7 @@ const PurchaseOrder = () => {
               )}
 
               <div className="closeBtnRece">
-                <button onClick={closeIcon3}>Close</button>
+                <button onClick={closeIcon3}> {t("close")}</button>
               </div>
             </div>
           </div>

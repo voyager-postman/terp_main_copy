@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+ import { useTranslation } from "react-i18next";
 const Footer = () => {
   const [t, i18n] = useTranslation("global");
   return (
@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="row align-items-center justify-content-lg-between">
           <div className="col-lg-12 mb-lg-0 mb-4">
             <div className="copyright text-center text-sm text-muted text-lg-center footerTrpA">
-              {t("footer.footerOne")} {new Date().getFullYear()}{" "}
+              {t("copyright")} {new Date().getFullYear()}{" "}
               <i className="fa fa-heart"></i>
               <a
                 href="#!"
@@ -15,9 +15,9 @@ const Footer = () => {
                 target="_blank"
                 rel="noreferrer"
               >
-                {t("header.logoName")}
-              </a>{" "}
-              {t("footer.footerTwo")}
+                {t("terp")}
+              </a>
+              {t("allRightsReserved")}
             </div>
           </div>
         </div>
@@ -25,5 +25,6 @@ const Footer = () => {
     </footer>
   );
 };
-
+ 
 export default Footer;
+ 

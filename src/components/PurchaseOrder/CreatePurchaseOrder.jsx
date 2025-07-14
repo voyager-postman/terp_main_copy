@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../Url/Api";
 import React, { useEffect, useState, useRef } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -1585,18 +1585,22 @@ const CreatePurchaseOrder = () => {
                               {formatterTwo.format(item.pod_crate)}
                             </td>
                             <td>
-                              <button
-                                type="button"
-                                onClick={() => handleEditClick(item)}
-                              >
-                                <i className="mdi mdi-pencil text-2xl" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => deleteDetails(item.pod_id)}
-                              >
-                                <i className="mdi mdi-minus text-2xl" />
-                              </button>
+                              {item.pod_status === 1 && (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditClick(item)}
+                                  >
+                                    <i className="mdi mdi-pencil text-2xl" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => deleteDetails(item.pod_id)}
+                                  >
+                                    <i className="mdi mdi-minus text-2xl" />
+                                  </button>
+                                </>
+                              )}
                             </td>
                           </tr>
                         ))}

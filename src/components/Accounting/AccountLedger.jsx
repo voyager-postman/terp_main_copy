@@ -6,15 +6,15 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import { Card } from "../../card";
 import { TableView } from "../table";
- 
+
 const AccountLedger = () => {
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(true);
   const navigate = useNavigate();
- 
+
   const getEanData = () => {
     axios
-      .get(`${API_BASE_URL}/getEan`)
+      .get(`${API_BASE_URL}/AccountingLedger`)
       .then((response) => {
         setData(response.data.data || []);
       })
@@ -22,16 +22,16 @@ const AccountLedger = () => {
         console.log(error);
       });
   };
- 
+
   useEffect(() => {
     getEanData();
   }, []);
- 
+
   const updateEanStatus = (eanID) => {
     const request = {
       ean_id: eanID,
     };
- 
+
     axios
       .post(`${API_BASE_URL}/eanStatus`, request)
       .then((resp) => {
@@ -58,48 +58,49 @@ const AccountLedger = () => {
     () => [
       {
         Header: "AL Date",
-        accessor: () => {
-          const rawDate = "02/08/2023"; // Original format: DD/MM/YYYY
-          const [day, month, year] = rawDate.split("/");
-          const formattedDate = `${day}-${month}-${year}`;
-          return <div>{formattedDate}</div>;
+        accessor: (row) => {
+          const date = new Date(row.AL_Date);
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = String(date.getFullYear()).slice(-2); // last 2 digits
+          return `${day}-${month}-${year}`; // dd-mm-yy
         },
       },
       {
         Header: "AL Number",
-        accessor: (a) => <div>AL-202570001</div>,
+        accessor: (a) => <div>{a.AL_Number}</div>,
       },
- 
+
       {
         Header: "Account No",
-        accessor: (a) => <div>{a.NW}</div>,
+        accessor: (a) => <div>{a.Account_No}</div>,
       },
- 
+
       {
         Header: "Client",
-        accessor: (a) => <div>HLB Tropical Food GmbH</div>,
+        accessor: (a) =><div>{a.client_name}</div>,
       },
       {
         Header: "Consignee",
-        accessor: (a) => <div>Costco Wholesale UK Ltd</div>,
+         accessor: (a) =><div>{a.consignee_name}</div>,
       },
       {
         Header: "Vendor",
-        accessor: (a) => <div>Siam Eats </div>,
+        accessor: (a) =><div>{a.vendor_name}</div>,
       },
       {
         Header: "Debit",
-        accessor: () => (
+        accessor: (a) => (
           <div style={{ textAlign: "right" }}>
-            {formatTwoDecimal.format(6725.3453)}
+            {formatTwoDecimal.format(a.Debit)}
           </div>
         ),
       },
       {
         Header: "Transaction Description",
-        accessor: (a) => <div>Lorem ipsum</div>,
+        accessor: (a) => <div>{a.Transaction_Description}</div>,
       },
- 
+
       {
         Header: "Actions",
         accessor: (a) => (
@@ -117,7 +118,7 @@ const AccountLedger = () => {
           </Link>
         ),
       },
- 
+
       // {
       //   Header: "Salary",
       //   accessor: (a) => <>{"10000000"}</>,
@@ -125,7 +126,7 @@ const AccountLedger = () => {
     ],
     []
   );
- 
+
   return (
     <Card
       title={"Accounting Ledger Management"}
@@ -143,5 +144,5 @@ const AccountLedger = () => {
     </Card>
   );
 };
- 
+
 export default AccountLedger;

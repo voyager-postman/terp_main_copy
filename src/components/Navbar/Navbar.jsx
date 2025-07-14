@@ -93,7 +93,7 @@ const Navbar = () => {
           <NavLink to={targetRoute} className="flex">
             <img src={Logo} alt="logo" className="md:cursor-pointer h-9" />
             <span className="text-white ml-2  justify-between items-center flex terplogo">
-              {t("header.logoName")}
+              {t("terp")}
             </span>
           </NavLink>
           <button
@@ -154,16 +154,7 @@ const Navbar = () => {
                   </li>
                 </ul>
               </div>
-              {/* <div class="dropdown">
-							<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-								Dropdown button
-							</button>
-							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="#">Action</a></li>
-								<li><a class="dropdown-item" href="#">Another action</a></li>
-								<li><a class="dropdown-item" href="#">Something else here</a></li>
-							</ul>
-						</div> */}
+            
             </div>
           )}
         </ul>

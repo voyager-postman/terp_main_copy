@@ -7,7 +7,7 @@ import { ComboBox } from "../combobox";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
-import axios from "axios";
+import axios from "../../Url/Api";
 const PurchaseView = () => {
   const CustomInput = ({ value, onClick }) => (
     <div

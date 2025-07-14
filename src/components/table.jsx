@@ -1,7 +1,8 @@
-import { useState } from "react";
+ import { useState } from "react";
 import ReactPaginate from "react-paginate";
 import { useGlobalFilter, useTable } from "react-table";
-
+import { useTranslation } from "react-i18next";
+ 
 export const TableView = ({
   columns = [],
   data = [],
@@ -25,36 +26,36 @@ export const TableView = ({
     },
     useGlobalFilter
   );
-
+ const [t, i18n] = useTranslation("global");
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
-
+ 
   return (
     <div className="top-space-search-reslute">
       <div className="tab-content px-2 md:!px-4">
         <div className="parentProduceSearch">
-					<div className="entries">
-						<small>Show</small>{" "}
-						<select
-							value={usersPerPage}
-							onChange={(e) => setUserPerPage(e.target.value)}
-						>
-							<option value="10">10</option>
-							<option value="25">25</option>
-							<option value="50">50</option>
-							<option value="100">100</option>
-						</select>{" "}
-						<small>entries</small>
-					</div>
-					<div>
-						<input
-							onChange={(e) => setGlobalFilter(e.target.value)}
-							type="search"
-							placeholder="search"
-						/>
-					</div>
-				</div>
+          <div className="entries">
+            <small>{t("show")}</small>{" "}
+            <select
+              value={usersPerPage}
+              onChange={(e) => setUserPerPage(e.target.value)}
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>{" "}
+            <small>{t("entries")}</small>
+          </div>
+          <div>
+            <input
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              type="search"
+              placeholder={t("search")}
+            />
+          </div>
+        </div>
         {customElement}
         <div className="tab-pane active" id="header" role="tabpanel">
           <div
@@ -83,7 +84,7 @@ export const TableView = ({
                   .slice(pagesVisited, pagesVisited + usersPerPage)
                   .map((row) => {
                     prepareRow(row);
-
+ 
                     return (
                       <tr className="rowCursorPointer" {...row.getRowProps()}>
                         {row?.cells.map((cell) => {
@@ -100,8 +101,8 @@ export const TableView = ({
             </table>
             <div className="flex justify-end">
               <ReactPaginate
-                previousLabel={"Previous"}
-                nextLabel={"Next"}
+                previousLabel={t("previous")}
+                nextLabel={t("next")}
                 pageCount={pageCount}
                 onPageChange={changePage}
                 containerClassName={"paginationBttns"}

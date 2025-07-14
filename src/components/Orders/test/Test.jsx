@@ -153,7 +153,7 @@ const Test = () => {
       .then((response) => {
         console.log(response);
         setTotalDetails(response.data.data);
-        setStartDate(new Date(response.data.data.load_date));
+        setStartDate(new Date(response.data.data.Load_Date));
         setStartDate1(new Date(response.data.data.Ship_date));
         setStartDate2(new Date(response.data.data.Arrival_date));
       })

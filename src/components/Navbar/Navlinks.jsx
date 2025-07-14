@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { links } from "./Mylinks";
+import { getLinks } from "./Mylinks";
 
 const lngs = [
   { code: "en", native: "English" },
@@ -9,6 +9,7 @@ const lngs = [
 ];
 
 const NavLinks = ({ setOpen }) => {
+  const links = getLinks();
   console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
   const [heading, setHeading] = useState("");
   const [subHeading, setSubHeading] = useState("");

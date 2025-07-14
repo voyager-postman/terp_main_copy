@@ -1,4 +1,4 @@
-import CodeIcon from "@mui/icons-material/Code";
+  import CodeIcon from "@mui/icons-material/Code";
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -353,19 +353,19 @@ const DashboardNew = () => {
   // };
   const confirmData2 = () => {
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired")); // âœ… Translated
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
     if (!date3) {
-      toast.error("Compare Start DATE is required");
+      toast.error(t("compareStartDateRequired"));
       return;
     }
     if (!date4) {
-      toast.error("Compare End DATE is required");
+      toast.error(t("compareEndDateRequired"));
       return;
     }
 
@@ -491,11 +491,11 @@ const DashboardNew = () => {
     console.log("confirm data is", obj);
 
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired")); // âœ… Translated
       return;
     }
 
@@ -520,10 +520,10 @@ const DashboardNew = () => {
       console.log("API Response:", response.data.data);
       setBoxsData(response.data.data);
       // Handle success
-      toast.success("Data fetched successfully!");
+      toast.success(t("dataFetchedSuccess"));
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Failed to fetch data. Please try again.");
+      toast.error(t("failedToFetch"));
     }
   };
 
@@ -611,19 +611,19 @@ const DashboardNew = () => {
   const confirmData1 = async () => {
     // Validation checks
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired")); // âœ… Translated
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired")); // âœ… Translated
       return;
     }
     if (!date3) {
-      toast.error("Compare Start DATE is required");
+      toast.error(t("compareStartDateRequired")); // âœ… Translated
       return;
     }
     if (!date4) {
-      toast.error("Compare End DATE is required");
+      toast.error(t("compareEndDateRequired")); // âœ… Translated
       return;
     }
 
@@ -646,10 +646,10 @@ const DashboardNew = () => {
       );
       console.log("API Response:", response);
       setTopFiveValue(response.data);
-      toast.success("Data fetched successfully!");
+      toast.success(t("dataFetchedSuccess"));
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Failed to fetch data. Please try again.");
+      toast.error(t("failedToFetch"));
     }
   };
 
@@ -807,13 +807,13 @@ const DashboardNew = () => {
         ...prev.options,
         title: {
           ...prev.options.title,
-          text: t("dashboard.graphHead"),
+          text: t("dashboard"),
         },
         yaxis: {
           ...prev.options.yaxis,
           title: {
             ...prev.options.yaxis.title,
-            text: t("dashboard.price"),
+            text: t("price"),
           },
         },
       },
@@ -1312,10 +1312,10 @@ const DashboardNew = () => {
       setConsigneeIdSet("");
       setClientIdSet("");
       setToDate("");
-      toast.success("Statement Added successful");
+      toast.success(t("statementSuccess"));
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
       // Handle the error as needed
     }
   };
@@ -1462,13 +1462,12 @@ const DashboardNew = () => {
           datas: dataToSubmit,
         }
       );
-      toast.success("Payment data submitted successfully");
+      toast.success(t("paymentSuccess"));
       console.log(response);
       // Handle successful response
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong");
-      // Handle error
+      toast.error(t("genericError"));
     }
   };
 
@@ -1488,7 +1487,7 @@ const DashboardNew = () => {
 
     // Check if parsedFxPayment is not equal to totalPaidAmount
     if (parsedFxPayment.toFixed(2) !== totalPaidAmount.toFixed(2)) {
-      toast.error("Total Paid Amount does not match FX Payment value.");
+      toast.error(t("paymentMismatch"));
       return;
     }
 
@@ -1566,7 +1565,7 @@ const DashboardNew = () => {
     } catch (error) {
       // Handle error case
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
 
@@ -1714,7 +1713,7 @@ const DashboardNew = () => {
       )
       .then((response) => {
         console.log(response);
-        toast.success("Customization Data Added Successfully", {
+        toast.success(t("customizationAdd"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1733,7 +1732,7 @@ const DashboardNew = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1755,7 +1754,7 @@ const DashboardNew = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1770,7 +1769,7 @@ const DashboardNew = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Customize Update  Successfully", {
+        toast.success(t("customizationUpdate"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1793,7 +1792,7 @@ const DashboardNew = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1808,7 +1807,7 @@ const DashboardNew = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Contact added Successfully", {
+        toast.success(t("contactAddSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1837,7 +1836,7 @@ const DashboardNew = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1892,7 +1891,7 @@ const DashboardNew = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Contact Update Successfully", {
+        toast.success(t("contactUpdate"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1921,7 +1920,7 @@ const DashboardNew = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -2040,9 +2039,7 @@ const DashboardNew = () => {
             >
               <div className="container-fluid py-1 px-0">
                 <nav aria-label="breadcrumb" style={{ width: "100%" }}>
-                  <h6 className="font-weight-bolder mb-0">
-                    {t("dashboard.DashboardHead")}
-                  </h6>
+                  <h6 className="font-weight-bolder mb-0">{t("dashboard")}</h6>
                 </nav>
 
                 {/* Button trigger modal */}
@@ -2196,7 +2193,7 @@ const DashboardNew = () => {
             </nav>
             <div className="row newSmallCard ">
               <div className="selectTimeHead">
-                <h6>{t("dashboard.timePeriod")} :</h6>
+                <h6>{t("selectTimePeriod")} :</h6>
               </div>
               <div className="flex flex-wrap">
                 <div>
@@ -2216,7 +2213,7 @@ const DashboardNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder={t("dashboard.SelectClient")}
+                            placeholder={t("selectClient")}
                             variant="outlined"
                           />
                         )}
@@ -2238,7 +2235,7 @@ const DashboardNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder={t("dashboard.SelectConsignee")}
+                            placeholder={t("selectConsignee")}
                             variant="outlined"
                           />
                         )}
@@ -2268,7 +2265,7 @@ const DashboardNew = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        placeholder={t("dashboard.ComparisonPeriod")}
+                        placeholder={t("comparisonPeriod")}
                       />
                     )}
                   />
@@ -2311,7 +2308,7 @@ const DashboardNew = () => {
                     type="submit"
                     onClick={confirmData}
                   >
-                    {t("dashboard.ConfirmBtn")}
+                    {t("confirm")}
                   </button>
                 </div>
               </div>
@@ -2787,9 +2784,7 @@ const DashboardNew = () => {
               <div className="row">
                 <div className="col-lg-6 mb20">
                   <div className="itemsOrderSearch">
-                    <h3 className="itemOrder">
-                      {t("dashboard.itemOrderHead")}
-                    </h3>
+                    <h3 className="itemOrder">{t("topItems")}</h3>
 
                     <div className="selectProduce">
                       <Autocomplete
@@ -2808,7 +2803,7 @@ const DashboardNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder={t("dashboard.invoiceValue")}
+                            placeholder={t("invoiceValue")}
                           />
                         )}
                       />
@@ -2818,11 +2813,11 @@ const DashboardNew = () => {
                   <div className="tableCreateClient">
                     <table>
                       <tr>
-                        <th>{t("dashboard.topH1")}</th>
-                        <th>{t("dashboard.topH2")}</th>
-                        <th>{t("dashboard.topH3")}</th>
-                        <th>{t("dashboard.topH4")}</th>
-                        <th>{t("dashboard.topH5")}</th>
+                        <th>{t("itfName")}</th>
+                        <th>{t("lastPeriodKg")}</th>
+                        <th>{t("currentPeriodKg")}</th>
+                        <th>{t("diff")}</th>
+                        <th>{t("percentChange")}</th>
                       </tr>
                       <tbody>
                         {topFiveValue?.Top5Data?.map((item, index) => (
@@ -2847,7 +2842,7 @@ const DashboardNew = () => {
                         value={options.find(
                           (option) => option.value === selectedDataset
                         )}
-                        placeholder={t("dashboard.select")}
+                        placeholder={t("select")}
                         isSearchable
                         styles={{
                           container: (provided) => ({

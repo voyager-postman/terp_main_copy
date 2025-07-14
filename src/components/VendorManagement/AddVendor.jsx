@@ -1,4 +1,4 @@
-// import axios from "axios";
+ // import axios from "axios";
 import axios from "../../Url/Api";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ const AddVendor = () => {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const location = useLocation();
   const { from } = location.state || {};
+  console.log(from);
   const navigate = useNavigate();
   const [state, setState] = useState({
     user_id: localStorage.getItem("id"),
@@ -35,7 +36,10 @@ const AddVendor = () => {
     bank_number: from?.bank_number ?? "",
     bank_account: from?.bank_account ?? "",
   });
+  console.log(state.subdistrict);
+  console.log(state.district);
   const { data: dropdownVendor } = useQuery("getDropdownVendor");
+  const { data: dropdownCountry } = useQuery("getAddressCountry");
   const { data: dropdownProvinces } = useQuery("getDropdownAddressProvinces");
   const { data: dropdownDistrict } = useQuery("getDropdownAddressDistrict");
   const { data: dropdownSubDistrict } = useQuery(
@@ -48,6 +52,7 @@ const AddVendor = () => {
   const availableSubDistrict = useMemo(() => {
     return dropdownSubDistrict?.filter((item) => item._id == state.district);
   }, [state.provinces, dropdownDistrict, state.district, dropdownSubDistrict]);
+  console.log(availableSubDistrict);
   useEffect(() => {
     const p = dropdownSubDistrict?.find(
       (item) => item.code == state.id
@@ -80,22 +85,22 @@ const AddVendor = () => {
         }`,
         state
       );
-      toast.success("Success");
+      toast.success(t("success"));
 
       navigate("/vendor");
     } catch (error) {
-      toast.error("Error while saving information");
+      toast.error(t("errorWhileSaving"));
     }
   };
 
-  const { t, i18n } = useTranslation();
+   const [t, i18n] = useTranslation("global");
 
   return (
-    <Card
-      title={`Vendor Management /
-		${typeof state.vendor_id !== "undefined" ? "Update" : "Create"}
-		Form`}
-    >
+   <Card
+  title={`${t("vendorManagement")} / ${
+    typeof state?.vendor_id !== "undefined" ? t("update") : t("create")
+  } ${t("form")}`}
+>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -107,30 +112,30 @@ const AddVendor = () => {
                 <form action="">
                   <div className="row">
                     <div className="form-group col-lg-4">
-                      <h6>Name</h6>
+                      <h6>{t("name")}</h6>
                       <input
                         type="text"
                         id="name_th"
                         onChange={handleChange}
                         name="name"
                         className="form-control"
-                        placeholder="Name"
+                        placeholder={t("name")}
                         defaultValue={state.name}
                       />
                     </div>
                     <div className="form-group col-lg-4">
-                      <h6>ID Card</h6>
+                      <h6>{t("idCard")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="id_card"
                         className="form-control"
-                        placeholder="ID Card"
+                        placeholder={t("idCard")}
                         defaultValue={state.id_card}
                       />
                     </div>
                     <div className="form-group col-lg-4 autoComplete">
-                      <h6>Entity</h6>
+                      <h6>{t("entity")}</h6>
                       <Autocomplete
                         options={dropdownVendor || []} // Populate with the list of vendors
                         getOptionLabel={(option) => option.entity_name_en || ""} // Display the English name of the entity
@@ -150,7 +155,7 @@ const AddVendor = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Entity" // Adds a placeholder
+                            placeholder={t("selectEntity")} // Adds a placeholder
                             InputLabelProps={{ shrink: false }} // Prevents floating label
                           />
                         )}
@@ -163,29 +168,61 @@ const AddVendor = () => {
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-12">
-                      <h6>Address</h6>
+                      <h6>{t("address")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="address"
                         className="form-control"
-                        placeholder="Address"
+                        placeholder={t("address")}
                         defaultValue={state.address}
                       />
                     </div>
-                    <div className="form-group col-lg-3">
-                      <h6 className="whitespace-nowrap">Postal Code</h6>
+                    <div className="form-group col-lg-2">
+                      <h6 className="whitespace-nowrap">{t("postalCode")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="postcode"
                         className="form-control"
-                        placeholder="Postal Code"
+                        placeholder={t("postalCode")}
                         defaultValue={state.postcode}
                       />
                     </div>
-                    <div className="form-group col-lg-3 autoComplete">
-                      <h6>Province</h6>
+                    <div className="form-group col-lg-2 autoComplete">
+                      <h6>{t("country")}</h6>
+                      <Autocomplete
+                        options={dropdownCountry || []}
+                        getOptionLabel={(option) => option.Name_EN || ""}
+                        value={
+                          dropdownCountry?.find(
+                            (country) =>
+                              String(country.ID) === String(state.country)
+                          ) || null
+                        }
+                        onChange={(e, newValue) => {
+                          handleChange({
+                            target: {
+                              name: "country",
+                              value: newValue?.ID || "",
+                            },
+                          });
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("selectCountry")}
+                            InputLabelProps={{ shrink: false }}
+                          />
+                        )}
+                        isOptionEqualToValue={(option, value) =>
+                          String(option.ID) === String(value.ID)
+                        }
+                        sx={{ width: 300 }}
+                      />
+                    </div>
+                    <div className="form-group col-lg-2 autoComplete">
+                      <h6>{t("province")}</h6>
                       <Autocomplete
                         options={dropdownProvinces || []} // Pass the array of provinces
                         getOptionLabel={(option) => option.name_en || ""} // Display the English name of the province
@@ -205,7 +242,7 @@ const AddVendor = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Province" // Adds a placeholder
+                            placeholder={t("selectProvince")} // Adds a placeholder
                             InputLabelProps={{ shrink: false }} // Prevents floating label
                           />
                         )}
@@ -215,8 +252,9 @@ const AddVendor = () => {
                         sx={{ width: 300 }}
                       />
                     </div>
+
                     <div className="form-group col-lg-3 autoComplete">
-                      <h6>District</h6>
+                   <h6>{t("district")}</h6>
                       <Autocomplete
                         options={availableDistrict || []} // Use the array of available districts
                         getOptionLabel={(option) => option.name_en || ""} // Display the English name of the district
@@ -236,7 +274,7 @@ const AddVendor = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select District" // Adds a placeholder
+                        placeholder={t("selectDistrict")}// Adds a placeholder
                             InputLabelProps={{ shrink: false }} // Prevents floating label
                           />
                         )}
@@ -247,14 +285,15 @@ const AddVendor = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3 autoComplete">
-                      <h6>Sub District</h6>
+                    <h6>{t("subDistrict")}</h6>
                       <Autocomplete
                         options={availableSubDistrict || []} // Populate with available subdistricts
                         getOptionLabel={(option) => option.name_en || ""} // Display the English name of the subdistrict
                         value={
                           availableSubDistrict?.find(
                             (subdistrict) =>
-                              subdistrict.id === state.subdistrict
+                              subdistrict.id.toString() ===
+                              state.subdistrict.toString()
                           ) || null
                         } // Match the current subdistrict ID in state with the options
                         onChange={(e, newValue) => {
@@ -268,7 +307,7 @@ const AddVendor = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Subdistrict" // Adds a placeholder
+                            placeholder={t("selectSubDistrict")}
                             InputLabelProps={{ shrink: false }} // Prevents floating label
                           />
                         )}
@@ -281,68 +320,68 @@ const AddVendor = () => {
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-4">
-                      <h6>Line ID</h6>
+                     <h6>{t("lineId")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="line_id"
                         className="form-control"
-                        placeholder="LINE ID"
+                     placeholder={t("lineId")}
                         defaultValue={state.line_id}
                       />
                     </div>
                     <div className="form-group col-lg-4">
-                      <h6>Phone</h6>
+                     <h6>{t("phone")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="phone"
                         className="form-control"
-                        placeholder="Phone"
+                       placeholder={t("phone")}
                         defaultValue={state.phone}
                       />
                     </div>
                     <div className="form-group col-lg-4">
-                      <h6>Email</h6>
+                     <h6>{t("email")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="email"
                         className="form-control"
-                        placeholder="Email"
+                        placeholder={t("email")}
                         defaultValue={state.email}
                       />
                     </div>
                     <div className="form-group col-lg-4">
-                      <h6>Bank</h6>
+                   <h6>{t("bank")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="bank_name"
                         className="form-control"
-                        placeholder="Bank Name"
+                    placeholder={t("bankName")}
                         defaultValue={state.bank_name}
                       />
                     </div>
                     <div className="form-group col-lg-4">
-                      <h6>Bank Number</h6>
+                      <h6>{t("bankNumber")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="bank_number"
                         className="form-control"
-                        placeholder="Bank Number"
+                      placeholder={t("bankNumber")}
                         defaultValue={state.bank_number}
                       />
                     </div>
                     <div className="form-group col-lg-4">
-                      <h6>Name of bank holder</h6>
+                  <h6>{t("bankHolder")}</h6>
                       <input
                         type="text"
                         onChange={handleChange}
                         name="bank_account"
                         className="form-control"
-                        placeholder="Name of Bank account holder"
+                         placeholder={t("bankHolder")}
                         defaultValue={state.bank_account}
                       />
                     </div>
@@ -359,10 +398,10 @@ const AddVendor = () => {
               onClick={updateVendor}
               disabled={isButtonClicked} // Disable button if it has been clicked
             >
-              {typeof state.vendor_id !== "undefined" ? "Update" : "Create"}
+              {typeof state.vendor_id !== "undefined" ? t("update") :t("create")}
             </button>
             <Link className="btn btn-danger" to={"/vendor"}>
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>

@@ -58,11 +58,11 @@ const Wastage = () => {
     () => [
       {
         Header: "PO Code",
-        accessor: (a) => <div>PO-000232024</div>,
+        accessor: "PODCODE",
       },
       {
         Header: "Vendor Name",
-        accessor: (a) => <div>Siam Eats</div>,
+        accessor: "Vendor_Name",
       },
       {
         Header: "Name (EN)",
@@ -71,44 +71,50 @@ const Wastage = () => {
 
       {
         Header: "Date",
-        accessor: () => "01-07-25", // dd-mm-yy format (e.g., 01 July 2025)
+        accessor: (row) => {
+          const date = new Date(row.Date);
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = String(date.getFullYear()).slice(-2); // last 2 digits
+          return `${day}-${month}-${year}`; // dd-mm-yy
+        },
       },
       {
         Header: "Crates",
-        accessor: () => formatTwoDecimal.format(3242.324),
+        accessor: (row) => formatTwoDecimal.format(row.Crates),
         Cell: ({ value }) => (
           <div style={{ textAlign: "right", width: "100%" }}>{value}</div>
         ),
       },
       {
         Header: "Quantity",
-        accessor: () => formatTwoDecimal.format(3242.324),
+        accessor: (row) => formatTwoDecimal.format(row.Quantity),
         Cell: ({ value }) => (
           <div style={{ textAlign: "right", width: "100%" }}>{value}</div>
         ),
       },
       {
         Header: "Unit",
-        accessor: (a) => <div>KG</div>,
+        accessor: (row) => <div>{row.Unit}</div>,
         Cell: ({ value }) => (
           <div style={{ textAlign: "center", width: "100%" }}>{value}</div>
         ),
       },
-      {
-        Header: "Cost",
-        accessor: () => formatTwoDecimal.format(3242.324),
-        Cell: ({ value }) => (
-          <div style={{ textAlign: "right", width: "100%" }}>{value}</div>
-        ),
-      },
+      // {
+      //   Header: "Cost",
+      //   accessor: () => formatTwoDecimal.format(3242.324),
+      //   Cell: ({ value }) => (
+      //     <div style={{ textAlign: "right", width: "100%" }}>{value}</div>
+      //   ),
+      // },
       {
         Header: "Qty/Crate",
         accessor: "Qty/Crate",
       },
-      {
-        Header: "Sorting ID",
-        accessor: "sorting_id",
-      },
+      // {
+      //   Header: "Sorting ID",
+      //   accessor: "sorting_id",
+      // },
       {
         Header: "Status",
         accessor: (a) => (

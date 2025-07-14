@@ -1,4 +1,4 @@
- import React from "react";
+import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "react-query";
 import { useState, useEffect } from "react";
@@ -3900,8 +3900,8 @@ const Accounts = () => {
       setAccountDataShow(response.data.data);
       setPaymentChannel1(response.data.Payment_Channel);
       setPayDate(
-        response.data.data.Payment_date
-          ? new Date(response.data.data.Payment_date).toISOString().slice(0, 10)
+        response.data.data.Payment_Date
+          ? new Date(response.data.data.Payment_Date).toISOString().slice(0, 10)
           : ""
       );
       setText(response.data.data.Payment_Channel);
@@ -4353,19 +4353,19 @@ const Accounts = () => {
                       <h6>
                         <strong>Bank Name</strong>
                       </h6>
-                      <p>SCB</p>
+                      <p>{filterData.Bank_nick_name}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
                         <strong>Account Name</strong>
                       </h6>
-                      <p>Mr. Zeid</p>
+                      <p>{accountDataShow.Account_Name}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
                         <strong>Account Number</strong>
                       </h6>
-                      <p>564005443344</p>
+                      <p>{accountDataShow.Account_Number}</p>
                     </div>
                   </div>
                 </div>
@@ -4373,157 +4373,158 @@ const Accounts = () => {
                   <div className="parantEmpView">
                     <div>
                       <h6>
-                        <strong>Client Payment Ref</strong>
+                        <strong>Bank Ref</strong>
                       </h6>
-                      <p>{accountDataShow.Client_payment_ref}</p>
+                      <p>{accountDataShow.Bank_Ref}</p>
                     </div>
 
                     <div className="parantEmpView">
                       <h6>
                         <strong>Total Before Tax</strong>
                       </h6>
-                      <p>{newFormatterTwo.format(45000)}</p>
+                      <p>
+                        {newFormatterTwo.format(
+                          accountDataShow.Total_Before_Tax
+                        )}
+                      </p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
                         <strong>VAT</strong>
                       </h6>
-                      <p>{newFormatterTwo.format(40)}</p>
+                      <p>{newFormatterTwo.format(accountDataShow.VAT)}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
                         <strong>WHT</strong>
                       </h6>
-                      <p>{newFormatterTwo.format(545)}</p>
+                      <p>{newFormatterTwo.format(accountDataShow.WHT)}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
                         <strong>Rounding</strong>
                       </h6>
-                      <p>{newFormatterTwo.format(40)}</p>
+                      <p>{newFormatterTwo.format(accountDataShow.Rounding)}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
                         <strong>Amount to Pay</strong>
                       </h6>
-                      <p>{newFormatterTwo.format(2224)}</p>
+                      <p>
+                        {newFormatterTwo.format(accountDataShow.Payment_Amount)}
+                      </p>
                     </div>
-                   
-                    
                   </div>
                 </div>
                 <div className="col-lg-3 mb-4">
-                <div className="parantEmpView d-flex"> 
-                      <h6>
-                        <strong>Payment Date </strong>
-                      </h6>
-                      <div className="editPayment">
-                        {editDate ? (
-                          <input
-                            type="date"
-                            value={datePay} // Use the function to format date for input field
-                            onChange={handleDateChange}
-                            onBlur={handleBlurDate}
-                            autoFocus
+                  <div className="parantEmpView d-flex">
+                    <h6>
+                      <strong>Payment Date </strong>
+                    </h6>
+                    <div className="editPayment">
+                      {editDate ? (
+                        <input
+                          type="date"
+                          value={datePay} // Use the function to format date for input field
+                          onChange={handleDateChange}
+                          onBlur={handleBlurDate}
+                          autoFocus
+                        />
+                      ) : (
+                        <p onClick={handleEditDate}>
+                          {datePay || "Select Date"}
+                        </p>
+                      )}
+                      <i
+                        className="mdi mdi-pencil"
+                        style={{ cursor: "pointer", marginLeft: "10px" }}
+                        onClick={handleEditDate}
+                      ></i>
+                    </div>
+                  </div>
+                  <div className="parantEmpView d-flex">
+                    <h6>
+                      <strong>Payment Channel</strong>
+                    </h6>
+                    <div className="editPayment autoComplete">
+                      <div style={{ width: "200px" }}>
+                        {isEditing ? (
+                          <Autocomplete
+                            options={
+                              paymentChannle?.map((vendor) => ({
+                                id: vendor.bank_id,
+                                name: vendor.Bank_nick_name,
+                              })) || []
+                            }
+                            getOptionLabel={(option) => option.name || ""}
+                            value={
+                              paymentChannle
+                                ?.map((vendor) => ({
+                                  id: vendor.bank_id,
+                                  name: vendor.Bank_nick_name,
+                                }))
+                                .find((option) => option.id === text) || null
+                            }
+                            onChange={(e, newValue) => {
+                              setText(newValue?.id || null); // Update `text` with the selected option's `id`
+                            }}
+                            sx={{ width: 300 }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder="Select Vendor"
+                                InputLabelProps={{ shrink: false }}
+                              />
+                            )}
                           />
                         ) : (
-                          <p onClick={handleEditDate}>
-                            {datePay || "Select Date"}
+                          <p
+                            onClick={handleEditClick}
+                            style={{ display: "inline", cursor: "pointer" }}
+                          >
+                            {paymentChanelShowData}
                           </p>
                         )}
                         <i
                           className="mdi mdi-pencil"
                           style={{ cursor: "pointer", marginLeft: "10px" }}
-                          onClick={handleEditDate}
+                          onClick={handleEditClick}
                         ></i>
                       </div>
                     </div>
-                    <div className="parantEmpView d-flex">
-                      <h6>
-                        <strong>Payment Channel</strong>
-                      </h6>
-                      <div className="editPayment autoComplete">
-                        <div style={{ width: "200px" }}>
-                          {isEditing ? (
-                            <Autocomplete
-                              options={
-                                paymentChannle?.map((vendor) => ({
-                                  id: vendor.bank_id,
-                                  name: vendor.Bank_nick_name,
-                                })) || []
-                              }
-                              getOptionLabel={(option) => option.name || ""}
-                              value={
-                                paymentChannle
-                                  ?.map((vendor) => ({
-                                    id: vendor.bank_id,
-                                    name: vendor.Bank_nick_name,
-                                  }))
-                                  .find((option) => option.id === text) || null
-                              }
-                              onChange={(e, newValue) => {
-                                setText(newValue?.id || null); // Update `text` with the selected option's `id`
-                              }}
-                              sx={{ width: 300 }}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  placeholder="Select Vendor"
-                                  InputLabelProps={{ shrink: false }}
-                                />
-                              )}
-                            />
-                          ) : (
-                            <p
-                              onClick={handleEditClick}
-                              style={{ display: "inline", cursor: "pointer" }}
-                            >
-                              {paymentChanelShowData}
-                            </p>
-                          )}
-                          <i
-                            className="mdi mdi-pencil"
-                            style={{ cursor: "pointer", marginLeft: "10px" }}
-                            onClick={handleEditClick}
-                          ></i>
-                        </div>
+                  </div>
+
+                  <div className=" d-flex parantEmpView editPayment">
+                    <h6>
+                      <strong>Bank Ref</strong>
+                    </h6>
+
+                    {editBank ? (
+                      <input
+                        value={bankText}
+                        onChange={handleBankChange}
+                        onBlur={() => setEditBank(false)}
+                        autoFocus
+                      />
+                    ) : (
+                      <div>
+                        <p
+                          onClick={handleEditBankRef}
+                          style={{ display: "inline", marginRight: "10px" }}
+                        >
+                          {bankText}
+                        </p>
+                        <i
+                          className="mdi mdi-pencil"
+                          style={{ cursor: "pointer" }}
+                          onClick={handleEditBankRef}
+                        ></i>
                       </div>
-                    </div>
-               
-                    <div className=" d-flex parantEmpView editPayment">
-                      <h6>
-                        <strong>Bank Ref</strong>
-                      </h6>
-
-                      {editBank ? (
-                        <input
-                          value={bankText}
-                          onChange={handleBankChange}
-                          onBlur={() => setEditBank(false)}
-                          autoFocus
-                        />
-                      ) : (
-                        <div>
-                          <p
-                            onClick={handleEditBankRef}
-                            style={{ display: "inline", marginRight: "10px" }}
-                          >
-                            {bankText}
-                          </p>
-                          <i
-                            className="mdi mdi-pencil"
-                            style={{ cursor: "pointer" }}
-                            onClick={handleEditBankRef}
-                          ></i>
-                        </div>
-                      )}
-                    </div>
-
-                 
+                    )}
+                  </div>
                 </div>
-                <div className="col-lg-3">
-                      
-                <div className="parantEmpView">
+                {/* <div className="col-lg-3">
+                  <div className="parantEmpView">
                     <div>
                       <h6>
                         <strong>FX Payment </strong>
@@ -4550,7 +4551,7 @@ const Accounts = () => {
                       </h6>
                       <p>{accountDataShow.LOSS_GAIN_THB}</p>
                     </div>
-                  </div>  
+                  </div>
                   <div className="parantEmpView">
                     <div>
                       <h6>
@@ -4571,8 +4572,7 @@ const Accounts = () => {
                       <p>{accountDataShow.THB_Paid}</p>
                     </div>
                   </div>
-                </div>
-                 
+                </div> */}
               </div>
             </div>
             <div className="modal-footer">
