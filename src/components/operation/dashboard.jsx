@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+ import { useMemo, useState, useEffect } from "react";
 import { API_BASE_URL } from "../../Url/Url";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
@@ -11,9 +11,10 @@ import { useQuery } from "react-query";
 import { useForm } from "@tanstack/react-form";
 import { ComboBox } from "../combobox";
 import { Autocomplete, TextField } from "@mui/material";
-
+import { useTranslation } from "react-i18next";
 const localizer = momentLocalizer(moment);
 export const OperationDashboard = () => {
+  const [t, i18n] = useTranslation("global");
   const [allData, setAllData] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -111,7 +112,7 @@ export const OperationDashboard = () => {
             order_id: selectedOrderId,
             ...value,
           });
-          toast.success("Order update successfully");
+          toast.success(t("orderUpdateSuccess"));
           setIsOpenModal(false);
           orderData();
           refetch();
@@ -192,7 +193,7 @@ export const OperationDashboard = () => {
     } catch (error) {
       // Log the error if the request fails
       console.error("Failed to fetch freight details:", error);
-      toast.error("Error fetching freight details");
+      toast.error(t("fetchFreight"));
     }
   };
   const handleLoadDateSelection = async (loadDate) => {
@@ -239,7 +240,7 @@ export const OperationDashboard = () => {
     } catch (error) {
       // Log the error if the request fails
       console.error("Failed to fetch freight details:", error);
-      toast.error("Error fetching freight details");
+      toast.error(t("fetchFreight"));
     }
   };
   const handleEditClick = async (order_id) => {
@@ -253,12 +254,12 @@ export const OperationDashboard = () => {
       console.log("API response:", response);
       loadingModal.close();
       orderData();
-      toast.success(" Copy Order Procedure successfully");
+      toast.success(t("copyOrderProcedureSuccessfully"));
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
       loadingModal.close();
-      toast.error("Failed to Copy Order Procedure");
+      toast.error(t("copyOrderFailed"));
     }
   };
   const handleChange2 = (e) => {
@@ -278,7 +279,7 @@ export const OperationDashboard = () => {
           modalInstance.hide();
         }
         console.log(response);
-        toast.success("Order Note Updated Successfully", {
+        toast.success(t("orderNoteUpdated"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -377,7 +378,7 @@ export const OperationDashboard = () => {
               aria-controls="nav-home"
               aria-selected="true"
             >
-              Calendar
+              {t("calendar")}
             </button>
           </div>
         </nav>
@@ -390,7 +391,7 @@ export const OperationDashboard = () => {
             tabIndex={0}
           >
             <div className="bg-white rounded w-full flex-col flex divide-y">
-              <div className="font-bold text-lg py-3 px-3">Order pipeline</div>
+              <div className="font-bold text-lg py-3 px-3">{t("orderPipeline")}</div>
               <div className="App" style={{ padding: "8px" }}>
                 <Calendar
                   localizer={localizer}
@@ -474,7 +475,7 @@ export const OperationDashboard = () => {
           />
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full ">
             <div className="crossArea">
-              <h3>Edit Details</h3>
+              <h3>{t("editDetails")}</h3>
               <p onClick={closeModal1}>
                 <CloseIcon />
               </p>
@@ -490,7 +491,7 @@ export const OperationDashboard = () => {
               >
                 <div className="p-3 bottomOrderSp">
                   <div className="form-group mb-3 autoComplete">
-                    <label>Liner</label>
+                    <label>{t("liner")}</label>
                     <form.Field
                       name="Liner"
                       children={(field) => (
@@ -524,7 +525,7 @@ export const OperationDashboard = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Liner"
+                              placeholder={t("selectLiner")}
                               variant="outlined"
                             />
                           )}
@@ -533,7 +534,7 @@ export const OperationDashboard = () => {
                     />
                   </div>
                   <div className="form-group autoComplete">
-                    <label>Journey Number</label>
+                    <label>{t("journeyNumber")}</label>
                     <form.Field
                       name="journey_number"
                       children={(field) => (
@@ -547,30 +548,13 @@ export const OperationDashboard = () => {
                             field.handleChange(e);
                             handleJourneySelection(e);
                           }}
+                          placeholder={t("journeyNumber")}
                         />
-
-                        // <Autocomplete
-                        //   options={Journey || []}
-                        //   getOptionLabel={(option) => option.journey_number}
-                        //   value={
-                        //     Journey?.find((v) => v.ID === field.state.value) ||
-                        //     null
-                        //   }
-                        //   onChange={(event, newValue) => {
-                        //     field.handleChange(newValue ? newValue.ID : null);
-                        //     handleJourneySelection(newValue.ID);
-                        //   }}
-                        //   renderInput={(params) => (
-                        //     <TextField {...params} placeholder="Select Journey" />
-                        //   )}
-                        // />
-
-                        
                       )}
                     />
                   </div>
                   <div className="form-group">
-                    <label>BL</label>
+                    <label>{t("bl")}</label>
                     <form.Field
                       name="bl"
                       children={(field) => (
@@ -585,7 +569,7 @@ export const OperationDashboard = () => {
                   </div>
                   <div className="flex gap-2">
                     <div className="form-group w-full">
-                      <label>Load Date</label>
+                      <label>{t("loadDate")}</label>
                       <form.Field
                         name="Load_date"
                         children={(field) => (
@@ -603,7 +587,7 @@ export const OperationDashboard = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label>Load Time</label>
+                      <label>{t("loadTime")}</label>
                       <form.Field
                         name="Load_time"
                         children={(field) => (
@@ -621,7 +605,7 @@ export const OperationDashboard = () => {
                   </div>
                   <div className="flex gap-2">
                     <div className="form-group w-full">
-                      <label>Ship Date</label>
+                      <label>{t("shipDate")}</label>
                       <form.Field
                         name="Ship_date"
                         children={(field) => (
@@ -637,7 +621,7 @@ export const OperationDashboard = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label>ETD</label>
+                      <label>{t("etd")}</label>
                       <form.Field
                         name="ETD"
                         children={(field) => (
@@ -655,7 +639,7 @@ export const OperationDashboard = () => {
                   </div>
                   <div className="flex gap-2">
                     <div className="form-group w-full">
-                      <label>Arrival Date</label>
+                      <label>{t("arrivalDate")}</label>
                       <form.Field
                         name="Arrival_date"
                         children={(field) => (
@@ -671,7 +655,7 @@ export const OperationDashboard = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label>ETA</label>
+                      <label>{t("eta")}</label>
                       <form.Field
                         name="ETA"
                         children={(field) => (
@@ -693,7 +677,7 @@ export const OperationDashboard = () => {
                     type="submit"
                     className="bg-black text-white px-4 py-2 rounded"
                   >
-                    Save
+                    {t("save")}
                   </button>
                 </div>
               </form>

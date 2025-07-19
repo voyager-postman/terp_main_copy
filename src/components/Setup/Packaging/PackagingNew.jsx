@@ -6,36 +6,38 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { TableView } from "../../table";
+import { useTranslation } from "react-i18next";
 
 const PackagingNew = () => {
+  const { t } = useTranslation("global");
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [isOn, setIsON] = useState(true);
   const updateAirportStatus = (airportId) => {
-		const request = {
-			packagingId: airportId,
-		}
+    const request = {
+      packagingId: airportId,
+    }
 
-		axios
-			.post(`${API_BASE_URL}/UpdateStatuspackaging`, request)
-			.then((response) => {
-				if (response.data.success == true) {
-					toast.success(response.data.message, {
-						autoClose: 1000,
-						theme: "colored",
-					})
+    axios
+      .post(`${API_BASE_URL}/UpdateStatuspackaging`, request)
+      .then((response) => {
+        if (response.data.success == true) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          })
           getAllPackages();
-					return
-				}
-			})
-			.catch((error) => {
-				console.log(error)
-			})
-	}
+          return
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
   const columns = React.useMemo(
     () => [
       {
-        Header: "Code",
+        Header: t("code"),
         accessor: (a) => (
           <div>
             <BarCode width={0.8} height={30} value={a.Inventory_code} />
@@ -43,12 +45,12 @@ const PackagingNew = () => {
         ),
       },
       {
-        Header: "Pack",
+        Header: t("pack"),
         accessor: "Name_EN",
       },
 
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -66,8 +68,8 @@ const PackagingNew = () => {
               defaultChecked={a.Available == "1" ? true : false}
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")}</span>
+              <span>{t("on")}</span>
             </span>
             <a></a>
           </label>
@@ -75,7 +77,7 @@ const PackagingNew = () => {
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => [
           <Link to="/updatePackaging" state={{ from: a }}>
             <i
@@ -88,13 +90,13 @@ const PackagingNew = () => {
               }}
             />
           </Link>,
-          
+
         ],
       },
 
-    
+
     ],
-    []
+    [t]
   );
 
   // Get All Packaging Api
@@ -109,7 +111,7 @@ const PackagingNew = () => {
       .catch((error) => {
         console.log(error);
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -124,14 +126,14 @@ const PackagingNew = () => {
 
   return (
     <Card
-      title="Packaging Management"
+      title={t("packagingManagement")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/createPackagingNew")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

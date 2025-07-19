@@ -8,8 +8,10 @@ import Select from "react-select";
 import { API_BASE_URL } from "../../Url/Url";
 import TextField from "@mui/material/TextField";
 import ReactApexChart from "react-apexcharts";
+import { useTranslation } from "react-i18next";
 
 const ConsigneeDashtwo = () => {
+  const [t, i18n] = useTranslation("global");
   const location = useLocation();
 
   const { from } = location.state || {};
@@ -190,19 +192,19 @@ const ConsigneeDashtwo = () => {
   // };
   const confirmData2 = () => {
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
     if (!date3) {
-      toast.error("Compare Start DATE is required");
+      toast.error(t("compareStartDateRequired"));
       return;
     }
     if (!date4) {
-      toast.error("Compare End DATE is required");
+      toast.error(t("compareEndDateRequired"));
       return;
     }
 
@@ -311,7 +313,7 @@ const ConsigneeDashtwo = () => {
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
-        toast.error("An error occurred while fetching data.");
+        toast.error(t("fetchDataError"));
       });
   };
 
@@ -329,11 +331,11 @@ const ConsigneeDashtwo = () => {
     console.log("confirm data is", obj);
 
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
 
@@ -358,10 +360,10 @@ const ConsigneeDashtwo = () => {
       console.log("API Response:", response.data.data);
       setBoxsData(response.data.data);
       // Handle success
-      toast.success("Data fetched successfully!");
+      toast.success(t("dataFetchedSuccess"));
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Failed to fetch data. Please try again.");
+      toast.error(t("failedToFetch"));
     }
   };
 
@@ -449,19 +451,19 @@ const ConsigneeDashtwo = () => {
   const confirmData1 = async () => {
     // Validation checks
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
     if (!date3) {
-      toast.error("Compare Start DATE is required");
+      toast.error(t("compareStartDateRequired"));
       return;
     }
     if (!date4) {
-      toast.error("Compare End DATE is required");
+      toast.error(t("compareEndDateRequired"));
       return;
     }
 
@@ -484,10 +486,10 @@ const ConsigneeDashtwo = () => {
       );
       console.log("API Response:", response);
       setTopFiveValue(response.data);
-      toast.success("Data fetched successfully!");
+      toast.success(t("dataFetchedSuccess"));
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Failed to fetch data. Please try again.");
+      toast.error(t("failedToFetch"));
     }
   };
 
@@ -502,73 +504,82 @@ const ConsigneeDashtwo = () => {
     minimumFractionDigits: 0,
   });
   const [chartOptions, setChartOptions] = useState({
-    series: [
-      {
-        name: "Produce Trend",
-        data: [], // Initial empty data
-      },
-    ],
-    options: {
-      chart: {
-        type: "area",
-        stacked: false,
-        height: 350,
-        zoom: {
-          type: "x",
-          enabled: true,
-          autoScaleYaxis: true,
-        },
-        toolbar: {
-          autoSelected: "zoom",
-        },
-      },
-      colors: ["#203764"],
-      dataLabels: {
-        enabled: false,
-      },
-      markers: {
-        size: 0,
-      },
-      title: {
-        text: "Produce Price Consignee",
-        align: "left",
-      },
-      fill: {
-        type: "gradient",
-        gradient: {
-          shadeIntensity: 1,
-          inverseColors: false,
-          opacityFrom: 0.5,
-          opacityTo: 0,
-          stops: [0, 90, 100],
-        },
-      },
-      yaxis: {
-        title: {
-          text: "Price",
-        },
-      },
-      xaxis: {
-        type: "datetime",
-        labels: {
-          formatter: function (val) {
-            const date = new Date(val);
-            const day = date.getDate();
-            const month = date.toLocaleString("default", { month: "short" });
-            return `${day} ${month}`; // e.g., "12 Jul"
-          },
-        },
-      },
-      tooltip: {
-        shared: false,
-        y: {
-          formatter: function (val) {
-            return val.toFixed(0);
-          },
-        },
-      },
-    },
+    series: [],
+    options: {},
   });
+
+  useEffect(() => {
+    setChartOptions({
+      series: [
+        {
+          name: t("produceTrend"),
+          data: [], // Replace with your actual data if available
+        },
+      ],
+      options: {
+        chart: {
+          type: "area",
+          stacked: false,
+          height: 350,
+          zoom: {
+            type: "x",
+            enabled: true,
+            autoScaleYaxis: true,
+          },
+          toolbar: {
+            autoSelected: "zoom",
+          },
+        },
+        colors: ["#203764"],
+        dataLabels: {
+          enabled: false,
+        },
+        markers: {
+          size: 0,
+        },
+        title: {
+          text: t("producePriceConsignee"),
+          align: "left",
+        },
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.5,
+            opacityTo: 0,
+            stops: [0, 90, 100],
+          },
+        },
+        yaxis: {
+          title: {
+            text: t("price"),
+          },
+        },
+        xaxis: {
+          type: "datetime",
+          labels: {
+            formatter: function (val) {
+              const date = new Date(val);
+              const day = date.getDate();
+              const month = date.toLocaleString("default", {
+                month: "short",
+              });
+              return `${day} ${month}`;
+            },
+          },
+        },
+        tooltip: {
+          shared: false,
+          y: {
+            formatter: function (val) {
+              return val.toFixed(0);
+            },
+          },
+        },
+      },
+    });
+  }, [t]); // Re-run when language changes
   return (
     <div className="bg-white clientDashRad newSmallCard">
       <div className="top-space-search-reslute">
@@ -580,7 +591,7 @@ const ConsigneeDashtwo = () => {
                   <div className="flex flex-wrap">
                     <div>
                       <div className="selectTimeHead">
-                        <h6>Select Time Period :</h6>
+                        <h6>{t("selectTimePeriod")} :</h6>
                       </div>
                       <div className="selectTimeParent">
                         {dataPeriod.map((item) => (
@@ -609,7 +620,7 @@ const ConsigneeDashtwo = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Comparison Period"
+                        placeholder={t("comparisonPeriod")}
                           />
                         )}
                       />
@@ -652,7 +663,8 @@ const ConsigneeDashtwo = () => {
                         type="submit"
                         onClick={confirmData}
                       >
-                        Confirm
+                                                   {t("confirm")}
+
                       </button>
                     </div>
                   </div>
@@ -675,7 +687,7 @@ const ConsigneeDashtwo = () => {
                         </div>
                         <div className="text-end pt-1">
                           <p className="text-sm mb-0 text-capitalize">
-                            Total Shipments
+                              {t("totalShipments")}
                           </p>
                           <h4 className="mb-0">
                             {boxsData?.CNF?.Total ? boxsData?.CNF?.Total : 0}
@@ -712,7 +724,8 @@ const ConsigneeDashtwo = () => {
                         </div>
                         <div className="text-end pt-1">
                           <p className="text-sm mb-0 text-capitalize">
-                            Total Claims
+                                                        {t("totalClaims")}
+
                           </p>
                           <h4 className="mb-0">
                             {" "}
@@ -753,7 +766,7 @@ const ConsigneeDashtwo = () => {
                         <div className="text-end pt-1">
                           <p className="text-sm mb-0 text-capitalize">
                             {" "}
-                            Total Payment{" "}
+                            {t("totalPayment")}{" "}
                           </p>
                           <h4 className="mb-0">
                             {" "}
@@ -793,7 +806,7 @@ const ConsigneeDashtwo = () => {
                         </div>
                         <div className="text-end pt-1">
                           <p className="text-sm mb-0 text-capitalize">
-                            Pending Payment
+                             {t("pendingPayment")}
                           </p>
                           <h4 className="mb-0">
                             {boxsData?.Pending?.Total
@@ -825,7 +838,7 @@ const ConsigneeDashtwo = () => {
                         </div>
                         <div className="text-end pt-1">
                           <p className="text-sm mb-0 text-capitalize">
-                            Total Net Weigt Shipped
+                           {t("totalNetWeightShipped")}
                           </p>
                           <h4 className="mb-0">
                             {boxsData?.NetWeight?.Total_GW
@@ -854,7 +867,7 @@ const ConsigneeDashtwo = () => {
                         </div>
                         <div className="text-end pt-1">
                           <p className="text-sm mb-0 text-capitalize">
-                            Total Gross Weight Shipped
+                           {t("totalGrossWeightShipped")}
                           </p>
                           <h4 className="mb-0">
                             {boxsData?.grossWeight?.Total_GW
@@ -883,7 +896,7 @@ const ConsigneeDashtwo = () => {
                         </div>
                         <div className="text-end pt-1">
                           <p className="text-sm mb-0 text-capitalize">
-                            Total Boxes Shipped
+                          {t("totalBoxesShipped")}
                           </p>
                           <h4 className="mb-0">
                             {boxsData?.Box?.Total_GW
@@ -913,10 +926,10 @@ const ConsigneeDashtwo = () => {
                         </div>
                         <div className="text-end pt-1">
                           <p className="text-sm mb-0 text-capitalize">
-                            Total Shipments
+                           {t("totalShipments")}
                           </p>
                           <div className="parentFirstShip mt-4">
-                            <p>Date of First Shipment</p>
+                            <p>{t("dateOfFirstShipment")}</p>
                             <p>
                               {" "}
                               {boxsData?.Shipments?.First_Shipment
@@ -925,7 +938,7 @@ const ConsigneeDashtwo = () => {
                             </p>
                           </div>
                           <div className="parentFirstShip">
-                            <p>Date of Last Shipment</p>
+                             <p>{t("dateOfLastShipment")}</p>
                             <p>
                               {" "}
                               {boxsData?.Shipments?.Last_Shipment
@@ -934,7 +947,7 @@ const ConsigneeDashtwo = () => {
                             </p>
                           </div>
                           <div className="parentFirstShip">
-                            <p> Shipments in Pipe Line</p>
+                             <p>{t("shipmentsInPipeLine")}</p>
                             <p>
                               {boxsData?.Shipments?.Pipe_Line
                                 ? boxsData?.Shipments?.Pipe_Line
@@ -950,7 +963,7 @@ const ConsigneeDashtwo = () => {
                 <div className="row">
                   <div className="col-lg-6 mb20">
                     <div className="itemsOrderSearch">
-                      <h3 className="itemOrder">Top 5 Items Ordered</h3>
+                      <h3 className="itemOrder">{t("topItems")}</h3>
 
                       <div className="selectProduce">
                         <Autocomplete
@@ -970,7 +983,7 @@ const ConsigneeDashtwo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Invoice Value"
+                              placeholder={t("invoiceValue")}
                             />
                           )}
                         />
@@ -980,11 +993,11 @@ const ConsigneeDashtwo = () => {
                     <div className="tableCreateClient">
                       <table>
                         <tr>
-                          <th>ITF Name</th>
-                          <th> Last Period Kg</th>
-                          <th> Current Period Kg</th>
-                          <th> DIFF </th>
-                          <th> % Change </th>
+                         <th>{t("itfName")}</th>
+                            <th>{t("lastPeriodKg")}</th>
+                            <th>{t("currentPeriodKg")}</th>
+                            <th>{t("diff")}</th>
+                            <th>{t("percentChange")}</th>
                         </tr>
                         <tbody>
                           {topFiveValue?.Top5Data?.map((item, index) => (
@@ -1009,7 +1022,8 @@ const ConsigneeDashtwo = () => {
                           value={options.find(
                             (option) => option.value === selectedDataset
                           )}
-                          placeholder="Select..."
+                                                    placeholder={t("select")}
+
                           isSearchable
                           styles={{
                             container: (provided) => ({
@@ -1032,7 +1046,7 @@ const ConsigneeDashtwo = () => {
               </div>
               <div className="card-footer text-center">
                 <Link className="btn btn-danger" to="/shipToNew">
-                  Close
+                  {t("close")}
                 </Link>
               </div>
             </div>

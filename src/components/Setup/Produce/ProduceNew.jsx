@@ -7,10 +7,11 @@ import { TableView } from "../../table";
 import axios from "axios";
 import { API_BASE_URL } from "../../../Url/Url";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const ProduceNew = () => {
+  const { t, i18n } = useTranslation("global");
   const navigate = useNavigate();
-
   const [data, setData] = useState([]);
   const getData = () => {
     axios.get(`${API_BASE_URL}/getAllProduceItem`).then((res) => {
@@ -48,17 +49,17 @@ const ProduceNew = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Code",
+        Header: t("code"),
         accessor: (a) => (
           <BarCode width={0.8} height={30} value={a.Inventory_code} />
         ),
       },
       {
-        Header: "Name",
+        Header: t("name"),
         accessor: (a) => a.Name_EN,
       },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -76,8 +77,8 @@ const ProduceNew = () => {
               defaultChecked={a.Available == "1" ? true : false}
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")}</span>
+              <span>{t("on")}</span>
             </span>
             <a></a>
           </label>
@@ -85,7 +86,7 @@ const ProduceNew = () => {
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <Link to="/updateProduce" state={{ from: a }}>
             <i
@@ -103,19 +104,19 @@ const ProduceNew = () => {
         ),
       },
     ],
-    []
+    [t]
   );
   return (
     <>
       <Card
-        title={"Produce Items"}
+        title={t("Produce_Items") }
         endElement={
           <button
             type="button"
             onClick={() => navigate("/produceCreateNew")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >

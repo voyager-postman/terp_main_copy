@@ -6,8 +6,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { TableView } from "../../table";
+import { useTranslation } from "react-i18next";
 
 export const OrderPackagingList = () => {
+  const { t, i18n } = useTranslation("global");
+
   const [data, setData] = useState([]);
   const navigate = useNavigate();
 
@@ -23,9 +26,9 @@ export const OrderPackagingList = () => {
   const confirmQuotation = async (id) => {
     try {
       await axios.post(`${API_BASE_URL}/confirmOrder`, { quote_id: id });
-      toast.success("Order confirmed successfully");
+      toast.success(t("order_confirm_success"));
     } catch (e) {
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
   const generateInvoice = (id, id1, id2) => {
@@ -60,19 +63,19 @@ export const OrderPackagingList = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Number",
+        Header: t("number"),
         accessor: "Order_Number",
       },
       {
-        Header: "TTREF",
+        Header: t("ttref"),
         accessor: "Shipment_ref",
       },
       {
-        Header: "Consignee Name",
+        Header: t("consigneeName"),
         accessor: "consignee_name",
       },
       {
-        Header: "Load Date",
+        Header: t("loadDate"),
         accessor: (a) => {
           return a.load_date
             ? new Date(a.load_date).toLocaleDateString()
@@ -80,24 +83,24 @@ export const OrderPackagingList = () => {
         },
       },
       {
-        Header: "Load Time",
+        Header: t("loadTime"),
         accessor: "Freight_load_time",
       },
       {
-        Header: "Supplier",
+        Header: t("supplier"),
         accessor: (a) => a.supplier_name,
       },
       {
-        Header: "Freight BL",
+        Header: t("freight_bl"),
         accessor: (a) => a.Freight_bl,
       },
       {
-        Header: "Status",
+        Header: t("status"),
         // accessor: (a) => ({ 2: "Confirmed" })[a.Status] || "Pending",
         accessor: (a) => a.Packing_status,
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="editIcon gap-2">
             {[4, 5, 6].includes(+a.Status) && (
@@ -108,7 +111,7 @@ export const OrderPackagingList = () => {
 
             {+a.Status === 6 && (
               <>
-                <button type="button" onClick={() => {}}></button>
+                <button type="button" onClick={() => { }}></button>
 
                 <button
                   type="button"
@@ -129,14 +132,14 @@ export const OrderPackagingList = () => {
 
   return (
     <Card
-      title={"Order Packaging Management"}
+    title={t("order_packaging_management")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/orderPackagingEdit")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

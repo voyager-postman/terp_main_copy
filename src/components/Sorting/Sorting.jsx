@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../Url/Api";
 import React, { useMemo, useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
@@ -10,8 +10,10 @@ import { Button, Modal } from "react-bootstrap";
 import CloseIcon from "@mui/icons-material/Close";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Sorting = () => {
+  const { t, i18n } = useTranslation("global");
   const navigate = useNavigate();
   const [id, setId] = useState(null);
   const [viewData, setViewData] = useState("");
@@ -95,7 +97,7 @@ const Sorting = () => {
       setRestoredRows((prev) => [...prev, id]);
     } catch (error) {
       console.error("Error during restoreSorting:", error);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -150,12 +152,12 @@ const Sorting = () => {
         );
         console.log(response.status); // Log the response object
         if (response.status == 200) {
-          toast.success("Ean Packing update successful");
+          toast.success(t("eanPackingUpdateSuccess"));
           getEanPackaging();
           setIsOpen(false);
         }
       } catch (error) {
-        toast.error("Something went wrong");
+        toast.error(t("genericError"));
       }
     },
   });
@@ -172,18 +174,18 @@ const Sorting = () => {
   const columns = useMemo(
     () => [
       {
-        Header: () => <div style={{ textAlign: "center" }}>PO CODE</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("poCode")}</div>,
         accessor: "PODCODE",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Vender Name</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("vendorName")}</div>,
         accessor: "Vendor_Name",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
         // if your table supports it
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}> Name</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("name")}</div>,
 
         accessor: "Name_EN",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
@@ -191,7 +193,7 @@ const Sorting = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Date</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("date")}</div>,
         accessor: (row) => {
           const date = new Date(row.Date);
           return date.toLocaleDateString("en-GB"); // 'en-GB' gives dd/mm/yyyy format
@@ -201,7 +203,7 @@ const Sorting = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Crates</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("create")}</div>,
         accessor: "Crates",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -211,7 +213,7 @@ const Sorting = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Quantity</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("quantity")}</div>,
         accessor: "Quantity",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
@@ -219,20 +221,20 @@ const Sorting = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Unit</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("unit")}</div>,
         accessor: "Unit",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Cost</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("cost")}</div>,
         accessor: "Cost",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>QTY / Crate</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("qtyPerCrate")}</div>,
 
         accessor: "Qty/Crate",
         Cell: ({ value }) => (
@@ -240,7 +242,7 @@ const Sorting = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Status</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("status")}</div>,
 
         accessor: "Status",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
@@ -299,7 +301,7 @@ const Sorting = () => {
         ),
       },
     ],
-    [restoredRows]
+    [restoredRows, t]
   );
   // modal
   const [show, setShow] = useState(false);
@@ -336,7 +338,7 @@ const Sorting = () => {
       }
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("An error occurred while accessing the file.");
+      toast.error(t("fileAccessError"))
     }
   };
   const closeIcon = () => {
@@ -424,7 +426,7 @@ const Sorting = () => {
 
         console.log("Access file updated (edit mode):", accessResponse.data);
 
-        toast.success("Sorting Added Successfully", {
+        toast.success(t("sortingSuccess"), {
           // autoClose: 2000,
           // onClose: () => {
           //   closeBootstrapModal();
@@ -445,7 +447,7 @@ const Sorting = () => {
 
         console.log("Access file updated (edit mode):", accessResponse.data);
 
-        toast.success("Sorting Added Successfully", {
+        toast.success(t("sortingSuccess"), {
           // autoClose: 1000,
           theme: "colored",
           onClose: () => {
@@ -527,7 +529,8 @@ const Sorting = () => {
       getSortData();
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
-      toast.error("An error occurred while closing.");
+      toast.error(t("closingError"));
+
     }
   };
 
@@ -557,7 +560,7 @@ const Sorting = () => {
       setIsButtonDisabled(false);
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
-      toast.error("An error occurred while closing.");
+      toast.error(t("closingError"));
     }
   };
 
@@ -609,7 +612,7 @@ const Sorting = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                View
+                {t("view")}
               </h1>
               <button
                 type="button"
@@ -626,7 +629,7 @@ const Sorting = () => {
                   <div className="parentPurchaseView mb-3">
                     <div className="me-3">
                       <strong>
-                        User Name <span>:</span>
+                        {t("user_name")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -639,7 +642,7 @@ const Sorting = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Recieving Crate
+                        {t("receivingCrate")}
                         <span>:</span>
                       </strong>
                     </div>
@@ -650,7 +653,7 @@ const Sorting = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Blue Crate
+                        {t("blueCrate")}
                         <span>:</span>
                       </strong>
                     </div>
@@ -664,7 +667,7 @@ const Sorting = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Sorting Good
+                        {t("sortingGood")}
                         <span>:</span>
                       </strong>
                     </div>
@@ -675,7 +678,7 @@ const Sorting = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Sorting Note
+                        {t("sortingNote")}
                         <span>:</span>
                       </strong>
                     </div>
@@ -695,7 +698,7 @@ const Sorting = () => {
         </div>
       </div>
       {/* view modal end */}
-      <Card title="Sorting Management">
+      <Card title={t("sortingManagement")}>
         <TableView columns={columns} data={data || []} />
         <div
           className="modal fade"
@@ -711,7 +714,7 @@ const Sorting = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h1 className="modal-title fs-5" id="exampleModalLabel">
-                  Operation / Sorting
+                  {t("operationSorting")}
                 </h1>
                 <button
                   type="button"
@@ -744,14 +747,14 @@ const Sorting = () => {
                                   <div className="form-group col-lg-3">
                                     <div className="parentPurchaseView">
                                       <div className="me-2">
-                                        <strong>POD CODE:</strong>
+                                        <strong> {t("pod_Code")}:</strong>
                                       </div>
 
                                       <p>{dataSet?.PODCODE} </p>
                                     </div>
                                     <div className="parentPurchaseView">
                                       <div className="me-3">
-                                        <strong>Name:</strong>
+                                        <strong> {t("name")}:</strong>
                                       </div>
 
                                       <p>{dataSet?.Name_EN} </p>
@@ -759,7 +762,7 @@ const Sorting = () => {
                                     <div className="flex">
                                       <div className="parentPurchaseView">
                                         <div className="me-2">
-                                          <strong>Quantity:</strong>
+                                          <strong> {t("quantity")}:</strong>
                                         </div>
 
                                         <p>
@@ -768,14 +771,14 @@ const Sorting = () => {
                                       </div>
                                       <div className="parentPurchaseView ms-3">
                                         <div className="me-2">
-                                          <strong> Unit:</strong>
+                                          <strong> {t("unit")}:</strong>
                                         </div>
 
                                         <p>{dataSet?.Unit} </p>
                                       </div>
                                       <div className="parentPurchaseView ms-3">
                                         <div className="me-2">
-                                          <strong>Crates:</strong>
+                                          <strong> {t("crates")}:</strong>
                                         </div>
 
                                         <p>
@@ -787,7 +790,7 @@ const Sorting = () => {
                                 </div>
                                 <div className="row mt-2 inputMarginUnset">
                                   <div className="form-group col-lg-6">
-                                    <h6> Recieving Crate</h6>
+                                    <h6> {t("receivingCrate")}</h6>
                                     <input
                                       onChange={handleChange}
                                       type="number"
@@ -809,7 +812,7 @@ const Sorting = () => {
                                 </div>
                                 <div className="row inputMarginUnset">
                                   <div className="form-group col-lg-6">
-                                    <h6>Blue Crate </h6>
+                                    <h6> {t("blueCrate")}</h6>
                                     <input
                                       onChange={handleChange}
                                       type="text"
@@ -819,7 +822,7 @@ const Sorting = () => {
                                     />
                                   </div>
                                   <div className="form-group col-lg-6">
-                                    <h6>Sorting Good</h6>
+                                    <h6> {t("sortingGood")}</h6>
                                     <input
                                       onChange={handleChange}
                                       type="number"
@@ -829,7 +832,7 @@ const Sorting = () => {
                                     />
                                   </div>
                                   <div className="form-group col-lg-12">
-                                    <h6>Sorting Note</h6>
+                                    <h6> {t("sortingNote")}</h6>
                                     <input
                                       onChange={handleChange}
                                       type="text"
@@ -852,7 +855,7 @@ const Sorting = () => {
                             type="submit"
                             name="signup"
                           >
-                            Sort
+                            {t("sort")}
                           </button>
                           <Link
                             className="btn btn-danger"
@@ -861,7 +864,7 @@ const Sorting = () => {
                             data-bs-dismiss="modal"
                             aria-label="Close"
                           >
-                            Cancel
+                            {t("cancel")}
                           </Link>
                         </div>
                       </div>
@@ -880,7 +883,7 @@ const Sorting = () => {
                         }}
                       >
                         <h1 className="modal-title fs-5" id="exampleModalLabel">
-                          Receive Check
+                          {t("receiveCheck")}
                         </h1>
                         <button
                           style={{ color: "#fff", fontSize: "30px" }}
@@ -913,7 +916,7 @@ const Sorting = () => {
                           {stock.Message_TH ? stock.Message_TH : "NULL"}
                         </p> */}
                           <div className="closeBtnRece">
-                            <button onClick={closeIcon}>Close</button>
+                            <button onClick={closeIcon}>  {t("close")}</button>
                           </div>
                         </div>
                       </div>
@@ -944,7 +947,7 @@ const Sorting = () => {
           />
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
             <div className="crossArea">
-              <h3>Edit Details</h3>
+              <h3> {t("editDetails")}</h3>
               <p onClick={closeModal}>
                 <CloseIcon />
               </p>
@@ -960,7 +963,7 @@ const Sorting = () => {
               >
                 <div className="p-3">
                   <div className="form-group">
-                    <label>Quantity on Hand</label>
+                    <label> {t("quantityOnHand")}</label>
                     <form.Field
                       name="Qty_on_hand "
                       children={(field) => (
@@ -975,7 +978,7 @@ const Sorting = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Crates on Hand</label>
+                    <label> {t("cratesOnHand")}</label>
                     <form.Field
                       name="Crates_on_hand "
                       children={(field) => (
@@ -997,7 +1000,7 @@ const Sorting = () => {
                       className="bg-gray-300 px-4 py-2 rounded"
                       onClick={closeModal}
                     >
-                      Close
+                      {t("close")}
                     </button>
 
                     <button
@@ -1005,7 +1008,7 @@ const Sorting = () => {
                       className="bg-black text-white px-4 py-2 rounded"
                       onClick={handleclickpostapi}
                     >
-                      Save
+                      {t("save")}
                     </button>
                   </div>
                 </div>

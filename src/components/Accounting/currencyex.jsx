@@ -123,12 +123,12 @@ const AccountLedger = () => {
       //   accessor: (a) => <>{"10000000"}</>,
       // },
     ],
-    []
+    [t]
   );
  
   return (
     <Card
-      title={"Accounting Ledger Management"}
+      title={t("AccountingLedgerManagement")}
       endElement={
         <button
           type="button"

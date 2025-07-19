@@ -4,8 +4,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { API_BASE_URL } from "../../../Url/Url"
 import { Card } from "../../../card"
+import { useTranslation } from "react-i18next";
 
 const UpdateBank = () => {
+	  const { t } = useTranslation("global");
 	const location = useLocation()
 	const navigate = useNavigate()
 	const { from } = location.state || {}
@@ -65,7 +67,7 @@ const UpdateBank = () => {
 	}
 
 	return (
-		<Card title="Bank / Update Form">
+		<Card title={t("bankUpdateForm")}>
 			<div className="top-space-search-reslute">
 				<div className="tab-content px-2 md:!px-4">
 					<div className="tab-pane active" id="header" role="tabpanel">
@@ -77,104 +79,104 @@ const UpdateBank = () => {
 								<form action="">
 									<div className="row">
 										<div className="form-group col-lg-3">
-											<h6>Bank Name</h6>
+											<h6>{t("bankName")}</h6>
 											<input
 												onChange={handleChange}
 												type="text"
 												id="name_th"
 												name="bank_name"
 												className="form-control"
-												placeholder="Bank Name"
+												placeholder={t("bankName")}
 												defaultValue={state.bank_name}
 											/>
 										</div>
 										<div className="form-group col-lg-3">
-											<h6>Bank Nick Name</h6>
+											<h6>{t("bankNickname")}</h6>
 											<input
 												onChange={handleChange}
 												type="text"
 												id="name_en"
 												name="Bank_nick_name"
 												className="form-control"
-												placeholder="Bank Nick Name"
+												placeholder={t("bankNickname")}
 												defaultValue={state.Bank_nick_name}
 											/>
 										</div>
 
 										<div className="form-group col-lg-3">
-											<h6>Account Number</h6>
+											<h6>{t("accountNumber")}</h6>
 											<input
 												onChange={handleChange}
 												type="text"
 												id="hs_name"
 												name="bank_account_number"
 												className="form-control"
-												placeholder="Account Number"
+												placeholder={t("accountNumber")}
 												defaultValue={state.bank_account_number}
 											/>
 										</div>
 										<div className="form-group col-lg-3">
-											<h6>Account Name</h6>
+											<h6>{t("accountName")}</h6>
 											<input
 												onChange={handleChange}
 												type="text"
 												id="name_en"
 												name="Account_Name"
 												className="form-control"
-												placeholder="Account Name"
+												placeholder={t("accountName")}
 												defaultValue={state.Account_Name}
 											/>
 										</div>
 									</div>
 									<div className="row">
 										<div className="form-group col-lg-3">
-											<h6>Currency</h6>
+											<h6>{t("currency")}</h6>
 											<input
 												onChange={handleChange}
 												type="text"
 												id="name_en"
 												name="Currency"
 												className="form-control"
-												placeholder="Currency"
+												placeholder={t("currency")}
 												defaultValue={state.Currency}
 											/>
 										</div>
 
 										<div className="form-group col-lg-3">
-											<h6>Bank Address</h6>
+											<h6>{t("bankAddress")}</h6>
 											<input
 												onChange={handleChange}
 												type="text"
 												id="name_en"
 												name="Bank_Address"
 												className="form-control"
-												placeholder="Bank Address"
+												placeholder={t("bankAddress")}
 												defaultValue={state.Bank_Address}
 											/>
 										</div>
 
 										<div className="form-group col-lg-3">
-											<h6>IBAN</h6>
+											<h6>{t("iban")}</h6>
 											<input
 												onChange={handleChange}
 												type="text"
 												id="name_en"
 												name="IBAN"
 												className="form-control"
-												placeholder="IBAN"
+												placeholder={t("iban")}
 												defaultValue={state.IBAN}
 											/>
 										</div>
 
 										<div className="form-group col-lg-3">
-											<h6>Swift</h6>
+											<h6>{t("swift")}</h6>
 											<input
 												onChange={handleChange}
 												type="text"
 												id="name_en"
 												name="Swift"
 												className="form-control"
-												placeholder="Swift"
+												placeholder={t("swift")}
 												defaultValue={state.Swift}
 											/>
 										</div>
@@ -190,10 +192,10 @@ const UpdateBank = () => {
 							type="submit"
 							name="signup"
 						>
-							Update
+							{t("update")}
 						</button>
 						<Link className="btn btn-danger " to="/bankNew">
-							Cancel
+							{t("cancel")}
 						</Link>
 					</div>
 				</div>

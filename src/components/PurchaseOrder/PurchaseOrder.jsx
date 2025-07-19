@@ -4586,8 +4586,8 @@ const PurchaseOrder = () => {
                             onChange={handleAgreedPricingChange9}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
@@ -4660,7 +4660,7 @@ const PurchaseOrder = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Client" // Adds a placeholder
+                              placeholder={t("selectConsignee")}
                               InputLabelProps={{ shrink: false }} // Prevents floating label
                             />
                           )}
@@ -4682,7 +4682,7 @@ const PurchaseOrder = () => {
                               }))
                             }
                             dateFormat="dd/MM/yyyy"
-                            placeholderText="Click to select a date"
+                            placeholderText={t("selectDate")}
                             customInput={<CustomInput />}
                           />
                         </div>
@@ -4703,7 +4703,7 @@ const PurchaseOrder = () => {
                               }))
                             }
                             dateFormat="dd/MM/yyyy"
-                            placeholderText="Click to select a date"
+                            placeholderText={t("selectDate")}
                             customInput={<CustomInput />}
                           />
                         </div>
@@ -5871,7 +5871,7 @@ const PurchaseOrder = () => {
                       }
                       sx={{ width: 300 }}
                       renderInput={(params) => (
-                        <TextField {...params} placeholder="Unit" />
+                        <TextField {...params} placeholder={t("unit")} />
                       )}
                     />
                   </div>
@@ -5882,7 +5882,7 @@ const PurchaseOrder = () => {
                       type="text"
                       name="quantity"
                       value={formDataAdd.quantity || ""}
-                      placeholder="Quantity"
+                      placeholder={t("quantity")}
                       onChange={handleChangeAdd}
                     />
                   </div>
@@ -5893,7 +5893,7 @@ const PurchaseOrder = () => {
                       type="number"
                       name="crate"
                       value={formDataAdd.crate}
-                      placeholder="Crate"
+                      placeholder={t("create")}
                       onChange={handleChangeAdd}
                     />
                   </div>
@@ -5905,7 +5905,7 @@ const PurchaseOrder = () => {
                       type="number"
                       name="price"
                       value={formDataAdd.price}
-                      placeholder="Price"
+                      placeholder={t("price")}
                       onChange={handleChangeAdd}
                     />
                   </div>
@@ -5918,7 +5918,7 @@ const PurchaseOrder = () => {
                         type="number"
                         name="vat"
                         value={formDataAdd.vat}
-                        placeholder="VAT"
+                        placeholder={t("vat")}
                         onChange={handleChangeAdd}
                       />
                     </div>
@@ -5930,7 +5930,7 @@ const PurchaseOrder = () => {
                         type="number"
                         name="wht"
                         value={formDataAdd.wht}
-                        placeholder="WHT"
+                        placeholder={t("wht")}
                         onChange={handleChangeAdd}
                       />
                     </div>
@@ -5944,7 +5944,7 @@ const PurchaseOrder = () => {
                         type="number"
                         name="total"
                         value={formDataAdd.total}
-                        placeholder="Total"
+                        placeholder={t("total")}
                         onChange={handleChangeAdd}
                       />
                     </div>
@@ -6012,7 +6012,7 @@ const PurchaseOrder = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Client" // Adds a placeholder
+                          placeholder={t("clients")}
                           InputLabelProps={{ shrink: false }} // Prevents floating label
                         />
                       )}
@@ -6040,7 +6040,7 @@ const PurchaseOrder = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Consignee" // Adds a placeholder
+                          placeholder={t("selectConsignee")} // Adds a placeholder
                           InputLabelProps={{ shrink: false }} // Prevents floating label
                         />
                       )}
@@ -6101,7 +6101,7 @@ const PurchaseOrder = () => {
                         <TextField
                           {...params}
                           variant="outlined"
-                          placeholder="select payment channel"
+                          placeholder={t("paymentChannel")}
                         />
                       )}
                     />
@@ -6160,7 +6160,7 @@ const PurchaseOrder = () => {
                         <TextField
                           {...params}
                           variant="outlined"
-                          placeholder=" select FX"
+                          placeholder={t("select_fx")}
                         />
                       )}
                     />

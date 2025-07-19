@@ -8,7 +8,10 @@ import { API_BASE_URL } from "../../Url/Url";
 import { Card } from "../../card";
 import { TableView } from "../table";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from "react-i18next";
+
 const EanPacking = () => {
+  const { t, i18n } = useTranslation("global");
   const navigate = useNavigate();
   const [data, setData] = useState([]);
 
@@ -81,13 +84,12 @@ const EanPacking = () => {
             "Access file updated (inside closeButton):",
             accessResponse.data
           );
-
-          toast.success("Ean Packing update successful");
+          toast.success(t("eanPackingUpdateSuccess"));
           getEanPackaging();
           setIsOpen(false);
         }
       } catch (error) {
-        toast.error("Something went wrong");
+        toast.error(t("genericError"));
       }
     },
   });
@@ -111,7 +113,7 @@ const EanPacking = () => {
       setIsOpen(false);
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
-      toast.error("An error occurred while closing.");
+      toast.error(t("closingError"));
     }
   };
   // const openModal = (id = null) => {
@@ -139,7 +141,7 @@ const EanPacking = () => {
       }
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("An error occurred while accessing the file.");
+      toast.error(t("fileAccessError"));
     }
   };
   const restoreEanPackage = async (id, id1) => {
@@ -197,7 +199,7 @@ const EanPacking = () => {
     } catch (error) {
       console.error("Error during restoreEanPackage:", error);
       getEanPackaging();
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -239,18 +241,18 @@ const EanPacking = () => {
   const columns = useMemo(
     () => [
       {
-        Header: () => <div style={{ textAlign: "center" }}>PO CODE</div>,
+        Header: () => <div style={{ textAlign: "center" }}>  {t("poCode")}</div>,
         accessor: "PODCODE",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Vender Name</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("vendorName")}</div>,
         accessor: "Vendor_Name",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
         // if your table supports it
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}> Name</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("name")}</div>,
 
         accessor: "Name_EN",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
@@ -258,14 +260,14 @@ const EanPacking = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Date</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("date")}</div>,
         accessor: (row) => new Date(row.Date).toLocaleDateString(),
         id: "Date", // important when using function accessor
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Crates</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("crates")}</div>,
         accessor: "Crates",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -275,7 +277,7 @@ const EanPacking = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Quantity</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("quantity")}Quantity</div>,
         accessor: "Quantity",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
@@ -283,20 +285,20 @@ const EanPacking = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Unit</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("unit")}</div>,
         accessor: "Unit",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Cost</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("cost")}</div>,
         accessor: "Cost",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>QTY / Crate</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("qtyPerCrate")}</div>,
 
         accessor: "Qty/Crate",
         Cell: ({ value }) => (
@@ -304,7 +306,7 @@ const EanPacking = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Status</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("status")}</div>,
 
         accessor: "Status",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
@@ -312,7 +314,7 @@ const EanPacking = () => {
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => {
           return (
             <>
@@ -347,9 +349,7 @@ const EanPacking = () => {
                     }
                   } catch (error) {
                     console.error("Access API error:", error);
-                    toast.error(
-                      "Something went wrong while checking file access."
-                    );
+                    toast.error(t("genericError"));
                   }
                 }}
                 style={{
@@ -420,7 +420,7 @@ const EanPacking = () => {
         },
       },
     ],
-    [restoredRows]
+    [restoredRows, t]
   );
   // const columns = useMemo(
   //   () => [
@@ -509,7 +509,7 @@ const EanPacking = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                View
+                {t("view")}
               </h1>
               <button
                 type="button"
@@ -526,7 +526,7 @@ const EanPacking = () => {
                   <div className="parentPurchaseView mb-3">
                     <div className="me-3">
                       <strong>
-                        User Name <span>:</span>
+                        {t("user_name")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -539,7 +539,7 @@ const EanPacking = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Name :<span>:</span>
+                        {t("name")}:<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -550,7 +550,7 @@ const EanPacking = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Quantity <span>:</span>
+                        {t("quantity")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -562,7 +562,7 @@ const EanPacking = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Quantity used
+                        {t("quantityUsed")}
                         <span>:</span>
                       </strong>
                     </div>
@@ -573,7 +573,7 @@ const EanPacking = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Number of Staff
+                        {t("numberOfStaff")}
                         <span>:</span>
                       </strong>
                     </div>
@@ -587,7 +587,7 @@ const EanPacking = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Start Time<span>:</span>
+                        {t("startTime")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -598,7 +598,7 @@ const EanPacking = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        End Time<span>:</span>
+                        {t("endTime")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -615,23 +615,23 @@ const EanPacking = () => {
                 >
                   <thead>
                     <tr>
-                      <th>EAN</th>
-                      <th>Quantity</th>
-                      <th>Unit</th>
-                      <th>Ean Cost</th>
-                      <th>Average Weight</th>
-                      <th>Ean Per KG</th>
-                      <th>Ean Per Hour</th>
-                      <th>Wastage</th>
+                      <th>{t("ean")} </th>
+                      <th>{t("quantity")} </th>
+                      <th>{t("unit")} </th>
+                      <th>{t("eanCost")} </th>
+                      <th>{t("averageWeight")} </th>
+                      <th>{t("eanPerKg")} </th>
+                      <th>{t("eanPerHour")} </th>
+                      <th>{t("wastage")} </th>
                     </tr>
                   </thead>
                   <tbody style={{ border: "unset" }}>
                     <tr>
-                      <td>xyz</td>
+                      <td> xyz</td>
                       <td style={{ textAlign: "right" }}>
                         {formatTwoDecimals(213.123)}
                       </td>
-                      <td style={{ textAlign: "center" }}>Box</td>
+                      <td style={{ textAlign: "center" }}>{t("box")}</td>
                       <td style={{ textAlign: "right" }}>
                         {formatTwoDecimals(23.123)}
                       </td>
@@ -661,7 +661,7 @@ const EanPacking = () => {
         </div>
       </div>
       {/* view modal end */}
-      <Card title="Packing Management">
+      <Card title={t("PackingManagement")}>
         <TableView columns={columns} data={data} />
       </Card>
       {isOpen && (
@@ -672,7 +672,7 @@ const EanPacking = () => {
           />
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
             <div className="crossArea">
-              <h3>Edit Details</h3>
+              <h3>{t("editDetails")}</h3>
               <p onClick={closeModal}>
                 <CloseIcon />
               </p>
@@ -688,7 +688,7 @@ const EanPacking = () => {
               >
                 <div className="p-3">
                   <div className="form-group">
-                    <label>Quantity on Hand</label>
+                    <label>{t("quantityOnHand")}</label>
                     <form.Field
                       name="Qty_on_hand "
                       children={(field) => (
@@ -703,7 +703,7 @@ const EanPacking = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Crates on Hand</label>
+                    <label>{t("cratesOnHand")}</label>
                     <form.Field
                       name="Crates_on_hand "
                       children={(field) => (
@@ -725,14 +725,14 @@ const EanPacking = () => {
                       className="bg-gray-300 px-4 py-2 rounded"
                       onClick={closeModal}
                     >
-                      Close
+                      {t("close")}
                     </button>
 
                     <button
                       type="submit"
                       className="bg-black text-white px-4 py-2 rounded"
                     >
-                      Save
+                      {t("save")}
                     </button>
                   </div>
                 </div>

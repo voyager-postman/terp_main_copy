@@ -19,7 +19,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import moment from "moment";
+import { useTranslation } from "react-i18next";
+
 const Accounts = () => {
+  const { t, i18n } = useTranslation("global");
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -469,10 +472,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_Invoices),
             105 +
-              valueWidth -
-              doc.getTextWidth(
-                formatter.format(response.data.data?.statement_Invoices)
-              ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Invoices)
+            ),
             finalY + 1
           );
 
@@ -481,10 +484,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_claims),
             105 +
-              valueWidth -
-              doc.getTextWidth(
-                formatter.format(response.data.data?.statement_claims)
-              ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_claims)
+            ),
             finalY + 5
           );
 
@@ -493,10 +496,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_payments),
             105 +
-              valueWidth -
-              doc.getTextWidth(
-                formatter.format(response.data.data?.statement_payments)
-              ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_payments)
+            ),
             finalY + 9
           );
 
@@ -508,10 +511,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_Totals),
             105 +
-              valueWidth -
-              doc.getTextWidth(
-                formatter.format(response.data.data?.statement_Totals)
-              ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Totals)
+            ),
             finalY + 16
           );
 
@@ -568,10 +571,10 @@ const Accounts = () => {
         setConsigneeIdSet("");
         setClientIdSet("");
         setToDate("");
-        toast.success("Statement Added successful");
+        toast.success(t("statementSuccess"));
       } catch (error) {
         console.error("Error fetching statement:", error);
-        toast.error("Something went Wrong ");
+        toast.error(t("genericError"));
         // Handle the error as needed
       }
     };
@@ -902,10 +905,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Invoices)
+          ),
           finalY + 1
         );
 
@@ -914,10 +917,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_claims)
+          ),
           finalY + 5
         );
 
@@ -926,10 +929,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_payments)
+          ),
           finalY + 9
         );
 
@@ -941,10 +944,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Totals)
+          ),
           finalY + 16
         );
 
@@ -997,10 +1000,10 @@ const Accounts = () => {
       setConsigneeIdSet("");
       setClientIdSet("");
       setToDate("");
-      toast.success("Statement Added successful");
+      toast.success(t("statementSuccess"));
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
       // Handle the error as needed
     }
   };
@@ -1034,7 +1037,7 @@ const Accounts = () => {
       // Automatically set Paid Amount to the corresponding amount_to_pay if checked
       const amountToPay = isChecked
         ? paymentTable2.find((item) => item.po_id === invoiceNumber)
-            ?.amount_to_pay || 0
+          ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -1136,11 +1139,13 @@ const Accounts = () => {
         clearAllFields();
         modalInstance.hide();
       }
-
       toast.success("Amount Transfer Successful");
+      // toast.success(t("returnToSupplierSuccess"));
+
     } catch (error) {
       console.error("Error during account transfer:", error);
       toast.error("Something went wrong during the transfer");
+      toast.error(t("genericError"));
     }
   };
 
@@ -1553,7 +1558,7 @@ const Accounts = () => {
       await uploadPDF1(pdfBlob, Expense_Payment_ID);
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
       // Handle the error as needed
     }
   };
@@ -1934,7 +1939,7 @@ const Accounts = () => {
       await uploadPDF(pdfBlob, invoiceData);
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
       // Handle the error as needed
     }
   };
@@ -2246,10 +2251,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Invoices)
+          ),
           finalY + 1
         );
 
@@ -2258,10 +2263,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_claims)
+          ),
           finalY + 5
         );
 
@@ -2270,10 +2275,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_payments)
+          ),
           finalY + 9
         );
 
@@ -2285,10 +2290,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Totals)
+          ),
           finalY + 16
         );
 
@@ -2341,10 +2346,10 @@ const Accounts = () => {
       setConsigneeIdSet("");
       setClientIdSet("");
       setToDate("");
-      toast.success("Statement Added successful");
+      toast.success(t("statementSuccess"));
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
       // Handle the error as needed
     }
   };
@@ -2451,24 +2456,19 @@ const Accounts = () => {
         const startX1 = 7;
         const lineHeight1 = 4.2;
 
-        const longText1_1 = `${
-          response.data.vendorData?.name ? response.data.vendorData?.name : ""
-        }(${
-          response.data.vendorData?.id_card
+        const longText1_1 = `${response.data.vendorData?.name ? response.data.vendorData?.name : ""
+          }(${response.data.vendorData?.id_card
             ? response.data.vendorData?.id_card
             : ""
-        })`;
+          })`;
         doc.setFont("helvetica", "normal");
-        const longText1_2 = `${
-          response.data.vendorData?.address
-            ? response.data.vendorData?.address
-            : ""
-        }`;
-        const longText1_3 = `${
-          response.data.vendorData?.email ? response.data.vendorData?.email : ""
-        } / ${
-          response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
-        }`;
+        const longText1_2 = `${response.data.vendorData?.address
+          ? response.data.vendorData?.address
+          : ""
+          }`;
+        const longText1_3 = `${response.data.vendorData?.email ? response.data.vendorData?.email : ""
+          } / ${response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
+          }`;
 
         // Render client details
         doc.setFont("NotoSansThai"); // Set the font to use
@@ -2626,10 +2626,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Invoices)
+          ),
           finalY + 1
         );
 
@@ -2638,10 +2638,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_claims)
+          ),
           finalY + 5
         );
 
@@ -2650,10 +2650,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_payments)
+          ),
           finalY + 9
         );
 
@@ -2665,10 +2665,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Totals)
+          ),
           finalY + 16
         );
 
@@ -2719,10 +2719,11 @@ const Accounts = () => {
       // Handle the response data as needed
       setFromDate("");
       setToDate("");
-      toast.success("Statement Added successful");
+      toast.success(t("statementSuccess"));
+
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
       // Handle the error as needed
     }
   };
@@ -2938,11 +2939,11 @@ const Accounts = () => {
             response.data.statement_details?.Starting_Balance
           ),
           alignmentX -
-            doc.getTextWidth(
-              formatterTwo.format(
-                response.data.statement_details?.Starting_Balance
-              )
-            ),
+          doc.getTextWidth(
+            formatterTwo.format(
+              response.data.statement_details?.Starting_Balance
+            )
+          ),
           finalY + 1
         );
         doc.text("Credit :", labelX, finalY + 5);
@@ -2951,11 +2952,11 @@ const Accounts = () => {
             response.data.statement_details?.Statement_Credits
           ),
           alignmentX -
-            doc.getTextWidth(
-              formatterTwo.format(
-                response.data.statement_details?.Statement_Credits
-              )
-            ),
+          doc.getTextWidth(
+            formatterTwo.format(
+              response.data.statement_details?.Statement_Credits
+            )
+          ),
           finalY + 5
         );
 
@@ -2965,11 +2966,11 @@ const Accounts = () => {
             response.data.statement_details?.Statement_Debits
           ),
           alignmentX -
-            doc.getTextWidth(
-              formatterTwo.format(
-                response.data.statement_details?.Statement_Debits
-              )
-            ),
+          doc.getTextWidth(
+            formatterTwo.format(
+              response.data.statement_details?.Statement_Debits
+            )
+          ),
           finalY + 9
         );
 
@@ -2980,11 +2981,11 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.statement_details?.Statement_Balance),
           alignmentX -
-            doc.getTextWidth(
-              formatter.format(
-                response.data.statement_details?.Statement_Balance
-              )
-            ),
+          doc.getTextWidth(
+            formatter.format(
+              response.data.statement_details?.Statement_Balance
+            )
+          ),
           finalY + 16
         );
 
@@ -3009,10 +3010,10 @@ const Accounts = () => {
       setConsigneeIdSet("");
       setClientIdSet("");
       setToDate("");
-      toast.success("Statement Added successful");
+      toast.success(t("statementSuccess"));
+
     } catch (error) {
-      console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("statementError"));
     }
   };
   const handlePaidAmountChange = (invoiceNumber, value) => {
@@ -3042,7 +3043,7 @@ const Accounts = () => {
       const updatedCheckedItems = { ...prev, [invoiceNumber]: isChecked };
       const amountToPay = isChecked
         ? paymentTable1.find((item) => item.transaction_ref === invoiceNumber)
-            ?.amount_to_pay || 0
+          ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -3072,15 +3073,15 @@ const Accounts = () => {
 
   const handleSubmit2 = async () => {
     if (!clientId1) {
-      toast.error("Vendor  is required.");
+      toast.error(t("vendorRequired"));
       return;
     }
     if (!paymentDate1) {
-      toast.error("Payment date is required.");
+      toast.error(t("paymentDateRequired"));
       return;
     }
     if (!paymentChannel1) {
-      toast.error("Payment channel is required.");
+      toast.error(t("paymentChannelRequired"));
       return;
     }
 
@@ -3171,15 +3172,15 @@ const Accounts = () => {
           "Payment details array submitted successfully",
           secondApiResponse
         );
-        toast.success("Payment details submitted successfully");
+        toast.success(t("paymentDetailsSuccess"));
       } catch (secondApiError) {
         console.error("Error submitting payment details", secondApiError);
-        toast.error("Something went wrong");
+        toast.error(t("genericError"));
       }
     } catch (error) {
       // Handle error case for first API
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
   const summaryTable = async (Payment_ID) => {
@@ -3198,13 +3199,13 @@ const Accounts = () => {
           datas: dataToSubmit,
         }
       );
-      toast.success("Payment data submitted successfully");
+      toast.success(t("paymentSuccess"));
       console.log(response);
       getInventoryList();
       // Handle successful response
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
       // Handle error
     }
   };
@@ -3231,7 +3232,7 @@ const Accounts = () => {
       // Update client details and summary table
 
       // Show success toast message
-      toast.success("Account Updated successfully");
+      toast.success(t("accountUpdated"));
       setText("");
       setPayDate("");
       setFilterData("");
@@ -3246,49 +3247,50 @@ const Accounts = () => {
     } catch (error) {
       // Handle error case
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
 
   const handleSubmit1 = async () => {
     // Validate required fields
     if (!clientId) {
-      toast.error("Client  is required.");
+      toast.error(t("clientRequired"));
       return;
     }
     if (!consigneeId) {
-      toast.error("Consignee  is required.");
+      toast.error(t("consigneeRequired"));
       return;
     }
     if (!paymentDate) {
-      toast.error("Payment Date is required.");
+      toast.error(t("paymentDateRequired"));
       return;
     }
     if (!paymentChannel) {
-      toast.error("Payment Channel is required.");
+      toast.error(t("paymentChannelRequired"));
       return;
     }
     if (!fxId) {
-      toast.error("FX  is required.");
+      toast.error(t("fxRequired"));
       return;
     }
     if (!fxRate || isNaN(parseFloat(fxRate))) {
-      toast.error("Valid FX Rate is required.");
+      toast.error(t("validFxRate"));
       return;
     }
     if (
       !intermittentBankCharges ||
       isNaN(parseFloat(intermittentBankCharges))
     ) {
-      toast.error("Valid Intermittent Bank Charges are required.");
+      toast.error(t("validInterBankCharges"));
       return;
     }
     if (!localBankCharges || isNaN(parseFloat(localBankCharges))) {
-      toast.error("Valid Local Bank Charges are required.");
+      toast.error(t("validLocalBankCharges"));
       return;
     }
     if (!thbReceived || isNaN(parseFloat(thbReceived))) {
       toast.error("Valid THB Received value is required.");
+      toast.error(t("genericError"));
       return;
     }
     // Calculate totalPaidAmount based on checked rows
@@ -3306,7 +3308,7 @@ const Accounts = () => {
 
     // Check if parsedFxPayment is not equal to totalPaidAmount
     if (parsedFxPayment.toFixed(2) !== totalPaidAmount.toFixed(2)) {
-      toast.error("Total Paid Amount does not match FX Payment value.");
+      toast.error(t("paymentMismatch"));
       return;
     }
 
@@ -3383,7 +3385,8 @@ const Accounts = () => {
     } catch (error) {
       // Handle error case
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
+
     }
   };
 
@@ -3542,10 +3545,9 @@ const Accounts = () => {
       currentYRight = renderLabelAndValue(
         doc,
         "Bank Name:",
-        `${
-          response?.data?.vendorBankDetails?.bank_name
-            ? response?.data?.vendorBankDetails?.bank_name
-            : ""
+        `${response?.data?.vendorBankDetails?.bank_name
+          ? response?.data?.vendorBankDetails?.bank_name
+          : ""
         }`,
         130,
         200,
@@ -3703,9 +3705,9 @@ const Accounts = () => {
       const totalAmount = parseFloat(
         response?.data?.Toataldata?.total_commision_THB
           ? String(response.data.Toataldata.total_commision_THB).replace(
-              /,/g,
-              ""
-            )
+            /,/g,
+            ""
+          )
           : 0
       );
 
@@ -3782,7 +3784,7 @@ const Accounts = () => {
       await uploadPDF2(pdfBlob, Expense_Payment_ID);
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
       // Handle the error as needed
     }
   };
@@ -3915,8 +3917,8 @@ const Accounts = () => {
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -3935,6 +3937,7 @@ const Accounts = () => {
           console.log(response);
           getInventoryList();
           toast.success(" Credit Account delete successfully");
+          // toast.success(t("returnToSupplierSuccess"));
         } catch (e) {
           // toast.error("Something went wrong");
           console.log(e);
@@ -3945,8 +3948,8 @@ const Accounts = () => {
   const deleteOrder1 = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -3965,6 +3968,7 @@ const Accounts = () => {
           console.log(response);
           getInventoryList();
           toast.success(" Debit Account delete successfully");
+          // toast.success(t("returnToSupplierSuccess"));
         } catch (e) {
           // toast.error("Something went wrong");
           console.log(e);
@@ -3983,7 +3987,7 @@ const Accounts = () => {
       .then((response) => {
         setIsModalVisible(false);
         console.log(response);
-        toast.success("Stock Adjustment Added Successfully", {
+        toast.success(t("stockAdjustmentSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -3992,7 +3996,7 @@ const Accounts = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -4002,15 +4006,15 @@ const Accounts = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Id",
+        Header: t("id"),
         accessor: "ID",
       },
       {
-        Header: "Bank Nick Name",
+        Header: t("bankNickname"),
         accessor: "Bank_nick_name",
       },
       {
-        Header: "Transaction",
+        Header: t("transaction"),
         accessor: (a) => {
           if (a.Credit !== "0.00") {
             return "Credit";
@@ -4028,7 +4032,7 @@ const Accounts = () => {
         },
       },
       {
-        Header: "Date",
+        Header: t("date"),
         accessor: (a) => {
           return a.Transaction_Date
             ? new Date(a.Transaction_Date).toLocaleDateString()
@@ -4044,11 +4048,11 @@ const Accounts = () => {
       },
 
       {
-        Header: "Bank Ref",
+        Header: t("bankRef"),
         accessor: "Reference",
       },
       {
-        Header: "Amount",
+        Header: t("amount"),
         accessor: (a) => {
           if (a.Credit !== "0.00") {
             return newFormatterTwo.format(a.Credit);
@@ -4059,16 +4063,16 @@ const Accounts = () => {
         },
       },
       {
-        Header: "Client / Vendor",
+        Header: t("clientVendor"),
         accessor: "Vendor_Client",
       },
       {
-        Header: "Account",
+        Header: t("account"),
         accessor: "Account",
       },
 
       {
-        Header: "Action",
+        Header: t("action"),
         accessor: (a) => (
           <div className="editIcon">
             {a.Reconcile_Status === 1 && (
@@ -4229,7 +4233,7 @@ const Accounts = () => {
         ),
       },
     ],
-    []
+    [t]
   );
   // js part start for editing end
   const [isEditing, setIsEditing] = useState(false);
@@ -4305,7 +4309,7 @@ const Accounts = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="5">
-                Edit
+                {t("edit")}
               </h1>
               <button
                 type="button"
@@ -4324,7 +4328,7 @@ const Accounts = () => {
                     {filterData.Expense_Payment_ID ? (
                       <div>
                         <h6>
-                          <strong>Vender </strong>
+                          <strong>{t("vendor")}</strong>
                         </h6>
                         <p>{accountDataShow.vendor_name}</p>
                       </div>
@@ -4335,13 +4339,13 @@ const Accounts = () => {
                       <>
                         <div>
                           <h6>
-                            <strong>Client</strong>
+                            <strong>{t("clients")}</strong>
                           </h6>
                           <p>{accountDataShow.Client}</p>
                         </div>
                         <div>
                           <h6>
-                            <strong>Consignee</strong>
+                            <strong>{t("consignee")}</strong>
                           </h6>
                           <p>{accountDataShow.Consignee}</p>
                         </div>
@@ -4351,19 +4355,19 @@ const Accounts = () => {
                     {/*  */}
                     <div className="parantEmpView">
                       <h6>
-                        <strong>Bank Name</strong>
+                        <strong>{t("bankName")}</strong>
                       </h6>
                       <p>{filterData.Bank_nick_name}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
-                        <strong>Account Name</strong>
+                        <strong>{t("accountName")}</strong>
                       </h6>
                       <p>{accountDataShow.Account_Name}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
-                        <strong>Account Number</strong>
+                        <strong>{t("accountNumber")}</strong>
                       </h6>
                       <p>{accountDataShow.Account_Number}</p>
                     </div>
@@ -4373,14 +4377,14 @@ const Accounts = () => {
                   <div className="parantEmpView">
                     <div>
                       <h6>
-                        <strong>Bank Ref</strong>
+                        <strong>{t("bankRef")}</strong>
                       </h6>
                       <p>{accountDataShow.Bank_Ref}</p>
                     </div>
 
                     <div className="parantEmpView">
                       <h6>
-                        <strong>Total Before Tax</strong>
+                        <strong>{t("totalBeforeTax")}</strong>
                       </h6>
                       <p>
                         {newFormatterTwo.format(
@@ -4390,25 +4394,25 @@ const Accounts = () => {
                     </div>
                     <div className="parantEmpView">
                       <h6>
-                        <strong>VAT</strong>
+                        <strong>{t("vat")}</strong>
                       </h6>
                       <p>{newFormatterTwo.format(accountDataShow.VAT)}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
-                        <strong>WHT</strong>
+                        <strong>{t("wht")}</strong>
                       </h6>
                       <p>{newFormatterTwo.format(accountDataShow.WHT)}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
-                        <strong>Rounding</strong>
+                        <strong>{t("rounding")} </strong>
                       </h6>
                       <p>{newFormatterTwo.format(accountDataShow.Rounding)}</p>
                     </div>
                     <div className="parantEmpView">
                       <h6>
-                        <strong>Amount to Pay</strong>
+                        <strong>{t("amountToPay")}</strong>
                       </h6>
                       <p>
                         {newFormatterTwo.format(accountDataShow.Payment_Amount)}
@@ -4419,7 +4423,7 @@ const Accounts = () => {
                 <div className="col-lg-3 mb-4">
                   <div className="parantEmpView d-flex">
                     <h6>
-                      <strong>Payment Date </strong>
+                      <strong>{t("paymentDate")}</strong>
                     </h6>
                     <div className="editPayment">
                       {editDate ? (
@@ -4444,7 +4448,7 @@ const Accounts = () => {
                   </div>
                   <div className="parantEmpView d-flex">
                     <h6>
-                      <strong>Payment Channel</strong>
+                      <strong>{t("paymentChannel")}</strong>
                     </h6>
                     <div className="editPayment autoComplete">
                       <div style={{ width: "200px" }}>
@@ -4472,7 +4476,7 @@ const Accounts = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Vendor"
+                                placeholder={t("selectVendor")}
                                 InputLabelProps={{ shrink: false }}
                               />
                             )}
@@ -4496,7 +4500,7 @@ const Accounts = () => {
 
                   <div className=" d-flex parantEmpView editPayment">
                     <h6>
-                      <strong>Bank Ref</strong>
+                      <strong>{t("bankRef")}</strong>
                     </h6>
 
                     {editBank ? (
@@ -4581,7 +4585,7 @@ const Accounts = () => {
                 onClick={handleSubmit4}
                 className="btn btn-primary"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -4589,14 +4593,14 @@ const Accounts = () => {
       </div>
       {/* {/ edit modal end /} */}
       <Card
-        title="Account Management"
+        title={t("Account_Management")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/createaccounts")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >
@@ -4608,7 +4612,7 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalState"
             >
-              Bank Statement
+              {t("bankStatement")}
             </button>
             <button
               type="button"
@@ -4616,7 +4620,7 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalVendor"
             >
-              Vendor Statement
+              {t("vendorStatement")}
             </button>
             <button
               type="button"
@@ -4624,7 +4628,7 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalPayment1"
             >
-              Expense Payment
+              {t("expensePayment")}
             </button>
             <button
               type="button"
@@ -4632,7 +4636,7 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalConsignee"
             >
-              Consignee Statement
+              {t("consigneeStatement")}
             </button>
             {/* consignee modal */}
             <div
@@ -4646,7 +4650,7 @@ const Accounts = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h1 className="modal-title fs-5" id="yt56555">
-                      Consignee Statement
+                      {t("consigneeStatement")}
                     </h1>
                     <button
                       type="button"
@@ -4660,7 +4664,7 @@ const Accounts = () => {
                   </div>
                   <div className="modal-body">
                     <div className="client_filter mb-2 autoComplete">
-                      <h6>Client</h6>
+                      <h6>{t("clients")}</h6>
                       <Autocomplete
                         options={
                           clients?.map((v) => ({
@@ -4676,15 +4680,15 @@ const Accounts = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Client" // Set placeholder text
+                            placeholder= /* {t("client")} */ "Select Client" // Set placeholder text
                             variant="outlined"
                           />
                         )}
                         value={
                           Array.isArray(clients)
                             ? clients.find(
-                                (client) => client.client_id === clientIdSet
-                              ) || null
+                              (client) => client.client_id === clientIdSet
+                            ) || null
                             : null
                         }
                         isOptionEqualToValue={(option, value) =>
@@ -4701,7 +4705,7 @@ const Accounts = () => {
                       /> */}
                     </div>
                     <div className="mb-2 autoComplete">
-                      <h6>Consignee</h6>
+                      <h6>{t("consignee")}</h6>
                       <Autocomplete
                         options={
                           consignees?.map((v) => ({
@@ -4719,7 +4723,7 @@ const Accounts = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Consignee" // Set placeholder text
+                            placeholder={t("selectConsignee")}  // Set placeholder text
                             variant="outlined"
                           />
                         )}
@@ -4727,9 +4731,9 @@ const Accounts = () => {
                           // Find the consignee object corresponding to the selected ID
                           Array.isArray(consignees)
                             ? consignees.find(
-                                (consignee) =>
-                                  consignee.consignee_id === consigneeIdSet
-                              ) || null
+                              (consignee) =>
+                                consignee.consignee_id === consigneeIdSet
+                            ) || null
                             : null
                         }
                         isOptionEqualToValue={(option, value) =>
@@ -4737,7 +4741,7 @@ const Accounts = () => {
                         } // Ensure the option matches the selected value
                       />
                     </div>
-                    <label htmlFor="fromDate">From Date</label>
+                    <label htmlFor="fromDate"> {t("fromDate")}</label>
                     <input
                       type="date"
                       className="form-control"
@@ -4746,7 +4750,7 @@ const Accounts = () => {
                       onChange={(e) => setFromDate(e.target.value)}
                     />
                     <label className="mt-2" htmlFor="toDate">
-                      To Date
+                      {t("toDate")}
                     </label>
                     <input
                       type="date"
@@ -4762,7 +4766,7 @@ const Accounts = () => {
                       className="btn btn-primary"
                       onClick={handleSubmit7}
                     >
-                      Submit
+                      {t("submit")}
                     </button>
                   </div>
                 </div>
@@ -4780,7 +4784,7 @@ const Accounts = () => {
                 <div className="modal-content">
                   <div class="modal-header">
                     <h1 class="modal-title fs-5" id="5">
-                      Payment
+                      {t("payment")}
                     </h1>
                     <button
                       type="button"
@@ -4796,7 +4800,7 @@ const Accounts = () => {
                     <div className="row">
                       <div className="col-lg-4">
                         <div className="parentFormPayment autoComplete">
-                          <p>Vendor </p>
+                          <p> {t("vendor")}</p>
 
                           <Autocomplete
                             disablePortal
@@ -4814,7 +4818,7 @@ const Accounts = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search Vendor"
+                                placeholder={t("searchVendor")}
                                 InputLabelProps={{ shrink: false }}
                               />
                             )}
@@ -4824,7 +4828,7 @@ const Accounts = () => {
                       <div className="col-lg-4">
                         <div className="parentFormPayment">
                           <div>
-                            <p>Payment Date</p>
+                            <p>{t("paymentDate")}</p>
                           </div>
                           <div>
                             <DatePicker
@@ -4833,7 +4837,7 @@ const Accounts = () => {
                                 (date) => setPaymentDate1(date) // Replace with your specific handling logic
                               }
                               dateFormat="dd/MM/yyyy"
-                              placeholderText="Click to select a date"
+                              placeholderText={t("clickToSelectDate")}
                               customInput={<CustomInput />} // Ensure you have the `CustomInput` component defined or imported
                             />
                           </div>
@@ -4842,7 +4846,7 @@ const Accounts = () => {
                       <div className="col-lg-4 ">
                         <div className="parentFormPayment">
                           <div>
-                            <p>Client Payment Ref</p>
+                            <p> {t("clientPaymentRef")}</p>
                           </div>
                           <div>
                             <input
@@ -4857,7 +4861,7 @@ const Accounts = () => {
                       </div>
                       <div className="col-lg-4 mt-3">
                         <div className="parentFormPayment autoComplete">
-                          <p>Payment Channel </p>
+                          <p> {t("paymentChannel")} </p>
                           {/* <Autocomplete
                             disablePortal
                             options={paymentChannle} // Use your payment channel array as options
@@ -4892,7 +4896,7 @@ const Accounts = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search Payment Channel"
+                                placeholder={t("searchChannel")}
                                 InputLabelProps={{ shrink: false }}
                               />
                             )}
@@ -4902,7 +4906,7 @@ const Accounts = () => {
                       <div className="col-lg-4 mt-3">
                         <div className="parentFormPayment">
                           <div>
-                            <p>Bank Ref</p>
+                            <p>{t("bankRef")}</p>
                           </div>
                           <div>
                             <input
@@ -4917,7 +4921,7 @@ const Accounts = () => {
                       <div className="col-lg-4 mt-3">
                         <div className="parentFormPayment">
                           <div>
-                            <p>Local Bank Charges</p>
+                            <p>{t("localBankCharges")}</p>
                           </div>
                           <div>
                             <input
@@ -4934,7 +4938,7 @@ const Accounts = () => {
                       <div className="col-lg-6 mt-3">
                         <div className="parentFormPayment">
                           <div>
-                            <p>THB Paid</p>
+                            <p>{t("thbPaid")}</p>
                           </div>
                           <div>
                             <input
@@ -4953,7 +4957,7 @@ const Accounts = () => {
                       <div className="col-lg-6 mt-3">
                         <div className="parentFormPayment">
                           <div>
-                            <p>Roundup/Discount</p>
+                            <p>{t("roundupDiscount")}</p>
                           </div>
                           <div>
                             <input
@@ -4967,7 +4971,7 @@ const Accounts = () => {
                       <div className="col-lg-12 mt-3">
                         <div className="parentFormPayment">
                           <div>
-                            <p>Notes</p>
+                            <p>{t("notes")}</p>
                           </div>
                           <div>
                             <textarea
@@ -4983,16 +4987,16 @@ const Accounts = () => {
                       <div className="tableCreateClient tablepayment">
                         <table>
                           <tr>
-                            <th>Check</th>
-                            <th> PO Number</th>
-                            <th> PO Date </th>
-                            <th> Invoice Number</th>
-                            <th> Invoice Date</th>
-                            <th>PO Amount</th>
-                            <th>Debit Amount</th>
-                            <th>Net Amount </th>
-                            <th>Past Payment</th>
-                            <th>Amount To Pay Paid Amount </th>
+                            <th>{t("check")}</th>
+                            <th> {t("poNumber")} </th>
+                            <th> {t("poDate")}  </th>
+                            <th> {t("invoiceNumber")} </th>
+                            <th> {t("invoiceDate")} </th>
+                            <th>{t("poAmount")} </th>
+                            <th>{t("debitAmount")} </th>
+                            <th>{t("netAmount")}  </th>
+                            <th>{t("pastPayment")} </th>
+                            <th>{t("amountPaid")} </th>
                           </tr>
                           {paymentTable2?.map((item) => {
                             return (
@@ -5056,7 +5060,7 @@ const Accounts = () => {
                       onClick={handleSubmit2}
                       className="btn btn-primary"
                     >
-                      Submit
+                      {t("submit")}
                     </button>
                   </div>
                 </div>
@@ -5075,7 +5079,7 @@ const Accounts = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="5">
-                      Vendor Statement
+                      {t("vendorStatement")}
                     </h5>
                     <button
                       type="button"
@@ -5090,7 +5094,7 @@ const Accounts = () => {
                   <div className="modal-body">
                     <div className="row">
                       <div className="col-lg-12 form-group mb-2">
-                        <h6>Vendor</h6>
+                        <h6> {t("vendor")}</h6>
                         <div className="ceateTransport">
                           {/* <Autocomplete
                             disablePortal
@@ -5124,7 +5128,7 @@ const Accounts = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search Vendor"
+                                placeholder={t("searchVendor")}
                                 InputLabelProps={{ shrink: false }}
                               />
                             )}
@@ -5133,7 +5137,7 @@ const Accounts = () => {
                       </div>
 
                       <div className="col-lg-12 form-group borderInputUnset mb-2">
-                        <h6>From</h6>
+                        <h6> {t("from")}</h6>
                         <input
                           className="form-control"
                           type="date"
@@ -5143,7 +5147,7 @@ const Accounts = () => {
                         />
                       </div>
                       <div className="col-lg-12 form-group borderInputUnset mb-2">
-                        <h6>To</h6>
+                        <h6> {t("to")}</h6>
                         <input
                           type="date"
                           className="form-control"
@@ -5160,7 +5164,7 @@ const Accounts = () => {
                       className="UpdatePopupBtn btn btn-primary "
                       onClick={handleSubmit6}
                     >
-                      Submit
+                      {t("submit")}
                     </button>
                   </div>
                 </div>
@@ -5178,7 +5182,7 @@ const Accounts = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h1 className="modal-title fs-5" id="5">
-                      Statement
+                      {t("statment")}
                     </h1>
                     <button
                       type="button"
@@ -5192,7 +5196,7 @@ const Accounts = () => {
                   </div>
                   <div className="modal-body">
                     <div className="client_filter autoComplete">
-                      <h6> Account/Bank/Wallet</h6>
+                      <h6> Account/Bank/Wallet {t("accountInfo")}</h6>
                       <Autocomplete
                         value={
                           bankList.find(
@@ -5211,14 +5215,15 @@ const Accounts = () => {
                           <TextField
                             {...params}
                             variant="outlined"
-                            placeholder="Select Bank"
+                            placeholder={t("selectBank")}
                           />
                         )}
                         disableClearable // Prevent clearing the selected value
                       />
                     </div>
 
-                    <label htmlFor="fromDate">From Date</label>
+
+                    <label htmlFor="fromDate">{t("fromDate")}</label>
                     <input
                       type="date"
                       className="form-control"
@@ -5227,7 +5232,7 @@ const Accounts = () => {
                       onChange={(e) => setFromDate(e.target.value)}
                     />
                     <label className="mt-2" htmlFor="toDate">
-                      To Date
+                      {t("toDate")}
                     </label>
                     <input
                       type="date"
@@ -5243,7 +5248,7 @@ const Accounts = () => {
                       className="btn btn-primary"
                       onClick={handleSubmit}
                     >
-                      Submit
+                      {t("submit")}
                     </button>
                   </div>
                 </div>
@@ -5258,7 +5263,7 @@ const Accounts = () => {
                 data-bs-toggle="modal"
                 data-bs-target="#modalPayment"
               >
-                Receive Payment
+                {t("receivePayment")}
               </button>
               {/* Modal */}
               <div
@@ -5272,7 +5277,7 @@ const Accounts = () => {
                   <div className="modal-content">
                     <div className="modal-header">
                       <h1 className="modal-title fs-5" id="5">
-                        Payment
+                        {t("payment")}
                       </h1>
                       <button
                         type="button"
@@ -5288,7 +5293,7 @@ const Accounts = () => {
                       <div className="row">
                         <div className="col-lg-4">
                           <div className="parentFormPayment autoComplete">
-                            <p>Client </p>
+                            <p> {t("clients")} </p>
                             <Autocomplete
                               options={
                                 clients?.map((item) => ({
@@ -5314,8 +5319,8 @@ const Accounts = () => {
                                 // Find the client object corresponding to the selected ID
                                 Array.isArray(clients)
                                   ? clients.find(
-                                      (client) => client.client_id === clientId
-                                    ) || null
+                                    (client) => client.client_id === clientId
+                                  ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5326,7 +5331,7 @@ const Accounts = () => {
                         </div>
                         <div className="col-lg-4">
                           <div className="parentFormPayment autoComplete">
-                            <p>Consignee </p>
+                            <p>{t("consignee")}</p>
                             <Autocomplete
                               options={
                                 consignees?.map((item) => ({
@@ -5345,7 +5350,7 @@ const Accounts = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Consignee" // Set placeholder text
+                                  placeholder={t("selectConsignee")}
                                   variant="outlined"
                                 />
                               )}
@@ -5353,9 +5358,9 @@ const Accounts = () => {
                                 // Find the consignee object corresponding to the selected ID
                                 Array.isArray(consignees)
                                   ? consignees.find(
-                                      (consignee) =>
-                                        consignee.consignee_id === consigneeId
-                                    ) || null
+                                    (consignee) =>
+                                      consignee.consignee_id === consigneeId
+                                  ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5381,7 +5386,7 @@ const Accounts = () => {
                         <div className="col-lg-4">
                           <div className="parentFormPayment">
                             <div>
-                              <p>Payment Date</p>
+                              <p>{t("paymentDate")}</p>
                             </div>
                             <div>
                               <input
@@ -5395,7 +5400,7 @@ const Accounts = () => {
                         <div className="col-lg-4 mt-3">
                           <div className="parentFormPayment">
                             <div>
-                              <p>Client Payment Ref</p>
+                              <p> {t("clientPaymentRef")}</p>
                             </div>
                             <div>
                               <input
@@ -5410,7 +5415,7 @@ const Accounts = () => {
                         </div>
                         <div className="col-lg-4 mt-3">
                           <div className="parentFormPayment autoComplete">
-                            <p>Payment Channel </p>
+                            <p>{t("paymentChannel")}</p>
                             <Autocomplete
                               options={
                                 paymentChannle?.map((item) => ({
@@ -5429,7 +5434,7 @@ const Accounts = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Payment Channel" // Set placeholder text
+                                  placeholder={t("searchChannel")}
                                   variant="outlined"
                                 />
                               )}
@@ -5437,9 +5442,9 @@ const Accounts = () => {
                                 // Find the payment channel object corresponding to the selected ID
                                 Array.isArray(paymentChannle)
                                   ? paymentChannle.find(
-                                      (channel) =>
-                                        channel.bank_id === paymentChannel
-                                    ) || null
+                                    (channel) =>
+                                      channel.bank_id === paymentChannel
+                                  ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5465,7 +5470,7 @@ const Accounts = () => {
                         <div className="col-lg-4 mt-3">
                           <div className="parentFormPayment">
                             <div>
-                              <p>Bank Ref</p>
+                              <p> {t("bankRef")}</p>
                             </div>
                             <div>
                               <input
@@ -5479,7 +5484,7 @@ const Accounts = () => {
                         <div className="col-lg-4 mt-3">
                           <div className="parentFormPayment">
                             <div>
-                              <p>FX Payment</p>
+                              <p> {t("fxPayment")}</p>
                             </div>
                             <div>
                               <input
@@ -5492,7 +5497,7 @@ const Accounts = () => {
                         </div>
                         <div className="col-lg-4 mt-3">
                           <div className="parentFormPayment autoComplete">
-                            <p> FX </p>
+                            <p> {t("fx")}</p>
                             <div>
                               <Autocomplete
                                 options={
@@ -5516,7 +5521,7 @@ const Accounts = () => {
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    placeholder="Select Fx" // Set placeholder text
+                                    placeholder={t("selectFx")}
                                     variant="outlined"
                                   />
                                 )}
@@ -5524,8 +5529,8 @@ const Accounts = () => {
                                   // Find the currency object corresponding to the selected fxId
                                   Array.isArray(currency)
                                     ? currency.find(
-                                        (item) => item.currency_id === fxId
-                                      ) || null
+                                      (item) => item.currency_id === fxId
+                                    ) || null
                                     : null
                                 }
                                 isOptionEqualToValue={(option, value) =>
@@ -5538,7 +5543,7 @@ const Accounts = () => {
                         <div className="col-lg-4 mt-3">
                           <div className="parentFormPayment">
                             <div>
-                              <p>FX Rate</p>
+                              <p> {t("fxRate")}</p>
                             </div>
                             <div>
                               <input
@@ -5553,7 +5558,7 @@ const Accounts = () => {
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
                             <div>
-                              <p>Intermittent Bank Charges</p>
+                              <p> {t("interBankCharges")}</p>
                             </div>
                             <div>
                               <input
@@ -5569,7 +5574,7 @@ const Accounts = () => {
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
                             <div>
-                              <p>Local Bank Charges</p>
+                              <p> {t("localBankCharges")}</p>
                             </div>
                             <div>
                               <input
@@ -5585,7 +5590,7 @@ const Accounts = () => {
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
                             <div>
-                              <p>THB Received</p>
+                              <p> {t("thbReceived")}</p>
                             </div>
                             <div>
                               <input
@@ -5599,7 +5604,7 @@ const Accounts = () => {
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
                             <div>
-                              <p>Loss/Gain on Exchange Rate</p>
+                              <p> {t("lossGainExchange")}</p>
                             </div>
                             <div>
                               <input
@@ -5617,19 +5622,19 @@ const Accounts = () => {
                         <div className="tableCreateClient tablepayment">
                           <table>
                             <tr>
-                              <th>Check</th>
-                              <th> Document Number</th>
-                              <th> Ship Date</th>
+                              <th> {t("check")}</th>
+                              <th> {t("documentNumber")}</th>
+                              <th> {t("shipDate")}</th>
                               {/* <th> AWB Number</th> */}
-                              <th> TT REF</th>
-                              <th>FX</th>
-                              <th>Invoice Amount</th>
+                              <th> {t("ttRef")}</th>
+                              <th>{t("fx")}</th>
+                              <th> {t("invoiceAmount")}</th>
 
-                              <th>Credit Note </th>
-                              <th> Net Amount</th>
-                              <th>Past Payment </th>
-                              <th>Amount To Pay </th>
-                              <th> Paid Amount</th>
+                              <th>  {t("creditNote")}</th>
+                              <th>  {t("netAmount")}</th>
+                              <th> {t("pastPayment")} </th>
+                              <th>   {t("amountToPay")}</th>
+                              <th>  {t("paidAmount")}</th>
                             </tr>
                             {paymentTable1?.map((item) => {
                               return (
@@ -5689,7 +5694,7 @@ const Accounts = () => {
                         onClick={handleSubmit1}
                         className="btn btn-primary"
                       >
-                        Submit
+                        {t("submit")}
                       </button>
                     </div>
                   </div>
@@ -5705,7 +5710,8 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalClaim"
             >
-              Transfer
+              {t("transfer")}
+
             </button>
             {/* Modal */}
             <div
@@ -5719,7 +5725,7 @@ const Accounts = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h1 className="modal-title fs-5" id="5">
-                      Account Transfer
+                      {t("accountTransfer")}
                     </h1>
                     <button
                       type="button"
@@ -5733,7 +5739,8 @@ const Accounts = () => {
                   </div>
                   <div className="modal-body">
                     <div className="client_filter autoComplete mb-3">
-                      <h6> From</h6>
+
+                      <h6> {t("from")}</h6>
                       {/* <ComboBox
                         options={bankList?.map((v) => ({
                           id: v.bank_id,
@@ -5756,7 +5763,7 @@ const Accounts = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Bank"
+                            placeholder={t("selectBank")}
                             variant="outlined"
                           />
                         )}
@@ -5767,7 +5774,7 @@ const Accounts = () => {
                       />
                     </div>
                     <div className="client_filter autoComplete">
-                      <h6> To</h6>
+                      <h6> {t("to")}</h6>
                       {/* <ComboBox
                         options={bankList?.map((v) => ({
                           id: v.bank_id,
@@ -5790,7 +5797,7 @@ const Accounts = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Bank" // Placeholder text
+                            placeholder={t("selectBank")}
                             variant="outlined"
                           />
                         )}
@@ -5801,7 +5808,7 @@ const Accounts = () => {
                       />
                     </div>
                     <label className="mt-2" htmlFor="toDate">
-                      Date
+                      {t("date")}
                     </label>
                     <input
                       type="date"
@@ -5811,7 +5818,7 @@ const Accounts = () => {
                       onChange={(e) => setDate(e.target.value)}
                     />
                     <label className="mt-2" htmlFor="amount">
-                      Amount
+                      {t("amount")}
                     </label>
                     <input
                       type="number"
@@ -5819,10 +5826,11 @@ const Accounts = () => {
                       id="amount"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      placeholder="Amount"
+                      placeholder={t("amount")}
+
                     />
                     <label className="mt-2" htmlFor="ref">
-                      REF
+                       {t("ref")}
                     </label>
                     <input
                       type="text"
@@ -5830,7 +5838,9 @@ const Accounts = () => {
                       id="ref"
                       value={ref}
                       onChange={(e) => setRef(e.target.value)}
-                      placeholder="Ref"
+                      placeholder= {t("ref")}
+                    // placeholder={t("amount")}
+
                     />
                   </div>
                   <div className="modal-footer">
@@ -5839,7 +5849,7 @@ const Accounts = () => {
                       className="btn btn-primary"
                       onClick={handleSubmitData}
                     >
-                      Submit
+                      {t("submit")}
                     </button>
                   </div>
                 </div>
@@ -5859,16 +5869,16 @@ const Accounts = () => {
                   </div>
                   <div className="text-end pt-1">
                     <p className="text-sm mb-0 text-capitalize">
-                      Account Details
+                      {t("accountDetails")}
                     </p>
                     <h4
                       className="mb-0"
                       dangerouslySetInnerHTML={{
                         __html: item.Name_exp_2
                           ? item.Name_exp_2.replace(/\r\n/g, "<br/>").replace(
-                              /\n/g,
-                              "<br/>"
-                            )
+                            /\n/g,
+                            "<br/>"
+                          )
                           : "",
                       }}
                     />
@@ -5900,7 +5910,7 @@ const Accounts = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h1 className="modal-title fs-5" id="5">
-                  Account Modal
+                  {t("accountModal")}
                 </h1>
                 <button
                   onClick={clearData}
@@ -5917,7 +5927,7 @@ const Accounts = () => {
                   <div className="row">
                     <div className="form-group col-lg-12">
                       <div className="invoiceModal">
-                        <h6>Copy Options -</h6>
+                        <h6>{t("copyOptions")} - </h6>
                         <input
                           type="radio"
                           id="html1"
@@ -5926,7 +5936,7 @@ const Accounts = () => {
                           checked={selectedInvoice === "Client"}
                           onChange={handleRadioChange}
                         />
-                        <label htmlFor="html1"> Internal copy</label>
+                        <label htmlFor="html1"> {t("internalCopy")}</label>
 
                         <input
                           type="radio"
@@ -5936,7 +5946,7 @@ const Accounts = () => {
                           checked={selectedInvoice === "Consignee"}
                           onChange={handleRadioChange}
                         />
-                        <label htmlFor="css1">Client copy</label>
+                        <label htmlFor="css1"> {t("clientCopy")}</label>
                       </div>
                     </div>
                   </div>
@@ -5948,7 +5958,7 @@ const Accounts = () => {
                   onClick={generatePdf}
                   className="btn btn-primary mb-4"
                 >
-                  Submit
+                  {t("submit")}
                 </button>
               </div>
             </div>

@@ -5,9 +5,11 @@ import axios from "axios";
 import { TableView } from "../../table";
 import { API_BASE_URL, API_IMAGE_URL } from "../../../Url/Url";
 import { toast } from "react-toastify";
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+ import { useTranslation } from "react-i18next";
 const CreateNotification = () => {
+   const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
@@ -93,17 +95,15 @@ const CreateNotification = () => {
       .post(`${API_BASE_URL}/addNotification`, requestData)
       .then((response) => {
         console.log(response);
-        toast.success("Notification added successfully");
+        toast.success(t("notificationAddedSuccessfully"));
         navigate("/notification");
         // Additional logic if needed
       })
       .catch((error) => {
         console.error(error);
-        toast.error("Failed to add notification");
+        toast.error(t("notification_add_fail"));
       });
   };
-
-
 
   return (
     <div className="container">
@@ -111,7 +111,7 @@ const CreateNotification = () => {
         <div className="grayBgColor px-4 py-3 rounded-t">
           <div className="flex justify-between items-center exportPopupBtn">
             <h6 className="font-weight-bolder mb-0">
-              Notification / Create Form
+              {t("notification_create_form")}
             </h6>
           </div>
         </div>
@@ -127,11 +127,11 @@ const CreateNotification = () => {
                     <div className="row">
                       <div className="form-group col-lg-4">
                         <div className="ceateTransport">
-                          <h6>Notification Name</h6>
+                          <h6>{t("notification_name")}</h6>
                           <input
                             className="w-100"
                             type="text"
-                            placeholder="Please Enter Your Notification Name"
+                            placeholder={t("enter_notification_name")}
                             value={notificationName}
                             onChange={(e) =>
                               setNotificationName(e.target.value)
@@ -141,7 +141,7 @@ const CreateNotification = () => {
                       </div>
                       <div className="form-group col-lg-4">
                         <div className="ceateTransport autoComplete">
-                          <h6>Client</h6>
+                          <h6>{t("client")}</h6>
                           {/* <select
                             className="form-control"
                             value={selectedClient}
@@ -171,8 +171,9 @@ const CreateNotification = () => {
                                   id: client.client_id,
                                   name: client.client_name,
                                 }))
-                                .find((option) => option.id === selectedClient) ||
-                              null
+                                .find(
+                                  (option) => option.id === selectedClient
+                                ) || null
                             } // Match the current `selectedClient` with the options
                             onChange={(e, newValue) => {
                               setSelectedClient(newValue?.id || ""); // Update state with selected client's `id`
@@ -184,7 +185,7 @@ const CreateNotification = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Client" // Adds a placeholder
+                                placeholder={t("select_client")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -193,7 +194,7 @@ const CreateNotification = () => {
                       </div>
                       <div className="form-group col-lg-4">
                         <div className="ceateTransport autoComplete">
-                          <h6>Consignee</h6>
+                          <h6>{t("consignee")}</h6>
                           {/* <select
                             className="form-control"
                             value={selectedConsignee}
@@ -225,8 +226,9 @@ const CreateNotification = () => {
                                   id: consignee.consignee_id,
                                   name: consignee.consignee_name,
                                 }))
-                                .find((option) => option.id === selectedConsignee) ||
-                              null
+                                .find(
+                                  (option) => option.id === selectedConsignee
+                                ) || null
                             } // Match the current `selectedConsignee` with the options
                             onChange={(e, newValue) => {
                               setSelectedConsignee(newValue?.id || ""); // Update state with selected consignee's `id`
@@ -238,7 +240,7 @@ const CreateNotification = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Consignee" // Adds a placeholder
+                                placeholder={t("selectConsignee")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -247,14 +249,17 @@ const CreateNotification = () => {
                       </div>
                       <div className="form-group col-lg-4 mb-3">
                         <div className="ceateTransport autoComplete">
-                          <h6 >Notify On</h6>
+                          <h6>{t("notify_on")}</h6>
                           <Autocomplete
                             options={[
                               { id: "1", name: "New Quotation Created" },
                               { id: "2", name: "Quotation Adjusted" },
                               { id: "3", name: "Request for Approval" },
                               { id: "4", name: "Quotation Approved" },
-                              { id: "5", name: "Create Order from Approved Quotation" },
+                              {
+                                id: "5",
+                                name: "Create Order from Approved Quotation",
+                              },
                               { id: "6", name: "Quotation Expiry" },
                               { id: "7", name: "Order Approved" },
                               { id: "8", name: "Order Update Any Time" },
@@ -270,14 +275,22 @@ const CreateNotification = () => {
                                 { id: "2", name: "Quotation Adjusted" },
                                 { id: "3", name: "Request for Approval" },
                                 { id: "4", name: "Quotation Approved" },
-                                { id: "5", name: "Create Order from Approved Quotation" },
+                                {
+                                  id: "5",
+                                  name: "Create Order from Approved Quotation",
+                                },
                                 { id: "6", name: "Quotation Expiry" },
                                 { id: "7", name: "Order Approved" },
                                 { id: "8", name: "Order Update Any Time" },
-                                { id: "9", name: "Order Update before set date" },
+                                {
+                                  id: "9",
+                                  name: "Order Update before set date",
+                                },
                                 { id: "10", name: "Order Dead Line" },
                                 { id: "11", name: "Add Shipment" },
-                              ].find((option) => option.id === notifyOnOption) || null
+                              ].find(
+                                (option) => option.id === notifyOnOption
+                              ) || null
                             }
                             onChange={(e, newValue) => {
                               setNotifyOnOption(newValue?.id || ""); // Update state with selected option's `id`
@@ -289,7 +302,7 @@ const CreateNotification = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Notify On" // Adds a placeholder
+                                placeholder={t("select_notify_on")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -315,7 +328,7 @@ const CreateNotification = () => {
                       </div>
                       <div className="form-group col-lg-12">
                         <div className="ceateTransport">
-                          <h6>Notification Message</h6>
+                          <h6>{t("notification_message")}</h6>
                           <textarea
                             value={notificationMessage}
                             onChange={(e) =>
@@ -340,7 +353,7 @@ const CreateNotification = () => {
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModalContact"
                   >
-                    Add User
+                    {t("add_user")}
                   </Link>
                   {/* modal start */}
                   <div
@@ -357,7 +370,7 @@ const CreateNotification = () => {
                             className="modal-title fs-5"
                             id="exampleModalLabel"
                           >
-                            Add User
+                            {t("add_user")}
                           </h1>
                           <button
                             type="button"
@@ -375,7 +388,7 @@ const CreateNotification = () => {
                               <div className="ceateTransport addUserSelect">
                                 <div className="mb-3">
                                   <label htmlFor="users" className="form-label">
-                                    Search Users:
+                                    {t("search_users")} :
                                   </label>
                                   <Select
                                     id="users"
@@ -384,6 +397,7 @@ const CreateNotification = () => {
                                     isMulti
                                     className="basic-multi-select"
                                     classNamePrefix="select"
+                                    placeholder={t("search_users")}
                                     value={selectedUsers}
                                     onChange={handleUserChange}
                                   />
@@ -398,7 +412,9 @@ const CreateNotification = () => {
                             className="btn btn-primary mb-0"
                             data-bs-dismiss="modal"
                             onClick={handleAddUsers}
-                          > Add User</button>
+                          >
+                            {t("add_user")}
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -412,10 +428,10 @@ const CreateNotification = () => {
                     name="signup"
                     onClick={handleCreateNotification}
                   >
-                    Create
+                    {t("create")}
                   </button>
                   <Link className="btn btn-danger" to="/airlineNew">
-                    Cancel
+                    {t("cancel")}
                   </Link>
                 </div>
               </div>
@@ -423,10 +439,10 @@ const CreateNotification = () => {
                 <table className="tableContact striped table borderTerpProduce">
                   <thead>
                     <tr>
-                      <th>User Name</th>
-                      <th>Company</th>
-                      <th>Role</th>
-                      <th>Status</th>
+                      <th>{t("user_name")}</th>
+                      <th>{t("company")}</th>
+                      <th>{t("role")}</th>
+                      <th>{t("status")}</th>
                     </tr>
                   </thead>
                   <tbody>

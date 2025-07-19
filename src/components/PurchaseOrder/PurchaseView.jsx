@@ -8,7 +8,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import axios from "../../Url/Api";
+import { useTranslation } from "react-i18next";
 const PurchaseView = () => {
+  const { t, i18n } = useTranslation("global");
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -148,7 +150,7 @@ const PurchaseView = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <h6 className="font-weight-bolder mb-0 pt-2">
-                        Purchase Order / View Form
+                        {t("purchaseOrderView")}
                       </h6>
                       {/* <i class="mdi mdi-view-headline"></i> */}
                     </div>
@@ -161,7 +163,8 @@ const PurchaseView = () => {
                       <div className="parentPurchaseView">
                         <div className="me-3">
                           <strong>
-                            Code <span>:</span>{" "}
+                            {t("code")}
+                            <span>:</span>{" "}
                           </strong>
                         </div>
                         <div>
@@ -173,7 +176,8 @@ const PurchaseView = () => {
                       <div className="parentPurchaseView">
                         <div className="me-3">
                           <strong>
-                            Create By <span>:</span>{" "}
+                            {t("createBy")}
+                            <span>:</span>{" "}
                           </strong>
                         </div>
                         <div>
@@ -186,11 +190,12 @@ const PurchaseView = () => {
 
                 <div className="row purchaseViewRow">
                   <div className="col-lg-3">
-                    <h6>Vendor Info</h6>
+                    <h6>{t("vendorInfo")}</h6>
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Name <span>:</span>{" "}
+                          {t("name")}
+                          <span>:</span>{" "}
                         </strong>
                       </div>
                       <div>
@@ -200,7 +205,8 @@ const PurchaseView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Address <span>:</span>
+                          {t("address")}
+                          <span>:</span>
                         </strong>
                       </div>
                       <div>
@@ -210,7 +216,8 @@ const PurchaseView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Contact <span>:</span>
+                          {t("contact")}
+                          <span>:</span>
                         </strong>
                       </div>
                       <div>
@@ -220,7 +227,8 @@ const PurchaseView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Line ID <span>:</span>
+                          {t("lineId")}
+                          <span>:</span>
                         </strong>
                       </div>
                       <div>
@@ -229,11 +237,12 @@ const PurchaseView = () => {
                     </div>
                   </div>
                   <div className="col-lg-3">
-                    <h6>Order History</h6>
+                    <h6>{t("orderHistory")}</h6>
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Create Date <span>:</span>{" "}
+                          {t("createDate")}
+                          <span>:</span>{" "}
                         </strong>
                       </div>
                       <div>
@@ -243,7 +252,8 @@ const PurchaseView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Delivery Date <span>:</span>
+                          {t("deliveryDate")}
+                          <span>:</span>
                         </strong>
                       </div>
                       <div>
@@ -252,11 +262,12 @@ const PurchaseView = () => {
                     </div>
                   </div>
                   <div className="col-lg-3">
-                    <h6>Payment</h6>
+                    <h6> {t("payment")}</h6>
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Totals<span>:</span>{" "}
+                          {t("totals")}
+                          <span>:</span>{" "}
                         </strong>
                       </div>
                       <div>
@@ -266,7 +277,8 @@ const PurchaseView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Bank Name <span>:</span>
+                          {t("bankName")}
+                          <span>:</span>
                         </strong>
                       </div>
                       <div>
@@ -276,7 +288,8 @@ const PurchaseView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Account Name <span>:</span>
+                          {t("accountName")}
+                          <span>:</span>
                         </strong>
                       </div>
                       <div>
@@ -286,7 +299,8 @@ const PurchaseView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Account Number <span>:</span>
+                          {t("accountNumber")}
+                          <span>:</span>
                         </strong>
                       </div>
                       <div>
@@ -295,11 +309,12 @@ const PurchaseView = () => {
                     </div>
                   </div>
                   <div className="col-lg-3">
-                    <h6>Invoice Details</h6>
+                    <h6> {t("invoiceDetails")}</h6>
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Invoice Number <span>:</span>{" "}
+                          {t("invoiceNumber")}
+                          <span>:</span>{" "}
                         </strong>
                       </div>
                       <div>
@@ -309,7 +324,8 @@ const PurchaseView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Invoice date <span>:</span>
+                          {t("invoiceDate")}
+                          <span>:</span>
                         </strong>
                       </div>
                       <div>
@@ -324,7 +340,7 @@ const PurchaseView = () => {
                         data-bs-toggle="modal"
                         data-bs-target="#exampleModal"
                       >
-                        Invoice Details
+                        {t("invoiceDetails")}
                       </button>
                       {/* Modal */}
                       <div
@@ -341,7 +357,7 @@ const PurchaseView = () => {
                                 className="modal-title fs-5"
                                 id="exampleModalLabel"
                               >
-                                Invoice Details ({data?.POCODE})
+                                {t("invoiceDetails")}({data?.POCODE})
                               </h1>
                               <button
                                 type="button"
@@ -356,7 +372,7 @@ const PurchaseView = () => {
                             <div className="modal-body">
                               <div>
                                 <label htmlFor="invoiceNumber">
-                                  Invoice Number
+                                  {t("invoiceNumber")}
                                 </label>
                               </div>
                               <div>
@@ -371,7 +387,7 @@ const PurchaseView = () => {
                               </div>
                               <div className="mt-3">
                                 <label htmlFor="invoiceDate">
-                                  Invoice Date
+                                  {t("invoiceDate")}
                                 </label>
                               </div>
                               <div>
@@ -384,7 +400,9 @@ const PurchaseView = () => {
                                 />
                               </div>
                               <div className="mt-3">
-                                <label htmlFor="invoiceDate">Due Date</label>
+                                <label htmlFor="invoiceDate">
+                                  {t("dueDate")}
+                                </label>
                               </div>
                               <div>
                                 {/* <input
@@ -397,7 +415,7 @@ const PurchaseView = () => {
                                   selected={dueDate}
                                   onChange={(date) => setDueDate(date)}
                                   dateFormat="dd-MM-yyyy" // Matches the format of <input type="date">
-                                  placeholderText="Click to select a date"
+                                  placeholderText={t("clickToSelectDate")}
                                   customInput={<CustomInput />}
                                 />
                               </div>
@@ -408,7 +426,7 @@ const PurchaseView = () => {
                                 className="btn btn-primary"
                                 onClick={handleSubmit}
                               >
-                                Submit
+                                {t("submit")}
                               </button>
                             </div>
                           </div>
@@ -418,7 +436,7 @@ const PurchaseView = () => {
                   </div>
                 </div>
                 <div className="row my-3">
-                  <h5 className="itemInfo">Items Info :</h5>
+                  <h5 className="itemInfo"> {t("itemsInfo")}:</h5>
                 </div>
                 <div className="row">
                   <div className="tab-pane active" id="header" role="tabpanel">
@@ -436,16 +454,16 @@ const PurchaseView = () => {
                         <thead>
                           <tr>
                             <th>#</th>
-                            <th>Account</th>
-                            <th>Item</th>
-                            <th> Barcode</th>
-                            <th>Quantity</th>
-                            <th>Unit</th>
-                            <th>Price</th>
-                            <th>VAT</th>
-                            <th>Total</th>
-                            <th>WHT</th>
-                            <th>Crate</th>
+                            <th>{t("account")}</th>
+                            <th>{t("item")}</th>
+                            <th> {t("barcode")}</th>
+                            <th>{t("quantity")}</th>
+                            <th>{t("unit")}</th>
+                            <th>{t("price")}</th>
+                            <th>{t("vat")}</th>
+                            <th>{t("total")}</th>
+                            <th>{t("wht")}</th>
+                            <th>{t("crate")}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -613,7 +631,7 @@ const PurchaseView = () => {
                       <div className="pe-3">
                         <div className="flexBefore">
                           <div>
-                            <strong>Total Before Tax :</strong>
+                            <strong>{t("totalBeforeTax")}:</strong>
                           </div>
                           <div>
                             <span>{formatNumber(data?.Total_Before_Tax)}</span>
@@ -621,7 +639,7 @@ const PurchaseView = () => {
                         </div>
                         <div className="flexBefore">
                           <div>
-                            <strong>VAT :</strong>
+                            <strong>{t("vat")}:</strong>
                           </div>
                           <div>
                             <span>{formatNumber(data?.VAT)}</span>
@@ -629,7 +647,7 @@ const PurchaseView = () => {
                         </div>
                         <div className="flexBefore">
                           <div>
-                            <strong>WHT :</strong>
+                            <strong>{t("wth")}:</strong>
                           </div>
                           <div>
                             <span>{formatNumber(data?.WHT)}</span>
@@ -637,7 +655,7 @@ const PurchaseView = () => {
                         </div>
                         <div className="flexBefore">
                           <div>
-                            <strong>Rounding :</strong>
+                            <strong>{t("rounding")}:</strong>
                           </div>
                           <div>
                             <span>{formatNumber(data?.rounding)}</span>
@@ -660,7 +678,7 @@ const PurchaseView = () => {
 
                         <div className="flexBefore">
                           <div>
-                            <strong>Amount to Pay :</strong>
+                            <strong> {t("amountToPay")}:</strong>
                           </div>
                           <div>
                             <span>
@@ -694,7 +712,7 @@ const PurchaseView = () => {
                 Create
               </button> */}
               <Link className="btn btn-danger" to={"/purchase_orders"}>
-                Close
+                {t("close")}
               </Link>
             </div>
           </div>

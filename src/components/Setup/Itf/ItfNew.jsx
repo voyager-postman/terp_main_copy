@@ -159,8 +159,10 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { TableView } from "../../table";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const ItfNew = () => {
+  const { t } = useTranslation("global");
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(true);
@@ -205,11 +207,11 @@ const ItfNew = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Name",
+        Header:  t("name"),
         accessor: (a) => a.ITF_Internal_Name_EN,
       },
       {
-        Header: "ITF Code",
+        Header:  t("itfCode"),
         accessor: (a) =>
           a.ITFCODE && a.ITFCODE.trim() ? ( // Check for undefined, null, and empty string
             <div>
@@ -234,29 +236,28 @@ const ItfNew = () => {
       //   },
       // },
       {
-        Header: "ITF NET Weight",
+        Header:  t("itfNetWeight"),
         accessor: (a) => {
           const weight = (a.itf_Net_Weight);
           return !isNaN(weight) ? `${weight} KG` : "N/A";
         },
       },
       {
-        Header: "ITF Gross Weight",
+        Header: t("itfGrossWeight"),
         accessor: (a) => {
           const weight = (a.Calculated_ITF_Gross_Weight);
           return !isNaN(weight) ? `${weight} KG` : "N/A";
         },
       },
-      {
-        Header: "ITF VVSW",
+      { Header: t("itfVVSW"),
         accessor: (a) => a.ITF_VVSW,
       },
       {
-        Header: "Box Pallete",
+        Header:  t("boxPallet"),
         accessor: (a) => a.itf_box_pallet,
       },
       {
-        Header: "Status",
+        Header:  t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -276,25 +277,25 @@ const ItfNew = () => {
               checked={a.Available == "1" ? true : false}
               type="checkbox"
               style={{
-                width: "20px", 
+                width: "20px",
                 height: "20px",
-                cursor: "pointer", 
+                cursor: "pointer",
               }}
             />
             <span
               style={{
-                pointerEvents: "none", 
+                pointerEvents: "none",
               }}
             >
-              <span>OFF</span>
-              <span>ON</span>
+              <span> {t("off")}</span>
+              <span> {t("on")}</span>
             </span>
             <a></a>
           </label>
         ),
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <Link to="/edit_itf" state={{ from: a }}>
             <i
@@ -310,19 +311,19 @@ const ItfNew = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
   return (
     <Card
-      title="ITF Setup Management"
+      title={t("itfSetupManagement")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/add_itf")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

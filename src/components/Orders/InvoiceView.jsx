@@ -5,7 +5,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 // import axios from "axios";
 import axios from "../../Url/Api";
 import { API_BASE_URL } from "../../Url/Url";
+import { useTranslation } from "react-i18next";
 const InvoiceView = () => {
+  const [t, i18n] = useTranslation("global");
   const location = useLocation();
   const navigate = useNavigate();
   const [data1, setData1] = useState("");
@@ -92,7 +94,7 @@ const InvoiceView = () => {
                         <div className="row">
                           <div className="col-md-6">
                             <h6 className="font-weight-bolder mb-0 pt-2">
-                              Invoice / View Form
+                              {t("invoiceViewForm")}
                             </h6>
                           </div>
                         </div>
@@ -103,7 +105,7 @@ const InvoiceView = () => {
                             <div className="parentPurchaseView">
                               <div className="me-3">
                                 <strong>
-                                  Code <span>:</span>{" "}
+                                  {t("code")} <span>:</span>{" "}
                                 </strong>
                               </div>
                               <div>
@@ -115,7 +117,7 @@ const InvoiceView = () => {
                             <div className="parentPurchaseView">
                               <div className="me-3">
                                 <strong>
-                                  Create By <span>:</span>{" "}
+                                  {t("createBy")} <span>:</span>{" "}
                                 </strong>
                               </div>
                               <div>
@@ -155,7 +157,7 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Client <span>:</span>{" "}
+                                {t("client")} <span>:</span>{" "}
                               </strong>
                             </div>
                             <div>
@@ -166,7 +168,8 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Ship To <span>:</span>{" "}
+                                {t("shipTo")}
+                                <span>:</span>{" "}
                               </strong>
                             </div>
                             <div>
@@ -176,7 +179,7 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Airport <span>:</span>
+                                {t("airport")} <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -188,7 +191,7 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Airline <span>:</span>
+                                {t("airline")} <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -222,7 +225,7 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Currency <span>:</span>
+                                {t("currency")} <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -232,7 +235,8 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Exchange Rate <span>:</span>
+                                {t("exchangeRate")}
+                                <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -243,7 +247,7 @@ const InvoiceView = () => {
                             <div className="parentPurchaseView">
                               <div className="me-3">
                                 <strong>
-                                  Markup Rate <span>:</span>
+                                  {t("markupRate")} <span>:</span>
                                 </strong>
                               </div>
                               <div>
@@ -264,7 +268,7 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Rebate <span>:</span>
+                                {t("rebate")} <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -279,7 +283,8 @@ const InvoiceView = () => {
                             <div className="parentPurchaseView">
                               <div className="me-3">
                                 <strong>
-                                  Total Profit <span>:</span>
+                                  {t("totalProfit")}
+                                  <span>:</span>
                                 </strong>
                               </div>
                               <div>
@@ -292,7 +297,8 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Clearance<span>:</span>
+                                {t("clearance")}
+                                <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -302,7 +308,7 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Palletized <span>:</span>
+                                {t("palletized")} <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -313,7 +319,7 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                CO from Chamber <span>:</span>
+                                {t("coFromChamber")} <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -323,7 +329,8 @@ const InvoiceView = () => {
                           <div className="parentPurchaseView">
                             <div className="me-3">
                               <strong>
-                                Ship Date <span>:</span>
+                                {t("shipDate")}
+                                <span>:</span>
                               </strong>
                             </div>
                             <div>
@@ -343,7 +350,7 @@ const InvoiceView = () => {
                         </div>
                       </div>
                       <div className="row my-3">
-                        <h5 className="itemInfo">Items Info :</h5>
+                        <h5 className="itemInfo">{t("itemsInfo")} :</h5>
                       </div>
                       <div className="row">
                         <div
@@ -357,14 +364,14 @@ const InvoiceView = () => {
                           >
                             <thead>
                               <tr role="row " className="borderTh">
-                                <th>ITF</th>
-                                <th>Brand Name</th>
-                                <th>Quantity</th>
-                                <th> Unit</th>
-                                <th>Number of Box</th>
-                                <th>NW</th>
-                                <th> Unit Price </th>
-                                <th> Adjust Price</th>
+                                <th>{t("itf")}</th>
+                                <th>{t("brandName")}</th>
+                                <th>{t("quantity")}</th>
+                                <th>{t("unit")}</th>
+                                <th>{t("numberOfBox")}</th>
+                                <th>{t("nw")}</th>
+                                <th>{t("unitPrice")}</th>
+                                <th>{t("adjustPrice")}</th>
                                 {!(
                                   (localStorage.getItem("level") ===
                                     "Level 1" &&
@@ -408,41 +415,41 @@ const InvoiceView = () => {
                           <div className="row py-4 px-4">
                             <div className="col-lg-3">
                               <div>
-                                <b> Total NW : </b>
+                                <b> {t("totalNW")} : </b>
                                 {(+data1?.NW || 0).toLocaleString()}
                               </div>
                               <div>
-                                <b> Total GW : </b>
+                                <b> {t("totalGW")}: </b>
                                 {(+data1?.GW || 0).toLocaleString()}
                               </div>
                               <div>
-                                <b> Total Box : </b>
+                                <b> {t("totalBox")} : </b>
                                 {(+data1?.Box || 0).toLocaleString()}
                               </div>
                               <div>
-                                <b> Total CBM : </b>
+                                <b> {t("totalCBM")} : </b>
                                 {(+data1?.CBM || 0).toLocaleString()}
                               </div>
                               <div>
-                                <b> Total ITF : </b>
+                                <b>{t("totalITF")} : </b>
                                 {(+data1?.Items || 0).toLocaleString()}
                               </div>
                             </div>
                             <div className="col-lg-3">
                               <div>
-                                <b>Freight : </b>
+                                <b>{t("freight")}  : </b>
                                 {(+data1?.Freight || 0).toLocaleString()}
                               </div>
                               <div>
-                                <b>TransPort : </b>
+                                <b>{t("transport")} : </b>
                                 {(+data1?.Transport || 0).toLocaleString()}
                               </div>
                               <div>
-                                <b>Clearance : </b>
+                                <b>{t("clearance")} : </b>
                                 {(+data1?.Clearance || 0).toLocaleString()}
                               </div>
                               <div>
-                                <b>Extra : </b>
+                                <b>{t("extra")} : </b>
                                 <span>
                                   {(+data1?.Extra || 0).toLocaleString()}
                                 </span>
@@ -450,11 +457,11 @@ const InvoiceView = () => {
                             </div>
                             <div className="col-lg-3">
                               <div>
-                                <b> Total FOB : </b>
+                                <b> {t("totalFOB")} : </b>
                                 {(+data1?.FOB || 0).toLocaleString()}
                               </div>
                               <div>
-                                <b> Total CNF : </b>
+                                <b> {t("totalCNF")} : </b>
                                 {(+data1?.CNF || 0).toLocaleString()}
                               </div>
                               {!(
@@ -463,13 +470,13 @@ const InvoiceView = () => {
                                 localStorage.getItem("level") === "Level 5"
                               ) && (
                                 <div className="">
-                                  <b> Total Profit : </b>
+                                  <b> {t("totalProfit")} : </b>
                                   {(+data1?.Profit || 0).toLocaleString()}
                                 </div>
                               )}
                               {localStorage.getItem("level") !== "Level 5" && (
                                 <div style={{ marginLeft: "2px" }}>
-                                  <b> Profit % : </b>
+                                  <b> {t("profitPercentage")} : </b>
                                   {(
                                     +data1?.Profit_Percentage || 0
                                   ).toLocaleString()}
@@ -478,18 +485,18 @@ const InvoiceView = () => {
                             </div>
                             <div className="col-lg-3">
                               <div>
-                                <b> Total CNF FX : </b>
+                                <b> {t("totalCNFFX")} : </b>
                                 {(+data1?.CNF_FX || 0).toLocaleString()}
                               </div>
                               <div>
                                 <div>
-                                  <b> Total Commission FX: </b>
+                                  <b> {t("totalCommissionFX")}: </b>
                                   {(
                                     +data1?.Commission_FX || 0
                                   ).toLocaleString()}
                                 </div>
                                 <div>
-                                  <b> Total Rebate FX : </b>
+                                  <b> {t("totalRebateFX")}: </b>
                                   {(+data1?.REBATE_FX || 0).toLocaleString()}
                                 </div>
                               </div>
@@ -501,7 +508,7 @@ const InvoiceView = () => {
                   </div>
                   <div className="card-footer">
                     <Link className="btn btn-danger" to={"/invoice"}>
-                      Close
+                      {t("close")}
                     </Link>
                   </div>
                 </div>

@@ -4,8 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
+ import { useTranslation } from "react-i18next";
 
 const CreateCompanyAddress = () => {
+  const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
 
   // State for form inputs
@@ -48,17 +50,17 @@ const CreateCompanyAddress = () => {
       );
 
       if (response.status === 200) {
-        toast.success("Company address created successfully!");
+        toast.success(t("company_address_success"));
         navigate("/companyaddress");
       }
     } catch (error) {
       console.error("Error creating company address:", error);
-      toast.error("Failed to create company address.");
+      toast.error(t("company_address_fail"));
     }
   };
 
   return (
-    <Card title={"CompanyAddress / Create Form"}>
+    <Card title={t("company_create_form")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -70,13 +72,13 @@ const CreateCompanyAddress = () => {
                 <form onSubmit={handleSubmit}>
                   <div className="row justify-content-center">
                     <div className="form-group col-lg-3">
-                      <h6>Line 1</h6>
+                      <h6>{t("line_1")}</h6>
                       <textarea
                         onChange={(e) => setLine1(e.target.value)}
                         name="line1"
                         value={line1}
                         className="form-control"
-                        placeholder="Enter Line 1"
+                        placeholder={t("line_1")}
                         required
                         style={{
                           width: '100%',
@@ -92,14 +94,14 @@ const CreateCompanyAddress = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Line 2</h6>
+                      <h6>{t("line_2")}</h6>
                       <textarea
                         type="text"
                         name="line2"
                         value={line2}
                         onChange={(e) => setLine2(e.target.value)}
                         className="form-control"
-                        placeholder="Enter Line 2"
+                        placeholder={t("line_2")}
                         style={{
                           width: '100%',
                           minHeight: '40px',
@@ -114,14 +116,14 @@ const CreateCompanyAddress = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Line 3</h6>
+                      <h6>{t("line_3")}</h6>
                       <textarea
                         type="text"
                         name="line3"
                         value={line3}
                         onChange={(e) => setLine3(e.target.value)}
                         className="form-control"
-                        placeholder="Enter Line 3"
+                        placeholder={t("line_3")}
                         style={{
                           width: '100%',
                           minHeight: '40px',
@@ -136,14 +138,14 @@ const CreateCompanyAddress = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Line 4</h6>
+                      <h6>{t("line_4")}</h6>
                       <textarea
                         type="text"
                         name="line4"
                         value={line4}
                         onChange={(e) => setLine4(e.target.value)}
                         className="form-control"
-                        placeholder="Enter Line 4"
+                        placeholder={t("line_4")}
                         style={{
                           width: '100%',
                           minHeight: '40px',
@@ -159,7 +161,9 @@ const CreateCompanyAddress = () => {
                     </div>
                   </div>
                   <div className="row mt-4">
-                    <h6>Upload Logo</h6>
+                    <h6>
+                      {t("upload_logo")}
+                    </h6>
                     <div className="uploadLogo d-flex">
                       <div className="me-4">
                         <input type="file" onChange={handleImageUpload} />
@@ -182,10 +186,10 @@ const CreateCompanyAddress = () => {
                   <div className="d-flex justify-content-center">
                     <div className="card-footer">
                       <button className="btn btn-primary" type="submit">
-                        Create
+                        {t("create")}
                       </button>
                       <Link className="btn btn-danger" to="/companyaddress">
-                        Cancel
+                        {t("cancel")}
                       </Link>
                     </div>
                   </div>

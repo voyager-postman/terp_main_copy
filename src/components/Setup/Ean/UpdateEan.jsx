@@ -13,8 +13,10 @@ import { Card } from "../../../card";
 import { API_IMAGE_URL } from "../../../Url/Url";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Autocomplete, TextField } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const UpdateEan = () => {
+  const [t, i18n] = useTranslation("global");
   const location = useLocation();
   const { from } = location.state || {};
   const [imagePath, setImagePath] = useState(from?.images || "");
@@ -62,7 +64,7 @@ const UpdateEan = () => {
         data: formValues.filter((v) => v.item_id),
         user_id: localStorage.getItem("id"),
       })
-      .then((response) => {})
+      .then((response) => { })
       .catch((error) => {
         console.log(error);
       });
@@ -103,7 +105,7 @@ const UpdateEan = () => {
       })
       .then((resp) => {
         if (resp.data.success == true) {
-          toast.success("Deleted Successfully", {
+          toast.success(t("deleteSuccess"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -273,7 +275,7 @@ const UpdateEan = () => {
   };
   console.log(editProduce);
   return (
-    <Card title="EAN Management / Edit Form">
+    <Card title={t("EAN_Management_Edit")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -285,29 +287,29 @@ const UpdateEan = () => {
                 <form action="">
                   <div className="row formEan">
                     <div className="col-lg-4 form-group">
-                      <h6>EAN Code</h6>
+                      <h6>{t("eanCode")}</h6>
                       <input
                         onChange={handleChange}
                         name="ean_code"
                         type="text"
                         value={state.ean_code}
-                        placeholder="ean code"
+                        placeholder={t("eanCode")}
                       />
                     </div>
 
                     <div className="col-lg-4 form-group autoComplete">
-                      <h6>Unit</h6>
+                      <h6>{t("unit")}</h6>
                       <Autocomplete
                         options={
                           Array.isArray(unitDropdown)
                             ? unitDropdown.map((item) => ({
-                                unit_id: item.ID,
-                                unit_name_en: item.Name_EN,
-                              }))
+                              unit_id: item.ID,
+                              unit_name_en: item.Name_EN,
+                            }))
                             : []
                         }
                         getOptionLabel={(option) =>
-                          option.unit_name_en || "Select Unit"
+                          option.unit_name_en || t("selectUnit")
                         }
                         onChange={(event, newValue) => {
                           handleChange({
@@ -320,7 +322,7 @@ const UpdateEan = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Unit"
+                            placeholder={t("selectUnit")}
                             variant="outlined"
                           />
                         )}
@@ -340,10 +342,10 @@ const UpdateEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Name En</h6>
+                      <h6>{t("nameEn")}</h6>
                       <input
                         type="text"
-                        placeholder="product name"
+                        placeholder={t("nameEn")}
                         name="ean_name_en"
                         value={state.ean_name_en}
                         onChange={handleChange}
@@ -351,10 +353,10 @@ const UpdateEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Name Th</h6>
+                      <h6>{t("nameTh")}</h6>
                       <input
                         type="text"
-                        placeholder="product name"
+                        placeholder={t("nameTh")}
                         name="ean_name_th"
                         value={state.ean_name_th}
                         onChange={handleChange}
@@ -362,10 +364,10 @@ const UpdateEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Estimated Ean/ Hour</h6>
+                      <h6>{t("estimatedEanHour")}</h6>
                       <input
                         type="text"
-                        placeholder="Estimated Ean/ Hour"
+                        placeholder={t("estimatedEanHour")}
                         value={state.estimated_EAN_PER_HOUR}
                         name="estimated_EAN_PER_HOUR"
                         onChange={handleChange}
@@ -373,10 +375,10 @@ const UpdateEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Estimated Ean/ Kg</h6>
+                      <h6>{t("estimatedEanKg")}</h6>
                       <input
                         type="text"
-                        placeholder="Estimated Ean/ Kg"
+                        placeholder={t("estimatedEanKg")}
                         name="estimated_EAN_PER_KG"
                         value={state.estimated_EAN_PER_KG}
                         onChange={handleChange}
@@ -384,17 +386,17 @@ const UpdateEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Notes </h6>
+                      <h6>{t("notes")} </h6>
                       <input
                         type="text"
-                        placeholder="Notes"
+                        placeholder={t("notes")}
                         name="Notes"
                         value={state.Notes}
                         onChange={handleChange}
                       />
                     </div>
                     <div className="col-lg-12 form-group">
-                      <h6>Image</h6>
+                      <h6>{t("image")}</h6>
                       <input
                         type="file"
                         id="box_image"
@@ -403,14 +405,14 @@ const UpdateEan = () => {
                         // key={fileInputKey}
                         accept="image/*"
                         className="d-none"
-                        // onChange={handleFileSelect}
+                      // onChange={handleFileSelect}
                       />
                       <div className="imgFlex">
                         <div className="pe-4">
                           <label htmlFor="box_image">
                             <div className="uploadBorder">
                               <span>
-                                Choose Image <CloudUploadIcon />{" "}
+                                {t("chooseImage")}  <CloudUploadIcon />{" "}
                               </span>
                             </div>
                           </label>
@@ -446,7 +448,7 @@ const UpdateEan = () => {
                         type="button"
                         onClick={generateName}
                       >
-                        Generate Name
+                        {t("generateName")}
                       </button>
                     </div>
                   </div>
@@ -462,16 +464,16 @@ const UpdateEan = () => {
                       <thead>
                         <tr>
                           <th>
-                            <h6>Type</h6>
+                            <h6>{t("type")}</h6>
                           </th>
                           <th>
-                            <h6>Name</h6>
+                            <h6>{t("name")}</h6>
                           </th>
                           <th>
-                            <h6>Quantity</h6>
+                            <h6>{t("quantity")}</h6>
                           </th>
                           <th>
-                            <h6>Actions</h6>
+                            <h6>{t("actions")}</h6>
                           </th>
                         </tr>
                       </thead>
@@ -492,7 +494,7 @@ const UpdateEan = () => {
                                     { detail_type: 45, label: "Setup produce" },
                                     {
                                       detail_type: 47 || 62,
-                                      label: "Setup packaging",
+                                      label: t("setupPackaging"),
                                     },
                                   ]} // Define the options
                                   getOptionLabel={(option) => option.label} // The text to display for each option
@@ -510,20 +512,20 @@ const UpdateEan = () => {
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
-                                      placeholder="Select Type" // Placeholder text for the input
+                                      placeholder={t("selectType")} // Placeholder text for the input
                                       variant="outlined"
                                     />
                                   )}
                                   value={
                                     [
-                                      { detail_type: 0, label: "Select Type" },
+                                      { detail_type: 0, label: t("selectType") },
                                       {
                                         detail_type: 45,
-                                        label: "Setup produce",
+                                        label: t("setupProduce"),
                                       },
                                       {
                                         detail_type: 47,
-                                        label: "Setup packaging",
+                                        label: t("setupPackaging"),
                                       },
                                     ].find(
                                       (option) =>
@@ -572,7 +574,7 @@ const UpdateEan = () => {
                                       renderInput={(params) => (
                                         <TextField
                                           {...params}
-                                          placeholder="Select Produce"
+                                          placeholder={t("selectProduce")}
                                           variant="outlined"
                                         />
                                       )}
@@ -607,7 +609,7 @@ const UpdateEan = () => {
                                       }
                                       getOptionLabel={(option) =>
                                         option.packaging_name ||
-                                        "Select Packaging"
+                                        t("selectPackaging")
                                       }
                                       onChange={(event, newValue) => {
                                         handleEditProduce(index, {
@@ -622,7 +624,7 @@ const UpdateEan = () => {
                                       renderInput={(params) => (
                                         <TextField
                                           {...params}
-                                          placeholder="Select Packaging"
+                                          placeholder={t("selectPackaging")}
                                           variant="outlined"
                                         />
                                       )}
@@ -669,7 +671,7 @@ const UpdateEan = () => {
                                         <TextField
                                           {...params}
                                           variant="outlined"
-                                          placeholder="Select" // Placeholder text
+                                          placeholder={t("select")} // Placeholder text
                                         />
                                       )}
                                       value={
@@ -724,7 +726,7 @@ const UpdateEan = () => {
                                     id="alert-dialog-title"
                                     className="text-center"
                                   >
-                                    {"Are you sure you want to delete?"}
+                                    {t("areYouSure")} {/*  {"Are you sure you want to delete?"} */}
                                   </DialogTitle>
                                   <DialogContent className="text-center p-0 m-0 alertDel">
                                     <DialogContentText id="alert-dialog-description">
@@ -747,14 +749,14 @@ const UpdateEan = () => {
                                         )
                                       }
                                     >
-                                      Yes
+                                      {/* {t("yes")} */} Yes
                                     </button>
                                     <button
                                       type="button"
                                       className="btn btn-primary btn-lg btn-block make-an-offer-btn me-1"
                                       onClick={handleCloseProduce}
                                     >
-                                      No
+                                      {/* {t("no")} */} No
                                     </button>
                                   </DialogActions>
                                 </Dialog>
@@ -771,18 +773,18 @@ const UpdateEan = () => {
                               <Autocomplete
                                 disablePortal
                                 options={[
-                                  { label: "Select Type", value: "0" },
-                                  { label: "Setup produce", value: "45" },
-                                  { label: "Setup packaging", value: "47" },
+                                  { label: t("selectType"), value: "0" },
+                                  { label: t("setupProduce"), value: "45" },
+                                  { label: t("setupPackaging"), value: "47" },
                                 ]}
                                 getOptionLabel={(option) =>
                                   option.label || "Select Type"
                                 }
                                 value={
                                   [
-                                    { label: "Select Type", value: "0" },
-                                    { label: "Setup produce", value: "45" },
-                                    { label: "Setup packaging", value: "47" },
+                                    { label: t("selectType"), value: "0" },
+                                    { label: t("setupProduce"), value: "45" },
+                                    { label: t("setupPackaging"), value: "47" },
                                   ].find(
                                     (item) => item.value === element.detail_type
                                   ) || null
@@ -798,7 +800,7 @@ const UpdateEan = () => {
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    placeholder="Select Type"
+                                    placeholder={t("selectType")}
                                     variant="outlined"
                                   />
                                 )}
@@ -857,7 +859,7 @@ const UpdateEan = () => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        placeholder="Select Produce"
+                                        placeholder={t("selectProduce")}
                                         variant="outlined"
                                       />
                                     )}
@@ -899,7 +901,7 @@ const UpdateEan = () => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        placeholder="Select Packaging"
+                                        placeholder={t("selectPackaging")}
                                         variant="outlined"
                                       />
                                     )}
@@ -952,7 +954,7 @@ const UpdateEan = () => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        placeholder="Select"
+                                        placeholder={t("select")}
                                         variant="outlined"
                                       />
                                     )}
@@ -1005,10 +1007,12 @@ const UpdateEan = () => {
               name="signup"
               onClick={EditEan}
             >
-              Update
+              {t("update")}
+
             </button>
             <Link className="btn btn-danger" to={"/eanNew"}>
-              Cancel
+              {t("cancel")}
+
             </Link>
           </div>
         </div>

@@ -4,8 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
+import { useTranslation } from "react-i18next";
 
 const CreateLocation = () => {
+  const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
   const defaultState = {
     name: "",
@@ -34,7 +36,7 @@ const CreateLocation = () => {
     };
 
     if (request.name == "" || request.address == "") {
-      toast.warn("Please Fill All The Fields", {
+      toast.warn(t("pleaseFillAllFields"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -44,7 +46,7 @@ const CreateLocation = () => {
       .post(`${API_BASE_URL}/createLocation`, request)
       .then((response) => {
         if (response.data.success == true) {
-          toast.success("Location Added Successfully", {
+          toast.success(/* t("pleaseFillAllFields") */ "Location Added Successfully", {
             autoClose: 1000,
             theme: "colored",
           });
@@ -58,7 +60,7 @@ const CreateLocation = () => {
   };
 
   return (
-    <Card title="Location Management / Create Form">
+    <Card title={t("LocationManagementCreate")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -70,38 +72,38 @@ const CreateLocation = () => {
                 <form action="">
                   <div className="row justify-content-center">
                     <div className="form-group col-lg-3">
-                      <h6>Name</h6>
+                      <h6>{t("name")}</h6>
                       <input
                         onChange={handleClose}
                         type="text"
                         id="name_th"
                         name="name"
                         className="form-control"
-                        placeholder="Maersk"
+                        placeholder={t("name")}
                         value={state.name}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Address</h6>
+                      <h6>{t("address")}</h6>
                       <input
                         onChange={handleClose}
                         type="text"
                         id="name_th"
                         name="address"
                         className="form-control"
-                        placeholder="Address"
+                        placeholder={t("address")}
                         value={state.address}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>GPS Location</h6>
+                      <h6>{t("gpsLocation")}</h6>
                       <input
                         onChange={handleClose}
                         type="text"
                         id="name_th"
                         name="gps_location"
                         className="form-control"
-                        placeholder="GPS location"
+                        placeholder={t("gpsLocation")}
                         value={state.gps_location}
                       />
                     </div>
@@ -118,10 +120,10 @@ const CreateLocation = () => {
                 type="submit"
                 name="signup"
               >
-                Create
+                {t("create")}
               </button>
               <Link className="btn btn-danger" to={"/location"}>
-                Cancel
+                {t("cancel")}
               </Link>
             </div>
           </div>

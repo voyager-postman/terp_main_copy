@@ -3,33 +3,35 @@ import { useMemo } from "react";
 import { Card } from "../../card";
 import { TableView } from "../table";
 import { format } from "date-fns"; // Make sure to install and import date-fns
+import { useTranslation } from "react-i18next";
 
 const Hpl = () => {
+  const { t, i18n } = useTranslation("global");
   const { data } = useQuery("HPLList");
   console.log(data);
 
   const columns = useMemo(
     () => [
       {
-        Header: "Code",
+        Header: t("code"),
         accessor: (a) => a.pod_code,
       },
       {
-        Header: "Date",
+        Header: t("date"),
 
         accessor: (a) => format(new Date(a.date), "dd/MM/yyyy"), // Format Date2
       },
 
       {
-        Header: "Brand",
+        Header: t("brand"),
         accessor: (a) => a.brand,
       },
       {
-        Header: "EAN",
+        Header: t("ean"),
         accessor: (a) => a.ean_name_en,
       },
       {
-        Header: "Quantity",
+        Header: t("quantity"),
         accessor: (a) => a.ean_qty,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -38,7 +40,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: "Packing Unit",
+        Header: t("packingUnit"),
         accessor: (a) => a.packing_ean_unit,
         Cell: ({ value }) => (
           <div style={{ textAlign: "center" }}>
@@ -48,7 +50,7 @@ const Hpl = () => {
       },
 
       {
-        Header: "Packaging Cost",
+        Header: t("packagingCost"),
         accessor: (a) => a.Packaging_cost,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -57,7 +59,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: "Wages Quantity",
+        Header: t("wagesQuantity"),
         accessor: (a) => a.wages_per_qty_packed,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -66,7 +68,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: "Product  Cost",
+        Header: t("productCost"),
         accessor: (a) => a.cal_cost,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -75,7 +77,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: " Cost",
+        Header: t("cost"),
         accessor: (a) => a.Cost,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -85,7 +87,7 @@ const Hpl = () => {
       },
 
       {
-        Header: "Average Weight",
+        Header: t("averageWeight"),
         accessor: (a) => a.average_weight,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -94,7 +96,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: "Raw Kg Cost",
+        Header: t("rawKgCost"),
         accessor: (a) => a.Raw_Kg_Cost,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -103,7 +105,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: "Wastage",
+        Header: t("wastage"),
         accessor: (a) => a.Wastage,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -112,7 +114,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: "Average Wastage",
+        Header: t("averageWastage"),
         accessor: (a) => a.Average_wastage,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -121,7 +123,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: "EPH",
+        Header: t("eph"),
         accessor: (a) => a.EPH,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -130,7 +132,7 @@ const Hpl = () => {
         ),
       },
       {
-        Header: "Average EPH",
+        Header: t("averageEph"),
         accessor: (a) => a.Average_EPH,
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -139,11 +141,11 @@ const Hpl = () => {
         ),
       },
     ],
-    []
+    [t]
   );
   console.log(data);
   return (
-    <Card title={"Packing History"}>
+    <Card title={t("packingHistory")}>
       <TableView columns={columns} data={data || []} />
     </Card>
   );

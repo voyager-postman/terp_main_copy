@@ -9,8 +9,10 @@ import { Card } from "../../card";
 import { TableView } from "../table";
 import { toast } from "react-toastify";
 import { Button, Modal } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const Receiving = () => {
+  const { t, i18n } = useTranslation("global");
   const navigate = useNavigate();
   const formatTwoDecimals = (value) => {
     return new Intl.NumberFormat(undefined, {
@@ -46,11 +48,10 @@ const Receiving = () => {
 
       console.log("API Response:", response);
       getReceiving();
-
-      toast.success("Successfully returned to supplier.");
+      toast.success(t("returnToSupplierSuccess"));
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went wrong.");
+      toast.error(t("genericError"));
     }
   };
 
@@ -95,30 +96,30 @@ const Receiving = () => {
         modal.show();
       } else {
         toast.warning(
-          accessResponse?.data?.message || "This file is being accessed."
+          accessResponse?.data?.message || t("fileInUse")
         );
       }
     } catch (error) {
       console.error("Error fetching access status:", error);
-      toast.error("An error occurred while accessing the file.");
+      toast.error(t("fileAccessError"));
     }
   };
 
   const columns = React.useMemo(
     () => [
       {
-        Header: () => <div style={{ textAlign: "center" }}>PO CODE</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("poCode")} </div>,
         accessor: "PODCODE",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Vender Name</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("vendorName")}</div>,
         accessor: "Vendor_Name",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
         // if your table supports it
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}> Name</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("name")}</div>,
 
         accessor: "Name_EN",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
@@ -126,7 +127,7 @@ const Receiving = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Date</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("date")}</div>,
         accessor: "Date", // assuming "Date" is a key in your data (like `a.Date`)
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
         // Cell: ({ value }) => {
@@ -142,7 +143,7 @@ const Receiving = () => {
         // },
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Crates</div>,
+        Header: () => <div style={{ textAlign: "center" }}>  {t("crates")}</div>,
         accessor: "Crates",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -152,7 +153,7 @@ const Receiving = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Quantity</div>,
+        Header: () => <div style={{ textAlign: "center" }}>  {t("quantity")}</div>,
         accessor: "Quantity",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
@@ -160,20 +161,20 @@ const Receiving = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Unit</div>,
+        Header: () => <div style={{ textAlign: "center" }}>  {t("unit")}</div>,
         accessor: "Unit",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Cost</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("cost")}</div>,
         accessor: "Cost",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>QTY / Crate</div>,
+        Header: () => <div style={{ textAlign: "center" }}>  {t("qtyPerCrate")}</div>,
 
         accessor: "Qty/Crate",
         Cell: ({ value }) => (
@@ -181,7 +182,7 @@ const Receiving = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Status</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("status")}</div>,
 
         accessor: "Status",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
@@ -189,7 +190,7 @@ const Receiving = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>Actions</div>,
+        Header: () => <div style={{ textAlign: "center" }}>  {t("actions")}</div>,
         accessor: (a) => (
           <>
             {/* {a.Open === 1 ? (
@@ -264,7 +265,7 @@ const Receiving = () => {
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
       },
     ],
-    []
+    [t]
   );
   // modal js
 
@@ -349,7 +350,8 @@ const Receiving = () => {
         console.log(response.data.success);
 
         if (response.data.success === true) {
-          toast.success("Receiving Added Successfully");
+          toast.success(t("receivingAddSuccess"));
+
           setStock(response.data.message);
           dataClear();
           getReceiving();
@@ -365,7 +367,7 @@ const Receiving = () => {
           setStock(response.data.message);
           setShow(true);
         } else if (response.data.success && response.data.data == "2") {
-          toast.success("Receiving Added Successfully", {
+          toast.success(t("receivingAddSuccess"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -382,7 +384,7 @@ const Receiving = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Something went wrong");
+        toast.error(t("genericError"));
         setIsButtonDisabled(false); // Re-enable the button on error
       });
   };
@@ -458,7 +460,8 @@ const Receiving = () => {
       setIsButtonDisabled(false);
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
-      toast.error("An error occurred while closing.");
+      toast.error(t("closingError"));
+
     }
   };
 
@@ -486,7 +489,8 @@ const Receiving = () => {
       );
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
-      toast.error("An error occurred while closing.");
+      toast.error(t("closingError"));
+
     }
   };
   console.log(viewData);
@@ -507,7 +511,7 @@ const Receiving = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                View
+                {t("view")}
               </h1>
               <button
                 type="button"
@@ -524,7 +528,7 @@ const Receiving = () => {
                   <div className="parentPurchaseView mb-3">
                     <div className="me-3">
                       <strong>
-                        User Name <span>:</span>
+                        {t("user_name")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -537,7 +541,7 @@ const Receiving = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Quantity<span>:</span>
+                        {t("user_name")}  Quantity<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -549,7 +553,7 @@ const Receiving = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Unit<span>:</span>
+                        {t("unit")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -561,7 +565,7 @@ const Receiving = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        Crate<span>:</span>
+                        {t("crate")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -573,7 +577,7 @@ const Receiving = () => {
                   <div className="parentPurchaseView">
                     <div className="me-0">
                       <strong>
-                        Quantity/Crate<span>:</span>
+                        {t("quantityPerCrate")}<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -592,7 +596,7 @@ const Receiving = () => {
         </div>
       </div>
       {/* view modal end */}
-      <Card title="Receive Management">
+      <Card title={t("receive_management")}>
         <TableView columns={columns} data={data} />
       </Card>
 
@@ -612,7 +616,7 @@ const Receiving = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Operation / Receiving
+                {t("operationReceiving")}
               </h1>
               <button
                 type="button"
@@ -645,14 +649,14 @@ const Receiving = () => {
                                 <div className="form-group col-lg-3">
                                   <div className="parentPurchaseView">
                                     <div className="me-2">
-                                      <strong>POD CODE:</strong>
+                                      <strong> {t("pod_Code")}:</strong>
                                     </div>
 
                                     <p>{dataSet?.PODCODE} </p>
                                   </div>
                                   <div className="parentPurchaseView">
                                     <div className="me-3">
-                                      <strong>Name:</strong>
+                                      <strong> {t("name")}:</strong>
                                     </div>
 
                                     <p>{dataSet?.Name_EN} </p>
@@ -660,7 +664,7 @@ const Receiving = () => {
                                   <div className="flex">
                                     <div className="parentPurchaseView">
                                       <div className="me-2">
-                                        <strong>Quantity:</strong>
+                                        <strong>{t("quantity")}:</strong>
                                       </div>
 
                                       <p>
@@ -669,14 +673,14 @@ const Receiving = () => {
                                     </div>
                                     <div className="parentPurchaseView ms-3">
                                       <div className="me-2">
-                                        <strong> unit:</strong>
+                                        <strong>{t("unit")}:</strong>
                                       </div>
 
                                       <p>{dataSet?.Unit} </p>
                                     </div>
                                     <div className="parentPurchaseView ms-3">
                                       <div className="me-2">
-                                        <strong>Crates:</strong>
+                                        <strong>{t("crates")}:</strong>
                                       </div>
 
                                       <p>
@@ -688,7 +692,7 @@ const Receiving = () => {
                               </div>
                               <div className="row mt-2 inputMarginUnset">
                                 <div className="form-group col-lg-6">
-                                  <h6>Crate</h6>
+                                  <h6>{t("create")}</h6>
                                   <input
                                     onChange={handleChange}
                                     type="text"
@@ -698,7 +702,7 @@ const Receiving = () => {
                                   />
                                 </div>
                                 <div className="form-group col-lg-6">
-                                  <h6>Quantity</h6>
+                                  <h6>{t("quantity")}</h6>
                                   <input
                                     onChange={handleChange}
                                     type="text"
@@ -708,7 +712,7 @@ const Receiving = () => {
                                   />
                                 </div>
                                 <div className="form-group col-lg-6">
-                                  <h6>Crate Weight</h6>
+                                  <h6>{t("crateWeight")}</h6>
                                   <input
                                     onChange={handleChange}
                                     type="text"
@@ -718,7 +722,7 @@ const Receiving = () => {
                                   />
                                 </div>
                                 <div className="form-group col-lg-6">
-                                  <h6>Gross Weight</h6>
+                                  <h6>{t("grossWeight")}</h6>
                                   <input
                                     onChange={handleChange}
                                     type="text"
@@ -728,14 +732,14 @@ const Receiving = () => {
                                   />
                                 </div>
                                 <div className="form-group col-lg-12">
-                                  <h6>Unit</h6>
+                                  <h6>{t("unit")}</h6>
                                   <select
                                     onChange={handleChange}
                                     name="rcvd_unit_id"
                                     className="form-control"
                                     value={state.rcvd_unit_id}
                                   >
-                                    <option value="">Select Unit</option>
+                                    <option value="">{t("selectUnit")}</option>
                                     {unitType.map((unit) => (
                                       <option value={unit.ID}>
                                         {unit.Name_EN}
@@ -755,7 +759,7 @@ const Receiving = () => {
                           type="submit"
                           name="signup"
                         >
-                          Receive
+                          {t("receive")}
                         </button>
                         <Link
                           className="btn btn-danger "
@@ -764,7 +768,8 @@ const Receiving = () => {
                           aria-label="Close"
                           to="/receiving"
                         >
-                          Cancel
+                          {t("cancel")}
+
                         </Link>
                       </div>
                     </div>
@@ -783,7 +788,7 @@ const Receiving = () => {
                       }}
                     >
                       <h1 className="modal-title fs-5" id="exampleModalLabel">
-                        Receive Check
+                        {t("receiveCheck")}
                       </h1>
                       <button
                         style={{ color: "#fff", fontSize: "30px" }}
@@ -816,7 +821,7 @@ const Receiving = () => {
                           {stock.message ? stock.message: "NULL"}
                         </p> */}
                         <div className="closeBtnRece">
-                          <button onClick={closeIcon}>Close</button>
+                          <button onClick={closeIcon}>  {t("close")}</button>
                         </div>
                       </div>
                     </div>

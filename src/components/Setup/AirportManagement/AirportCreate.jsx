@@ -7,8 +7,10 @@ import { Card } from "../../../card";
 import { useQuery } from "react-query";
 import { ComboBox } from "../../combobox";
 import { Autocomplete, TextField } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const AirportCreate = () => {
+  const { t } = useTranslation("global");
   const { data: clearance } = useQuery("getClearancedropdown");
   const { data: linear } = useQuery("getLinerdropdown");
   const { data: transportation } = useQuery("getTransportationdropdown");
@@ -57,7 +59,7 @@ const AirportCreate = () => {
       })
       .catch((error) => {
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -75,8 +77,7 @@ const AirportCreate = () => {
   const updatePort = () => {
     axios
       .post(
-        `${API_BASE_URL}/${
-          typeof state.port_id == "undefined" ? "addAirport" : "updateAirPort"
+        `${API_BASE_URL}/${typeof state.port_id == "undefined" ? "addAirport" : "updateAirPort"
         }`,
         {
           ...state,
@@ -84,7 +85,7 @@ const AirportCreate = () => {
         }
       )
       .then((response) => {
-        toast[response.data.success == true ? "success" : "error"](
+        toast[response.data.success == true ? t("success") : t("error")](
           response.data.message,
           {
             autoClose: 1000,
@@ -95,7 +96,7 @@ const AirportCreate = () => {
       })
       .catch((error) => {
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -108,7 +109,7 @@ const AirportCreate = () => {
   };
   return (
     <Card
-      title={`Port Management / ${state.port_id ? "Update" : "Create"} Form`}
+      title={`${t("port_management")} / ${state.port_id ? t("update") : t("create")} ${t("form")}`}
     >
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
@@ -121,7 +122,7 @@ const AirportCreate = () => {
                 <form action="">
                   <div className="row justify-content-center">
                     <div className="col-lg-4 form-group">
-                      <h6>Port name </h6>
+                      <h6>{t("portName")}</h6>
                       <div className="parentthb packParent">
                         <div className="childThb">
                           <input
@@ -129,13 +130,13 @@ const AirportCreate = () => {
                             name="port_name"
                             value={state.port_name}
                             onChange={handleChange}
-                            placeholder="Name"
+                            placeholder={t("name")}
                           />
                         </div>
                       </div>
                     </div>
                     <div className="col-lg-4 form-group">
-                      <h6>Country </h6>
+                      <h6>{t("country")} </h6>
                       <div className="parentthb packParent">
                         <div className="childThb">
                           <input
@@ -143,18 +144,18 @@ const AirportCreate = () => {
                             name="port_country"
                             value={state.port_country}
                             onChange={handleChange}
-                            placeholder="country"
+                            placeholder= {t("country")}
                           />
                         </div>
                       </div>
                     </div>
                     <div className="col-lg-4 form-group">
-                      <h6>City</h6>
+                      <h6>{t("city")}</h6>
                       <div className="parentthb packParent">
                         <div className="childThb">
                           <input
                             type="text"
-                            placeholder="city"
+                            placeholder={t("city")}
                             name="port_city"
                             value={state.port_city}
                             onChange={handleChange}
@@ -163,7 +164,7 @@ const AirportCreate = () => {
                       </div>
                     </div>
                     <div className="col-lg-4 form-group autoComplete">
-                      <h6>Port Type</h6>
+                      <h6>{t("portType")}</h6>
                       {/* <select
                         value={state.port_type_id}
                         onChange={handleChange}
@@ -194,7 +195,7 @@ const AirportCreate = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Port Type"
+                            placeholder={t("portType")}
                             variant="outlined"
                           />
                         )}
@@ -206,12 +207,12 @@ const AirportCreate = () => {
                     {state.port_type_id == 1 ? (
                       <>
                         <div className="col-lg-4 form-group">
-                          <h6>IATA code</h6>
+                          <h6>{t("iataCode")}</h6>
                           <div className="parentthb packParent">
                             <div className="childThb">
                               <input
                                 type="text"
-                                placeholder="code"
+                                placeholder= {t("iataCode")}
                                 name="IATA_code"
                                 value={state.IATA_code}
                                 onChange={handleChange}
@@ -220,12 +221,12 @@ const AirportCreate = () => {
                           </div>
                         </div>
                         <div className="col-lg-4 form-group">
-                          <h6>ICAO code</h6>
+                          <h6>{t("icaoCode")}</h6>
                           <div className="parentthb packParent">
                             <div className="childThb">
                               <input
                                 type="text"
-                                placeholder="code"
+                                placeholder= {t("icaoCode")}
                                 name="ICAO_Code"
                                 value={state.ICAO_Code}
                                 onChange={handleChange}
@@ -234,7 +235,7 @@ const AirportCreate = () => {
                           </div>
                         </div>
                         <div className="col-lg-4 form-group autoComplete">
-                          <h6>Preferred Transportation </h6>
+                          <h6> {t("preferredTransport")} </h6>
 
                           {/* <ComboBox
                             options={transportation?.map((v) => ({
@@ -278,8 +279,8 @@ const AirportCreate = () => {
                             value={
                               transportation?.length
                                 ? transportation.find(
-                                    (v) => v.ID === state.preferred_transport
-                                  ) || null
+                                  (v) => v.ID === state.preferred_transport
+                                ) || null
                                 : null
                             }
                             onChange={(event, newValue) => {
@@ -294,7 +295,7 @@ const AirportCreate = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Preferred Transport"
+                                placeholder={t("preferredTransport")}
                                 variant="outlined"
                               />
                             )}
@@ -304,7 +305,7 @@ const AirportCreate = () => {
                           />
                         </div>
                         <div className="col-lg-4 form-group autoComplete">
-                          <h6>Preferred Customs</h6>
+                          <h6>{t("preferredCustoms")}</h6>
                           {/* <Autocomplete
                             options={
                               clearance?.map((v) => ({
@@ -399,7 +400,7 @@ const AirportCreate = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Preferred Customs"
+                                placeholder= {t("preferredCustoms")}
                                 variant="outlined"
                               />
                             )}
@@ -420,7 +421,7 @@ const AirportCreate = () => {
                           /> */}
                         </div>
                         <div className="col-lg-4 form-group autoComplete">
-                          <h6>Preferred Liner </h6>
+                          <h6>{t("preferredLiner")}</h6>
                           {/* <ComboBox
                             options={linear?.map((v) => ({
                               id: v.liner_id,
@@ -449,7 +450,7 @@ const AirportCreate = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Liner"
+                                placeholder={t("selectLiner")}
                                 variant="outlined"
                               />
                             )}
@@ -472,12 +473,12 @@ const AirportCreate = () => {
                     ) : state.port_type_id == 2 ? (
                       <>
                         <div className="col-lg-4 form-group">
-                          <h6>Sea port code</h6>
+                          <h6> {t("Sea_Port_Code")}</h6>
                           <div className="parentthb packParent">
                             <div className="childThb">
                               <input
                                 type="text"
-                                placeholder="code"
+                                placeholder={t("code")}
                                 name="Seaport_code"
                                 value={state.Seaport_code}
                                 onChange={handleChange}
@@ -486,7 +487,7 @@ const AirportCreate = () => {
                           </div>
                         </div>
                         <div className="col-lg-4 form-group autoComplete">
-                          <h6>Preferred Transportation </h6>
+                          <h6> {t("preferredTransport")}</h6>
                           {/* <ComboBox
                             options={transportation?.map((v) => ({
                               id: v.vendor_id,
@@ -527,14 +528,14 @@ const AirportCreate = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Transport"
+                                placeholder={t("selectTransportProvider")}
                                 variant="outlined"
                               />
                             )}
                           />
                         </div>
                         <div className="col-lg-4 form-group autoComplete">
-                          <h6>Preferred Customs</h6>
+                          <h6>{t("preferredCustoms")}</h6>
                           {/* <ComboBox
                             options={clearance?.map((v) => ({
                               id: v.vendor_id,
@@ -613,14 +614,14 @@ const AirportCreate = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Clearance"
+                                placeholder={t("selectClearanceProvider")}
                                 variant="outlined"
                               />
                             )}
                           />
                         </div>
                         <div className="col-lg-4 form-group autoComplete">
-                          <h6>Preferred Liner </h6>
+                          <h6> {t("preferredLiner")}</h6>
                           {/* <ComboBox
                             options={linear?.map((v) => ({
                               id: v.liner_id,
@@ -699,7 +700,7 @@ const AirportCreate = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Liner"
+                                placeholder={t("selectLiner")}
                                 variant="outlined"
                               />
                             )}
@@ -710,7 +711,7 @@ const AirportCreate = () => {
                       <></>
                     )}
                     <div className="col-lg-12 form-group mt-4">
-                      <h6>Requires Chamber CO</h6>
+                      <h6> {t("requiresCO")}</h6>
                       <label className="toggleSwitch large">
                         <input
                           type="checkbox"
@@ -719,8 +720,8 @@ const AirportCreate = () => {
                           onChange={handleAgreedPricingChange1}
                         />
                         <span>
-                          <span>OFF</span>
-                          <span>ON</span>
+                          <span>{t("off")}</span>
+                          <span>{t("on")}</span>
                         </span>
                         <a></a>
                       </label>
@@ -738,10 +739,10 @@ const AirportCreate = () => {
                 name="signup"
                 onClick={updatePort}
               >
-                {state.port_id ? "Update" : "Create"}
+                {state.port_id ? t("update") : t("create")}
               </button>
               <Link className="btn btn-danger" to="/airportNew">
-                Cancel
+                {t("cancel")}
               </Link>
             </div>
           </div>

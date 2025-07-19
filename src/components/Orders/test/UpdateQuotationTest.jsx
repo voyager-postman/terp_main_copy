@@ -19,8 +19,9 @@ import { set } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
-
+import { useTranslation } from "react-i18next";
 const UpdateQuotationTest = () => {
+  const { t, i18n } = useTranslation("global");
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -89,7 +90,7 @@ const UpdateQuotationTest = () => {
       .post(`${API_BASE_URL}/OrderPopulate`, payload)
       .then((res) => {
         getOrdersDetails();
-        toast.success("Quotation populated successfully", {
+        toast.success(t("quotationPopulatedSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -102,7 +103,7 @@ const UpdateQuotationTest = () => {
       })
 
       .catch((err) => {
-        toast.error("Failed to populate quotation", {
+        toast.error(t("quotationPopulateFailed"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -233,7 +234,7 @@ const UpdateQuotationTest = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -266,12 +267,12 @@ const UpdateQuotationTest = () => {
           [name]: value,
         });
 
-        toast.success(` updated successfully!`, {
+        toast.success(t("updateSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
       } catch (error) {
-        toast.error(`Error updating ${name}`, {
+        toast.error(`${t("tryAgain")} ${name}`, {
           position: "top-right",
           autoClose: 3000,
         });
@@ -445,7 +446,7 @@ const UpdateQuotationTest = () => {
       console.log(response);
       getOrdersDetails();
 
-      toast.success("Invoice Price updated  successfully");
+      toast.success(`${t("price")} ${t("updateSuccess")}`);
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -458,7 +459,7 @@ const UpdateQuotationTest = () => {
       console.log(response);
       getOrdersDetails();
 
-      toast.success("Agreed Price updated  successfully");
+      toast.success(`${t("agreedPrice")} ${t("updateSuccess")}`);
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -471,7 +472,7 @@ const UpdateQuotationTest = () => {
       console.log(response);
       getOrdersDetails();
 
-      toast.success("Last Price updated  successfully");
+      toast.success(`${t("lastPrice")} ${t("updateSuccess")}`);
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -566,7 +567,7 @@ const UpdateQuotationTest = () => {
             input: copyData,
           }
         );
-        toast.success(" updated  successfully");
+        toast.success(t(updateSuccess));
         console.log("Consignee Response:", response.data);
       } catch (error) {
         console.error("Error fetching consignee data:", error);
@@ -685,7 +686,7 @@ const UpdateQuotationTest = () => {
       console.error("API error:", error);
 
       // Optional: show error toast
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -714,7 +715,7 @@ const UpdateQuotationTest = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -742,7 +743,7 @@ const UpdateQuotationTest = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -770,7 +771,7 @@ const UpdateQuotationTest = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -839,14 +840,14 @@ const UpdateQuotationTest = () => {
           );
           if (response.data.success === true) {
             console.log("API response:", response);
-            toast.success("Quotation deleted successfully");
+            toast.success(t("quotationDetailDeletedSuccess"));
 
             getOrdersDetails();
             oneQoutationDAta();
           }
         } catch (e) {
           console.error("API call error:", e);
-          toast.error("Something went wrong");
+          toast.error(t("tryAgain"));
         }
       }
     });
@@ -879,7 +880,7 @@ const UpdateQuotationTest = () => {
       } else if (response.data.success == true) {
         setShow(false);
 
-        toast.success("Quotation updated successfully", {
+        toast.success(t("updateSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -887,7 +888,7 @@ const UpdateQuotationTest = () => {
         navigate("/quotation");
       }
     } catch (e) {
-      toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
     } finally {
       setIsLoading(false);
       loadingModal.close();
@@ -947,7 +948,7 @@ const UpdateQuotationTest = () => {
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
-        toast.success("Quotation Calculated successfully", {
+        toast.success(t("quotationCalculatedSuccessfully"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1012,7 +1013,7 @@ const UpdateQuotationTest = () => {
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
-        toast.success("Quotation Update successfully", {
+        toast.success(t("quotationUpdateSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1104,7 +1105,7 @@ const UpdateQuotationTest = () => {
       const modalInstance = bootstrap.Modal.getInstance(modalEl);
       if (modalInstance) modalInstance.hide();
       setState5("");
-      toast.success(" Price updated  successfully");
+      toast.success(`${t("invoicePrice")} ${t("updateSuccess")}`);
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -1157,7 +1158,7 @@ const UpdateQuotationTest = () => {
         // getSummary();
         oneQoutationDAta();
         getOrdersDetails();
-        toast.success("Quotation Calculated successfully", {
+        toast.success(t("quotationCalculatedSuccessfully"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1290,7 +1291,7 @@ const UpdateQuotationTest = () => {
       is_changed: true,
     };
     if (!values.ITF || !values.itf_quantity || !values.itf_unit)
-      return toast.error("Please fill all fields");
+      return toast.error(t("fillAllFields"));
     loadingModal.fire();
     closeModal();
     try {
@@ -1316,7 +1317,7 @@ const UpdateQuotationTest = () => {
       console.log(data);
       getOrdersDetails();
       orderCrossFreight();
-      toast.success("Quotation detail added successfully");
+      toast.success(t("quotationDetailAddedSuccessfully"));
       setState((prevState) => {
         return {
           ...prevState,
@@ -1334,7 +1335,7 @@ const UpdateQuotationTest = () => {
       console.error(e);
       MySwal.close();
       closeModal();
-      toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
     } finally {
       MySwal.close();
       closeModal();
@@ -1400,14 +1401,14 @@ const UpdateQuotationTest = () => {
 
         oneQoutationDAta();
         console.log(response);
-        toast.success("Quotation Recalculate  Successfully", {
+        toast.success(t("quotationRecalculatedSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
       })
       .finally(() => {
         calculate();
@@ -1526,7 +1527,7 @@ const UpdateQuotationTest = () => {
   };
   return (
     <>
-      <Card title={`Quotation Management / Update Form`}>
+      <Card title={`${t("quotationTestManagement")} / ${t("updateForm")}`}>
         <div className="top-space-search-reslute">
           <div className="tab-content px-2 md:!px-4">
             <div className="tab-pane active" id="header" role="tabpanel">
@@ -1566,7 +1567,7 @@ const UpdateQuotationTest = () => {
                     </div>
                     <div className="row formEan quotationRowDro">
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Client</h6>
+                        <h6>{t("clients")}</h6>
                         <Autocomplete
                           options={
                             clients?.map((v) => ({
@@ -1598,13 +1599,13 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select client"
+                              placeholder={t("select_client")}
                             />
                           )}
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Consignee</h6>
+                        <h6>{t("consignee")}</h6>
                         <Autocomplete
                           options={consigneesNew || []} // Ensure consignees is an array
                           getOptionLabel={(option) =>
@@ -1644,7 +1645,7 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Consignee"
+                              placeholder={t("selectConsignee")}
                               variant="outlined"
                             />
                           )}
@@ -1654,7 +1655,7 @@ const UpdateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Brands</h6>
+                        <h6>{t("brands")}</h6>
                         {/* <Autocomplete
                           options={
                             brands?.map((v) => ({
@@ -1720,12 +1721,15 @@ const UpdateQuotationTest = () => {
                             setState({ ...state, brand_id: value?.id || null }); // Update state with selected ID
                           }}
                           renderInput={(params) => (
-                            <TextField {...params} placeholder="Select brand" />
+                            <TextField
+                              {...params}
+                              placeholder={t("selectBrand")}
+                            />
                           )}
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Currency</h6>
+                        <h6>{t("currency")}</h6>
                         <Autocomplete
                           options={
                             currency?.map((v) => ({
@@ -1763,13 +1767,13 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select currency"
+                              placeholder={t("selectCurrency")}
                             />
                           )}
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Loading Location</h6>
+                        <h6> {t("loadingLocation")}</h6>
                         <Autocomplete
                           options={
                             locations?.map((v) => ({
@@ -1807,13 +1811,13 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select location"
+                              placeholder={t("selectLoading")}
                             />
                           )}
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Port of Origin</h6>
+                        <h6>{t("portOfOrigins")}</h6>
                         <Autocomplete
                           options={
                             ports?.map((v) => ({
@@ -1850,12 +1854,15 @@ const UpdateQuotationTest = () => {
                             }); // Update state with selected `id`
                           }}
                           renderInput={(params) => (
-                            <TextField {...params} placeholder="Select port" />
+                            <TextField
+                              {...params}
+                              placeholder={t("selectOrigin")}
+                            />
                           )}
                         />
                       </div>
                       <div className="col-lg-3 form-group quotationSelectSer">
-                        <h6>Port of Destination</h6>
+                        <h6>{t("portOfDestination")}</h6>
                         <Autocomplete
                           options={
                             ports?.map((v) => ({
@@ -1897,13 +1904,13 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select destination port"
+                              placeholder={t("selectDestinationPort")}
                             />
                           )}
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Airline</h6>
+                        <h6> {t("airline")}</h6>
                         {/* <Autocomplete
                           options={
                             liners?.map((v) => ({
@@ -1973,7 +1980,7 @@ const UpdateQuotationTest = () => {
                                   Freight_provider_: state.Freight_provider_,
                                 }
                               );
-                              toast.success(" updated successfully!", {
+                              toast.success(t("updateSuccess"), {
                                 autoClose: 1000,
                                 theme: "colored",
                               });
@@ -1985,7 +1992,7 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Airline"
+                              placeholder={t("selectAirline")}
                               variant="outlined"
                             />
                           )}
@@ -1995,7 +2002,7 @@ const UpdateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Transportation</h6>
+                        <h6>{t("transportation")}</h6>
                         <Autocomplete
                           options={
                             transport?.map((v) => ({
@@ -2037,13 +2044,13 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Transportation Provider"
+                              placeholder={t("selectTransportation")}
                             />
                           )}
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Clearance</h6>
+                        <h6>{t("clearance")}</h6>
                         <Autocomplete
                           options={
                             clearance?.map((v) => ({
@@ -2085,13 +2092,13 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Clearance Provider"
+                              placeholder={t("selectClearance")}
                             />
                           )}
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Freight Provider</h6>
+                        <h6>{t("freightProvider")}</h6>
                         {/* <Autocomplete
                           options={
                             freights?.map((v) => ({
@@ -2167,7 +2174,7 @@ const UpdateQuotationTest = () => {
                                   Freight_provider_: newId,
                                 }
                               );
-                              toast.success(" updated successfully!", {
+                              toast.success(t("updateSuccess"), {
                                 autoClose: 1000,
                                 theme: "colored",
                               });
@@ -2184,7 +2191,7 @@ const UpdateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Freight Provider"
+                              placeholder={t("selectFreightProvider")}
                             />
                           )}
                           isOptionEqualToValue={(option, value) =>
@@ -2193,7 +2200,7 @@ const UpdateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group  ">
-                        <h6>EX Rate</h6>
+                        <h6> {t("exRate")}</h6>
                         <input
                           type="number"
                           value={computedState.fx_rate}
@@ -2202,7 +2209,7 @@ const UpdateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-2 form-group  ">
-                        <h6>Markup Rate</h6>
+                        <h6>{t("markupRate")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
@@ -2230,7 +2237,7 @@ const UpdateQuotationTest = () => {
                         </div>
                       </div>
                       <div className="col-lg-2 form-group">
-                        <h6> Rebate</h6>
+                        <h6> {t("rebate")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
@@ -2260,7 +2267,7 @@ const UpdateQuotationTest = () => {
                       <div className="col-lg-8">
                         <div className="IncludeClaim">
                           <div>
-                            <h6>Charge Volume</h6>
+                            <h6>{t("chargeVolume")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large" onclick="">
                                 <input
@@ -2270,8 +2277,8 @@ const UpdateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange4}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
@@ -2281,7 +2288,7 @@ const UpdateQuotationTest = () => {
                           <div>
                             <div>
                               <div>
-                                <h6>Include Claim</h6>
+                                <h6>{t("includeClaim")}</h6>
                                 <div className="flex gap-2 items-center">
                                   <label
                                     className="toggleSwitch large"
@@ -2294,8 +2301,8 @@ const UpdateQuotationTest = () => {
                                       onChange={handleAgreedPricingChange8}
                                     />
                                     <span>
-                                      <span>OFF</span>
-                                      <span>ON</span>
+                                      <span> {t("off")}</span>
+                                      <span> {t("on")}</span>
                                     </span>
                                     <a></a>
                                   </label>
@@ -2304,7 +2311,7 @@ const UpdateQuotationTest = () => {
                             </div>
                           </div>
                           <div>
-                            <h6>Palletized</h6>
+                            <h6>{t("palletized")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large">
                                 <input
@@ -2314,8 +2321,8 @@ const UpdateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange5}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
@@ -2323,7 +2330,7 @@ const UpdateQuotationTest = () => {
                             </div>
                           </div>
                           <div>
-                            <h6>CO from Chamber</h6>
+                            <h6>{t("coFromChamber")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large">
                                 <input
@@ -2333,8 +2340,8 @@ const UpdateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange6}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
@@ -2342,7 +2349,7 @@ const UpdateQuotationTest = () => {
                             </div>
                           </div>
                           <div>
-                            <h6>Precooling</h6>
+                            <h6> {t("precooling")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large">
                                 <input
@@ -2352,8 +2359,8 @@ const UpdateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange7}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
@@ -2363,7 +2370,7 @@ const UpdateQuotationTest = () => {
                         </div>
                       </div>
                       <div className="col-lg-3 form-group">
-                        <h6>Loading Date</h6>
+                        <h6> {t("loadingDate")}</h6>
                         {/* <input
                           type="date"
                           onChange={handleChange}
@@ -2395,7 +2402,7 @@ const UpdateQuotationTest = () => {
                             className=""
                             onClick={() => calculate1(false)}
                           >
-                            Calculate
+                            {t("calculate")}
                           </button>
 
                           {!isError && (
@@ -2413,7 +2420,7 @@ const UpdateQuotationTest = () => {
                                 }
                               }}
                             >
-                              Add
+                              {t("add")}
                             </button>
                           )}
                           <button
@@ -2429,7 +2436,7 @@ const UpdateQuotationTest = () => {
                               }
                             }}
                           >
-                            Add Consignee Items
+                            {t("addConsigneeItems")}
                           </button>
 
                           <div
@@ -2446,7 +2453,7 @@ const UpdateQuotationTest = () => {
                                     className="modal-title fs-5"
                                     id="exampleModalLabel"
                                   >
-                                    Quotation Populate
+                                    {t("quotationPopulate")}
                                   </h1>
                                   <button
                                     type="button"
@@ -2458,7 +2465,7 @@ const UpdateQuotationTest = () => {
                                   </button>
                                 </div>
                                 <div className="modal-body">
-                                  <label htmlFor=""> Net Weight</label>
+                                  <label htmlFor="">{t("netWeight")}</label>
                                   <input
                                     type="number"
                                     value={orderNetWeight}
@@ -2474,7 +2481,7 @@ const UpdateQuotationTest = () => {
                                     className="btn btn-primary"
                                     onClick={handleSaveOrderPopulate}
                                   >
-                                    Save
+                                    {t("save")}
                                   </button>
                                 </div>
                               </div>
@@ -2487,7 +2494,7 @@ const UpdateQuotationTest = () => {
                               data-bs-toggle="modal"
                               data-bs-target="#exampleModal"
                             >
-                              Round Price
+                              {t("roundPrice")}
                             </button>
 
                             {/* Button trigger modal */}
@@ -2507,7 +2514,7 @@ const UpdateQuotationTest = () => {
                                       className="modal-title fs-5"
                                       id="exampleModalLabel"
                                     >
-                                      Price Rounding
+                                      {t("priceRounding")}
                                     </h1>
                                     <button
                                       type="button"
@@ -2525,7 +2532,7 @@ const UpdateQuotationTest = () => {
                                   </div>
                                   <div className="modal-body">
                                     <div className="col-lg-12 form-group autoComplete">
-                                      <h6>Rounding</h6>
+                                      <h6>{t("rounding")}</h6>
                                       <Autocomplete
                                         options={RoundingDataList || []}
                                         getOptionLabel={(option) =>
@@ -2551,7 +2558,7 @@ const UpdateQuotationTest = () => {
                                         renderInput={(params) => (
                                           <TextField
                                             {...params}
-                                            placeholder="Select Rounding"
+                                            placeholder={t("selectRounding")}
                                             variant="outlined"
                                           />
                                         )}
@@ -2564,7 +2571,7 @@ const UpdateQuotationTest = () => {
                                       className="btn btn-primary"
                                       onClick={handleSubmit}
                                     >
-                                      Submit
+                                      {t("submit")}
                                     </button>
                                   </div>
                                 </div>
@@ -2577,7 +2584,7 @@ const UpdateQuotationTest = () => {
                               className="me-2"
                               onClick={handleSubmit1}
                             >
-                              Use Invoice Price
+                              {t("useInvoicePrice")}
                             </button>
                           </div>
                           <div>
@@ -2586,7 +2593,7 @@ const UpdateQuotationTest = () => {
                               className="me-2"
                               onClick={handleSubmit2}
                             >
-                              Agreed Price
+                              {t("agreedPrice")}
                             </button>
                           </div>
                           <div>
@@ -2595,20 +2602,20 @@ const UpdateQuotationTest = () => {
                               className="me-2"
                               onClick={handleSubmit3}
                             >
-                              Last Price
+                              {t("lastPrice")}
                             </button>
                           </div>
                         </div>
                       )}
                       {isError && (
                         <div className="my-4 text-red-500">
-                          <i className="mdi mdi-alert" /> Please adjust Select
-                          ITF to complete a box
+                          <i className="mdi mdi-alert" />
+                          {t("pleaseAdjustITF")}
                         </div>
                       )}
                       <div className="addBtnEan mb-4">
                         <button type="button" onClick={() => calculate(true)}>
-                          Recalculate
+                          {t("recalculate")}
                         </button>
                       </div>
                     </div>
@@ -2641,7 +2648,7 @@ const UpdateQuotationTest = () => {
                                   return <th key={key}>{label}</th>;
                                 }
                               )}
-                              <th>Action</th>
+                              <th> {t("action")}</th>
                             </tr>
                           </thead>
                         )}
@@ -2971,7 +2978,7 @@ const UpdateQuotationTest = () => {
                   name="signup"
                   onClick={updateOrderTest}
                 >
-                  UPDATE AND CLOSE
+                  {t("updateAndClose")}
                 </button>
               ) : (
                 ""
@@ -2985,20 +2992,19 @@ const UpdateQuotationTest = () => {
           <div>
             <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
               <div className="crossArea">
-                <h3>Edit Details</h3>
+                <h3>{t("editDetails")}</h3>
                 <p onClick={closeModal}>
                   <CloseIcon />
                 </p>
               </div>
               <div className="formEan formCreate">
                 <div className="form-group mb-3 itfHeight quotationSelectSer">
-                  <label>ITF</label>
-
+                  <label>{t("itf")}</label>
                   <Select
                     value={selectedOption || null} // The selected value
                     onChange={handleChangeSe} // Handle selection
                     options={options} // The dropdown options
-                    placeholder="Search or Select ITF"
+                    placeholder={t("selectItf")}
                     isClearable // Adds a clear button
                     styles={customStyles}
                     components={{ DropdownIndicator }} // Use the custom indicator
@@ -3006,7 +3012,7 @@ const UpdateQuotationTest = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Quantity</label>
+                  <label> {t("quantity")}</label>
                   <input
                     type="number"
                     value={
@@ -3019,7 +3025,7 @@ const UpdateQuotationTest = () => {
                   />
                 </div>
                 <div className="form-group mb-3 quotationSelectSer">
-                  <h6>Brands</h6>
+                  <h6>{t("brands")}</h6>
                   {/* <Autocomplete
                     disablePortal
                     options={brandNew?.map((v) => ({
@@ -3171,13 +3177,13 @@ const UpdateQuotationTest = () => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        placeholder="Select Brand"
+                        placeholder={t("selectBrand")}
                       />
                     )}
                   />
                 </div>
                 <div className="form-group mb-3 quotationSelectSer">
-                  <label>Unit</label>
+                  <label> {t("unit")}</label>
                   {/* <Autocomplete
                     disablePortal
                     options={unit?.map((v) => ({
@@ -3330,13 +3336,13 @@ const UpdateQuotationTest = () => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        placeholder="Select Unit"
+                        placeholder={t("selectUnit")}
                       />
                     )}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Adjustment price</label>
+                  <label>{t("adjustmentPrice")}</label>
                   <input
                     type="number"
                     value={
@@ -3355,7 +3361,7 @@ const UpdateQuotationTest = () => {
                   onClick={saveNewDetails}
                   className="bg-black text-white px-4 py-2 rounded"
                 >
-                  Save
+                  {t("save")}
                 </button>
               </div>
             </div>
@@ -3367,7 +3373,7 @@ const UpdateQuotationTest = () => {
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Freight or Transport Error
+              {t("freightError")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -3524,7 +3530,7 @@ const UpdateQuotationTest = () => {
                   className="btn btn-secondary"
                   onClick={handleCloseModal}
                 >
-                  Close
+                  {t("close")}
                 </button>
               </div>
             </div>
@@ -3545,7 +3551,7 @@ const UpdateQuotationTest = () => {
             }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Quotation Check
+              {t("quotationCheck")}
             </h1>
             {/* <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -3568,11 +3574,11 @@ const UpdateQuotationTest = () => {
                   backgroundColor: color ? "" : "#631f37",
                 }}
               >
-                Loading Date missing
+                {t("loadingDateMissing")}
               </p>
 
               <div className="closeBtnRece">
-                <button onClick={closeIcon1}>Close</button>
+                <button onClick={closeIcon1}>{t("close")}</button>
               </div>
             </div>
           </div>

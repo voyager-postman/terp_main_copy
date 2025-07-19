@@ -5,8 +5,9 @@ import { toast } from "react-toastify";
 import { API_BASE_URL, API_IMAGE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-
+ import { useTranslation } from "react-i18next";
 const EditCompanyAddress = () => {
+  const [t, i18n] = useTranslation("global");
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -97,7 +98,7 @@ const EditCompanyAddress = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -122,7 +123,7 @@ const EditCompanyAddress = () => {
   }, []);
 
   return (
-    <Card title={"Update CompanyAddress / Edit Form"}>
+    <Card title={t("company_edit_form")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -135,7 +136,7 @@ const EditCompanyAddress = () => {
                   <div className="row">
                     {from?.ID >= 1 && (
                       <div className="form-group col-lg-3">
-                        <h6>Line 1</h6>
+                        <h6>{t("line_1")}</h6>
                         <textarea
                           ref={line1Ref}
                           id="line_1"
@@ -145,7 +146,7 @@ const EditCompanyAddress = () => {
                           }}
                           name="Line_1"
                           className="form-control"
-                          placeholder="Enter Line 1"
+                          placeholder={t("line_1")}
                           value={editProduceData.Line_1}
                           style={{
                             width: "100%",
@@ -157,7 +158,7 @@ const EditCompanyAddress = () => {
                     )}
                     {from?.ID >= 2 && (
                       <div className="form-group col-lg-3">
-                        <h6>Line 2</h6>
+                        <h6>{t("line_2")}</h6>
                         <textarea
                           ref={line2Ref}
                           id="line_2"
@@ -167,7 +168,7 @@ const EditCompanyAddress = () => {
                           }}
                           name="Line_2"
                           className="form-control"
-                          placeholder="Enter Line 2"
+                          placeholder={t("line_2")}
                           value={editProduceData.Line_2}
                           style={{
                             width: "100%",
@@ -179,7 +180,7 @@ const EditCompanyAddress = () => {
                     )}
                     {from?.ID >= 3 && (
                       <div className="form-group col-lg-3">
-                        <h6>Line 3</h6>
+                        <h6>{t("line_3")}</h6>
                         <textarea
                           ref={line3Ref}
                           id="line_3"
@@ -189,7 +190,7 @@ const EditCompanyAddress = () => {
                           }}
                           name="Line_3"
                           className="form-control"
-                          placeholder="Enter Line 3"
+                          placeholder={t("line_2")}
                           value={editProduceData.Line_3}
                           style={{
                             width: "100%",
@@ -201,7 +202,7 @@ const EditCompanyAddress = () => {
                     )}
                     {from?.ID >= 4 && (
                       <div className="form-group col-lg-3">
-                        <h6>Line 4</h6>
+                        <h6>{t("line_4")}</h6>
                         <textarea
                           ref={line4Ref}
                           id="line_4"
@@ -211,7 +212,7 @@ const EditCompanyAddress = () => {
                           }}
                           name="Line_4"
                           className="form-control"
-                          placeholder="Enter Line 4"
+                          placeholder={t("line_4")}
                           value={editProduceData.Line_4}
                           style={{
                             width: "100%",
@@ -223,9 +224,9 @@ const EditCompanyAddress = () => {
                     )}
                   </div>
 
-                  <div className="row">
+                  <div className="row mt-3">
                     <div className="col-lg-6 form-group">
-                      <h6>Upload Logo</h6>
+                      <h6>{t("upload_logo")}</h6>
                       <input
                         type="file"
                         id="logo"
@@ -239,7 +240,7 @@ const EditCompanyAddress = () => {
                           <label htmlFor="logo">
                             <div className="uploadBorder">
                               <span>
-                                Choose Image <CloudUploadIcon />{" "}
+                                {t("chooseImage")} <CloudUploadIcon />{" "}
                               </span>
                             </div>
                           </label>
@@ -279,10 +280,10 @@ const EditCompanyAddress = () => {
               className="btn btn-primary"
               type="button"
             >
-              Update
+              {t("update")}
             </button>
             <Link className="btn btn-danger" to="/companyaddress">
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>

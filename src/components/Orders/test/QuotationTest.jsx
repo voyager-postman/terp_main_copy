@@ -17,7 +17,11 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MySwal from "../../../swal";
+import { useTranslation } from "react-i18next";
+
 const QuotationTest = () => {
+  const { t, i18n } = useTranslation("global");
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(false);
@@ -65,7 +69,7 @@ const QuotationTest = () => {
 
   useEffect(() => {
     getAllQuotation();
-  }, []);
+  }, [i18n]);
   const orderData1 = () => {
     axios
       .get(`${API_BASE_URL}/getAllQuotation`, {
@@ -1166,36 +1170,36 @@ const QuotationTest = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Number",
+        Header: t("number"),
         accessor: "Quotation_Number",
       },
       {
-        Header: "Client Name",
+        Header: t("clientName"),
         accessor: "client_name",
       },
       {
-        Header: "Destination port ",
+        Header: t("destinationPort"),
         accessor: "port_name",
       },
       {
-        Header: "Consignee Name",
+        Header: t("consigneeName"),
         accessor: "consignee_name",
       },
       {
-        Header: "Location",
+        Header: t("location"),
         accessor: "location_name",
       },
       {
-        Header: "Load date",
+        Header: t("loadDate"),
         accessor: "load_Before_date",
       },
 
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: "status_name",
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="editIcon">
             <Link to="/quotation_view" state={{ from: { ...a } }}>
@@ -1318,7 +1322,7 @@ const QuotationTest = () => {
         ),
       },
     ],
-    []
+    [i18n.language]
   );
   const clearData = () => {
     setExchangeRate(false);
@@ -1380,20 +1384,23 @@ const QuotationTest = () => {
         </div>
       </div>
       <Card
-        title="Quotation  Management"
+        title={t("quotationTestManagement")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/create_Quotation")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >
         <Box sx={{ minWidth: 120 }} className="selectActive">
           <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Status</InputLabel>
+            <InputLabel id="demo-simple-select-label">
+              {" "}
+              {t("status")}
+            </InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
@@ -1401,10 +1408,10 @@ const QuotationTest = () => {
               label="Status"
               onChange={handleChange}
             >
-              <MenuItem value="4">All</MenuItem>
-              <MenuItem value="0">Active</MenuItem>
-              <MenuItem value="1">Used </MenuItem>
-              <MenuItem value="2">Expired </MenuItem>
+              <MenuItem value="4"> {t("all")}</MenuItem>
+              <MenuItem value="0"> {t("active")}</MenuItem>
+              <MenuItem value="1"> {t("used")} </MenuItem>
+              <MenuItem value="2"> {t("expired")} </MenuItem>
             </Select>
           </FormControl>
         </Box>

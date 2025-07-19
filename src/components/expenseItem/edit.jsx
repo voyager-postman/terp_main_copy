@@ -8,8 +8,10 @@ import { Card } from "../../card";
 import { ComboBox } from "../combobox";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
+ import { useTranslation } from "react-i18next";
 
 const EditExpenseItems = () => {
+  const [t, i18n] = useTranslation("global");
   const location = useLocation();
   const { from } = location.state || {};
   console.log(from);
@@ -72,7 +74,7 @@ const EditExpenseItems = () => {
       toast.success("Successfully");
       navigate("/expenseItem");
     } catch (e) {
-      toast.error("Network Error");
+      toast.error(t("networkError"));
     }
   };
   console.log(selectedClassification1);
@@ -197,7 +199,7 @@ const EditExpenseItems = () => {
   }, []);
   // Edit Box Api
   return (
-    <Card title={"Expenses Management / Edit Form"}>
+    <Card title={t("expense_edit_form")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -209,32 +211,32 @@ const EditExpenseItems = () => {
                 <form action="">
                   <div className="row">
                     <div className="form-group col-lg-3">
-                      <label>English Name</label>
+                     <h6>{t("english_name")}</h6>
                       <input
                         type="text"
                         id="name_en"
                         name="name_en"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="name"
+                      placeholder={t("name")}
                         defaultValue={editBoxData.name_en}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <label>Thai Name</label>
+                      <h6>{t("thai_name")}</h6>
                       <input
                         type="text"
                         id="name_th"
                         name="name_th"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="name"
+                       placeholder={t("name")}
                         defaultValue={editBoxData.name_th}
                       />
                     </div>
 
                     <div className="form-group col-lg-3 autoComplete">
-                      <label>Charts of Accounting</label>
+                   <h6>{t("charts_of_accounting")}</h6>
 
                       {/* <Autocomplete
                         disablePortal
@@ -294,7 +296,7 @@ const EditExpenseItems = () => {
                           <TextField
                             {...params}
                             variant="outlined"
-                            placeholder="Select Account"
+                            placeholder={t("selectAccount")}
                           />
                         )}
                       />
@@ -336,7 +338,7 @@ const EditExpenseItems = () => {
                  
                     </div> */}
                     <div className="form-group col-lg-4 form-group autoComplete classificationSelect mb-3">
-                      <h6>VAT Type</h6>
+                       <h6>{t("vatType")}</h6>
                       <Autocomplete
                         options={
                           classification2.map((item) => ({
@@ -358,7 +360,7 @@ const EditExpenseItems = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select VAT Classification"
+                            placeholder={t("selectVatClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -371,7 +373,7 @@ const EditExpenseItems = () => {
                     </div>
 
                     <div className="form-group col-lg-4 form-group autoComplete classificationSelect mb-3">
-                      <h6>Inventory Type</h6>
+                          <h6>{t("inventoryType")}</h6>
                       <Autocomplete
                         options={
                           classification3.map((item) => ({
@@ -393,7 +395,7 @@ const EditExpenseItems = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Inventory Classification"
+                            placeholder={t("selectInventoryClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -406,7 +408,7 @@ const EditExpenseItems = () => {
                     </div>
 
                     <div className="form-group col-lg-4 form-group autoComplete classificationSelect mb-3">
-                      <h6> WHT Type</h6>
+                    <h6>{t("whtType")}</h6>
                       <Autocomplete
                         options={
                           classification4.map((item) => ({
@@ -428,7 +430,7 @@ const EditExpenseItems = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select WHT Classification"
+                            placeholder={t("selectWhtClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -452,10 +454,10 @@ const EditExpenseItems = () => {
               type="submit"
               name="signup"
             >
-              {from?.ID ? "Update" : "Create"}
+              {from?.ID ? t("update") : t("create")}
             </button>
             <Link className="btn btn-danger" to="/expenseItem">
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>

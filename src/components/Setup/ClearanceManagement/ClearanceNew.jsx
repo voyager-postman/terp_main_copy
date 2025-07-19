@@ -5,8 +5,10 @@ import { toast } from "react-toastify"
 import { API_BASE_URL } from "../../../Url/Url"
 import { Card } from "../../../card"
 import { TableView } from "../../table"
+import { useTranslation } from "react-i18next";
 
 const ClearanceNew = () => {
+	const { t } = useTranslation("global");
 	const navigate = useNavigate()
 	const [data, setData] = useState([])
 	const [status, setStatus] = useState("on")
@@ -20,7 +22,7 @@ const ClearanceNew = () => {
 			.catch((error) => {
 				console.log(error)
 				if (error) {
-					toast.error("Network Error", {
+					toast.error(t("networkError"), {
 						autoClose: 1000,
 						theme: "colored",
 					})
@@ -55,25 +57,25 @@ const ClearanceNew = () => {
 	const columns = React.useMemo(
 		() => [
 			{
-				Header: "ID",
+				Header: t("id"),
 				id: "index",
 				accessor: (_row, i) => i + 1,
 			},
 			{
-				Header: "Vendor",
+				Header: t("vendor"),
 				accessor: "name",
 			},
 			{
-				Header: "Port Of Origin",
+				Header: t("portOfOrigin"),
 				accessor: "port_name",
 			},
 			{
-				Header: "Port Type",
+				Header: t("portType"),
 				accessor: "port_type",
 			},
 
 			{
-				Header: "Status",
+				Header: t("status"),
 				accessor: (a) => (
 					<label
 						style={{
@@ -92,8 +94,8 @@ const ClearanceNew = () => {
 							checked={a.status == "on" ? true : false}
 						/>
 						<span>
-							<span>OFF</span>
-							<span>ON</span>
+							<span>{t("off")}</span>
+							<span>{t("on")}</span>
 						</span>
 						<a></a>
 					</label>
@@ -101,7 +103,7 @@ const ClearanceNew = () => {
 			},
 
 			{
-				Header: "Actions",
+				Header: t("actions"),
 				accessor: (a) => (
 					<Link to="/updateClearanceNew" state={{ from: a }}>
 						<i
@@ -119,19 +121,19 @@ const ClearanceNew = () => {
 			},
 
 		],
-		[],
+		[t],
 	)
 
 	return (
 		<Card
-			title={"Clearance Management"}
+			title={t("clearance_management")}
 			endElement={
 				<button
 					type="button"
 					onClick={() => navigate("/createClearanceNew")}
 					className="btn button btn-info"
 				>
-					Create
+					{t("create")}
 				</button>
 			}
 		>

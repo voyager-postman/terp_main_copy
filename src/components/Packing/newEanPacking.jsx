@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../Url/Api";
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -16,8 +16,10 @@ import { format } from "date-fns";
 import Box from "@mui/material/Box";
 import CloseIcon from "@mui/icons-material/Close";
 import { Autocomplete } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const NewEanPacking = () => {
+  const { t, i18n } = useTranslation("global");
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -148,31 +150,31 @@ const NewEanPacking = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "EAN",
+        Header: t("ean"),
         accessor: "ean_name_en",
       },
       {
-        Header: "Quantity",
+        Header: t("quantity"),
         accessor: "ean_qty",
       },
       {
-        Header: "Unit",
+        Header: t("unit"),
         accessor: "packing_ean_unit",
       },
       {
-        Header: "Ean Cost",
+        Header: t("eanCost"),
         accessor: "ean_cost",
       },
       {
-        Header: "Average Weight",
+        Header: t("averageWeight"),
         accessor: "average_weight",
       },
       {
-        Header: "Ean Per KG",
+        Header: t("eanPerKg"),
         accessor: "EanPerKg",
       },
       {
-        Header: "Ean Per Hour",
+        Header: t("eanPerHour"),
         accessor: "EanPerHour",
       },
     ],
@@ -251,7 +253,7 @@ const NewEanPacking = () => {
         console.log(response);
 
         if (response.data?.message === "success") {
-          toast.success("Packing data fetched successfully!", {
+          toast.success(t("packingFetchSuccess"), {
             position: "top-right",
             autoClose: 3000,
           });
@@ -265,7 +267,7 @@ const NewEanPacking = () => {
       navigate("/eanPacking");
     } catch (error) {
       console.error("Error in getPackingCommonCancel:", error);
-      toast.error("Failed to fetch packing data or release access!");
+      toast.error(t("packingFetchFail"));
     } finally {
       loadingModal.close(); // Always close modal
     }
@@ -418,23 +420,23 @@ const NewEanPacking = () => {
 
           // Step-by-step single validation
           if (!crates_used) {
-            return toast.error("Please enter Crates value");
+            return toast.error(t("enterCrates"));
           }
 
           if (!qty_used) {
-            return toast.error("Please enter Quantity value");
+            return toast.error(t("enterQuantity"));
           }
 
           if (!number_of_staff) {
-            return toast.error("Please enter Number of Staff value");
+            return toast.error(t("enterStaffNumber"));
           }
 
           if (!selectedDate1) {
-            return toast.error("Please select Start Time");
+            return toast.error(t("selectStartTime"));
           }
 
           if (!selectedDate) {
-            return toast.error("Please select End Time");
+            return toast.error(t("selectEndTime"));
           }
         }
 
@@ -448,7 +450,7 @@ const NewEanPacking = () => {
         });
       }
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("genericError"));
       console.error(error);
     }
   };
@@ -480,6 +482,7 @@ const NewEanPacking = () => {
 
             setCloseButton(true);
             toast.success("Ean updated successfully");
+            // toast.success(t("returnToSupplierSuccess"));
             setToggle(!toggle);
           }
         });
@@ -493,7 +496,7 @@ const NewEanPacking = () => {
     const { ean_id, unit_id, brand_id, ean_quantity } = data;
 
     if (!unit_id || brand_id === null || !ean_quantity) {
-      return toast.error("Please fill all fields");
+      return toast.error(t("pleaseFillAllFields"));
     }
 
     const request = {
@@ -522,7 +525,7 @@ const NewEanPacking = () => {
         // console.log(lidValue);
         // setFilterdata(lidValue);
         if (response.status === 200) {
-          toast.success("EanPacking detail added successfully");
+          toast.success(t("eanPackingAddSuccess"));
           closeModal();
           setToggle(!toggle);
           setData({
@@ -605,7 +608,7 @@ const NewEanPacking = () => {
                       <div className="row">
                         <div className="col-md-6">
                           <h6 className="font-weight-bolder mb-0">
-                            EAN Packing Management
+                            {t("eanPackingManagement")}
                           </h6>
                         </div>
                       </div>
@@ -739,7 +742,7 @@ const NewEanPacking = () => {
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
-                                      PODCODE <span>:</span>
+                                      {t("podCode")} <span>:</span>
                                     </strong>
                                   </div>
                                   <div>
@@ -749,7 +752,7 @@ const NewEanPacking = () => {
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
-                                      Supplier <span>:</span>
+                                      {t("supplier")} <span>:</span>
                                     </strong>
                                   </div>
                                   <div>
@@ -758,14 +761,14 @@ const NewEanPacking = () => {
                                 </div>
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
-                                    <strong>Date :</strong>
+                                    <strong>{t("date")}:</strong>
                                   </div>
                                   <div>{formatDate1(from?.Date)}</div>
                                 </div>
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
-                                      Name <span>:</span>
+                                      {t("name")} <span>:</span>
                                     </strong>
                                   </div>
                                   <div>
@@ -777,7 +780,7 @@ const NewEanPacking = () => {
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
-                                      Quantity
+                                      {t("quantity")}
                                       <span>:</span>
                                     </strong>
                                   </div>
@@ -788,7 +791,7 @@ const NewEanPacking = () => {
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
-                                      Unit<span>:</span>
+                                      {t("unit")}<span>:</span>
                                     </strong>
                                   </div>
                                   <div>
@@ -798,7 +801,7 @@ const NewEanPacking = () => {
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
-                                      Crate
+                                      {t("crate")}
                                       <span>:</span>
                                     </strong>
                                   </div>
@@ -809,7 +812,7 @@ const NewEanPacking = () => {
                                 <div className="parentPurchaseView">
                                   <div className="me-3">
                                     <strong>
-                                      Quantity/crate<span>:</span>
+                                      {t("quantityPerCrate")}<span>:</span>
                                     </strong>
                                   </div>
                                   <div>
@@ -822,7 +825,7 @@ const NewEanPacking = () => {
                               <form action="">
                                 <div className="row">
                                   <div className="form-group col-lg-3">
-                                    <h6>Crates used</h6>
+                                    <h6> {t("cratesUsed")}</h6>
                                     <input
                                       onChange={handleChange}
                                       type="number"
@@ -832,7 +835,7 @@ const NewEanPacking = () => {
                                     />
                                   </div>
                                   <div className="form-group col-lg-3">
-                                    <h6>Quantity used</h6>
+                                    <h6>{t("quantityUsed")}</h6>
                                     <input
                                       type="number"
                                       name="qty_used"
@@ -843,7 +846,7 @@ const NewEanPacking = () => {
                                   </div>
 
                                   <div className="form-group col-lg-3">
-                                    <h6>Number of Staff</h6>
+                                    <h6>{t("numberOfStaff")}</h6>
                                     <input
                                       onChange={handleChange}
                                       type="number"
@@ -853,7 +856,7 @@ const NewEanPacking = () => {
                                     />
                                   </div>
                                   <div className="form-group col-lg-3 eanDateTime">
-                                    <h6>Start Time</h6>
+                                    <h6>{t("startTime")}</h6>
 
                                     <LocalizationProvider
                                       dateAdapter={AdapterDateFns}
@@ -879,7 +882,7 @@ const NewEanPacking = () => {
                                     </LocalizationProvider>
                                   </div>
                                   <div className="form-group col-lg-3 eanDateTime">
-                                    <h6>End Time</h6>
+                                    <h6>{t("endTime")}</h6>
                                     {/* <input
                                     onChange={handleChange}
                                     type="time"
@@ -918,7 +921,7 @@ const NewEanPacking = () => {
                                       onClick={() => calculate()}
                                       disabled={!packingCommonId}
                                     >
-                                      Calculate
+                                      {t("calculate")}
                                     </button>
                                     <button
                                       type="button"
@@ -932,7 +935,7 @@ const NewEanPacking = () => {
                                         }
                                       }}
                                     >
-                                      Add
+                                      {t("add")}
                                     </button>
                                   </div>
                                 </div>
@@ -945,14 +948,14 @@ const NewEanPacking = () => {
                                   >
                                     <thead>
                                       <tr>
-                                        <th>EAN</th>
-                                        <th>Quantity</th>
-                                        <th>Unit</th>
-                                        <th>Ean Cost</th>
-                                        <th>Average Weight</th>
-                                        <th>Ean Per KG</th>
-                                        <th>Ean Per Hour</th>
-                                        <th>Wastage</th>
+                                        <th>{t("ean")}</th>
+                                        <th>{t("quantity")}</th>
+                                        <th>{t("unit")}</th>
+                                        <th>{t("eanCost")}</th>
+                                        <th>{t("averageWeight")}</th>
+                                        <th>{t("eanPerKg")}</th>
+                                        <th>{t("eanPerHour")}</th>
+                                        <th>{t("wastage")}</th>
                                       </tr>
                                     </thead>
                                     <tbody>
@@ -1031,25 +1034,24 @@ const NewEanPacking = () => {
                                   navigate("/eanPacking");
                                 } catch (error) {
                                   console.error("Access API error:", error);
-                                  toast.error(
-                                    "Something went wrong while checking file access."
-                                  );
+                                  toast.error(t("genericError"));
                                 }
                               } else {
                                 toast.warning(
                                   "Invalid operation: Sorting ID not found."
                                 );
+                                //  toast.warning(t("genericError"));
                               }
                             }}
                           >
-                            Close
+                            {t("close")}
                           </button>
                         ) : null}
                         <button
                           className="btn btn-danger"
                           onClick={getPackingCommonCancel}
                         >
-                          Cancel
+                          {t("cancel")}
                         </button>
                       </div>
                     </div>
@@ -1067,14 +1069,14 @@ const NewEanPacking = () => {
               />
               <div className="bg-white rounded-lg shadow-lg max-w-md w-full z-50">
                 <div className="crossArea">
-                  <h3>Edit Details</h3>
+                  <h3>{t("editDetails")}</h3>
                   <p onClick={closeModal}>
                     <CloseIcon />
                   </p>
                 </div>
                 <div className="formEan formCreate">
                   <div className="form-group mb-3 autoComplete">
-                    <label>EAN</label>
+                    <label>{t("ean")}</label>
 
                     <Autocomplete
                       options={options}
@@ -1087,7 +1089,7 @@ const NewEanPacking = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select EAN"
+                          placeholder= {t("selectEan")}
                           variant="outlined"
                         />
                       )}
@@ -1100,7 +1102,7 @@ const NewEanPacking = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Quantity</label>
+                    <label>{t("quantity")}</label>
                     <input
                       type="number"
                       value={data?.ean_quantity}
@@ -1109,7 +1111,7 @@ const NewEanPacking = () => {
                     />
                   </div>
                   <div className="form-group mb-3 autoComplete">
-                    <label>Unit</label>
+                    <label>{t("unit")}</label>
 
                     <Autocomplete
                       options={unitType?.slice(0, 3) || []}
@@ -1122,7 +1124,7 @@ const NewEanPacking = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Unit"
+                          placeholder= {t("selectUnit")}
                           variant="outlined"
                         />
                       )}
@@ -1136,7 +1138,7 @@ const NewEanPacking = () => {
                     />
                   </div>
                   <div className="form-group mb-3 autoComplete">
-                    <label>Brand</label>
+                    <label>{t("brand")}</label>
 
                     <Autocomplete
                       options={brandOptions}
@@ -1149,7 +1151,7 @@ const NewEanPacking = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Brand"
+                          placeholder={t("selectBrand")}
                           variant="outlined"
                         />
                       )}
@@ -1166,7 +1168,7 @@ const NewEanPacking = () => {
                     />
                   </div>
                   <div className="form-group mb-3 autoComplete">
-                    <label>Assigned Order</label>
+                    <label>{t("AssignedOrder")}</label>
 
                     {/* <Autocomplete
                       options={assigned}
@@ -1205,7 +1207,7 @@ const NewEanPacking = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Order"
+                          placeholder= {t("selectOrder")}
                           variant="outlined"
                         />
                       )}
@@ -1232,7 +1234,7 @@ const NewEanPacking = () => {
                     onClick={() => saveNewDetails()}
                     className="bg-black text-white px-4 py-2 rounded"
                   >
-                    Save
+                    {t("save")}
                   </button>
                 </div>
               </div>
@@ -1262,7 +1264,7 @@ const NewEanPacking = () => {
               <p className="text-center">{massageShow}</p>
               <div className="closeBtnRece">
                 <button className="mb-3" onClick={closeIcon}>
-                  Close
+                  {t("close")}
                 </button>
               </div>
             </div>
@@ -1282,7 +1284,7 @@ const NewEanPacking = () => {
             }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Crates used Check
+              {t("checkCratesUsed")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -1305,11 +1307,11 @@ const NewEanPacking = () => {
                   backgroundColor: color ? "" : "#631f37",
                 }}
               >
-                Crates entered more than available
+                {t("cratesExceed")}
               </p>
 
               <div className="closeBtnRece">
-                <button onClick={closeIcon1}>Close</button>
+                <button onClick={closeIcon1}> {t("close")}</button>
               </div>
             </div>
           </div>

@@ -3,8 +3,10 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"; // Optional: for notifications
 import { API_BASE_URL } from "../../Url/Url";
+import { useTranslation } from "react-i18next";
 
 const CreateAccounts = () => {
+  const { t, i18n } = useTranslation("global");
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     account_number: "",
@@ -44,7 +46,7 @@ const CreateAccounts = () => {
       );
 
       // Success notification
-      toast.success("Account created successfully!");
+      toast.success(t("accountCreateSuccess"));
       navigate("/accounts");
       console.log(response.data);
 
@@ -60,7 +62,7 @@ const CreateAccounts = () => {
       });
     } catch (error) {
       // Error notification
-      toast.error("Error creating account.");
+      toast.error(t("accountCreateError"));
       console.error("There was an error!", error);
     }
   };
@@ -70,7 +72,7 @@ const CreateAccounts = () => {
       <div className="bg-white rounded border">
         <div className="grayBgColor px-4 py-3 rounded-t">
           <div className="flex justify-between items-center exportPopupBtn">
-            <h6 className="font-weight-bolder mb-0">Accounts / Create Form</h6>
+            <h6 className="font-weight-bolder mb-0"> {t("createAccountForm")}</h6>
           </div>
         </div>
         <div className="px-2 md:px-4">
@@ -85,45 +87,46 @@ const CreateAccounts = () => {
                     <form onSubmit={handleSubmit}>
                       <div className="row">
                         <div className="form-group col-lg-3">
-                          <h6>Account Number</h6>
+                          <h6>{t("accountNumber")}
+                          </h6>
                           <input
                             type="text"
                             name="account_number"
                             className="form-control"
-                            placeholder="Account Number"
+                            placeholder={t("accountNumber")}
                             value={formData.account_number}
                             onChange={handleChange}
                           />
                         </div>
                         <div className="form-group col-lg-3">
-                          <h6>Account lvl1</h6>
+                          <h6> {t("accountLevel1")}</h6>
                           <input
                             type="text"
                             name="account_lvl1"
                             className="form-control"
-                            placeholder="Account lvl1"
+                            placeholder={t("accountLevel1")}
                             value={formData.account_lvl1}
                             onChange={handleChange}
                           />
                         </div>
                         <div className="form-group col-lg-3">
-                          <h6>Account lvl2</h6>
+                          <h6>{t("accountLevel2")}</h6>
                           <input
                             type="text"
                             name="account_lvl2"
                             className="form-control"
-                            placeholder="Account lvl2"
+                            placeholder={t("accountLevel2")}
                             value={formData.account_lvl2}
                             onChange={handleChange}
                           />
                         </div>
                         <div className="form-group col-lg-3">
-                          <h6>Account lvl3</h6>
+                          <h6>{t("accountLevel3")}</h6>
                           <input
                             type="text"
                             name="account_lvl3"
                             className="form-control"
-                            placeholder="Account lvl3"
+                            placeholder={t("accountLevel3")}
                             value={formData.account_lvl3}
                             onChange={handleChange}
                           />
@@ -131,34 +134,34 @@ const CreateAccounts = () => {
                       </div>
                       <div className="row">
                         <div className="form-group col-lg-3">
-                          <h6>Account lvl4</h6>
+                          <h6>{t("accountLevel4")}</h6>
                           <input
                             type="text"
                             name="account_lvl4"
                             className="form-control"
-                            placeholder="Account lvl4"
+                            placeholder={t("accountLevel4")}
                             value={formData.account_lvl4}
                             onChange={handleChange}
                           />
                         </div>
                         <div className="form-group col-lg-3">
-                          <h6>Type Name (en)</h6>
+                          <h6>{t("typeNameEn")}</h6>
                           <input
                             type="text"
                             name="type_name_en"
                             className="form-control"
-                            placeholder="Type Name (en)"
+                            placeholder={t("typeNameEn")}
                             value={formData.type_name_en}
                             onChange={handleChange}
                           />
                         </div>
                         <div className="form-group col-lg-3">
-                          <h6>Type Name (th)</h6>
+                          <h6> {t("typeNameTh")}</h6>
                           <input
                             type="text"
                             name="type_name_th"
                             className="form-control"
-                            placeholder="Type Name (th)"
+                            placeholder={t("typeNameTh")}
                             value={formData.type_name_th}
                             onChange={handleChange}
                           />
@@ -166,10 +169,10 @@ const CreateAccounts = () => {
                       </div>
                       <div className="card-footer text-center">
                         <button className="btn btn-primary" type="submit">
-                          Create
+                          {t("create")}
                         </button>
                         <Link className="btn btn-danger" to="/accounts">
-                          Cancel
+                          {t("cancel")}
                         </Link>
                       </div>
                     </form>

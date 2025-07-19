@@ -7,8 +7,10 @@ import { Card } from "../../../card";
 import { useQuery } from "react-query";
 import { ComboBox } from "../../combobox";
 import { Autocomplete, TextField } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const AddAirline = () => {
+  const [t, i18n] = useTranslation("global");
   const { data: dummyData } = useQuery("Providerdropdown");
   const location = useLocation();
   const { from } = location.state || {};
@@ -36,7 +38,7 @@ const AddAirline = () => {
     axios
       .post(`${API_BASE_URL}/updateLiner`, state)
       .then((response) => {
-        toast[response.data.success ? "success" : "error"](
+        toast[response.data.success ? t("success") : /* t("error") */"error"](
           response.data.success ? "Success" : "Error",
           {
             autoClose: 1000,
@@ -56,9 +58,8 @@ const AddAirline = () => {
   ];
   return (
     <Card
-      title={`Liner Management / ${
-        typeof state.liner_id !== "undefined" ? "Update" : "Create"
-      } Form`}
+      title={`${t("liner_management")} / ${typeof state.liner_id !== "undefined" ? t("update") : t("create")
+        } ${t("form")}`}
     >
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
@@ -71,29 +72,29 @@ const AddAirline = () => {
                 <form action="">
                   <div className="row justify-content-center">
                     <div className="form-group col-lg-3">
-                      <h6>Name</h6>
+                      <h6>{t("name")}</h6>
                       <input
                         type="text"
                         name="liner_name"
                         className="form-control"
-                        placeholder="name"
+                        placeholder={t("name")}
                         onChange={handleChange}
                         value={state.liner_name}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Code</h6>
+                      <h6>{t("code")}</h6>
                       <input
                         type="text"
                         name="liner_code"
                         className="form-control"
-                        placeholder="code"
+                        placeholder={t("code")}
                         onChange={handleChange}
                         value={state.liner_code}
                       />
                     </div>
                     <div className="form-group col-lg-3 radioLiner autoComplete">
-                      <h6>Liner Type</h6>
+                      <h6>{t("linerType")}</h6>
                       {/* <select
                         value={state.liner_type_id}
                         name="liner_type_id"
@@ -124,13 +125,13 @@ const AddAirline = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Liner Type" // Placeholder text
+                            placeholder={t("selectLinerType")} // Placeholder text
                           />
                         )}
                       />
                     </div>
                     <div className="col-lg-4 form-group autoComplete">
-                      <h6>Preferred Provider</h6>
+                      <h6>{t("preferredProvider")}</h6>
                       {/* <ComboBox
                         options={dummyData?.map((v) => ({
                           id: v.vendor_id,
@@ -180,7 +181,7 @@ const AddAirline = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Preferred Supplier"
+                            placeholder={t("selectSupplier")}
                             variant="outlined"
                           />
                         )}
@@ -207,10 +208,10 @@ const AddAirline = () => {
                 onClick={update}
                 name="signup"
               >
-                {typeof state.liner_id !== "undefined" ? "Update" : "Create"}
+                {typeof state.liner_id !== "undefined" ? t("update") : t("create")}
               </button>
               <Link className="btn btn-danger" to="/airlineNew">
-                Cancel
+                {t("cancel")}
               </Link>
             </div>
           </div>

@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { TableView } from "../../table";
+import { useTranslation } from "react-i18next";
 
 const EanNew = () => {
+  const { t } = useTranslation("global");
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(true);
   const navigate = useNavigate();
@@ -37,7 +39,7 @@ const EanNew = () => {
       .then((resp) => {
         // console.log(resp, "Check Resp")
         if (resp.data.success == true) {
-          toast.success("Status Updated Successfully", {
+          toast.success(t("statusUpdated"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -53,12 +55,12 @@ const EanNew = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Name",
+        Header: t("name"),
         accessor: "EAN_Internal_EN",
       },
 
       {
-        Header: "EAN Code",
+        Header: t("eanCode"),
         accessor: (a) => (
           <div>
             <Barcode width={0.8} height={30} value={a.EANCODE} />
@@ -67,17 +69,17 @@ const EanNew = () => {
       },
 
       {
-        Header: "Net Weight",
+        Header: t("netWeight"),
         accessor: (a) => <div>{a.NW}</div>,
       },
 
       {
-        Header: "Gross Weight",
+        Header: t("grossWeight"),
         accessor: (a) => <div>{a.GW}</div>,
       },
 
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -98,8 +100,8 @@ const EanNew = () => {
               type="checkbox"
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")}</span>
+              <span>{t("on")}</span>
             </span>
             <a></a>
           </label>
@@ -107,7 +109,7 @@ const EanNew = () => {
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <Link to="/update_ean" state={{ from: a }}>
             <i
@@ -129,19 +131,19 @@ const EanNew = () => {
       //   accessor: (a) => <>{"10000000"}</>,
       // },
     ],
-    []
+    [t]
   );
 
   return (
     <Card
-      title={"EAN Setup Management"}
+      title={t("EAN_Setup_Management")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/add_ean")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

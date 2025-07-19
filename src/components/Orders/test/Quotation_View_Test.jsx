@@ -4,7 +4,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../../Url/Url";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 const Quotation_View_Test = () => {
+  
+const { t, i18n } = useTranslation("global");
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -81,7 +84,7 @@ const Quotation_View_Test = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <h6 className="font-weight-bolder mb-0 pt-2">
-                        Quotation / View Form
+                     {t("quotationViewForm")}
                       </h6>
                     </div>
                   </div>
@@ -527,7 +530,7 @@ const Quotation_View_Test = () => {
                 Create
               </button> */}
               <Link className="btn btn-danger" to={"/quotation"}>
-                Close
+             {t("close")}
               </Link>
             </div>
           </div>

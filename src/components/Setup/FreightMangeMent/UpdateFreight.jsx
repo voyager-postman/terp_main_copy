@@ -5,7 +5,10 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { toast } from "react-toastify";
 import MySwal from "../../../swal";
+import { useTranslation } from "react-i18next";
+
 const UpdateFreight = () => {
+  const { t } = useTranslation("global");
   const location = useLocation();
   const { from } = location.state || {};
   console.log(from);
@@ -64,7 +67,7 @@ const UpdateFreight = () => {
       })
       .then((response) => {
         if (response.data.success == true) {
-          toast.success("Freight Added Successfully", {
+          toast.success(t("freightAddSuccess"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -105,7 +108,7 @@ const UpdateFreight = () => {
       })
       .then((response) => {
         console.log(response);
-        toast.success("Freight  Update Successfully", {
+        toast.success(t("freightUpdateSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -118,14 +121,14 @@ const UpdateFreight = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Something went Wrong ");
+        toast.error(t("genericError"));
       });
   };
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -143,9 +146,9 @@ const UpdateFreight = () => {
           );
           console.log(response);
           tableData();
-          toast.success("Freight delete successfully");
+          toast.success(t("freightDeleteSuccess"));
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("genericError"));
         }
       }
     });
@@ -168,7 +171,7 @@ const UpdateFreight = () => {
         console.log(response);
         setMinWeight1("");
         setRate1("");
-        toast.success("Freight Added Successfully", {
+        toast.success(t("freightAddSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -181,7 +184,7 @@ const UpdateFreight = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Something went Wrong ");
+        toast.error(t("genericError"));
       });
   };
 
@@ -217,7 +220,7 @@ const UpdateFreight = () => {
       });
   }, []);
   return (
-    <Card title={`Frieght Management / ${from?.ID ? "Update" : "Edit"} Form`}>
+    <Card title={` ${t("freightManagement")}/ ${from?.ID ? t("update") : t("edit")} ${t("form")}`}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -231,21 +234,21 @@ const UpdateFreight = () => {
                   <div>
                     <div className=" d-flex">
                       <div className=" d-flex pe-5">
-                        <h6 className="me-2">Vendor : </h6>
+                        <h6 className="me-2"> {t("vendor")} : </h6>
                         <p> {from?.Freight_provider_name}</p>
                       </div>
                       <div className=" d-flex">
-                        <h6 className="me-2">Liner : </h6>
+                        <h6 className="me-2">  {t("liner")}: </h6>
                         <p>{from?.Airline}</p>
                       </div>
                     </div>
                     <div className=" d-flex">
                       <div className=" d-flex pe-5">
-                        <h6 className="me-2">Port of Origin : </h6>
+                        <h6 className="me-2"> {t("portOfOrigin")} : </h6>
                         <p> {from?.FromPort}</p>
                       </div>
                       <div className=" d-flex">
-                        <h6 className="me-2">Destination Port : </h6>
+                        <h6 className="me-2">{t("destinationPort")} : </h6>
                         <p> {from?.DestinationPort}</p>
                       </div>
                     </div>
@@ -259,7 +262,7 @@ const UpdateFreight = () => {
                   data-bs-toggle="modal"
                   data-bs-target="#exampleModal1"
                 >
-                  Add
+                  {t("add")}
                 </button>
                 <div
                   className="modal fade"
@@ -272,7 +275,7 @@ const UpdateFreight = () => {
                     <div className="modal-content">
                       <div className="modal-header">
                         <h1 className="modal-title fs-5" id="exampleModalLabel">
-                          ADD Freight
+                          {t("addFreight")}
                         </h1>
                         <button
                           type="button"
@@ -290,7 +293,7 @@ const UpdateFreight = () => {
                             <div className="form-group">
                               <div className="row">
                                 <div className="col-lg-6">
-                                  <h6>Min Weight</h6>
+                                  <h6>{t("minWeight")}</h6>
                                   <div>
                                     <input
                                       type="text"
@@ -302,7 +305,7 @@ const UpdateFreight = () => {
                                   </div>
                                 </div>
                                 <div className="col-lg-6">
-                                  <h6>Rate</h6>
+                                  <h6> {t("rate")}</h6>
                                   <div>
                                     <input
                                       type="text"
@@ -322,7 +325,7 @@ const UpdateFreight = () => {
                           className="btn btn-primary"
                           onClick={updateData1}
                         >
-                          Add
+                          {t("add")}
                         </button>
                       </div>
                     </div>
@@ -338,9 +341,9 @@ const UpdateFreight = () => {
                     style={{ width: "100%" }}
                   >
                     <tr>
-                      <th>Min Weight</th>
-                      <th>Rate</th>
-                      <th>Action</th>
+                      <th>{t("minWeight")}</th>
+                      <th> {t("rate")}</th>
+                      <th> {t("action")}</th>
                     </tr>
 
                     {tableList?.map((item, index) => (
@@ -403,7 +406,7 @@ const UpdateFreight = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h1 className="modal-title fs-5" id="exampleModalLabel">
-                      Edit Freight
+                      {t("editFreight")}
                     </h1>
                     <button
                       type="button"
@@ -421,7 +424,7 @@ const UpdateFreight = () => {
                           <div className="form-group">
                             <div className="row">
                               <div className="col-lg-6">
-                                <h6>Min Weight</h6>
+                                <h6>{t("minWeight")}</h6>
                                 <div>
                                   <input
                                     type="text"
@@ -433,7 +436,7 @@ const UpdateFreight = () => {
                                 </div>
                               </div>
                               <div className="col-lg-6">
-                                <h6>Rate</h6>
+                                <h6> {t("rate")}</h6>
                                 <div>
                                   <input
                                     type="text"
@@ -454,14 +457,14 @@ const UpdateFreight = () => {
                       className="btn btn-primary"
                       onClick={updateData}
                     >
-                      Update
+                      {t("update")}
                     </button>
                   </div>
                 </div>
               </div>
             </div>
             <Link className="btn btn-danger" to={"/freightNew"}>
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>

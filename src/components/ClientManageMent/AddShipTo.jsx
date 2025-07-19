@@ -1,4 +1,4 @@
-import axios from "axios";
+  import axios from "axios";
 import { useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -13,7 +13,9 @@ import "jspdf-autotable";
 import { Card } from "../../card";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { useTranslation } from "react-i18next";
 const AddShipTo = () => {
+  const [t, i18n] = useTranslation("global");
   const [unitDropdown, setUnitDropDown] = useState([]);
   const getUnitDropdown = () => {
     axios
@@ -208,11 +210,11 @@ const AddShipTo = () => {
     console.log("confirm data is", obj);
 
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
 
@@ -236,28 +238,28 @@ const AddShipTo = () => {
       console.log("API Response:", response.data.data);
       setBoxsData(response.data.data);
       // Handle success
-      toast.success("Data fetched successfully!");
+      toast.success(t("dataFetchedSuccess"));
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Failed to fetch data. Please try again.");
+      toast.error(t("failedToFetch"));
     }
   };
   const confirmData1 = async () => {
     // Validation checks
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
     if (!date3) {
-      toast.error("Compare Start DATE is required");
+      toast.error(t("compareStartDateRequired"));
       return;
     }
     if (!date4) {
-      toast.error("Compare End DATE is required");
+      toast.error(t("compareEndDateRequired"));
       return;
     }
 
@@ -280,10 +282,10 @@ const AddShipTo = () => {
       );
       console.log("API Response:", response);
       setTopFiveValue(response.data);
-      toast.success("Data fetched successfully!");
+      toast.success(t("dataFetchedSuccess"));
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Failed to fetch data. Please try again.");
+      toast.error(t("dataFetchFailed"));
     }
   };
 
@@ -453,28 +455,28 @@ const AddShipTo = () => {
       );
       console.log("API Response:", response);
 
-      toast.success("invoice Setup update Successfully");
+      toast.success(t("invoiceSetupUpdated"));
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Failed to fetch data. Please try again.");
+      toast.error(t("fetchDataFailed"));
     }
   };
 
   const confirmData2 = () => {
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
     if (!date3) {
-      toast.error("Compare Start DATE is required");
+      toast.error(t("compareStartDateRequired"));
       return;
     }
     if (!date4) {
-      toast.error("Compare End DATE is required");
+      toast.error(t("compareEndDateRequired"));
       return;
     }
 
@@ -583,7 +585,7 @@ const AddShipTo = () => {
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
-        toast.error("An error occurred while fetching data.");
+        toast.error(t("fetchDataFailed"));
       });
   };
 
@@ -713,14 +715,14 @@ const AddShipTo = () => {
       .then(() => {
         oneQoutationData();
         getCongineeDetails1();
-        toast.success("Updated successfully", {
+        toast.success(t("updatedSuccessfully"), {
           autoClose: 1000,
           theme: "colored",
         });
       })
       .catch((error) => {
         console.error("Error updating data:", error);
-        toast.error("Update failed", {
+        toast.error(t("updateFailed"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -728,7 +730,6 @@ const AddShipTo = () => {
   };
   const handleChange5 = (e) => {
     const { name, type, checked, value } = e.target;
-
     if (name === "commissionCurrency") {
       // Toggle between "THB" and "FX"
       setState5((prevState) => ({
@@ -1325,8 +1326,8 @@ const AddShipTo = () => {
   const deleteOrder1 = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -1344,9 +1345,9 @@ const AddShipTo = () => {
           );
           console.log(response);
           getAllContact();
-          toast.success("Contact delete successfully");
+          toast.success(t("contactDeletedSuccessfully"));
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("genericError"));
         }
       }
     });
@@ -1354,8 +1355,8 @@ const AddShipTo = () => {
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -1373,9 +1374,9 @@ const AddShipTo = () => {
           );
           console.log(response);
           getAllCustomization();
-          toast.success("Order delete successfully");
+          toast.success(t("orderDeleted"));
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("genericError"));
         }
       }
     });
@@ -1383,7 +1384,7 @@ const AddShipTo = () => {
 
   const submitCustomizationData = () => {
     if (!dataCustomization.ITF) {
-      toast.warn("Please enter ITF", {
+      toast.warn(t("enterITF"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1391,7 +1392,7 @@ const AddShipTo = () => {
     }
 
     if (!dataCustomization.Unit) {
-      toast.warn("Please enter Unit", {
+      toast.warn(t("enterUnit"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1413,7 +1414,7 @@ const AddShipTo = () => {
       .then((response) => {
         if (response.data?.success) {
           console.log(response);
-          toast.success("Customization Data Added Successfully", {
+          toast.success(t("customizationAdd"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -1436,7 +1437,7 @@ const AddShipTo = () => {
           });
           getAllCustomization();
         } else {
-          toast.warn("This Consignee already has the specified ITF", {
+          toast.warn(t("itfExists"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -1444,7 +1445,7 @@ const AddShipTo = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1461,14 +1462,14 @@ const AddShipTo = () => {
       )
       .then((response) => {
         navigate("/shipToNew");
-        toast.success("Updated", {
+        toast.success(t("updatedSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1503,14 +1504,14 @@ const AddShipTo = () => {
         console.log(response);
         oneQoutationData();
         getCongineeDetails1();
-        toast.success("Updated", {
+        toast.success(t("updatedSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
       })
       .catch((error) => {
         console.error(error); // Use console.error for better error tracking
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1520,7 +1521,7 @@ const AddShipTo = () => {
 
   const customizationDataSubmit = (e) => {
     if (!dataCustomization.ITF) {
-      toast.warn("Please enter ITF", {
+      toast.warn(t("enterITF"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1528,7 +1529,7 @@ const AddShipTo = () => {
     }
 
     if (!dataCustomization.Unit) {
-      toast.warn("Please enter Unit", {
+      toast.warn(t("enterUnit"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1542,7 +1543,7 @@ const AddShipTo = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Customize Update  Successfully", {
+        toast.success(t("customizeUpdateSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1567,7 +1568,7 @@ const AddShipTo = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1582,7 +1583,7 @@ const AddShipTo = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Contact added Successfully", {
+        toast.success(t("contactAddSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1611,7 +1612,7 @@ const AddShipTo = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1627,7 +1628,7 @@ const AddShipTo = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Contact Update Successfully", {
+        toast.success(t("contactUpdate"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1656,7 +1657,7 @@ const AddShipTo = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1737,13 +1738,19 @@ const AddShipTo = () => {
   useEffect(() => {
     orderData2();
   }, []);
-  const [chartOptions, setChartOptions] = useState({
-    series: [
-      {
-        name: "Produce Trend",
-        data: [],
-      },
-    ],
+ const [chartOptions, setChartOptions] = useState({
+  series: [
+    {
+      name: "Produce Trend",
+      data: [],
+    },
+  ],
+  options: {}, // initially empty
+});
+
+useEffect(() => {
+  setChartOptions((prev) => ({
+    ...prev,
     options: {
       chart: {
         type: "area",
@@ -1766,7 +1773,7 @@ const AddShipTo = () => {
         size: 0,
       },
       title: {
-        text: "Produce Price Consignee",
+        text: t("producePriceConsignee"),
         align: "left",
       },
       fill: {
@@ -1781,7 +1788,7 @@ const AddShipTo = () => {
       },
       yaxis: {
         title: {
-          text: "Price",
+          text: t("price"),
         },
       },
       xaxis: {
@@ -1791,7 +1798,7 @@ const AddShipTo = () => {
             const date = new Date(val);
             const day = date.getDate();
             const month = date.toLocaleString("default", { month: "short" });
-            return `${day} ${month}`; // e.g., "12 Jul"
+            return `${day} ${month}`;
           },
         },
       },
@@ -1804,10 +1811,14 @@ const AddShipTo = () => {
         },
       },
     },
-  });
+  }));
+}, [t]); // run again if t() changes due to language switch
+
   return (
     <Card
-      title={`Consignee To / ${from?.consignee_id ? "Update" : "Create"} Form`}
+      title={`${t("consignee")} / ${
+        from?.consignee_id ? t("update") : t("create")
+      } ${t("form")}`}
     >
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
@@ -1823,7 +1834,7 @@ const AddShipTo = () => {
                   role="tab"
                   aria-controls="first-tab-pane"
                 >
-                  Details
+                  {t("details")}
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -1836,7 +1847,7 @@ const AddShipTo = () => {
                   role="tab"
                   aria-controls="home-tab-pane"
                 >
-                  Contact
+                  {t("contact")}
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -1850,7 +1861,7 @@ const AddShipTo = () => {
                   aria-controls="profile-tab-pane"
                   aria-selected="false"
                 >
-                  Customization
+                  {t("customization")}
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -1863,7 +1874,7 @@ const AddShipTo = () => {
                   role="tab"
                   aria-controls="notify-tab-pane"
                 >
-                  Notify
+                  {t("notify")}
                 </button>
               </li>
               {localStorage.getItem("level") !== "Level 5" && (
@@ -1879,7 +1890,7 @@ const AddShipTo = () => {
                       aria-controls="contact-tab-pane"
                       aria-selected="false"
                     >
-                      Portfolio
+                      {t("portfolio")}
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
@@ -1893,7 +1904,7 @@ const AddShipTo = () => {
                       aria-controls="margins-tab-pane"
                       aria-selected="false"
                     >
-                      Margins and Payments
+                      {t("marginsAndPayments")}
                     </button>
                   </li>
                 </>
@@ -1909,7 +1920,7 @@ const AddShipTo = () => {
                   aria-controls="invoiceSetup-tab-pane"
                   aria-selected="false"
                 >
-                  Invoice Setup
+                  {t("invoiceSetup")}
                 </button>
               </li>
             </ul>
@@ -1926,7 +1937,7 @@ const AddShipTo = () => {
                   <div className="row">
                     <div className="form-group col-lg-6 ">
                       <div className="invoiceModal d-flex justify-content-between invoiceShip">
-                        <h6> Use Agreed pricing ?</h6>
+                        <h6>{t("useAgreedPricing")}</h6>
                         <div>
                           <label
                             className="toggleSwitch large"
@@ -1944,15 +1955,15 @@ const AddShipTo = () => {
                               onChange={handleAgreedPricingChange}
                             />
                             <span>
-                              <span>No</span>
-                              <span> Yes</span>
+                              <span>{t("no")}</span>
+                              <span>{t("yes")}</span>
                             </span>
                             <a> </a>
                           </label>
                         </div>
                       </div>
                       <div className="invoiceModal d-flex justify-content-between">
-                        <h6>Use custom name? </h6>
+                        <h6>{t("useCustomName")}</h6>
                         <div>
                           <label
                             className="toggleSwitch large"
@@ -1970,15 +1981,15 @@ const AddShipTo = () => {
                               onChange={handleAgreedPricingChange1}
                             />
                             <span>
-                              <span>No</span>
-                              <span> Yes</span>
+                              <span>{t("no")}</span>
+                              <span>{t("yes")}</span>
                             </span>
                             <a> </a>
                           </label>
                         </div>
                       </div>
                       <div className="invoiceModal d-flex justify-content-between  ">
-                        <h6>Show Gross weight and CBM ? </h6>
+                        <h6>{t("showGrossWeightAndCBM")} </h6>
                         <div>
                           <label
                             className="toggleSwitch large"
@@ -1996,15 +2007,15 @@ const AddShipTo = () => {
                               onChange={handleAgreedPricingChange2}
                             />
                             <span>
-                              <span>No</span>
-                              <span> Yes</span>
+                              <span>{t("no")}</span>
+                              <span>{t("yes")}</span>
                             </span>
                             <a> </a>
                           </label>
                         </div>
                       </div>
                       <div className="invoiceModal">
-                        <h6>Invoice Name Can be -</h6>
+                        <h6>{t("invoiceNameCanBe")} -</h6>
                         <input
                           type="radio"
                           id="html1"
@@ -2013,7 +2024,7 @@ const AddShipTo = () => {
                           checked={selectedInvoice === "Client"}
                           onChange={handleRadioChange}
                         />
-                        <label htmlFor="html1">Client</label>
+                        <label htmlFor="html1">{t("client")}</label>
                         <input
                           type="radio"
                           id="css1"
@@ -2022,10 +2033,10 @@ const AddShipTo = () => {
                           checked={selectedInvoice === "Consignee"}
                           onChange={handleRadioChange}
                         />
-                        <label htmlFor="css1">Consignee</label>
+                        <label htmlFor="css1">{t("consignee")}</label>
                       </div>
                       <div className="invoiceModal d-flex justify-content-between">
-                        <h6>Show exchange rate ? </h6>
+                        <h6>{t("showExchangeRate")} </h6>
                         <div>
                           <label
                             className="toggleSwitch large"
@@ -2043,15 +2054,15 @@ const AddShipTo = () => {
                               onChange={handleAgreedPricingChange3}
                             />
                             <span>
-                              <span>No</span>
-                              <span> Yes</span>
+                              <span>{t("no")}</span>
+                              <span>{t("yes")}</span>
                             </span>
                             <a> </a>
                           </label>
                         </div>
                       </div>
                       <div className="invoiceModal">
-                        <h6>Delivery Terms - </h6>
+                        <h6>{t("deliveryTerms")} -</h6>
                         <input
                           type="radio"
                           id="cif"
@@ -2060,7 +2071,7 @@ const AddShipTo = () => {
                           checked={selectedDeliveryTerm === "CIF"}
                           onChange={handleChange7}
                         />
-                        <label htmlFor="cif">CIF</label>
+                        <label htmlFor="cif">{t("cif")}</label>
                         <input
                           type="radio"
                           id="cnf"
@@ -2069,7 +2080,7 @@ const AddShipTo = () => {
                           checked={selectedDeliveryTerm === "CNF"}
                           onChange={handleChange7}
                         />
-                        <label htmlFor="cnf">CNF</label>
+                        <label htmlFor="cnf">{t("cnf")}</label>
                         <input
                           type="radio"
                           id="dap"
@@ -2078,7 +2089,7 @@ const AddShipTo = () => {
                           checked={selectedDeliveryTerm === "DAP"}
                           onChange={handleChange7}
                         />
-                        <label htmlFor="dap">DAP</label>
+                        <label htmlFor="dap">{t("dap")}</label>
                         <input
                           type="radio"
                           id="fob"
@@ -2087,11 +2098,11 @@ const AddShipTo = () => {
                           checked={selectedDeliveryTerm === "FOB"}
                           onChange={handleChange7}
                         />
-                        <label htmlFor="fob">FOB</label>
+                        <label htmlFor="fob">{t("fob")}</label>
                       </div>
 
                       <div className="invoiceModal d-flex justify-content-between">
-                        <h6>Barcode </h6>
+                        <h6>{t("barcode")} </h6>
                         <div>
                           <label
                             className="toggleSwitch large"
@@ -2109,8 +2120,8 @@ const AddShipTo = () => {
                               onChange={handleAgreedPricingChange4}
                             />
                             <span>
-                              <span>No</span>
-                              <span> Yes</span>
+                              <span>{t("no")}</span>
+                              <span>{t("yes")}</span>
                             </span>
                             <a> </a>
                           </label>
@@ -2118,7 +2129,8 @@ const AddShipTo = () => {
                       </div>
 
                       <div className="invoiceModal">
-                        <h6> Invoice Options</h6>
+                        <h6>{t("invoiceOptions")}</h6>
+
                         <input
                           type="radio"
                           id="fob"
@@ -2127,7 +2139,7 @@ const AddShipTo = () => {
                           checked={selectedInvoiceOrder === "invoice only"}
                           onChange={handleChange8}
                         />
-                        <label htmlFor="invoiceOnly">Invoice Only</label>
+                        <label htmlFor="invoiceOnly">{t("invoiceOnly")}</label>
 
                         <input
                           type="radio"
@@ -2138,7 +2150,7 @@ const AddShipTo = () => {
                           onChange={handleChange8}
                         />
                         <label htmlFor="packingListOnly">
-                          Packing list Only
+                          {t("packingListOnly")}
                         </label>
 
                         <input
@@ -2152,7 +2164,7 @@ const AddShipTo = () => {
                           onChange={handleChange8}
                         />
                         <label htmlFor="invoicePackingList">
-                          Invoice and packing list
+                          {t("invoiceAndPackingList")}
                         </label>
                       </div>
                       <div className="card-footer ">
@@ -2160,7 +2172,7 @@ const AddShipTo = () => {
                           className="btn btn-primary"
                           onClick={updatedata}
                         >
-                          Update
+                          {t("update")}
                         </button>
                       </div>
                     </div>
@@ -2183,7 +2195,7 @@ const AddShipTo = () => {
                     <form action="">
                       <div className="row">
                         <div className="form-group col-lg-4 autoComplete">
-                          <h6> Client</h6>
+                          <h6>{t("client")}</h6>
                           <div className=" ">
                             <Autocomplete
                               options={client || []} // List of client options
@@ -2201,7 +2213,7 @@ const AddShipTo = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Client"
+                                  placeholder={t("selectClient")}
                                   variant="outlined"
                                 />
                               )}
@@ -2217,7 +2229,7 @@ const AddShipTo = () => {
                           </div>
                         </div>
                         <div className="form-group col-lg-4">
-                          <h6>Code</h6>
+                          <h6>{t("code")}</h6>
                           <input
                             type="text"
                             name="CODE"
@@ -2227,7 +2239,7 @@ const AddShipTo = () => {
                           />
                         </div>
                         <div className="form-group col-lg-4">
-                          <h6>Name</h6>
+                          <h6>{t("name")}</h6>
                           <input
                             type="text"
                             name="consignee_name"
@@ -2239,7 +2251,7 @@ const AddShipTo = () => {
 
                         <div className="form-group col-lg-4">
                           <div>
-                            <h6>Address</h6>
+                            <h6>{t("address")}</h6>
                             <input
                               name="consignee_address"
                               className="border-2 rounded-md border-[#203764] w-full"
@@ -2274,7 +2286,7 @@ const AddShipTo = () => {
                         </div>
                         <div className="form-group col-lg-4">
                           <div>
-                            <h6>Tax Number</h6>
+                            <h6>{t("taxNumber")}</h6>
                             <input
                               type="text"
                               className="w-full"
@@ -2284,7 +2296,7 @@ const AddShipTo = () => {
                             />
                           </div>
                           <div>
-                            <h6>Phone Number</h6>
+                            <h6>{t("phoneNumber")}</h6>
                             <input
                               type="text"
                               className="w-full"
@@ -2296,7 +2308,7 @@ const AddShipTo = () => {
                         </div>
 
                         <div className="form-group col-lg-4">
-                          <h6> Brand</h6>
+                          <h6>{t("brand")}</h6>
                           <div className="ceateTransport autoComplete mb-2">
                             <Autocomplete
                               options={brands || []} // List of brand options
@@ -2312,7 +2324,7 @@ const AddShipTo = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Brand"
+                                  placeholder={t("selectBrand")}
                                   variant="outlined"
                                 />
                               )}
@@ -2327,7 +2339,7 @@ const AddShipTo = () => {
                             />
                           </div>
                           <div>
-                            <h6>Email</h6>
+                            <h6>{t("email")}</h6>
                             <input
                               type="email"
                               className="w-full"
@@ -2339,8 +2351,7 @@ const AddShipTo = () => {
                         </div>
 
                         <div className="form-group col-lg-3">
-                          <h6> Location</h6>
-
+                          <h6>{t("location")}</h6>
                           <div className="ceateTransport autoComplete">
                             <Autocomplete
                               options={locations || []} // List of location options
@@ -2356,7 +2367,7 @@ const AddShipTo = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Location"
+                                  placeholder={t("selectLocation")}
                                   variant="outlined"
                                 />
                               )}
@@ -2372,7 +2383,7 @@ const AddShipTo = () => {
                           </div>
                         </div>
                         <div className="form-group col-lg-3">
-                          <h6> Port of origin</h6>
+                          <h6>{t("portOfOrigin")}</h6>
                           <div className="ceateTransport autoComplete">
                             <Autocomplete
                               options={port || []} // List of port options
@@ -2390,7 +2401,7 @@ const AddShipTo = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Airport"
+                                  placeholder={t("selectAirport")}
                                   variant="outlined"
                                 />
                               )}
@@ -2406,7 +2417,7 @@ const AddShipTo = () => {
                           </div>
                         </div>
                         <div className="form-group col-lg-3 autoComplete">
-                          <h6> Port of Destination</h6>
+                          <h6>{t("portOfDestination")}</h6>
                           <div className="ceateTransport">
                             <Autocomplete
                               options={port || []} // List of port options
@@ -2424,7 +2435,7 @@ const AddShipTo = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Airport"
+                                  placeholder={t("selectAirport")}
                                   variant="outlined"
                                 />
                               )}
@@ -2441,7 +2452,7 @@ const AddShipTo = () => {
                           </div>
                         </div>
                         <div className="form-group col-lg-3">
-                          <h6> Airline</h6>
+                          <h6>{t("airline")}</h6>
                           <div className="ceateTransport autoComplete">
                             <Autocomplete
                               options={liner || []} // List of airline options
@@ -2459,7 +2470,7 @@ const AddShipTo = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Please Select Airline"
+                                  placeholder={t("selectAirline")}
                                   variant="outlined"
                                 />
                               )}
@@ -2484,43 +2495,42 @@ const AddShipTo = () => {
                               fontSize: "20px",
                             }}
                           >
-                            Bank Informations
+                            {t("bankInformations")}
                           </h6>
                           <div className="row ">
                             <div className="form-group col-lg-4">
-                              <h6>Bank Name</h6>
-
+                              <h6>{t("bankName")}</h6>
                               <input
                                 onChange={handleChange}
                                 type="text"
                                 id="name_en"
                                 name="client_bank_account"
                                 className="form-control"
-                                placeholder="axis "
+                                placeholder={t("bankName")}
                                 value={state.client_bank_account}
                               />
                             </div>
                             <div className="form-group col-lg-4">
-                              <h6>Account Name</h6>
+                              <h6>{t("accountName")}</h6>
                               <input
                                 onChange={handleChange}
                                 type="text"
                                 id="name_en"
                                 name="client_bank_name"
                                 className="form-control"
-                                placeholder="xxxxx "
+                                placeholder={t("accountName")}
                                 value={state.client_bank_name}
                               />
                             </div>
                             <div className="form-group col-lg-4">
-                              <h6>Account Number</h6>
+                              <h6>{t("accountNumber")}</h6>
                               <input
                                 onChange={handleChange}
                                 type="text"
                                 id="name_en"
                                 name="client_bank_number"
                                 className="form-control"
-                                placeholder="3345345435 "
+                                placeholder={t("accountNumber")}
                                 value={state.client_bank_number}
                               />
                             </div>
@@ -2535,10 +2545,10 @@ const AddShipTo = () => {
                       onClick={update}
                       type="button"
                     >
-                      {from?.consignee_id ? "Update" : "Create"}
+                      {from?.consignee_id ? t("update") : t("create")}
                     </button>
                     <Link className="btn btn-danger" to="/shipToNew">
-                      Cancel
+                      {t("cancel")}
                     </Link>
                   </div>
                 </div>
@@ -2553,14 +2563,14 @@ const AddShipTo = () => {
                 <div className="table-responsive">
                   <table className="  tableContact striped  table borderTerpProduce">
                     <tr className="">
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Nick Name</th>
-                      <th>Position </th>
-                      <th>Type</th>
-                      <th>Email</th>
-                      <th>Mobile</th>
-                      <th>Action</th>
+                      <th>{t("firstName")}</th>
+                      <th>{t("lastName")}</th>
+                      <th>{t("nickName")}</th>
+                      <th>{t("position")}</th>
+                      <th>{t("type")}</th>
+                      <th>{t("email")}</th>
+                      <th>{t("mobile")}</th>
+                      <th>{t("action")}</th>
                     </tr>
 
                     {data?.map((item) => {
@@ -2600,7 +2610,7 @@ const AddShipTo = () => {
                                         class="modal-title fs-5"
                                         id="exampleModalLabel"
                                       >
-                                        Contact Update
+                                        {t("contactUp")}
                                       </h1>
                                       <button
                                         type="button"
@@ -2617,7 +2627,7 @@ const AddShipTo = () => {
                                         <form action="">
                                           <div className="row">
                                             <div class="form-group col-lg-3">
-                                              <h6>Contact Type </h6>
+                                              <h6>{t("contactType")}</h6>
                                               <div class="ceateTransport autoComplete">
                                                 {/* <select
                                                   name="contact_type_id"
@@ -2663,7 +2673,9 @@ const AddShipTo = () => {
                                                   renderInput={(params) => (
                                                     <TextField
                                                       {...params}
-                                                      placeholder="Select Type"
+                                                      placeholder={t(
+                                                        "selectType"
+                                                      )}
                                                       InputLabelProps={{
                                                         shrink: false,
                                                       }}
@@ -2673,104 +2685,104 @@ const AddShipTo = () => {
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6> First Name </h6>
+                                              <h6>{t("firstName")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="text"
                                                   name="first_name"
                                                   onChange={handleChange1}
                                                   value={state1.first_name}
-                                                  placeholder="first name"
+                                                  placeholder={t("firstName")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Last Name </h6>
+                                              <h6>{t("lastName")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="text"
                                                   name="last_name"
                                                   onChange={handleChange1}
                                                   value={state1.last_name}
-                                                  placeholder="last name"
+                                                  placeholder={t("lastName")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Nick Name</h6>
+                                              <h6>{t("nickName")}</h6>
                                               <div>
                                                 <input
                                                   type="text"
                                                   name="Nick_name"
                                                   onChange={handleChange1}
                                                   value={state1.Nick_name}
-                                                  placeholder="nick name"
+                                                  placeholder={t("nickName")}
                                                 />
                                               </div>
                                             </div>
 
                                             <div class="form-group col-lg-3">
-                                              <h6>Position </h6>
+                                              <h6>{t("position")} </h6>
                                               <div class=" ">
                                                 <input
                                                   type="text"
                                                   name="position"
                                                   onChange={handleChange1}
                                                   value={state1.position}
-                                                  placeholder="position"
+                                                  placeholder={t("position")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Email</h6>
+                                              <h6>{t("email")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="email"
                                                   name="Email"
                                                   onChange={handleChange1}
                                                   value={state1.Email}
-                                                  placeholder="email"
+                                                  placeholder={t("email")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Mobile</h6>
+                                              <h6>{t("mobile")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="number"
                                                   name="mobile"
                                                   onChange={handleChange1}
                                                   value={state1.mobile}
-                                                  placeholder="mobile"
+                                                  placeholder={t("mobile")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Landline</h6>
+                                              <h6>{t("landline")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="number"
                                                   name="landline"
                                                   onChange={handleChange1}
                                                   value={state1.landline}
-                                                  placeholder="landline"
+                                                  placeholder={t("landline")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-4">
-                                              <h6>Birthday</h6>
+                                              <h6>{t("birthday")}</h6>
                                               <div>
                                                 <input
                                                   type="date"
                                                   name="birthday"
                                                   onChange={handleChange1}
                                                   value={state1.birthday}
-                                                  placeholder="birthday"
+                                                  placeholder={t("birthday")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-8">
-                                              <h6>Notes</h6>
+                                              <h6>{t("notes")}</h6>
                                               <div>
                                                 <textarea
                                                   name="Notes"
@@ -2791,7 +2803,7 @@ const AddShipTo = () => {
                                         type="button"
                                         class="btn btn-primary mb-0"
                                       >
-                                        Update
+                                        {t("update")}
                                       </button>
                                     </div>
                                   </div>
@@ -2820,7 +2832,7 @@ const AddShipTo = () => {
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModalContact"
                   >
-                    Add Contact
+                    {t("addContact")}
                   </Link>
                   {/* modal */}
                   <div
@@ -2834,7 +2846,7 @@ const AddShipTo = () => {
                       <div class="modal-content">
                         <div class="modal-header">
                           <h1 class="modal-title fs-5" id="exampleModalLabel">
-                            Contact
+                            {t("contact")}
                           </h1>
                           <button
                             type="button"
@@ -2850,7 +2862,7 @@ const AddShipTo = () => {
                             <form action="">
                               <div className="row">
                                 <div class="form-group col-lg-3">
-                                  <h6>Contact Type </h6>
+                                  <h6>{t("contactType")}</h6>
                                   <div class="ceateTransport autoComplete">
                                     <Autocomplete
                                       options={contactType || []} // List of contact types
@@ -2870,7 +2882,7 @@ const AddShipTo = () => {
                                       renderInput={(params) => (
                                         <TextField
                                           {...params}
-                                          placeholder="Select Type"
+                                          placeholder={t("selectType")}
                                           variant="outlined"
                                         />
                                       )}
@@ -2889,104 +2901,104 @@ const AddShipTo = () => {
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6> First Name </h6>
+                                  <h6> {t("firstName")} </h6>
                                   <div class=" ">
                                     <input
                                       type="text"
                                       name="first_name"
                                       onChange={handleChange1}
                                       value={state1.first_name}
-                                      placeholder="first name"
+                                      placeholder={t("firstName")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Last Name </h6>
+                                  <h6>{t("lastName")}</h6>
                                   <div class=" ">
                                     <input
                                       type="text"
                                       name="last_name"
                                       onChange={handleChange1}
                                       value={state1.last_name}
-                                      placeholder="last name"
+                                      placeholder={t("lastName")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Nick Name</h6>
+                                  <h6>{t("nickName")}</h6>
                                   <div>
                                     <input
                                       type="text"
                                       name="Nick_name"
                                       onChange={handleChange1}
                                       value={state1.Nick_name}
-                                      placeholder="nick name"
+                                      placeholder={t("nickName")}
                                     />
                                   </div>
                                 </div>
 
                                 <div class="form-group col-lg-3">
-                                  <h6>Position </h6>
+                                  <h6>{t("position")} </h6>
                                   <div class=" ">
                                     <input
                                       type="text"
                                       name="position"
                                       onChange={handleChange1}
                                       value={state1.position}
-                                      placeholder="position"
+                                      placeholder={t("position")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Email</h6>
+                                  <h6>{t("email")}</h6>
                                   <div class=" ">
                                     <input
                                       type="email"
                                       name="Email"
                                       onChange={handleChange1}
                                       value={state1.Email}
-                                      placeholder="email"
+                                      placeholder={t("email")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Mobile</h6>
+                                  <h6>{t("mobile")}</h6>
                                   <div class=" ">
                                     <input
                                       type="number"
                                       name="mobile"
                                       onChange={handleChange1}
                                       value={state1.mobile}
-                                      placeholder="mobile"
+                                      placeholder={t("mobile")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Landline</h6>
+                                  <h6>{t("landline")}</h6>
                                   <div class=" ">
                                     <input
                                       type="number"
                                       name="landline"
                                       onChange={handleChange1}
                                       value={state1.landline}
-                                      placeholder="landline"
+                                      placeholder={t("landline")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-4">
-                                  <h6>Birthday</h6>
+                                  <h6>{t("birthday")}</h6>
                                   <div>
                                     <input
                                       type="date"
                                       name="birthday"
                                       onChange={handleChange1}
                                       value={state1.birthday}
-                                      placeholder="birthday"
+                                      placeholder={t("birthday")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-8">
-                                  <h6>Notes</h6>
+                                  <h6>{t("notes")}</h6>
                                   <div>
                                     <textarea
                                       name="Notes"
@@ -3007,7 +3019,7 @@ const AddShipTo = () => {
                             class="btn btn-primary mb-0"
                             onClick={contactDataSubmit}
                           >
-                            Submit
+                            {t("submit")}
                           </button>
                         </div>
                       </div>
@@ -3027,7 +3039,7 @@ const AddShipTo = () => {
                 <div className="statisticsContent formCreate">
                   <div className="row">
                     <div className="form-group col-lg-6">
-                      <h6>Name</h6>
+                      <h6>{t("name")}</h6>
                       <input
                         type="text"
                         className="form-control"
@@ -3037,7 +3049,7 @@ const AddShipTo = () => {
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>Tax Number</h6>
+                      <h6>{t("taxNumber")}</h6>
                       <input
                         type="text"
                         className="form-control"
@@ -3047,7 +3059,7 @@ const AddShipTo = () => {
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>Email</h6>
+                      <h6>{t("email")}</h6>
                       <input
                         type="email"
                         className="form-control"
@@ -3057,7 +3069,7 @@ const AddShipTo = () => {
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>Phone Number</h6>
+                      <h6>{t("phoneNumber")}</h6>
                       <input
                         type="text"
                         className="form-control"
@@ -3067,7 +3079,7 @@ const AddShipTo = () => {
                       />
                     </div>
                     <div className="form-group col-lg-12">
-                      <h6>Address</h6>
+                      <h6>{t("address")}</h6>
                       <textarea
                         className="border-2 rounded-md border-[#203764] w-full"
                         value={formData.notify_address}
@@ -3083,10 +3095,10 @@ const AddShipTo = () => {
                     onClick={handleSubmit6}
                     type="button"
                   >
-                    {from?.consignee_id ? "Update" : "Create"}
+                    {from?.consignee_id ? t("update") : t("create")}
                   </button>
                   <Link className="btn btn-danger" to="/shipToNew">
-                    Cancel
+                    {t("cancel")}
                   </Link>
                 </div>
               </div>
@@ -3100,13 +3112,13 @@ const AddShipTo = () => {
                 <div className="table-responsive">
                   <table className="  tableContact striped  table borderTerpProduce">
                     <tr className="">
-                      <th> ITF Name</th>
-                      <th>Custom Name</th>
-                      <th>Dummy Price</th>
-                      <th>Brand</th>
-                      <th>Unit</th>
-                      <th>Barcode</th>
-                      <th>Action</th>
+                      <th>{t("itfName")}</th>
+                      <th>{t("customName")}</th>
+                      <th>{t("dummyPrice")}</th>
+                      <th>{t("brand")}</th>
+                      <th>{t("unit")}</th>
+                      <th>{t("barcode")}</th>
+                      <th>{t("action")}</th>
                     </tr>
                     {customization?.map((item) => {
                       return (
@@ -3143,7 +3155,7 @@ const AddShipTo = () => {
                                         className="modal-title fs-5"
                                         id="exampleModalLabel"
                                       >
-                                        Update customization
+                                        {t("updateCustomization")}
                                       </h1>
                                       <button
                                         type="button"
@@ -3159,7 +3171,7 @@ const AddShipTo = () => {
                                       <div className="formCreate">
                                         <div className="row">
                                           <div className="form-group col-lg-12 mb-2">
-                                            <h6>ITF Name </h6>
+                                            <h6>{t("itfName")}</h6>
                                             <div className="ceateTransport autoComplete">
                                               {/* <select
                                                 name="ITF"
@@ -3204,7 +3216,7 @@ const AddShipTo = () => {
                                                 renderInput={(params) => (
                                                   <TextField
                                                     {...params}
-                                                    placeholder="Select ITF"
+                                                    placeholder={t("selectItf")}
                                                     InputLabelProps={{
                                                       shrink: false,
                                                     }}
@@ -3214,7 +3226,7 @@ const AddShipTo = () => {
                                             </div>
                                           </div>
                                           <div class="form-group col-lg-12">
-                                            <h6> Custom Name </h6>
+                                            <h6>{t("customName")}</h6>
                                             <div className=" ">
                                               <input
                                                 type="text"
@@ -3224,12 +3236,12 @@ const AddShipTo = () => {
                                                 value={
                                                   dataCustomization.Custom_Name
                                                 }
-                                                placeholder="Custom Name"
+                                                placeholder={t("customName")}
                                               />
                                             </div>
                                           </div>
                                           <div class="form-group col-lg-12">
-                                            <h6> Agreed price </h6>
+                                            <h6>{t("agreedPrice")}</h6>
                                             <div className=" ">
                                               <input
                                                 type="number"
@@ -3238,12 +3250,12 @@ const AddShipTo = () => {
                                                 value={
                                                   dataCustomization.Dummy_Price
                                                 }
-                                                placeholder="Custom Name"
+                                                placeholder={t("agreedPrice")}
                                               />
                                             </div>
                                           </div>
                                           <div className="form-group col-lg-12 ">
-                                            <h6>Brand </h6>
+                                            <h6>{t("brand")} </h6>
                                             <div className="ceateTransport autoComplete">
                                               <Autocomplete
                                                 options={brands || []} // List of brand options
@@ -3263,7 +3275,9 @@ const AddShipTo = () => {
                                                 renderInput={(params) => (
                                                   <TextField
                                                     {...params}
-                                                    placeholder="Select Brand"
+                                                    placeholder={t(
+                                                      "selectBrand"
+                                                    )}
                                                     variant="outlined"
                                                   />
                                                 )}
@@ -3283,7 +3297,7 @@ const AddShipTo = () => {
                                           </div>
 
                                           <div className="form-group col-lg-12 ">
-                                            <h6>Unit </h6>
+                                            <h6>{t("unit")}</h6>
                                             <div className="ceateTransport autoComplete">
                                               <Autocomplete
                                                 options={unitDropdown || []} // List of ITFs
@@ -3303,7 +3317,9 @@ const AddShipTo = () => {
                                                 renderInput={(params) => (
                                                   <TextField
                                                     {...params}
-                                                    placeholder="Select ITF"
+                                                    placeholder={t(
+                                                      "selectUnit"
+                                                    )}
                                                     variant="outlined"
                                                   />
                                                 )}
@@ -3321,7 +3337,7 @@ const AddShipTo = () => {
                                               />
                                             </div>
                                             <div class="form-group col-lg-12 mt-2">
-                                              <h6> Barcode </h6>
+                                              <h6> {t("barcode")} </h6>
                                               <div className=" ">
                                                 <input
                                                   type="text"
@@ -3330,7 +3346,7 @@ const AddShipTo = () => {
                                                   value={
                                                     dataCustomization.Barcode
                                                   }
-                                                  placeholder="BarCode Name"
+                                                  placeholder={t("barcode")}
                                                 />
                                               </div>
                                             </div>
@@ -3344,7 +3360,7 @@ const AddShipTo = () => {
                                         onClick={customizationDataSubmit}
                                         className="btn mb-0 btn-primary"
                                       >
-                                        Update{" "}
+                                        {t("update")}{" "}
                                       </button>
                                     </div>
                                   </div>
@@ -3371,7 +3387,7 @@ const AddShipTo = () => {
                   data-bs-toggle="modal"
                   data-bs-target="#exampleModalCustomization"
                 >
-                  Add
+                  {t("add")}
                 </Link>
                 {/* customixation modal */}
                 <div
@@ -3385,7 +3401,7 @@ const AddShipTo = () => {
                     <div className="modal-content">
                       <div className="modal-header">
                         <h1 className="modal-title fs-5" id="exampleModalLabel">
-                          Add customization
+                          {t("addCustomization")}
                         </h1>
                         <button
                           type="button"
@@ -3401,7 +3417,7 @@ const AddShipTo = () => {
                         <div className="formCreate">
                           <div className="row">
                             <div className="form-group col-lg-12 mb-3">
-                              <h6>ITF Name </h6>
+                              <h6>{t("itfName")}</h6>
                               <div className="ceateTransport autoComplete">
                                 <Autocomplete
                                   options={getItf || []} // List of ITFs
@@ -3419,7 +3435,7 @@ const AddShipTo = () => {
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
-                                      placeholder="Select ITF"
+                                      placeholder={t("selectItf")}
                                       variant="outlined"
                                     />
                                   )}
@@ -3436,32 +3452,32 @@ const AddShipTo = () => {
                               </div>
                             </div>
                             <div class="form-group col-lg-12">
-                              <h6> Custom Name </h6>
+                              <h6>{t("customName")}</h6>
                               <div className=" ">
                                 <input
                                   type="text"
                                   name="Custom_Name"
                                   onChange={handleChange2}
                                   value={dataCustomization.Custom_Name}
-                                  placeholder="Custom Name"
+                                  placeholder={t("customName")}
                                   className="mb-3"
                                 />
                               </div>
                             </div>
                             <div class="form-group col-lg-12">
-                              <h6> Agreed price </h6>
+                              <h6>{t("agreedPrice")}</h6>
                               <div className=" ">
                                 <input
                                   type="number"
                                   name="Dummy_Price"
                                   onChange={handleChange2}
                                   value={dataCustomization.Dummy_Price}
-                                  placeholder="Custom Name"
+                                  placeholder={t("agreedPrice")}
                                 />
                               </div>
                             </div>
                             <div className="form-group col-lg-12 ">
-                              <h6>Brand </h6>
+                              <h6>{t("brand")}</h6>
                               <div className="ceateTransport autoComplete">
                                 <Autocomplete
                                   options={brands || []} // List of brand options
@@ -3479,7 +3495,7 @@ const AddShipTo = () => {
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
-                                      placeholder="Select Brand"
+                                      placeholder={t("selectBrand")}
                                       variant="outlined"
                                     />
                                   )}
@@ -3496,7 +3512,7 @@ const AddShipTo = () => {
                               </div>
                             </div>
                             <div className="form-group col-lg-12 ">
-                              <h6>Unit </h6>
+                              <h6>{t("unit")}</h6>
                               <div className="ceateTransport autoComplete">
                                 <Autocomplete
                                   options={unitDropdown || []} // List of ITFs
@@ -3514,7 +3530,7 @@ const AddShipTo = () => {
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
-                                      placeholder="Select ITF"
+                                      placeholder={t("selectUnit")}
                                       variant="outlined"
                                     />
                                   )}
@@ -3530,14 +3546,14 @@ const AddShipTo = () => {
                                 />
                               </div>
                               <div class="form-group col-lg-12 mt-2">
-                                <h6> Barcode </h6>
+                                <h6> {t("barcode")} </h6>
                                 <div className=" ">
                                   <input
                                     type="text"
                                     name="Barcode"
                                     onChange={handleChange2}
                                     value={dataCustomization.Barcode}
-                                    placeholder="BarCode Name"
+                                    placeholder={t("barcode")}
                                   />
                                 </div>
                               </div>
@@ -3551,7 +3567,7 @@ const AddShipTo = () => {
                           onClick={submitCustomizationData}
                           className="btn mb-0 btn-primary"
                         >
-                          Add
+                          {t("add")}
                         </button>
                       </div>
                     </div>
@@ -3567,7 +3583,7 @@ const AddShipTo = () => {
                 aria-labelledby="invoiceSetup-tab"
                 tabindex="0"
               >
-                <p cls>invoice set up</p>
+                <p cls>{t("invoiceSetup")}</p>
               </div>
 
               <div
@@ -3582,7 +3598,7 @@ const AddShipTo = () => {
                   <form>
                     <div className="row justify-content-center">
                       <div className="col-lg-3 form-group autoComplete">
-                        <h6>Invoice Currency</h6>
+                        <h6>{t("invoiceCurrency")}</h6>
                         <Autocomplete
                           options={currency || []} // List of currencies
                           getOptionLabel={(option) => option.FX || ""} // Label to display (currency name for each item)
@@ -3597,7 +3613,7 @@ const AddShipTo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Currency"
+                              placeholder={t("selectCurrency")}
                               variant="outlined"
                             />
                           )}
@@ -3612,7 +3628,8 @@ const AddShipTo = () => {
                         />
                       </div>
                       <div className="col-lg-2 form-group autoComplete">
-                        <h6> Invoice Unit</h6>
+                        <h6>{t("invoiceUnit")}</h6>
+
                         {/* <Autocomplete
                           options={
                             Array.isArray(unitDropdown)
@@ -3671,7 +3688,7 @@ const AddShipTo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Unit"
+                              placeholder={t("selectUnit")}
                               variant="outlined"
                             />
                           )}
@@ -3686,7 +3703,7 @@ const AddShipTo = () => {
                         />
                       </div>
                       <div className="col-lg-2 form-group autoComplete">
-                        <h6>Commission</h6>
+                        <h6>{t("commission")}</h6>
 
                         <Autocomplete
                           options={commission || []}
@@ -3704,7 +3721,7 @@ const AddShipTo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Commission"
+                              placeholder={t("selectCommission")}
                               variant="outlined"
                             />
                           )}
@@ -3719,13 +3736,13 @@ const AddShipTo = () => {
                         />
                       </div>
                       <div className="col-lg-2 form-group">
-                        <h6>Commission Value</h6>
+                        <h6>{t("commissionValue")}</h6>
                         <div className="parentthb packParent">
                           <div className="childThb">
                             <input
                               type="text"
                               name="commissionValue"
-                              placeholder="code"
+                              placeholder={t("commissionValue")}
                               value={state5.commissionValue}
                               onChange={handleChange5}
                             />
@@ -3733,7 +3750,7 @@ const AddShipTo = () => {
                         </div>
                       </div>
                       <div className="col-lg-1 shipToToggle">
-                        <h6>Commission </h6>
+                        <h6>{t("commission")}</h6>
                         <label
                           style={{
                             display: "flex",
@@ -3750,14 +3767,14 @@ const AddShipTo = () => {
                             name="commissionCurrency"
                           />
                           <span>
-                            <span>FX</span>
-                            <span> THB</span>
+                            <span>{t("fx")}</span>
+                            <span> {t("thb")}</span>
                           </span>
                           <a> </a>
                         </label>
                       </div>
                       <div className="col-lg-2 shipToToggle">
-                        <h6>Charge Volume </h6>
+                        <h6>{t("chargeVolume")}</h6>
                         <label
                           style={{
                             display: "flex",
@@ -3774,15 +3791,15 @@ const AddShipTo = () => {
                             name="chargeVolume"
                           />
                           <span>
-                            <span>NO</span>
-                            <span>Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
                       </div>
 
                       <div className="col-lg-2 form-group autoComplete">
-                        <h6>Delivery Terms Incoterms</h6>
+                        <h6>{t("deliveryTermsIncoterms")}</h6>
                         <Autocomplete
                           options={DropdownDelivery || []} // List of delivery terms and incoterms
                           getOptionLabel={(option) => option.Incoterms || ""} // Label to display (Incoterms)
@@ -3797,7 +3814,7 @@ const AddShipTo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Delivery Terms and Incoterms"
+                              placeholder={t("selectDeliveryTermsIncoterms")}
                               variant="outlined"
                             />
                           )}
@@ -3813,7 +3830,7 @@ const AddShipTo = () => {
                       </div>
 
                       <div className="col-lg-2 form-group autoComplete">
-                        <h6>Payment Terms</h6>
+                        <h6>{t("paymentTerms")}</h6>
                         <Autocomplete
                           options={FXCorrection || []} // List of payment terms
                           getOptionLabel={(option) =>
@@ -3830,7 +3847,7 @@ const AddShipTo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Payment Terms"
+                               placeholder={t("selectPaymentTerms")}
                               variant="outlined"
                             />
                           )}
@@ -3846,7 +3863,7 @@ const AddShipTo = () => {
                       </div>
 
                       <div className="col-lg-2 form-group autoComplete">
-                        <h6>Statement Due Date</h6>
+                        <h6>{t("statementDueDate")}</h6>
                         <Autocomplete
                           disablePortal
                           options={[
@@ -3858,7 +3875,7 @@ const AddShipTo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Statement Due Date" // Adds a placeholder
+                               placeholder={t("selectStatementDueDate")}
                               InputLabelProps={{ shrink: false }} // Prevents floating label
                             />
                           )}
@@ -3878,7 +3895,7 @@ const AddShipTo = () => {
                         />
                       </div> */}
                       <div className="col-lg-2 form-group autoComplete">
-                        <h6>Rounding</h6>
+                       <h6>{t("rounding")}</h6>
                         <Autocomplete
                           options={RoundingDataList || []} // List of delivery terms and incoterms
                           getOptionLabel={(option) => option.DropDown || ""} // Label to display (Incoterms)
@@ -3893,7 +3910,7 @@ const AddShipTo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Rounding"
+                          placeholder={t("selectRounding")}
                               variant="outlined"
                             />
                           )}
@@ -3908,37 +3925,36 @@ const AddShipTo = () => {
                         />
                       </div>
                       <div className="col-lg-2 form-group">
-                        <h6>Extra Cost</h6>
+                        <h6>{t("extraCost")}</h6>
                         <input
                           type="text"
                           name="extraCost"
                           className="form-control"
-                          placeholder="15.000"
+                         placeholder={t("extraCost")}
                           value={state5.extraCost}
                           onChange={handleChange5}
                         />
                       </div>
                       <div className="col-lg-2 form-group  ">
-                        <h6>Freight Adjustment</h6>
-
+                        <h6>{t("freightAdjustment")}</h6>
                         <input
                           type="text"
                           name="freightAdjust"
                           className="form-control"
-                          placeholder="Freight Adjustment"
+                           placeholder={t("freightAdjustment")}
                           value={state5.freightAdjust}
                           onChange={handleChange5}
                         />
                       </div>
                       <div className="col-lg-2 form-group">
-                        <h6>Markup Value</h6>
+                        <h6>{t("markupValue")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
                               type="text"
                               name="markupValue"
                               className="form-control"
-                              placeholder="15.000"
+                            placeholder={t("markupValue")}
                               value={state5.markupValue}
                               onChange={handleChange5}
                             />
@@ -3950,14 +3966,14 @@ const AddShipTo = () => {
                       </div>
 
                       <div className="col-lg-2 form-group">
-                        <h6>Rebate Value</h6>
+                        <h6>{t("rebateValue")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
                               type="text"
                               name="rebateValue"
                               className="form-control"
-                              placeholder="15.000"
+                              placeholder={t("rebateValue")}
                               value={state5.rebateValue}
                               onChange={handleChange5}
                             />
@@ -3969,14 +3985,14 @@ const AddShipTo = () => {
                       </div>
 
                       <div className="col-lg-2 form-group">
-                        <h6>Quotation</h6>
+                      <h6>{t("quotation")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
                               type="text"
                               name="quotation"
                               className="form-control"
-                              placeholder="15.000"
+                              placeholder={t("quotation")}
                               value={state5.quotation}
                               onChange={handleChange5}
                             />
@@ -3988,14 +4004,14 @@ const AddShipTo = () => {
                       </div>
 
                       <div className="col-lg-2 form-group">
-                        <h6>Claim</h6>
+                       <h6>{t("claim")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
                               type="text"
                               name="claim"
                               className="form-control"
-                              placeholder="15.000"
+                               placeholder={t("claim")}
                               value={claimValue1}
                               onChange={handleChange5}
                             />
@@ -4007,14 +4023,14 @@ const AddShipTo = () => {
                       </div>
 
                       <div className="col-lg-2 form-group">
-                        <h6>Other</h6>
+                        <h6>{t("other")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
                               type="text"
                               name="other"
                               className="form-control"
-                              placeholder="15.000"
+                              placeholder={t("other")}
                               value={state5.other}
                               onChange={handleChange5}
                             />
@@ -4026,14 +4042,14 @@ const AddShipTo = () => {
                       </div>
 
                       <div className="col-lg-2 form-group">
-                        <h6>Final</h6>
+                        <h6>{t("final")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
                               type="text"
                               name="final"
                               className="form-control"
-                              placeholder="15.000"
+                              placeholder={t("final")}
                               value={claimValue}
                               onChange={handleChange5}
                             />
@@ -4050,10 +4066,10 @@ const AddShipTo = () => {
                           onClick={updatePaymentValue}
                           type="button"
                         >
-                          {from?.consignee_id ? "Update" : "Create"}
+                          {from?.consignee_id ? t("update") : t("create")}
                         </button>
                         <Link className="btn btn-danger" to="/shipToNew">
-                          Cancel
+                          {t("cancel")}
                         </Link>
                       </div>
                     </div>
@@ -4072,7 +4088,7 @@ const AddShipTo = () => {
                     <div className="flex flex-wrap">
                       <div>
                         <div className="selectTimeHead">
-                          <h6>Select Time Period :</h6>
+                        <h6>{t("selectTimePeriod")} :</h6>
                         </div>
                         <div className="selectTimeParent">
                           {dataPeriod.map((item) => (
@@ -4101,7 +4117,7 @@ const AddShipTo = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Comparison Period"
+                             placeholder={t("comparisonPeriod")}
                             />
                           )}
                         />
@@ -4144,7 +4160,7 @@ const AddShipTo = () => {
                           type="submit"
                           onClick={confirmData}
                         >
-                          Confirm
+                           {t("confirm")}
                         </button>
                       </div>
                     </div>
@@ -4167,7 +4183,7 @@ const AddShipTo = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Shipments
+                             {t("totalShipments")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.CNF?.Total ? boxsData?.CNF?.Total : 0}
@@ -4204,7 +4220,7 @@ const AddShipTo = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Claims
+                             {t("totalClaims")}
                             </p>
                             <h4 className="mb-0">
                               {" "}
@@ -4245,7 +4261,7 @@ const AddShipTo = () => {
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
                               {" "}
-                              Total Payment{" "}
+                              {t("totalPayment")}{" "}
                             </p>
                             <h4 className="mb-0">
                               {" "}
@@ -4285,7 +4301,7 @@ const AddShipTo = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Pending Payment
+                            {t("pendingPayment")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.Pending?.Total
@@ -4317,7 +4333,7 @@ const AddShipTo = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Net Weigt Shipped
+                              {t("totalNetWeightShipped")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.NetWeight?.Total_GW
@@ -4346,7 +4362,7 @@ const AddShipTo = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Gross Weight Shipped
+                            {t("totalGrossWeightShipped")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.grossWeight?.Total_GW
@@ -4375,7 +4391,7 @@ const AddShipTo = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Boxes Shipped
+                             {t("totalBoxesShipped")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.Box?.Total_GW
@@ -4405,10 +4421,10 @@ const AddShipTo = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Shipments
+                             {t("totalShipments")}
                             </p>
                             <div className="parentFirstShip mt-4">
-                              <p>Date of First Shipment</p>
+                              <p>{t("dateOfFirstShipment")}</p>
                               <p>
                                 {" "}
                                 {boxsData?.Shipments?.First_Shipment
@@ -4417,7 +4433,7 @@ const AddShipTo = () => {
                               </p>
                             </div>
                             <div className="parentFirstShip">
-                              <p>Date of Last Shipment</p>
+                              <p>{t("dateOfLastShipment")}</p>
                               <p>
                                 {" "}
                                 {boxsData?.Shipments?.Last_Shipment
@@ -4426,7 +4442,7 @@ const AddShipTo = () => {
                               </p>
                             </div>
                             <div className="parentFirstShip">
-                              <p> Shipments in Pipe Line</p>
+                             <p>{t("shipmentsInPipeLine")}</p>
                               <p>
                                 {boxsData?.Shipments?.Pipe_Line
                                   ? boxsData?.Shipments?.Pipe_Line
@@ -4442,7 +4458,7 @@ const AddShipTo = () => {
                   <div className="row">
                     <div className="col-lg-6 mb20">
                       <div className="itemsOrderSearch">
-                        <h3 className="itemOrder">Top 5 Items Ordered</h3>
+                      <h3 className="itemOrder">{t("topItems")}</h3>
 
                         <div className="selectProduce">
                           <Autocomplete
@@ -4462,7 +4478,7 @@ const AddShipTo = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Invoice Value"
+                                placeholder={t("invoiceValue")}
                               />
                             )}
                           />
@@ -4472,11 +4488,11 @@ const AddShipTo = () => {
                       <div className="tableCreateClient">
                         <table>
                           <tr>
-                            <th>ITF Name</th>
-                            <th> Last Period Kg</th>
-                            <th> Current Period Kg</th>
-                            <th> DIFF </th>
-                            <th> % Change </th>
+                           <th>{t("itfName")}</th>
+                            <th>{t("lastPeriodKg")}</th>
+                            <th>{t("currentPeriodKg")}</th>
+                            <th>{t("diff")}</th>
+                            <th>{t("percentChange")}</th>
                           </tr>
                           <tbody>
                             {topFiveValue?.Top5Data?.map((item, index) => (
@@ -4501,7 +4517,7 @@ const AddShipTo = () => {
                             value={options?.find(
                               (option) => option.value === selectedDataset
                             )}
-                            placeholder="Select..."
+                            placeholder={t("select")}
                             isSearchable
                             styles={{
                               container: (provided) => ({
@@ -4524,7 +4540,7 @@ const AddShipTo = () => {
                 </div>
                 <div className="card-footer text-center">
                   <Link className="btn btn-danger" to="/shipToNew">
-                    Close
+                    {t("close")}
                   </Link>
                 </div>
               </div>

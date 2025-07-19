@@ -1,4 +1,4 @@
-import axios from "axios";
+ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -14,9 +14,10 @@ import "jspdf-autotable";
 import { useQuery } from "react-query";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-
+import { useTranslation } from "react-i18next";
 const ClientNew = () => {
   const navigate = useNavigate();
+  const [t, i18n] = useTranslation("global");
   const { data: clients } = useQuery("getClientDataAsOptions");
   const { data: paymentChannle } = useQuery("PaymentChannela");
   const { data: currency } = useQuery("getCurrency");
@@ -626,7 +627,7 @@ const ClientNew = () => {
 
     // Check if parsedFxPayment is not equal to totalPaidAmount
     if (parsedFxPayment.toFixed(2) !== totalPaidAmount.toFixed(2)) {
-      toast.error("Total Paid Amount does not match FX Payment value.");
+      toast.error(t("paymentMismatch"));
       return;
     }
 
@@ -704,7 +705,7 @@ const ClientNew = () => {
     } catch (error) {
       // Handle error case
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
   const clearAllFields = () => {
@@ -752,23 +753,23 @@ const ClientNew = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Id",
+        Header: t("id"),
         id: "index",
         accessor: (_row, i) => i + 1,
       },
 
       {
-        Header: "Name / Company",
+        Header: t("nameCompany"),
         accessor: "client_name",
       },
 
       {
-        Header: "Email",
+        Header: t("email"),
         accessor: "client_email",
       },
 
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -786,8 +787,8 @@ const ClientNew = () => {
               defaultChecked
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")}</span>
+              <span>{t("on")}</span>
             </span>
             <a> </a>
           </label>
@@ -795,7 +796,7 @@ const ClientNew = () => {
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="" state={{ from: a }}>
             <Link
@@ -881,11 +882,11 @@ const ClientNew = () => {
         ),
       },
       {
-        Header: "Salary",
+        Header: t("salary"),
         accessor: (a) => <>{"100000000"}</>,
       },
     ],
-    []
+    [t]
   );
   const getAirportData = () => {
     axios
@@ -898,7 +899,7 @@ const ClientNew = () => {
       .catch((error) => {
         console.log(error);
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -914,14 +915,14 @@ const ClientNew = () => {
   return (
     <>
       <Card
-        title="Client Management"
+        title={t("client_management")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/createClient")}
             className="btn button btn-info"
           >
-            Create
+            {"create"}
           </button>
         }
       >
@@ -939,7 +940,7 @@ const ClientNew = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Statement
+                {t("statement")}
               </h1>
               <button
                 type="button"
@@ -951,7 +952,7 @@ const ClientNew = () => {
               </button>
             </div>
             <div className="modal-body">
-              <label htmlFor="fromDate">From Date</label>
+              <label htmlFor="fromDate">{t("fromDate")}</label>
               <input
                 type="date"
                 className="form-control"
@@ -960,7 +961,7 @@ const ClientNew = () => {
                 onChange={(e) => setFromDate(e.target.value)}
               />
               <label className="mt-2" htmlFor="toDate">
-                To Date
+                {t("toDate")}
               </label>
               <input
                 type="date"
@@ -976,7 +977,7 @@ const ClientNew = () => {
                 className="btn btn-primary"
                 onClick={handleSubmit}
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -993,7 +994,7 @@ const ClientNew = () => {
           <div className="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="exampleModalLabel">
-                Payment
+                {t("payment")}
               </h1>
               <button
                 type="button"
@@ -1009,7 +1010,7 @@ const ClientNew = () => {
               <div className="row">
                 <div className="col-lg-4">
                   <div className="parentFormPayment autoComplete">
-                    <p>Client </p>
+                    <p>{t("client")}</p>
                     <Autocomplete
                       options={clients || []}
                       getOptionLabel={(option) => option.client_name || ""} // Label to display
@@ -1019,7 +1020,7 @@ const ClientNew = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Client"
+                          placeholder={t("selectClient")}
                           variant="outlined"
                         />
                       )}
@@ -1035,7 +1036,7 @@ const ClientNew = () => {
                 </div>
                 <div className="col-lg-4">
                   <div className="parentFormPayment autoComplete">
-                    <p>Consignee </p>
+                    <p>{t("consignee")}</p>
                     <Autocomplete
                       options={consignees || []}
                       getOptionLabel={(option) => option.consignee_name || ""} // Label to display
@@ -1045,7 +1046,7 @@ const ClientNew = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Consignee"
+                          placeholder={t("selectConsignee")}
                           variant="outlined"
                         />
                       )}
@@ -1063,7 +1064,7 @@ const ClientNew = () => {
                 <div className="col-lg-4">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Payment Date</p>
+                      <p>{t("paymentDate")}</p>
                     </div>
                     <div>
                       <input
@@ -1077,7 +1078,7 @@ const ClientNew = () => {
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Client Payment Ref</p>
+                      <p>{t("clientPaymentRef")}</p>
                     </div>
                     <div>
                       <input
@@ -1090,8 +1091,7 @@ const ClientNew = () => {
                 </div>
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment autoComplete">
-                    <p>Payment Channel </p>
-
+                    <p>{t("paymentChannel")}</p>
                     <Autocomplete
                       options={paymentChannle || []} // Use paymentChannle as options
                       getOptionLabel={(option) => option.bank_name || ""} // Label to display
@@ -1101,7 +1101,7 @@ const ClientNew = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Payment Channel"
+                          placeholder={t("selectPaymentChannel")}
                           variant="outlined"
                         />
                       )}
@@ -1119,7 +1119,7 @@ const ClientNew = () => {
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Bank Ref</p>
+                      <p>{t("bankRef")}</p>
                     </div>
                     <div>
                       <input
@@ -1133,7 +1133,7 @@ const ClientNew = () => {
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>FX Payment</p>
+                      <p>{t("fxPayment")}</p>
                     </div>
                     <div>
                       <input
@@ -1146,7 +1146,7 @@ const ClientNew = () => {
                 </div>
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment autoComplete">
-                    <p> FX </p>
+                    <p>{t("fx")}</p>
                     <div>
                       <Autocomplete
                         options={currency || []} // List of currencies
@@ -1157,7 +1157,7 @@ const ClientNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Fx"
+                            placeholder={t("selectFx")}
                             variant="outlined"
                           />
                         )}
@@ -1175,7 +1175,7 @@ const ClientNew = () => {
                 <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>FX Rate</p>
+                      <p>{t("fxRate")}</p>
                     </div>
                     <div>
                       <input
@@ -1190,7 +1190,7 @@ const ClientNew = () => {
                 <div className="col-lg-6 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Intermittent Bank Charges</p>
+                      <p>{t("interBankCharges")}</p>
                     </div>
                     <div>
                       <input
@@ -1206,7 +1206,7 @@ const ClientNew = () => {
                 <div className="col-lg-6 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Local Bank Charges</p>
+                      <p>{t("localBankCharges")}</p>
                     </div>
                     <div>
                       <input
@@ -1220,7 +1220,7 @@ const ClientNew = () => {
                 <div className="col-lg-6 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>THB Received</p>
+                      <p>{t("thbReceived")}</p>
                     </div>
                     <div>
                       <input
@@ -1234,7 +1234,7 @@ const ClientNew = () => {
                 <div className="col-lg-6 mt-3">
                   <div className="parentFormPayment">
                     <div>
-                      <p>Loss/Gain on Exchange Rate</p>
+                      <p>{t("lossGain")}</p>
                     </div>
                     <div>
                       <input
@@ -1252,13 +1252,13 @@ const ClientNew = () => {
                 <div className="tableCreateClient tablepayment">
                   <table>
                     <tr>
-                      <th>Check</th>
-                      <th> Document Number</th>
-                      <th> Ship Date</th>
-                      <th> AWB Number</th>
-                      <th> Net Amount</th>
-                      <th>Amount To Pay </th>
-                      <th> Paid Amount</th>
+                      <th>{t("check")}</th>
+                      <th>{t("documentNumber")}</th>
+                      <th>{t("shipDate")}</th>
+                      <th>{t("awbNumber")}</th>
+                      <th>{t("netAmount")}</th>
+                      <th>{t("amountToPay")}</th>
+                      <th>{t("paidAmount")}</th>
                     </tr>
                     {paymentTable1?.map((item) => {
                       return (
@@ -1307,7 +1307,7 @@ const ClientNew = () => {
                 onClick={handleSubmit1}
                 className="btn btn-primary"
               >
-                Submit
+              {t("Submit")}
               </button>
             </div>
           </div>

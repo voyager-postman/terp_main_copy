@@ -5,7 +5,10 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { Autocomplete, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 const UpdatePackaging = () => {
+  const { t } = useTranslation("global");
   const location = useLocation();
   const { from } = location.state || {};
   console.log(from);
@@ -239,7 +242,7 @@ const UpdatePackaging = () => {
     getClassificationData5();
   }, []);
   return (
-    <Card title="Packaging Management / Edit Form">
+    <Card title={t("Packaging_Management_Edit")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -251,7 +254,7 @@ const UpdatePackaging = () => {
                 <form action="">
                   <div className="row justify-content-center">
                     <div className="col-lg-4 form-group">
-                      <h6>Pack</h6>
+                      <h6>{t("pack")}</h6>
                       <div className="thbFrieght">
                         <div className="parentthb packParent">
                           <div className="childThb">
@@ -266,7 +269,7 @@ const UpdatePackaging = () => {
                       </div>
                     </div>
                     <div className="col-lg-4 form-group">
-                      <h6>Weight</h6>
+                      <h6>{t("weight")}</h6>
                       {/* <div className="thbFrieght">
                                                                     <div className="parentthb">
                                                                         <div className="childThb">
@@ -286,17 +289,17 @@ const UpdatePackaging = () => {
                             name="packaging_weight"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="weight"
+                            placeholder={t("weight")}
                             defaultValue={editPackageData.packaging_weight}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>g</span>
+                          <span>{t("gram")}g</span>
                         </div>
                       </div>
                     </div>
                     <div className="col-lg-4 form-group">
-                      <h6> Inventory Id </h6>
+                      <h6>  {t("Inventory_Id")}</h6>
                       <div className="thbFrieght">
                         <div className="parentthb packParent">
                           <div className="childThb">
@@ -341,7 +344,7 @@ const UpdatePackaging = () => {
                       </div>
                     </div> */}
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>Charts of Accounting</h6>
+                      <h6>{t("chartOfAccounts")}</h6>
                       <Autocomplete
                         options={
                           classification1.map((item) => ({
@@ -363,7 +366,7 @@ const UpdatePackaging = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Classification"
+                            placeholder={t("selectClassification")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -375,7 +378,7 @@ const UpdatePackaging = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>VAT Type</h6>
+                      <h6>{t("vatType")}</h6>
                       <Autocomplete
                         options={
                           classification2.map((item) => ({
@@ -397,7 +400,7 @@ const UpdatePackaging = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select VAT Classification"
+                            placeholder={t("selectVatClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -410,7 +413,7 @@ const UpdatePackaging = () => {
                     </div>
 
                     <div className="form-group col-lg-2 form-group autoComplete classificationSelect mb-3">
-                      <h6>Inventory Type</h6>
+                      <h6>{t("inventoryType")}</h6>
                       <Autocomplete
                         options={
                           classification3.map((item) => ({
@@ -432,7 +435,7 @@ const UpdatePackaging = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Inventory Classification"
+                            placeholder={t("selectInventoryClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -445,7 +448,7 @@ const UpdatePackaging = () => {
                     </div>
 
                     <div className="form-group col-lg-2 form-group autoComplete classificationSelect mb-3">
-                      <h6> WHT Type</h6>
+                      <h6>{t("whtType")}</h6>
                       <Autocomplete
                         options={
                           classification4.map((item) => ({
@@ -467,7 +470,7 @@ const UpdatePackaging = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select WHT Classification"
+                            placeholder={t("selectWhtClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -479,14 +482,14 @@ const UpdatePackaging = () => {
                       />
                     </div>
                     <div className="col-lg-2 autoComplete classificationSelect">
-                      <h6>Brand</h6>
+                      <h6> {t("brand")}</h6>
                       <Autocomplete
                         options={
                           classification5
                             ? classification5.map((item) => ({
-                                id: item.ID,
-                                name: item.Name_EN,
-                              }))
+                              id: item.ID,
+                              name: item.Name_EN,
+                            }))
                             : []
                         }
                         getOptionLabel={(option) => option.name || ""}
@@ -496,7 +499,7 @@ const UpdatePackaging = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Brand"
+                            placeholder={t("selectBrand")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -520,10 +523,11 @@ const UpdatePackaging = () => {
                 type="submit"
                 name="signup"
               >
-                Update
+                {t("update")}
+
               </button>
               <Link className="btn btn-danger" to="/packagingNew">
-                Cancel
+                {t("cancel")}
               </Link>
             </div>
           </div>

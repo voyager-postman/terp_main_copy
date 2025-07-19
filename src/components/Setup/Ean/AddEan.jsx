@@ -1,4 +1,4 @@
-import axios from "axios";
+ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,13 +6,14 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Autocomplete, TextField } from "@mui/material";
+import { useTranslation } from "react-i18next";
+
 const AddEan = () => {
+  const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
-
   const [items, setItems] = useState([]);
   const [itfId, setItfId] = useState("");
-
   const [packagingData, setPackagingData] = useState([]);
   const [formValues, setFormValues] = useState([
     {
@@ -132,7 +133,7 @@ const AddEan = () => {
     const fieldCheck = state.ean_unit === "" || state.ean_code === "";
 
     if (fieldCheck) {
-      toast.warn("Please Fill All The Fields", {
+      toast.warn(t("pleaseFillAllFields"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -146,7 +147,7 @@ const AddEan = () => {
       })
       .then((response) => {
         if (response.data.success === true) {
-          toast.success("Success", {
+          toast.success(t("success"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -222,7 +223,7 @@ const AddEan = () => {
       })
       .then((response) => {
         console.log(response);
-        toast.success("EAN Cancel Successfully", {
+        toast.success(t("eanCancelSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -230,7 +231,7 @@ const AddEan = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -238,14 +239,14 @@ const AddEan = () => {
   };
 
   const confirmCloseWindow = () => {
-    toast.success("EAN Confirm Successful", {
+    toast.success(t("eanConfirmSuccess"), {
       autoClose: 1000,
       theme: "colored",
     });
     navigate("/eanNew");
   };
   return (
-    <Card title="EAN Management / Create Form">
+    <Card title={t("eanCreateForm")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -257,17 +258,17 @@ const AddEan = () => {
                 <form action="">
                   <div className="row formEan">
                     <div className="col-lg-4 form-group">
-                      <h6>EAN Code</h6>
+                      <h6>{t("eanCode")}</h6>
                       <input
                         onChange={handleChange}
                         name="ean_code"
                         type="text"
-                        placeholder="ean code"
+                        placeholder={t("eanCode")}
                       />
                     </div>
 
                     <div className="col-lg-4 form-group autoComplete">
-                      <h6>Unit</h6>
+                      <h6>{t("unit")}</h6>
                       <Autocomplete
                         options={unitDropdown.map((item) => ({
                           id: item.ID,
@@ -287,7 +288,7 @@ const AddEan = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Unit"
+                            placeholder={t("selectUnit")}
                             variant="outlined"
                           />
                         )}
@@ -298,10 +299,10 @@ const AddEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Name En</h6>
+                      <h6>{t("nameEn")}</h6>
                       <input
                         type="text"
-                        placeholder="product name"
+                        placeholder={t("nameEn")}
                         name="ean_name_en"
                         value={state.ean_name_en}
                         onChange={handleChange}
@@ -309,10 +310,10 @@ const AddEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Name Th</h6>
+                      <h6>{t("nameTh")}</h6>
                       <input
                         type="text"
-                        placeholder="product name"
+                        placeholder={t("nameTh")}
                         name="ean_name_th"
                         value={state.ean_name_th}
                         onChange={handleChange}
@@ -320,10 +321,10 @@ const AddEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Estimated Ean/ Hour</h6>
+                      <h6>{t("estimatedEanHour")}</h6>
                       <input
                         type="text"
-                        placeholder="Estimated Ean/ Hour"
+                        placeholder={t("estimatedEanHour")}
                         name="estimated_EAN_PER_HOUR"
                         value={state.estimated_EAN_PER_HOUR}
                         onChange={handleChange}
@@ -331,10 +332,10 @@ const AddEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Estimated Ean/ Kg</h6>
+                      <h6>{t("estimatedEanKg")}</h6>
                       <input
                         type="text"
-                        placeholder="Estimated Ean/ Kg"
+                        placeholder={t("estimatedEanKg")}
                         name="estimated_EAN_PER_KG"
                         value={state.estimated_EAN_PER_KG}
                         onChange={handleChange}
@@ -342,16 +343,16 @@ const AddEan = () => {
                     </div>
 
                     <div className="col-lg-4 form-group">
-                      <h6>Notes </h6>
+                      <h6>{t("notes")} </h6>
                       <input
                         type="text"
-                        placeholder="Notes"
+                        placeholder={t("notes")}
                         name="Notes"
                         onChange={handleChange}
                       />
                     </div>
                     <div className="col-lg-12 form-group">
-                      <h6>Image</h6>
+                      <h6>{t("image")}</h6>
                       <input
                         type="file"
                         id="box_image"
@@ -367,7 +368,7 @@ const AddEan = () => {
                           <label htmlFor="box_image">
                             <div className="uploadBorder">
                               <span>
-                                Choose Image <CloudUploadIcon />{" "}
+                                {t("chooseImage")} <CloudUploadIcon />{" "}
                               </span>
                             </div>
                           </label>
@@ -392,7 +393,7 @@ const AddEan = () => {
                           onClick={generateName}
                           type="button"
                         >
-                          Generate Name
+                          {t("generateName")}
                         </button>
                       </div>
                     </div>
@@ -404,16 +405,16 @@ const AddEan = () => {
                   >
                     <div className="eanTop">
                       <div className="eanTableAddHead">
-                        <h6>Type</h6>
+                        <h6>{t("type")}</h6>
                       </div>
                       <div className="eanTableAddHead">
-                        <h6>Name</h6>
+                        <h6>{t("name")}</h6>
                       </div>
                       <div className="eanTableAddHead">
-                        <h6>Quantity</h6>
+                        <h6>{t("quantity")}</h6>
                       </div>
                       <div className="eanTableAddHead">
-                        <h6>Actions</h6>
+                        <h6>{t("actions")}</h6>
                       </div>
                     </div>
 
@@ -427,19 +428,19 @@ const AddEan = () => {
                             <Autocomplete
                               disablePortal
                               options={[
-                                { label: "Select Type", value: "0" },
+                                { label: t("selectType"), value: "0" },
 
-                                { label: "Setup produce", value: "45" },
-                                { label: "Setup packaging", value: "47" },
+                                { label: t("setupProduce"), value: "45" },
+                                { label: t("setupPackaging"), value: "47" },
                               ]}
                               getOptionLabel={(option) =>
                                 option.label || "Select Type"
                               }
                               value={
                                 [
-                                  { label: "Select Type", value: "0" },
-                                  { label: "Setup produce", value: "45" },
-                                  { label: "Setup packaging", value: "47" },
+                                  { label: t("selectType"), value: "0" },
+                                  { label: t("setupProduce"), value: "45" },
+                                  { label: t("setupPackaging"), value: "47" },
                                 ].find(
                                   (item) => item.value === element.detail_type
                                 ) || null
@@ -455,7 +456,7 @@ const AddEan = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Type"
+                                  placeholder={t("selectType")}
                                   variant="outlined"
                                 />
                               )}
@@ -499,7 +500,7 @@ const AddEan = () => {
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    placeholder="Select Produce"
+                                    placeholder={t("selectProduce")}
                                     variant="outlined"
                                   />
                                 )}
@@ -541,7 +542,7 @@ const AddEan = () => {
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    placeholder="Select Packaging"
+                                    placeholder={t("selectPackaging")}
                                     variant="outlined"
                                   />
                                 )}
@@ -552,14 +553,13 @@ const AddEan = () => {
                               className="ceateTransport autoComplete"
                               style={{ width: "280px" }}
                             >
-                              {" "}
                               <Autocomplete
                                 disablePortal
-                                options={[{ label: "Select", value: 0 }]}
+                                options={[{ label: t("select"), value: 0 }]}
                                 getOptionLabel={(option) =>
                                   option.label || "Select"
                                 }
-                                value={{ label: "Select", value: 0 }}
+                                value={{ label: t("select"), value: 0 }}
                                 onChange={(event, value) => {
                                   addFieldHandleChange(index, {
                                     target: {
@@ -571,7 +571,7 @@ const AddEan = () => {
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    placeholder="Select"
+                                    placeholder={t("select")}
                                     variant="outlined"
                                   />
                                 )}
@@ -638,7 +638,7 @@ const AddEan = () => {
                 name="signup"
                 onClick={confirmCloseWindow}
               >
-                Confirm and Close
+{t("confirmClose")}
               </button>
             ) : (
               <button
@@ -647,16 +647,16 @@ const AddEan = () => {
                 name="signup"
                 onClick={createEan}
               >
-                Create
+                {t("create")}
               </button>
             )}
             {itfId ? (
               <button className="btn btn-danger" onClick={cancelData}>
-                Cancel
+               {t("cancel")}
               </button>
             ) : (
               <Link className="btn btn-danger" to="/itfNew">
-                Close
+                {t("close")}
               </Link>
             )}
           </div>

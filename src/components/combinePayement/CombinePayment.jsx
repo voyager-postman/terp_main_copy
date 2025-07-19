@@ -1,4 +1,4 @@
-import axios from "axios";
+ import axios from "axios";
 import { useEffect, useMemo, useState, useRef } from "react";
 import Barcode from "react-barcode";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,8 +12,11 @@ import DatePicker from "react-datepicker";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { FaCalendarAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 import MySwal from "../../swal";
 const CombinePayment = () => {
+  const [t, i18n] = useTranslation("global");
   const [roundingData, setRoundingData] = useState("");
   const [VATTotal, setVATTotal] = useState(0);
   const [WHTTotal, setWHTTotal] = useState(0);
@@ -161,13 +164,12 @@ const CombinePayment = () => {
     const request = {
       ean_id: eanID,
     };
-
-    axios
+  axios
       .post(`${API_BASE_URL}/eanStatus`, request)
       .then((resp) => {
         // console.log(resp, "Check Resp")
         if (resp.data.success == true) {
-          toast.success("Status Updated Successfully", {
+          toast.success(t("statusUpdated"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -182,13 +184,13 @@ const CombinePayment = () => {
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Delete",
+      confirmButtonText: "delete",
     }).then(async (result) => {
       console.log(result);
       if (result.isConfirmed) {
@@ -201,9 +203,9 @@ const CombinePayment = () => {
           );
           console.log(response);
           getCombinedPayment();
-          toast.success("Combined Payment  delete successfully");
+          toast.success(t("combinedPaymentDeleteSuccess"));
         } catch (e) {
-          toast.error("Something went wrong");
+           toast.error(t("genericError"));
         }
       }
     });
@@ -215,101 +217,58 @@ const CombinePayment = () => {
   }, [depositAvailableNew, basePayment]);
   const columns = useMemo(
     () => [
-      {
-        Header: "CPN Number",
+        {
+        Header: t("cpnNumber"),
         accessor: "CPNCODE",
       },
-
       {
-        Header: "Vendor",
+        Header: t("vendor"),
         accessor: "vendor_name",
       },
-
       {
-        Header: "Date",
+        Header: t("date"),
         accessor: (a) => {
-          const formattedDate = new Date(a.CPN_Date).toLocaleDateString(
-            "en-GB",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }
-          );
-
-          return <div>{formattedDate}</div>;
-        },
-      },
-
-      {
-        Header: "Due date",
-        accessor: (a) => {
-          const formattedDate = new Date(a.Due_Date).toLocaleDateString(
-            "en-GB",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }
-          );
-
+          const formattedDate = new Date(a.CPN_Date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
           return <div>{formattedDate}</div>;
         },
       },
       {
-        Header: "POs",
+        Header: t("dueDate"),
+        accessor: (a) => {
+          const formattedDate = new Date(a.Due_Date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+          return <div>{formattedDate}</div>;
+        },
+      },
+      {
+        Header:t("count"),
         accessor: (a) => <div>{a.POCount}</div>,
       },
-
       {
-        Header: "Amount",
+        Header: t("amount"),
         accessor: (a) => (
           <div style={{ textAlign: "right" }}>
             {formatterTwo.format(a.Total_After_Tax)}
           </div>
         ),
       },
-
       {
-        Header: "Payable",
+        Header: t("payable"),
         accessor: (a) => (
           <div style={{ textAlign: "right" }}>
             {formatterTwo.format(a.Payable)}
           </div>
         ),
       },
-      // {
-      //   Header: "Status",
-      //   accessor: (a) => (
-      //     <label
-      //       style={{
-      //         display: "flex",
-      //         justifyContent: "center",
-      //         alignItems: "center",
-      //         marginTop: "10px",
-      //       }}
-      //       className="toggleSwitch large"
-      //     >
-      //       <input
-      //         checked={a.Available == "1" ? true : false}
-      //         onChange={() => {
-      //           setIsOn(!isOn);
-      //         }}
-      //         onClick={() => updateEanStatus(a.ID)}
-      //         value={a.Available}
-      //         type="checkbox"
-      //       />
-      //       <span>
-      //         <span>OFF</span>
-      //         <span>ON</span>
-      //       </span>
-      //       <a></a>
-      //     </label>
-      //   ),
-      // },
-
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="editIcon">
             <button
@@ -329,7 +288,7 @@ const CombinePayment = () => {
                   <i className="mdi mdi-delete " />
                 </button>
               </>
-            )}
+         )}
 
             {!(a.Payment_Status === 4) && (
               <button
@@ -348,12 +307,12 @@ const CombinePayment = () => {
                   <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z"></path>
                 </svg>
               </button>
-            )}
+            )}  
           </div>
         ),
       },
     ],
-    []
+    [t]
   );
 
   useEffect(() => {
@@ -492,14 +451,14 @@ const CombinePayment = () => {
   return (
     <>
       <Card
-        title={"Combined Payment  Management"}
+        title={t("combinedPaymentManagement")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/combinePaymenEdit")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >
@@ -518,7 +477,7 @@ const CombinePayment = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Payment
+                {t("payment")}
               </h1>
               <button
                 type="button"
@@ -537,12 +496,12 @@ const CombinePayment = () => {
                     {/* Payment Date */}
                     <div className="col-lg-6">
                       <div className="parentFormPayment">
-                        <p>Payment Date</p>
+                        <p>{t("paymentDate")}</p>
                         <DatePicker
                           selected={selectedPaymentDate}
                           onChange={(date) => setSelectedPaymentDate(date)}
                           dateFormat="dd/MM/yyyy"
-                          placeholderText="Click to select a date"
+                          placeholderText={t("clickToSelectDate")}
                           customInput={<CustomInput />}
                         />
                       </div>
@@ -551,7 +510,7 @@ const CombinePayment = () => {
                     {/* Payment Channel */}
                     <div className="col-lg-6">
                       <div className="parentFormPayment autoComplete">
-                        <p>Payment Channel</p>
+                        <p>{t("paymentChannel")}</p>
                         <Autocomplete
                           disablePortal
                           options={paymentChannle || []}
@@ -571,7 +530,7 @@ const CombinePayment = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Search Payment Channel"
+                              placeholder={t("searchChannel")}
                               InputLabelProps={{ shrink: false }}
                             />
                           )}
@@ -582,7 +541,7 @@ const CombinePayment = () => {
                     {/* Bank Ref */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Bank Ref</p>
+                        <p>{t("bankRef")}</p>
                         <input
                           type="text"
                           value={bankReference}
@@ -594,7 +553,7 @@ const CombinePayment = () => {
                     {/* Bank Charges */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Bank Charges</p>
+                        <p>{t("bankCharges")}</p>
                         <input
                           type="text"
                           value={bankChargeAmount}
@@ -606,7 +565,7 @@ const CombinePayment = () => {
                     {/* Available Deposit */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Available Deposit</p>
+                        <p>{t("availableDeposit")}</p>
                         <input
                           type="text"
                           value={depositAvailableNew}
@@ -619,7 +578,7 @@ const CombinePayment = () => {
                     </div>
                     <div className="col-lg-6">
                       <div className="parentFormPayment mt-3">
-                        <p>Rounding</p>
+                        <p>{t("rounding")}</p>
                         <input
                           type="text"
                           value={roundingNew}
@@ -632,7 +591,7 @@ const CombinePayment = () => {
                     </div>
                     <div className="col-lg-6">
                       <div className="parentFormPayment mt-3">
-                        <p>Payment Amount</p>
+                        <p>{t("paymentAmount")}</p>
                         <input
                           type="text"
                           value={paymentAmmountNew}
@@ -646,7 +605,7 @@ const CombinePayment = () => {
 
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Notes</p>
+                        <p>{t("notes")}</p>
                         <textarea
                           type="text"
                           value={paymentNotes}
@@ -675,7 +634,7 @@ const CombinePayment = () => {
                       {/* Total Before Tax */}
                       <div className="flexBefore">
                         <div>
-                          <strong>Total Before Tax : </strong>
+                          <strong>{t("totalBeforeTax")}  </strong>
                         </div>
                         <div>
                           <span>
@@ -688,7 +647,7 @@ const CombinePayment = () => {
                       {/* VAT */}
                       <div className="flexBefore">
                         <div>
-                          <strong>VAT : </strong>
+                          <strong>{t("vat")} : </strong>
                         </div>
                         <div>
                           <span>
@@ -705,7 +664,7 @@ const CombinePayment = () => {
                       {/* WHT */}
                       <div className="flexBefore">
                         <div>
-                          <strong>WHT : </strong>
+                          <strong>{t("wht")} :</strong>
                         </div>
                         <div>
                           <span>
@@ -721,7 +680,7 @@ const CombinePayment = () => {
                       {/* Rounding Input */}
                       <div className="flexBefore">
                         <div>
-                          <strong>Rounding : </strong>
+                          <strong>{t("rounding")} :</strong>
                         </div>
                         <div>
                           <span>
@@ -731,7 +690,7 @@ const CombinePayment = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>Deposit : </strong>
+                          <strong>{t("deposit")} : </strong>
                         </div>
                         <div>
                           <span>{Number(depositAvailableNew)}</span>
@@ -758,7 +717,7 @@ const CombinePayment = () => {
                       {/* Amount to Pay */}
                       <div className="flexBefore">
                         <div>
-                          <strong>Amount to Pay : </strong>
+                          <strong>{t("amountToPay")} : </strong>
                         </div>
                         <div>
                           {/* <span>
@@ -793,7 +752,7 @@ const CombinePayment = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>Remainder : </strong>
+                          <strong>{t("remainder")} : </strong>
                         </div>
                         <div>
                           <span>
@@ -818,7 +777,7 @@ const CombinePayment = () => {
                 onClick={submitPaymentData}
                 className="btn btn-primary"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -837,7 +796,7 @@ const CombinePayment = () => {
             style={{ backgroundColor: color ? "#2f423c" : "" }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Purchase Payment Check
+              {t("purchasePaymentCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -855,7 +814,7 @@ const CombinePayment = () => {
             <div className="eanCheck errorMessage recheckReceive">
               {!selectedPaymentDate ? (
                 <p style={{ backgroundColor: color ? "" : "#631f37" }}>
-                  {"Payment Date is Required "}
+                  {t("paymentDateRequired")}
                 </p>
               ) : (
                 ""
@@ -870,7 +829,7 @@ const CombinePayment = () => {
               )}
 
               <div className="closeBtnRece">
-                <button onClick={closeIcon2}>Close</button>
+                <button onClick={closeIcon2}>{("close")}</button>
               </div>
             </div>
           </div>

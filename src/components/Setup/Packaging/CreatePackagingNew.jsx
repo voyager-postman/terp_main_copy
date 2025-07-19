@@ -5,7 +5,10 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { useEffect, useState } from "react";
 import { Autocomplete, TextField } from "@mui/material";
+import { useTranslation } from "react-i18next";
+
 const CreatePackagingNew = () => {
+  const { t } = useTranslation("global");
   const defaultState = {
     packaging_name: "",
     Inventory_ID: "",
@@ -165,7 +168,7 @@ const CreatePackagingNew = () => {
       request.packaging_weight == "";
 
     if (fieldCheck) {
-      toast.warn("Please Fill All The Fields", {
+      toast.warn(t("pleaseFillAllFields"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -175,7 +178,7 @@ const CreatePackagingNew = () => {
       .post(`${API_BASE_URL}/addPackage`, request)
       .then((response) => {
         if (response.data.success == true) {
-          toast.success("Created Successfully", {
+          toast.success(t("createSuccess"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -189,7 +192,7 @@ const CreatePackagingNew = () => {
   };
 
   return (
-    <Card title="Packaging Management / Create Form">
+    <Card title={t("packagingCreateForm")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -201,14 +204,14 @@ const CreatePackagingNew = () => {
                 <form action="">
                   <div className="row justify-content-center">
                     <div className="col-lg-4 form-group">
-                      <h6>Pack</h6>
+                      <h6>{t("pack")}</h6>
                       <div className="thbFrieght">
                         <div className="parentthb packParent">
                           <div className="childThb">
                             <input
                               type="text"
                               onChange={handleChange}
-                              placeholder="packaging_name"
+                              placeholder={t("pack")}
                               name="packaging_name"
                             />
                           </div>
@@ -216,7 +219,7 @@ const CreatePackagingNew = () => {
                       </div>
                     </div>
                     <div className="col-lg-4 form-group">
-                      <h6>Weight</h6>
+                      <h6>{t("weight")}</h6>
                       {/* <div className="parentShip">
                                                                         <div className="markupShip">
                                                                             <input type="number" placeholder='weight' onChange={handleChange} name='packaging_weight'/>
@@ -233,11 +236,11 @@ const CreatePackagingNew = () => {
                             name="packaging_weight"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="weight"
+                            placeholder={t("weight")}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>g</span>
+                          <span>{t("gram")}</span>
                         </div>
                       </div>
                     </div>
@@ -264,7 +267,7 @@ const CreatePackagingNew = () => {
                       </div>
                     </div> */}
                     <div className="form-group col-lg-4 form-group autoComplete classificationSelect mb-3">
-                      <h6>Charts of Accounting</h6>
+                      <h6>{t("chartOfAccounts")}</h6>
                       <Autocomplete
                         options={
                           classification1.map((item) => ({
@@ -286,7 +289,7 @@ const CreatePackagingNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Classification"
+                            placeholder={t("selectClassification")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -298,7 +301,7 @@ const CreatePackagingNew = () => {
                       />
                     </div>
                     <div className="form-group col-lg-4 form-group autoComplete classificationSelect mb-3">
-                      <h6>VAT Type</h6>
+                      <h6>{t("vatType")}</h6>
                       <Autocomplete
                         options={
                           classification2.map((item) => ({
@@ -320,7 +323,7 @@ const CreatePackagingNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select VAT Classification"
+                            placeholder={t("selectVatClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -333,7 +336,7 @@ const CreatePackagingNew = () => {
                     </div>
 
                     <div className="form-group col-lg-4 form-group autoComplete classificationSelect mb-3">
-                      <h6>Inventory Type</h6>
+                      <h6>{t("inventoryType")}</h6>
                       <Autocomplete
                         options={
                           classification3.map((item) => ({
@@ -355,7 +358,7 @@ const CreatePackagingNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Inventory Classification"
+                            placeholder={t("selectInventoryClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -368,7 +371,7 @@ const CreatePackagingNew = () => {
                     </div>
 
                     <div className="form-group col-lg-4 form-group autoComplete classificationSelect mb-3">
-                      <h6> WHT Type</h6>
+                      <h6>{t("whtType")}</h6>
                       <Autocomplete
                         options={
                           classification4.map((item) => ({
@@ -390,7 +393,7 @@ const CreatePackagingNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select WHT Classification"
+                            placeholder={t("selectWhtClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -414,10 +417,10 @@ const CreatePackagingNew = () => {
                 name="signup"
                 onClick={addPackaging}
               >
-                Create
+                {t("create")}
               </button>
               <Link className="btn btn-danger" to="/packagingNew">
-                Cancel
+                {t("cancel")}
               </Link>
             </div>
           </div>

@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import { TableView } from "../table";
 import { Card } from "../../card";
+import { useTranslation } from "react-i18next";
 
 const InventoryPackaging = () => {
+  const { t, i18n } = useTranslation("global");
   const formatTwoDecimals = (value) => {
     return new Intl.NumberFormat(undefined, {
       minimumFractionDigits: 2,
@@ -53,7 +55,7 @@ const InventoryPackaging = () => {
       .then((response) => {
         setIsModalVisible(false);
         console.log(response);
-        toast.success("Stock Adjustment Added Successfully", {
+        toast.success(t("stockAdjustmentSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -64,7 +66,7 @@ const InventoryPackaging = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -74,20 +76,20 @@ const InventoryPackaging = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: () => <div style={{ textAlign: "center" }}>Item</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("item")}</div>,
         accessor: "Item",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Unit</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("unit")}</div>,
         accessor: "Unit",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
 
       {
         Header: () => (
-          <div style={{ textAlign: "center",}}>
-            Quantity Available{" "}
+          <div style={{ textAlign: "center", }}>
+            {t("quantityAvailable")}{" "}
           </div>
         ),
         accessor: "Quantity Available",
@@ -96,14 +98,14 @@ const InventoryPackaging = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Average Cost </div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("averageCost")}</div>,
         accessor: "Average Cost",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
         ),
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="editIcon">
             <i className=" ps-2 mdi mdi-eye" />
@@ -119,7 +121,7 @@ const InventoryPackaging = () => {
         ),
       },
     ],
-    []
+    [t]
   );
   const dataClear = () => {
     setIsModalVisible(false);
@@ -128,14 +130,14 @@ const InventoryPackaging = () => {
   return (
     <>
       <Card
-        title="Available Packaging Management"
+        title={t("packingAvail")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/createUser")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >
@@ -156,7 +158,7 @@ const InventoryPackaging = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h1 className="modal-title fs-5" id="exampleModalLabel">
-                  Stock Adjustment PB
+                  {t("stockAdjustment")}
                 </h1>
                 <button
                   type="button"
@@ -171,7 +173,7 @@ const InventoryPackaging = () => {
               </div>
               <div className="modal-body">
                 <div className="form-group col-lg-12 formCreate">
-                  <h6>Quantity on hand</h6>
+                  <h6>{t("quantityOnHand")}</h6>
                   <div>
                     <input
                       type="text"
@@ -189,7 +191,7 @@ const InventoryPackaging = () => {
                   onClick={updateBoxes}
                   className="btn mb-0 btn-primary"
                 >
-                  Update
+                  {t("update")}
                 </button>
               </div>
             </div>

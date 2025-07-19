@@ -7,7 +7,11 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import MySwal from "../../../swal";
 import { Button, Modal } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
+
 export const OrderPackagingEdit = () => {
+  const { t, i18n } = useTranslation("global");
+
   const navigate = useNavigate();
   const location = useLocation();
   // const [editRowIndex, setEditRowIndex] = useState(null);
@@ -68,7 +72,7 @@ export const OrderPackagingEdit = () => {
         setDetails(response.data.data || []);
         setTableHeader(response.data.table_head);
       })
-      .catch((e) => {});
+      .catch((e) => { });
   };
 
   // const handleEditValues = (index, e) => {
@@ -179,7 +183,7 @@ export const OrderPackagingEdit = () => {
         })
         .then((response) => {
           console.log(response);
-          toast.success("Order packaged successfully", {
+          toast.success(t("order_pack_success"), {
             theme: "colored",
           });
           getOrdersDetails();
@@ -193,7 +197,7 @@ export const OrderPackagingEdit = () => {
         // Open a modal here
         setShow(true);
       } else {
-        toast.error("Something went wrong", {
+        toast.error(t("genericError"), {
           theme: "colored",
         });
       }
@@ -294,7 +298,7 @@ export const OrderPackagingEdit = () => {
 
       setEditedValue({});
       getOrdersDetails();
-      toast.success("Value updated successfully!");
+      toast.success(t("value_update_success"));
     } catch (error) {
       console.error("Failed to update packing:", error);
     }
@@ -305,7 +309,7 @@ export const OrderPackagingEdit = () => {
   };
   return (
     <>
-      <Card title="Expense Item Management / Edit Form">
+      <Card title={t("expense_edit_form_2")}>
         <div
           id="datatable_wrapper"
           className="information_dataTables dataTables_wrapper dt-bootstrap4 px-4"
@@ -314,7 +318,7 @@ export const OrderPackagingEdit = () => {
             <form action="">
               <div className="row formEan">
                 <div className="col-lg-3 form-group">
-                  <h6> Order Code </h6>
+                  <h6>{t("order_code")}</h6>
                   <input
                     readOnly
                     className="border-0"
@@ -322,7 +326,7 @@ export const OrderPackagingEdit = () => {
                   />
                 </div>
                 <div className="col-lg-3 form-group">
-                  <h6>Shipment Ref </h6>
+                  <h6>{t("shipmentRef")} </h6>
                   <input
                     readOnly
                     className="border-0"
@@ -330,7 +334,7 @@ export const OrderPackagingEdit = () => {
                   />
                 </div>
                 <div className="col-lg-3 form-group">
-                  <h6> Load Date </h6>
+                  <h6> {t("loadDate")} </h6>
                   <input
                     readOnly
                     className="border-0"
@@ -342,7 +346,7 @@ export const OrderPackagingEdit = () => {
                   />
                 </div>
                 <div className="col-lg-3 form-group">
-                  <h6> Load Time </h6>
+                  <h6>{t("loadTime")}</h6>
                   <input
                     readOnly
                     className="border-0"
@@ -372,7 +376,7 @@ export const OrderPackagingEdit = () => {
                               !["Order_ID", "OD ID", "Status"].includes(key)
                           )
                           .map(([key, label]) => <th key={key}>{label}</th>)}
-                      <th>Action</th>
+                      <th>{t("action")}</th>
                     </tr>
                   </thead>
 
@@ -606,14 +610,14 @@ export const OrderPackagingEdit = () => {
         </div>
         <div className="card-footer">
           <Link className="btn btn-danger" to={"/orderPackaging"}>
-         Close
+             {t("close")}
           </Link>
         </div>
         <Modal className="modalError" show={show} onHide={handleClose}>
           <div className="modal-content">
-            <div className="modal-header" style={{borderBottom:"unset"}}>
+            <div className="modal-header" style={{ borderBottom: "unset" }}>
               <h1 className="modal-title text-center fs-5 w-100" id="exampleModalLabel">
-                Stock Check
+              {t("stock_check")}
               </h1>
               {/* <button
                 style={{ color: "#fff", fontSize: "30px" }}
@@ -628,8 +632,8 @@ export const OrderPackagingEdit = () => {
                 <p>{stock.message ? stock.message : "NULL"}</p>
                 <p>{stock.message2 ? stock.message2 : "NULL"}</p>
                 <div className="closeBtnRece mt-3">
-                <button  onClick={() => setShow(false)}>Close</button>
-              </div>
+                  <button onClick={() => setShow(false)}>{t("close")}</button>
+                </div>
                 {/* <p>{stock.message3 ? stock.message3 : "NULL"}</p> */}
               </div>
             </div>

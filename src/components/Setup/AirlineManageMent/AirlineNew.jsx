@@ -5,8 +5,10 @@ import { toast } from "react-toastify"
 import { API_BASE_URL } from "../../../Url/Url"
 import { Card } from "../../../card"
 import { TableView } from "../../table"
+import { useTranslation } from "react-i18next";
 
 const AirlineNew = () => {
+	const { t } = useTranslation("global");
 	const navigate = useNavigate()
 	const [data, setData] = useState([])
 
@@ -51,28 +53,28 @@ const AirlineNew = () => {
 	const columns = useMemo(
 		() => [
 			{
-				Header: "Id",
+				Header:"id",
 				accessor: (_row, i) => _row.liner_id,
 			},
 
 			{
-				Header: "Name",
+				Header: t("name"),
 				accessor: (a) => a.liner_name,
 			},
 
 			{
-				Header: "Code",
+				Header: t("code"),
 				accessor: (a) => a.liner_code,
 			},
 
 			{
-				Header: "Service Type",
+				Header: t("serviceType"),
 				accessor: (a) =>
 					({ 1: "Air", 2: "Sea", 3: "Land" })[`${a.liner_type_id}`],
 			},
 
 			{
-				Header: "Status",
+				Header: t("status"),
 				accessor: (a) => (
 					<label
 						style={{
@@ -92,8 +94,8 @@ const AirlineNew = () => {
 							defaultChecked={a.status == "on" ? true : false}
 						/>
 						<span>
-							<span>OFF</span>
-							<span>ON</span>
+							<span>{t("off")}</span>
+							<span>{t("on")}</span>
 						</span>
 						<a></a>
 					</label>
@@ -101,7 +103,7 @@ const AirlineNew = () => {
 			},
 
 			{
-				Header: "Actions",
+				Header: t("actions"),
 				accessor: (a) => (
 					<Link to="/update_airline" state={{ from: a }}>
 						<i
@@ -117,21 +119,21 @@ const AirlineNew = () => {
 				),
 			},
 
-		
+
 		],
-		[],
+		[t],
 	)
 
 	return (
 		<Card
-			title="Liner Management"
+			title= {t("liner_management")}
 			endElement={
 				<button
 					type="button"
 					onClick={() => navigate("/add_airline")}
 					className="btn button btn-info"
 				>
-					Create
+					{t("create")}
 				</button>
 			}
 		>

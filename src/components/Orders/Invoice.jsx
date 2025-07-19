@@ -6,7 +6,6 @@ import { useQuery } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import logo from "../../assets/logoT.jpg";
-
 import "jspdf-autotable";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
@@ -16,8 +15,9 @@ import { TableView } from "../table";
 import { API_IMAGE_URL } from "../../Url/Url";
 import { Button, Modal } from "react-bootstrap";
 import RobotoRegular from "../../assets/fonts/Roboto_Regular";
-
+import { useTranslation } from "react-i18next";
 const Invoice = () => {
+  const [t, i18n] = useTranslation("global");
   const [isLoading, setIsLoading] = useState(false);
   const loadingModal = MySwal.mixin({
     title: "Loading...",
@@ -100,7 +100,7 @@ const Invoice = () => {
     });
 
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      throw new Error(t("networkError"));
     }
 
     return response.json();
@@ -232,10 +232,10 @@ const Invoice = () => {
             order_id: dataFind?.order_id,
             ...value,
           });
-          toast.success("Order update successfully");
+          toast.success(t("orderUpdateSuccess"));
           refetch();
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("genericError"));
         }
       }
       closeModal();
@@ -294,11 +294,11 @@ const Invoice = () => {
       });
       console.log("API response:", response);
       allInvoiceData();
-      toast.success("Update  successfully");
+      toast.success(t("invoiceLoaded"));
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
-      toast.error("Failed to invoice  Loaded");
+      toast.error(t("invoiceLoadFailed"));
     }
   };
   const quotationConfirmation8 = async (Invoice_id) => {
@@ -311,11 +311,11 @@ const Invoice = () => {
       });
       console.log("API response:", response);
       allInvoiceData();
-      toast.success("Update  successfully");
+      toast.success(t("invoiceLoaded"));
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
-      toast.error("Failed to invoice  Loaded");
+      toast.error(t("invoiceLoadFailed"));
     }
   };
   const quotationConfirmation10 = async (Invoice_id, document) => {
@@ -330,14 +330,14 @@ const Invoice = () => {
 
       console.log("API response:", response);
       allInvoiceData();
-      toast.success("Update successfully");
+      toast.success(t("invoiceLoaded"));
 
       // Open the PDF in a new tab
       const pdfUrl = `${API_IMAGE_URL}${document}`;
       window.open(pdfUrl, "_blank");
     } catch (error) {
       console.error("API call error:", error);
-      toast.error("Failed to invoice Loaded");
+      toast.error(t("invoiceLoadFailed"));
     }
   };
 
@@ -380,7 +380,7 @@ const Invoice = () => {
       setSelectedFile(file);
       setErrorMessage("");
     } else {
-      setErrorMessage("Please select a PDF file.");
+      setErrorMessage(t("selectPdf"));
       setSelectedFile(null);
     }
   };
@@ -406,7 +406,7 @@ const Invoice = () => {
       setSelectedFile1(file);
       setErrorMessage("");
     } else {
-      setErrorMessage("Please select a PDF file.");
+      setErrorMessage(t("selectPdf"));
       setSelectedFile1(null);
     }
   };
@@ -425,7 +425,7 @@ const Invoice = () => {
           modalInstance.hide();
         }
         console.log(response);
-        toast.success("Invoice Adjustment  Weight Added Successfully", {
+        toast.success(t("invoiceWeightAdjusted"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -443,7 +443,7 @@ const Invoice = () => {
   };
   const uploadData1 = () => {
     if (!selectedFile) {
-      setErrorMessage("No file selected.");
+      setErrorMessage(t("noFileSelected"));
       return;
     }
 
@@ -476,7 +476,7 @@ const Invoice = () => {
           setShow(false);
         }
         console.log(response);
-        toast.success("Call Invoice Shipped Successfully", {
+        toast.success(t("invoiceShipped"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -521,12 +521,10 @@ const Invoice = () => {
         .catch((error) => {
           console.error(error);
           if (error.response?.status === 400) {
-            // setMassageSet(error.response.data.message);
             messageSet = error.response.data.message;
             console.log(error.response.data.message);
           }
         });
-      // Fetch PDF details
 
       const deliveryApi = await axios.post(`${API_BASE_URL}/pdf_delivery_by`, {
         order_id: a?.order_id,
@@ -2487,7 +2485,7 @@ const Invoice = () => {
       });
       console.log("API response:", response);
 
-      toast.success("success");
+      toast.success(t("success"));
       allInvoiceData();
 
       getOrdersDetails();
@@ -2495,12 +2493,12 @@ const Invoice = () => {
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
-      toast.error("Failed to Copy Order Procedure");
+      toast.error(t("copyOrderFailed"));
     }
   };
   const uploadData2 = () => {
     if (!selectedFile1) {
-      setErrorMessage("No file selected.");
+      setErrorMessage(t("noFileSelected"));
       return;
     }
 
@@ -2554,7 +2552,7 @@ const Invoice = () => {
           modalInstance.hide();
         }
         console.log(response);
-        toast.success("Invoice Note Updated Successfully", {
+        toast.success(t("invoiceNoteUpdated"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -2586,14 +2584,14 @@ const Invoice = () => {
         } else if (response.status === 200) {
           allInvoiceData();
 
-          toast.success("Invoice cancel successful", {
+          toast.success(t("invoiceCancelled"), {
             autoClose: 1000,
             theme: "colored",
           });
         } else {
           allInvoiceData();
 
-          toast.warn("Something went wrong", {
+          toast.warn(t("genericError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -2721,11 +2719,11 @@ const Invoice = () => {
       setAmounts({});
       setPaymentDate(""); // if you're using a date field
       console.log("AddClaimDetails response:", response);
-      toast.success("Claim data submitted successfully");
+      toast.success(t("claimSubmitted"));
       // Optional: show success toast or refresh data
     } catch (error) {
       console.error("Error in AddClaimDetails:", error);
-      toast.error("Error in AddClaimDetails");
+      toast.error(t("errorAddClaimDetails"));
       // Optional: show error toast
     }
   };
@@ -2778,7 +2776,7 @@ const Invoice = () => {
       }
     } catch (error) {
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
 
@@ -2808,32 +2806,32 @@ const Invoice = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Invoice Number",
+        Header: t("invoiceNumber"),
         accessor: "Invoice_Number",
       },
       {
-        Header: "Order Number",
+        Header: t("orderNumber"),
         accessor: "Order_Number",
       },
       {
-        Header: "Shipment Ref",
+        Header: t("shipmentRef"),
         accessor: "Shipment_ref",
       },
       {
-        Header: "Consignee Name",
+        Header: t("consigneeName"),
         accessor: "Consignee_name",
       },
       {
-        Header: "Client Ref",
+        Header: t("clientRef"),
         accessor: "Customer_ref",
       },
       {
-        Header: "AWB/BL",
+        Header: t("awbBl"),
         accessor: "BL",
       },
 
       {
-        Header: "Ship Date",
+        Header: t("shipDate"),
         accessor: (a) =>
           `${new Date(a.Ship_date).getDate().toString().padStart(2, "0")}-${(
             new Date(a.Ship_date).getMonth() + 1
@@ -2842,12 +2840,12 @@ const Invoice = () => {
             .padStart(2, "0")}-${new Date(a.Ship_date).getFullYear()}`,
       },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: "status_name",
       },
 
       {
-        Header: "Action",
+        Header: t("action"),
         accessor: (a) => (
           <>
             <div className="editIcon">
@@ -3091,7 +3089,7 @@ const Invoice = () => {
         ),
       },
     ],
-    [data, form]
+    [data, form, t]
   );
   // const invoiceFirstpdf=()=>{
   //   navigate("/invoicefirsttpdf")
@@ -4334,10 +4332,6 @@ const Invoice = () => {
       const yIncrementRight = 1; // Adjust this value based on your spacing requirements
 
       const textDataRight = [
-        // { label: "AWB/BL:", value: `${a?.bl}` },
-        // { label: "Ship Date: ", value: `${formatDate1(a?.Ship_date)}` },
-        // { label: "Delivery By:", value: `` },
-
         {
           label: `${invoiceResponse?.data?.transportTypeLabel.AWB}`,
           value: `${invoiceResponse?.data?.transportInfo.AWB}`,
@@ -4369,8 +4363,16 @@ const Invoice = () => {
 
       // invoice to
       doc.setFontSize(12);
-      doc.text("Invoice to", 7, 48.5);
-      doc.text("Consignee Details", 100, 48.5);
+      doc.text(
+        `${invoiceResponse?.data?.clientLabel["Client Details"]}`,
+        7,
+        48.5
+      );
+      doc.text(
+        `${invoiceResponse?.data?.consigneeLabel["Consignee Details"]}`,
+        100,
+        48.5
+      );
     };
     doc.setFillColor(32, 55, 100);
     doc.rect(7, 50.5, doc.internal.pageSize.width - 15, 0.5, "FD");
@@ -4401,8 +4403,7 @@ const Invoice = () => {
       invoiceResponse.data?.client_address.Address2,
       invoiceResponse.data?.client_address.Address3,
       invoiceResponse.data?.client_address.Address4,
-      invoiceResponse.data?.client_address.client_address3,
-      a.client_email,
+      invoiceResponse.data?.client_address.client_phone,
     ].filter((text) => text && text.toString().trim() !== "");
 
     let currentY1 = commonStartY;
@@ -4727,7 +4728,7 @@ const Invoice = () => {
   return (
     <>
       <Card
-        title="Invoice Management"
+        title={t("invoiceManagement")}
         // endElement={
         // <button
         //   type="button"
@@ -4752,7 +4753,7 @@ const Invoice = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Invoice Adjust Weight
+                {t("adjustInvoiceWeight")}
               </h1>
               <button
                 type="button"
@@ -4765,7 +4766,7 @@ const Invoice = () => {
             </div>
             <div className="modal-body">
               <div className="form-group col-lg-12 formCreate">
-                <h6> Invoice Adjust Weight</h6>
+                <h6> {t("adjustInvoiceWeight")}</h6>
                 <div>
                   <input
                     type="text"
@@ -4783,7 +4784,7 @@ const Invoice = () => {
                 onClick={uploadData}
                 className="btn mb-0 btn-primary"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -4801,7 +4802,7 @@ const Invoice = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel1">
-                Call Invoice Shipped
+                {t("callInvoiceShipped")}
               </h1>
               <button
                 type="button"
@@ -4814,7 +4815,7 @@ const Invoice = () => {
             </div>
             <div className="modal-body">
               <div className="form-group col-lg-12 formCreate">
-                <h6> Upload Pdf</h6>
+                <h6>{t("uploadPdf")}</h6>
                 <div>
                   <input
                     type="file"
@@ -4825,7 +4826,11 @@ const Invoice = () => {
                   {errorMessage && (
                     <p style={{ color: "red" }}>{errorMessage}</p>
                   )}
-                  {selectedFile && <p>Selected file: {selectedFile.name}</p>}
+                  {selectedFile && (
+                    <p>
+                      {t("selectedFile")}: {selectedFile.name}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -4835,7 +4840,7 @@ const Invoice = () => {
                 onClick={uploadData1}
                 className="btn mb-0 btn-primary"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -4853,7 +4858,7 @@ const Invoice = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Set Invoice Note
+                {t("setInvoiceNote")}
               </h1>
               <button
                 type="button"
@@ -4864,9 +4869,10 @@ const Invoice = () => {
             </div>
             <div className="modal-body">
               <textarea
+              className="ps-2"
                 value={notes}
                 onChange={handleChange2}
-                placeholder="Type Notes Here"
+                placeholder={t("typeNotes")}
               />
             </div>
             <div className="modal-footer">
@@ -4875,14 +4881,14 @@ const Invoice = () => {
                 className="btn btn-secondary "
                 data-bs-dismiss="modal"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
                 onClick={dataSubmit}
                 className="btn btn-primary"
               >
-                ok
+                {t("ok")}
               </button>
             </div>
           </div>
@@ -4900,7 +4906,7 @@ const Invoice = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel1">
-                Upload Invoice Shipe
+                {t("uploadInvoice")}
               </h1>
               <button
                 type="button"
@@ -4913,7 +4919,7 @@ const Invoice = () => {
             </div>
             <div className="modal-body">
               <div className="form-group col-lg-12 formCreate">
-                <h6> Upload Pdf</h6>
+                <h6> {t("uploadPdf")}</h6>
                 <div>
                   <input
                     type="file"
@@ -4924,7 +4930,11 @@ const Invoice = () => {
                   {errorMessage && (
                     <p style={{ color: "red" }}>{errorMessage}</p>
                   )}
-                  {selectedFile1 && <p>Selected file: {selectedFile1.name}</p>}
+                  {selectedFile1 && (
+                    <p>
+                      {t("selectedFile")}: {selectedFile1.name}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -4934,7 +4944,7 @@ const Invoice = () => {
                 onClick={uploadData2}
                 className="btn mb-0 btn-primary"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -4951,7 +4961,7 @@ const Invoice = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Claim
+                {t("claim")}
               </h1>
               <button
                 type="button"
@@ -5024,7 +5034,7 @@ const Invoice = () => {
               <div className="uploadFileMain">
                 <div>
                   <p>
-                    <strong>Claim Date</strong>
+                    <strong>{t("claimDate")}</strong>
                   </p>
                   <input
                     type="date"
@@ -5034,7 +5044,7 @@ const Invoice = () => {
                 </div>
                 <div className="uploadFile">
                   <p>
-                    <strong>Upload</strong>
+                    <strong>{t("upload")}</strong>
                   </p>
                   <div className="parentInsideUp">
                     <div>
@@ -5084,7 +5094,7 @@ const Invoice = () => {
                                 }
                               >
                                 <option value="" disabled>
-                                  Select an option
+                                  {t("selectOption")}
                                 </option>
                                 {claim?.map((claim) => (
                                   <option
@@ -5122,7 +5132,7 @@ const Invoice = () => {
                                 }
                               >
                                 <option value="" disabled>
-                                  Select an option
+                                  {t("selectOption")}
                                 </option>
                                 {unit?.map((unitItem) => (
                                   <option key={unitItem.ID} value={unitItem.ID}>
@@ -5155,7 +5165,7 @@ const Invoice = () => {
                 className="btn btn-primary"
                 onClick={handleSubmit1}
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -5165,7 +5175,7 @@ const Invoice = () => {
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Freight or Transport Error
+              {t("freightError")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -5196,7 +5206,7 @@ const Invoice = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Invoice Modal
+                {t("invoiceModal")}
               </h1>
               <button
                 onClick={clearData}
@@ -5213,7 +5223,7 @@ const Invoice = () => {
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6> Use Agreed pricing ?</h6>
+                      <h6>{t("useAgreedPricing")} ?</h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5231,8 +5241,8 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span> {t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
@@ -5240,7 +5250,7 @@ const Invoice = () => {
                     </div>
 
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Use custom name? </h6>
+                      <h6>{t("useCustomName")}? </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5258,15 +5268,15 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange1}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
                       </div>
                     </div>
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Show Gross weight and CBM ? </h6>
+                      <h6>{t("showGrossWeightAndCBM")} </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5284,8 +5294,8 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange2}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
@@ -5293,7 +5303,7 @@ const Invoice = () => {
                     </div>
 
                     <div className="invoiceModal">
-                      <h6>Invoice Name Can be -</h6>
+                      <h6>{t("invoiceNameCanBe")} -</h6>
                       <input
                         type="radio"
                         id="html1"
@@ -5302,7 +5312,7 @@ const Invoice = () => {
                         checked={selectedInvoice === "Client"}
                         onChange={handleRadioChange}
                       />
-                      <label htmlFor="html1">Client</label>
+                      <label htmlFor="html1">{t("client")}</label>
 
                       <input
                         type="radio"
@@ -5312,10 +5322,10 @@ const Invoice = () => {
                         checked={selectedInvoice === "Consignee"}
                         onChange={handleRadioChange}
                       />
-                      <label htmlFor="css1">Consignee</label>
+                      <label htmlFor="css1">{t("consignee")}</label>
                     </div>
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Show exchange rate ? </h6>
+                      <h6>{t("showExchangeRate")} ? </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5333,8 +5343,8 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange3}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
@@ -5342,7 +5352,7 @@ const Invoice = () => {
                     </div>
 
                     <div className="invoiceModal">
-                      <h6>Delivery Terms - </h6>
+                      <h6>{t("deliveryTerms")}- </h6>
                       {deliveryList?.map((term) => (
                         <div key={term.id}>
                           <input
@@ -5369,7 +5379,7 @@ const Invoice = () => {
                 onClick={generatePdf}
                 className="btn btn-primary mb-4"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -5386,7 +5396,7 @@ const Invoice = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Invoice Modal
+                {t("invoiceModal")}
               </h1>
               <button
                 onClick={clearData1}
@@ -5403,7 +5413,7 @@ const Invoice = () => {
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Use custom name? </h6>
+                      <h6>{t("useCustomName")}? </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5421,15 +5431,15 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange5}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
                       </div>
                     </div>
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Show Gross weight and CBM ? </h6>
+                      <h6>{t("showGrossWeightAndCBM")} ? </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5447,8 +5457,8 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange4}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
@@ -5456,7 +5466,7 @@ const Invoice = () => {
                     </div>
 
                     <div className="invoiceModal">
-                      <h6>Invoice Name Can be -</h6>
+                      <h6>{t("invoiceNameCanBe")} -</h6>
                       <input
                         type="radio"
                         id="html1"
@@ -5465,7 +5475,7 @@ const Invoice = () => {
                         checked={selectedInvoice1 === "Client"}
                         onChange={handleRadioChange6}
                       />
-                      <label htmlFor="html1">Client</label>
+                      <label htmlFor="html1">{t("client")}</label>
 
                       <input
                         type="radio"
@@ -5475,10 +5485,10 @@ const Invoice = () => {
                         checked={selectedInvoice1 === "Consignee"}
                         onChange={handleRadioChange6}
                       />
-                      <label htmlFor="css1">Consignee</label>
+                      <label htmlFor="css1">{t("consignee")}</label>
                     </div>
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Barcode </h6>
+                      <h6>{t("barcode")} </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5496,15 +5506,15 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange7}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
                       </div>
                     </div>
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>CustomBarcode </h6>
+                      <h6>{t("customBarcode")}</h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5522,15 +5532,15 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange8}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
                       </div>
                     </div>
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Notes </h6>
+                      <h6>{t("notes")} </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -5548,8 +5558,8 @@ const Invoice = () => {
                             onChange={handleAgreedPricingChange9}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
@@ -5565,7 +5575,7 @@ const Invoice = () => {
                 onClick={generatePdf5}
                 className="btn btn-primary mb-4"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>

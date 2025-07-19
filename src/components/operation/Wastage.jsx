@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import { Card } from "../../card";
 import { TableView } from "../table";
+import { useTranslation } from "react-i18next";
 
 const Wastage = () => {
+  const { t, i18n } = useTranslation("global");
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(true);
   const navigate = useNavigate();
@@ -37,7 +39,7 @@ const Wastage = () => {
       .then((resp) => {
         // console.log(resp, "Check Resp")
         if (resp.data.success == true) {
-          toast.success("Status Updated Successfully", {
+          toast.success(t("statusUpdated"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -57,20 +59,20 @@ const Wastage = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "PO Code",
+        Header: t("poCode"),
         accessor: "PODCODE",
       },
       {
-        Header: "Vendor Name",
+        Header: t("vendorName"),
         accessor: "Vendor_Name",
       },
       {
-        Header: "Name (EN)",
+        Header: t("nameEn"),
         accessor: "Name_EN",
       },
 
       {
-        Header: "Date",
+        Header: t("date"),
         accessor: (row) => {
           const date = new Date(row.Date);
           const day = String(date.getDate()).padStart(2, "0");
@@ -80,21 +82,21 @@ const Wastage = () => {
         },
       },
       {
-        Header: "Crates",
+        Header: t("creates"),
         accessor: (row) => formatTwoDecimal.format(row.Crates),
         Cell: ({ value }) => (
           <div style={{ textAlign: "right", width: "100%" }}>{value}</div>
         ),
       },
       {
-        Header: "Quantity",
+        Header: t("quantity"),
         accessor: (row) => formatTwoDecimal.format(row.Quantity),
         Cell: ({ value }) => (
           <div style={{ textAlign: "right", width: "100%" }}>{value}</div>
         ),
       },
       {
-        Header: "Unit",
+        Header: t("unit"),
         accessor: (row) => <div>{row.Unit}</div>,
         Cell: ({ value }) => (
           <div style={{ textAlign: "center", width: "100%" }}>{value}</div>
@@ -108,7 +110,7 @@ const Wastage = () => {
       //   ),
       // },
       {
-        Header: "Qty/Crate",
+        Header: t("qtyPerCrate"),
         accessor: "Qty/Crate",
       },
       // {
@@ -116,7 +118,7 @@ const Wastage = () => {
       //   accessor: "sorting_id",
       // },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -142,7 +144,7 @@ const Wastage = () => {
         ),
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (row) => (
           <Link to="/update_ean" state={{ from: row }}>
             <i
@@ -158,19 +160,19 @@ const Wastage = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
   return (
     <Card
-      title={"Wastage Management"}
+      title={t("wastageManagement")}
       endElement={
         <button
           type="button"
           //   onClick={() => navigate("/add_ean")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

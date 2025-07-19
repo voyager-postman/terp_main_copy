@@ -17,8 +17,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaCaretDown } from "react-icons/fa"; // Import an icon from react-icons
+import { useTranslation } from "react-i18next";
 
 const CreateQuotationTest = () => {
+  const { t, i18n } = useTranslation("global");
   const [color, setColor] = useState(false);
   const { data: RoundingDataList } = useQuery("GetRoundingTable");
   const [copyData, setCopyData] = useState("");
@@ -91,7 +93,7 @@ const CreateQuotationTest = () => {
         });
         setOrderId(res?.data?.order_id);
         getOrdersDetails();
-        toast.success("Quotation populated successfully", {
+        toast.success(t("quotationPopulatedSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -104,7 +106,7 @@ const CreateQuotationTest = () => {
       })
 
       .catch((err) => {
-        toast.error("Failed to populate quotation", {
+        toast.error(t("quotationPopulateFailed"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -242,7 +244,7 @@ const CreateQuotationTest = () => {
           [name]: value,
         });
         console.log(`${name} updated successfully`);
-        toast.success(" updated successfully!", {
+        toast.success(t("updateSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -334,7 +336,7 @@ const CreateQuotationTest = () => {
         }
       } catch (error) {
         console.error("API error:", error);
-        toast.error("Failed to update status", {
+        toast.error(t("failedToUpdateStatus"), {
           autoClose: 1500,
           theme: "colored",
         });
@@ -363,7 +365,7 @@ const CreateQuotationTest = () => {
         }
       } catch (error) {
         console.error("API error:", error);
-        toast.error("Failed to update status", {
+        toast.error(t("failedToUpdateStatus"), {
           autoClose: 1500,
           theme: "colored",
         });
@@ -392,7 +394,7 @@ const CreateQuotationTest = () => {
         }
       } catch (error) {
         console.error("API error:", error);
-        toast.error("Failed to update status", {
+        toast.error(t("failedToUpdateStatus"), {
           autoClose: 1500,
           theme: "colored",
         });
@@ -421,7 +423,7 @@ const CreateQuotationTest = () => {
         }
       } catch (error) {
         console.error("API error:", error);
-        toast.error("Failed to update status", {
+        toast.error(t("failedToUpdateStatus"), {
           autoClose: 1500,
           theme: "colored",
         });
@@ -450,7 +452,7 @@ const CreateQuotationTest = () => {
         }
       } catch (error) {
         console.error("API error:", error);
-        toast.error("Failed to update status", {
+        toast.error(t("failedToUpdateStatus"), {
           autoClose: 1500,
           theme: "colored",
         });
@@ -485,40 +487,6 @@ const CreateQuotationTest = () => {
     });
   }, [details]);
 
-  // console.log(isError);
-  // const isMinWeightError = useMemo(() => {
-  //   return (
-  //     (+summary?.Gross_weight || 0) <
-  //     freights?.find(
-  //       (v) => v.Freight_provider == computedState.Freight_provider_
-  //     )?.min_weight
-  //   );
-  // }, [freights, summary]);
-  // const isMinWeightTransportError = useMemo(() => {
-  //   return (
-  //     (+summary?.Gross_weight || 0) <
-  //       freights?.find(
-  //         (v) => v.Freight_provider == computedState.Freight_provider_
-  //       )?.min_weight &&
-  //     (+summary?.Gross_weight || 0) >=
-  //       transport?.find(
-  //         (v) =>
-  //           v.Transportation_provider == computedState.Transportation_provider
-  //       )?.max_weight3
-  //   );
-  // }, [freights, summary]);
-  // const isMinTransportError = useMemo(() => {
-  //   return (
-  //     (+summary?.Gross_weight || 0) >=
-  //     transport?.find(
-  //       (v) =>
-  //         v.Transportation_provider == computedState.Transportation_provider
-  //     )?.max_weight3
-  //   );
-  // }, [freights, summary]);
-  // console.log(isMinWeightError);
-  // console.log(isMinTransportError);
-
   const deleteDetail = async (i) => {
     if (isReadOnly || isLoading) return;
     if (details[i].OD_ID) {
@@ -544,8 +512,7 @@ const CreateQuotationTest = () => {
               getOrdersDetails();
               return prevState.filter((v, index) => index != i);
             });
-
-            toast.success("Quotation detail deleted successfully");
+            toast.success(t("quotationDetailDeletedSuccess"));
           }
         });
       } catch (e) {}
@@ -558,7 +525,6 @@ const CreateQuotationTest = () => {
   const handleChange3 = (e) => {
     setNotes1(e.target.value);
   };
-
 
   const handleSubmit = async () => {
     try {
@@ -578,7 +544,7 @@ const CreateQuotationTest = () => {
       const modalInstance = bootstrap.Modal.getInstance(modalEl);
       if (modalInstance) modalInstance.hide();
       setState5("");
-      toast.success(" Price updated  successfully");
+      toast.success(`${t("price")} ${t("updateSuccess")}`);
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -599,7 +565,7 @@ const CreateQuotationTest = () => {
           modalInstance.hide();
         }
         if (response.data.success) {
-          toast.success("Quotation Deleted Successfully", {
+          toast.success(t("quotationDeletedSuccessfully"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -629,7 +595,7 @@ const CreateQuotationTest = () => {
     if (deleteOrderId) {
       try {
         await axios.post(`${API_BASE_URL}/deleteOrder`, { id: deleteOrderId });
-        toast.success("Quotation cancel successfully");
+        toast.success(t("quotationCancelSuccessfully"));
         navigate("/quotation");
         oneQoutationDAta();
         refetch();
@@ -698,7 +664,7 @@ const CreateQuotationTest = () => {
       } else if (data.success === true) {
         calculateList();
         setShow(false);
-        toast.success("Quotation Calculated successfully", {
+        toast.success(t("quotationCalculatedSuccessfully"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -710,7 +676,7 @@ const CreateQuotationTest = () => {
       // getSummary();
     } catch (e) {
       console.error(e);
-      toast.error("Something went wrong", {
+      toast.error(t("tryAgain"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -733,8 +699,7 @@ const CreateQuotationTest = () => {
       );
       console.log(response);
       getOrdersDetails();
-
-      toast.success("Invoice Price updated  successfully");
+      toast.success(`${t("invoicePrice")} ${t("updateSuccess")}`);
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -747,12 +712,12 @@ const CreateQuotationTest = () => {
       console.log(response);
       getOrdersDetails();
 
-      toast.success("Agreed Price updated  successfully");
+      toast.success(`${t("agreedPrice")} ${t("updateSuccess")}`);
     } catch (e) {
       console.error("Something went wrong", e);
     }
   };
-    const handleSubmit3 = async () => {
+  const handleSubmit3 = async () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/LASTPrice`, {
         Order_ID: state.order_id,
@@ -760,7 +725,7 @@ const CreateQuotationTest = () => {
       console.log(response);
       getOrdersDetails();
 
-      toast.success("Last Price updated  successfully");
+      toast.success(`${t("lastPrice")} ${t("updateSuccess")}`);
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -806,7 +771,7 @@ const CreateQuotationTest = () => {
       } else if (data.success === true) {
         calculateList();
         setShow(false);
-        toast.success("Quotation Calculated successfully", {
+        toast.success(t("quotationCalculatedSuccessfully"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -817,7 +782,7 @@ const CreateQuotationTest = () => {
       // getSummary();
     } catch (e) {
       console.error(e);
-      toast.error("Something went wrong", {
+      toast.error(t("tryAgain"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -866,7 +831,7 @@ const CreateQuotationTest = () => {
       } else if (data.success === true) {
         calculateList();
         setShow(false);
-        toast.success("Quotation Create successfully", {
+        toast.success(t("quotationCreateSuccessfully"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -877,7 +842,7 @@ const CreateQuotationTest = () => {
       navigate("/quotation"); // getSummary();
     } catch (e) {
       console.error(e);
-      toast.error("Something went wrong", {
+      toast.error(t("tryAgain"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -960,7 +925,7 @@ const CreateQuotationTest = () => {
     };
     if (!values.ITF || !values.itf_quantity || !values.itf_unit) {
       setOrderErr(true);
-      return toast.error("Please fill all fields");
+      return toast.error(t("fillAllFields"));
     }
     setOrderErr(false);
     loadingModal.fire();
@@ -984,7 +949,7 @@ const CreateQuotationTest = () => {
       oneQoutationDAta();
       setOrderId(data?.order_id);
       console.log(data.order_id);
-      toast.success("Quotation detail added successfully");
+      toast.success(t("quotationDetailAddedSuccessfully"));
       setDeleteOrderId(data?.order_id);
       setState((prevState) => {
         return {
@@ -1002,7 +967,7 @@ const CreateQuotationTest = () => {
       console.error(e);
       MySwal.close();
       closeModal();
-      toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
     } finally {
       MySwal.close();
       closeModal();
@@ -1063,7 +1028,7 @@ const CreateQuotationTest = () => {
             input: copyData,
           }
         );
-        toast.success(" updated  successfully");
+        toast.success(t(updateSuccess));
 
         console.log("Consignee Response:", response.data);
       } catch (error) {
@@ -1251,14 +1216,6 @@ const CreateQuotationTest = () => {
       option.value === (toEditDetails?.ITF ?? defaultDetailsValue?.ITF)
   );
 
-  // const handleChangeSe = (selected) => {
-  //   console.log(selected);
-  //   setToEditDetails((prevDetails) => ({
-  //     ...prevDetails,
-  //     ITF: selected ? selected.value : "", // Update selected ITF
-  //   }));
-  // };
-
   const handleChangeSe = (selected) => {
     console.log(selected);
     if (selected) {
@@ -1290,10 +1247,7 @@ const CreateQuotationTest = () => {
 
   return (
     <>
-      <Card
-        title={`Quotation  Management /Create
-         Form`}
-      >
+      <Card title={`${t("quotationTestManagement")} / ${t("createForm")}`}>
         <div className="top-space-search-reslute">
           <div className="tab-content px-2 md:!px-4">
             <div className="tab-pane active" id="header" role="tabpanel">
@@ -1325,7 +1279,7 @@ const CreateQuotationTest = () => {
                     </div>
                     <div className="row formEan quotationRowDro">
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer ">
-                        <h6>Client</h6>
+                        <h6>{t("clients")}</h6>
                         <Autocomplete
                           options={clients || []} // Ensure clients is an array
                           getOptionLabel={(option) => option.client_name || ""} // Display the client name
@@ -1344,7 +1298,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Client"
+                              placeholder={t("select_client")}
                               variant="outlined"
                             />
                           )}
@@ -1354,7 +1308,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Consignee</h6>
+                        <h6>{t("consignee")}</h6>
                         <Autocomplete
                           options={consigneesNew || []} // Ensure consignees is an array
                           getOptionLabel={(option) =>
@@ -1394,7 +1348,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Consignee"
+                              placeholder={t("selectConsignee")}
                               variant="outlined"
                             />
                           )}
@@ -1404,7 +1358,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Brands</h6>
+                        <h6> {t("brands")}</h6>
 
                         <Autocomplete
                           options={brands || []} // Safe fallback if brands is undefined
@@ -1423,7 +1377,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Brand"
+                              placeholder={t("selectBrand")}
                               variant="outlined"
                             />
                           )}
@@ -1434,7 +1388,7 @@ const CreateQuotationTest = () => {
                       </div>
 
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Currency</h6>
+                        <h6> {t("currency")}</h6>
 
                         <Autocomplete
                           options={currency || []} // Ensure options is an array even if currency is undefined
@@ -1457,7 +1411,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Currency"
+                              placeholder={t("selectCurrency")}
                               variant="outlined"
                             />
                           )}
@@ -1467,7 +1421,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Loading Location</h6>
+                        <h6> {t("loadingLocation")}</h6>
                         <Autocomplete
                           options={locations || []} // Ensure options is an array even if locations is undefined
                           getOptionLabel={(option) => option.name || ""}
@@ -1488,7 +1442,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Loading"
+                              placeholder={t("selectLoading")}
                               variant="outlined"
                             />
                           )}
@@ -1498,7 +1452,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Port of Origin</h6>
+                        <h6>{t("portOfOrigins")}</h6>
                         <Autocomplete
                           options={ports || []} // Ensure options is an array even if ports is undefined
                           getOptionLabel={(option) => option.port_name || ""}
@@ -1519,7 +1473,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Origin"
+                              placeholder={t("selectOrigin")}
                               variant="outlined"
                             />
                           )}
@@ -1529,7 +1483,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group quotationSelectSer">
-                        <h6>Port of Destination</h6>
+                        <h6> {t("portOfDestination")}</h6>
 
                         <Autocomplete
                           options={
@@ -1561,7 +1515,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Destination Port"
+                              placeholder={t("selectDestinationPort")}
                               variant="outlined"
                             />
                           )}
@@ -1571,7 +1525,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Airline</h6>
+                        <h6> {t("airline")}</h6>
                         <Autocomplete
                           options={
                             liners?.map((v) => ({
@@ -1605,7 +1559,7 @@ const CreateQuotationTest = () => {
                                   Freight_provider_: state.Freight_provider_,
                                 }
                               );
-                              toast.success(" updated successfully!", {
+                              toast.success(t("updateSuccess"), {
                                 autoClose: 1000,
                                 theme: "colored",
                               });
@@ -1617,7 +1571,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Airline"
+                              placeholder={t("selectAirline")}
                               variant="outlined"
                             />
                           )}
@@ -1664,7 +1618,7 @@ const CreateQuotationTest = () => {
                         /> */}
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Transportation</h6>
+                        <h6> {t("transportation")}</h6>
                         <Autocomplete
                           options={transport?.map((v) => ({
                             id: v.Transportation_provider,
@@ -1689,7 +1643,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select transportation"
+                              placeholder={t("selectTransportation")}
                             />
                           )}
                           isOptionEqualToValue={(option, value) =>
@@ -1698,7 +1652,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Clearance</h6>
+                        <h6> {t("clearance")}</h6>
                         <Autocomplete
                           options={clearance?.map((v) => ({
                             id: v.Clearance_provider,
@@ -1723,7 +1677,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select clearance"
+                              placeholder={t("selectClearance")}
                             />
                           )}
                           isOptionEqualToValue={
@@ -1732,7 +1686,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
-                        <h6>Freight Provider</h6>
+                        <h6>{t("freightProvider")}</h6>
                         {/* <Autocomplete
                           options={freights?.map((v) => ({
                             id: v.Freight_provider,
@@ -1794,7 +1748,7 @@ const CreateQuotationTest = () => {
                                   Freight_provider_: newId,
                                 }
                               );
-                              toast.success(" updated successfully!", {
+                              toast.success(t("updateSuccess"), {
                                 autoClose: 1000,
                                 theme: "colored",
                               });
@@ -1811,7 +1765,7 @@ const CreateQuotationTest = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Freight Provider"
+                              placeholder={t("selectFreightProvider")}
                             />
                           )}
                           isOptionEqualToValue={(option, value) =>
@@ -1820,7 +1774,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-3 form-group">
-                        <h6>EX Rate</h6>
+                        <h6> {t("exRate")}</h6>
                         <input
                           type="number"
                           value={computedState.fx_rate}
@@ -1829,7 +1783,7 @@ const CreateQuotationTest = () => {
                         />
                       </div>
                       <div className="col-lg-2 form-group">
-                        <h6>Markup Rate</h6>
+                        <h6> {t("markupRate")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
@@ -1847,7 +1801,7 @@ const CreateQuotationTest = () => {
                         </div>
                       </div>
                       <div className="col-lg-2 form-group">
-                        <h6> Rebate</h6>
+                        <h6> {t("rebate")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
@@ -1867,7 +1821,7 @@ const CreateQuotationTest = () => {
                       <div className="col-lg-8">
                         <div className="IncludeClaim">
                           <div>
-                            <h6>Include Claim</h6>
+                            <h6>{t("includeClaim")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large" onclick="">
                                 <input
@@ -1877,15 +1831,15 @@ const CreateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange8}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
                             </div>
                           </div>
                           <div>
-                            <h6>Charge Volume</h6>
+                            <h6> {t("chargeVolume")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large" onclick="">
                                 <input
@@ -1895,15 +1849,15 @@ const CreateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange4}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
                             </div>
                           </div>
                           <div>
-                            <h6>Palletized</h6>
+                            <h6> {t("palletized")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large">
                                 <input
@@ -1913,15 +1867,15 @@ const CreateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange5}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
                             </div>
                           </div>
                           <div>
-                            <h6>CO from Chamber</h6>
+                            <h6>{t("coFromChamber")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large">
                                 <input
@@ -1931,15 +1885,15 @@ const CreateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange6}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
                             </div>
                           </div>
                           <div>
-                            <h6>Precooling</h6>
+                            <h6> {t("precooling")}</h6>
                             <div className="flex gap-2 items-center">
                               <label className="toggleSwitch large">
                                 <input
@@ -1949,8 +1903,8 @@ const CreateQuotationTest = () => {
                                   onChange={handleAgreedPricingChange7}
                                 />
                                 <span>
-                                  <span>OFF</span>
-                                  <span>ON</span>
+                                  <span> {t("off")}</span>
+                                  <span> {t("on")}</span>
                                 </span>
                                 <a></a>
                               </label>
@@ -1959,7 +1913,7 @@ const CreateQuotationTest = () => {
                         </div>
                       </div>
                       <div className="col-lg-3 form-group">
-                        <h6>Loading Date</h6>
+                        <h6> {t("loadingDate")}</h6>
 
                         <DatePicker
                           selected={computedState.load_date}
@@ -1985,7 +1939,7 @@ const CreateQuotationTest = () => {
                             className=""
                             onClick={() => calculate1(false)}
                           >
-                            Calculate
+                            {t("calculate")}
                           </button>
                           {/* {!isError && ( */}
                           <button
@@ -2000,7 +1954,7 @@ const CreateQuotationTest = () => {
                               }
                             }}
                           >
-                            Add
+                            {t("add")}
                           </button>
 
                           <button
@@ -2016,7 +1970,7 @@ const CreateQuotationTest = () => {
                               }
                             }}
                           >
-                            Add Consignee Items
+                            {t("addConsigneeItems")}
                           </button>
 
                           <div
@@ -2033,7 +1987,7 @@ const CreateQuotationTest = () => {
                                     className="modal-title fs-5"
                                     id="exampleModalLabel"
                                   >
-                                    Quotation Populate
+                                    {t("quotationPopulate")}
                                   </h1>
                                   <button
                                     type="button"
@@ -2045,7 +1999,7 @@ const CreateQuotationTest = () => {
                                   </button>
                                 </div>
                                 <div className="modal-body">
-                                  <label htmlFor=""> Net Weight</label>
+                                  <label htmlFor=""> {t("netWeight")} </label>
                                   <input
                                     type="number"
                                     value={orderNetWeight}
@@ -2061,7 +2015,7 @@ const CreateQuotationTest = () => {
                                     className="btn btn-primary"
                                     onClick={handleSaveOrderPopulate}
                                   >
-                                    Save
+                                    {t("save")}
                                   </button>
                                 </div>
                               </div>
@@ -2074,7 +2028,7 @@ const CreateQuotationTest = () => {
                               data-bs-toggle="modal"
                               data-bs-target="#exampleModal"
                             >
-                              Round Price
+                              {t("roundPrice")}
                             </button>
 
                             {/* Button trigger modal */}
@@ -2094,7 +2048,7 @@ const CreateQuotationTest = () => {
                                       className="modal-title fs-5"
                                       id="exampleModalLabel"
                                     >
-                                      Price Rounding
+                                      {t("priceRounding")}
                                     </h1>
                                     <button
                                       type="button"
@@ -2112,7 +2066,7 @@ const CreateQuotationTest = () => {
                                   </div>
                                   <div className="modal-body">
                                     <div className="col-lg-12 form-group autoComplete">
-                                      <h6>Rounding</h6>
+                                      <h6> {t("rounding")}</h6>
                                       <Autocomplete
                                         options={RoundingDataList || []}
                                         getOptionLabel={(option) =>
@@ -2138,7 +2092,7 @@ const CreateQuotationTest = () => {
                                         renderInput={(params) => (
                                           <TextField
                                             {...params}
-                                            placeholder="Select Rounding"
+                                            placeholder={t("selectRounding")}
                                             variant="outlined"
                                           />
                                         )}
@@ -2151,7 +2105,7 @@ const CreateQuotationTest = () => {
                                       className="btn btn-primary"
                                       onClick={handleSubmit}
                                     >
-                                      Submit
+                                      {t("submit")}
                                     </button>
                                   </div>
                                 </div>
@@ -2164,7 +2118,7 @@ const CreateQuotationTest = () => {
                               className="me-2"
                               onClick={handleSubmit1}
                             >
-                              Use Invoice Price
+                              {t("useInvoicePrice")}
                             </button>
                           </div>
                           <div>
@@ -2173,7 +2127,7 @@ const CreateQuotationTest = () => {
                               className="me-2"
                               onClick={handleSubmit2}
                             >
-                              Agreed Price
+                              {t("agreedPrice")}
                             </button>
                           </div>
                           <div>
@@ -2182,7 +2136,7 @@ const CreateQuotationTest = () => {
                               className=""
                               onClick={handleSubmit3}
                             >
-                             Last Price
+                              {t("lastPrice")}
                             </button>
                           </div>
                           {/* )} */}
@@ -2190,13 +2144,12 @@ const CreateQuotationTest = () => {
                       )}
                       {isError && (
                         <div className="my-4 text-red-500">
-                          <i className="mdi mdi-alert" /> Please adjust Select
-                          ITF to complete a box
+                          <i className="mdi mdi-alert" /> {t("pleaseAdjustITF")}
                         </div>
                       )}
                       <div className="addBtnEan mb-4">
                         <button type="button" onClick={() => calculate(true)}>
-                          Recalculate
+                          {t("recalculate")}
                         </button>
                       </div>
                     </div>
@@ -2229,7 +2182,7 @@ const CreateQuotationTest = () => {
                                   return <th key={key}>{label}</th>;
                                 }
                               )}
-                              <th>Action</th>
+                              <th>{t("actions")}</th>
                             </tr>
                           </thead>
                         )}
@@ -2558,7 +2511,7 @@ const CreateQuotationTest = () => {
                   name="signup"
                   onClick={createTestOrder}
                 >
-                  Create
+                  {t("create")}
                 </button>
               ) : (
                 ""
@@ -2570,7 +2523,7 @@ const CreateQuotationTest = () => {
                 // data-bs-target="#exampleModal1"
                 onClick={dataSubmit1}
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>
@@ -2584,20 +2537,20 @@ const CreateQuotationTest = () => {
           />
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
             <div className="crossArea">
-              <h3>Edit Details</h3>
+              <h3>{t("editDetails")}</h3>
               <p onClick={closeModal}>
                 <CloseIcon />
               </p>
             </div>
             <div className="formEan formCreate">
               <div className="form-group mb-3 itfHeight quotationSelectSer">
-                <label>ITF</label>
+                <label>{t("itf")}</label>
 
                 <Select
                   value={selectedOption || null}
                   onChange={handleChangeSe}
                   options={options}
-                  placeholder="Search or Select ITF"
+                  placeholder={t("selectItf")}
                   isClearable
                   styles={customStyles}
                   components={{ DropdownIndicator }}
@@ -2605,7 +2558,7 @@ const CreateQuotationTest = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Quantity</label>
+                <label> {t("quantity")}</label>
                 <input
                   type="number"
                   value={
@@ -2616,7 +2569,7 @@ const CreateQuotationTest = () => {
                 />
               </div>
               <div className="form-group mb-3 quotationSelectSer">
-                <h6>Brands</h6>
+                <h6>{t("brands")}</h6>
 
                 <Autocomplete
                   disablePortal
@@ -2653,13 +2606,13 @@ const CreateQuotationTest = () => {
                     <TextField
                       {...params}
                       variant="outlined"
-                      placeholder="Select Brand"
+                      placeholder={t("selectBrand")}
                     />
                   )}
                 />
               </div>
               <div className="form-group mb-3 quotationSelectSer">
-                <label>Unit</label>
+                <label> {t("unit")}</label>
 
                 <Autocomplete
                   disablePortal
@@ -2699,13 +2652,13 @@ const CreateQuotationTest = () => {
                     <TextField
                       {...params}
                       variant="outlined"
-                      placeholder="Select Unit"
+                      placeholder={t("selectUnit")}
                     />
                   )}
                 />
               </div>
               <div className="form-group">
-                <label>Adjustment price</label>
+                <label> {t("adjustmentPrice")}</label>
                 <input
                   type="number"
                   value={
@@ -2724,7 +2677,7 @@ const CreateQuotationTest = () => {
                 onClick={saveNewDetails}
                 className="bg-black text-white px-4 py-2 rounded"
               >
-                Save
+                {t("save")}
               </button>
             </div>
           </div>
@@ -2734,7 +2687,7 @@ const CreateQuotationTest = () => {
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Freight or Transport Error
+              {t("freightError")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -2775,7 +2728,7 @@ const CreateQuotationTest = () => {
             </div>
             <div className="modal-body">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Note
+                {t("notes")}
               </h1>
               <textarea
                 value={notes1}
@@ -2789,14 +2742,14 @@ const CreateQuotationTest = () => {
                 className="btn btn-secondary "
                 data-bs-dismiss="modal"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
                 onClick={dataSubmit1}
                 className="btn btn-primary"
               >
-                ok
+                {t("ok")}
               </button>
             </div>
           </div>
@@ -2807,7 +2760,7 @@ const CreateQuotationTest = () => {
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Order
+              {t("order")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -2880,7 +2833,7 @@ const CreateQuotationTest = () => {
                   className="btn btn-secondary"
                   onClick={handleCloseModal}
                 >
-                  Close
+                  {t("close")}
                 </button>
               </div>
             </div>
@@ -2900,15 +2853,8 @@ const CreateQuotationTest = () => {
             }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Quotation Check
+              {t("quotationCheck")}
             </h1>
-            {/* <button
-              style={{ color: "#fff", fontSize: "30px" }}
-              type="button"
-              onClick={closeIcon1}
-            >
-              <i class="mdi mdi-close"></i>
-            </button> */}
           </div>
           <div
             className="modal-body pt-0 pb-0"
@@ -2923,11 +2869,11 @@ const CreateQuotationTest = () => {
                   backgroundColor: color ? "" : "#631f37",
                 }}
               >
-                Loading Date missing
+                {t("loadingDateMissing")}
               </p>
 
               <div className="closeBtnRece">
-                <button onClick={closeIcon1}>Close</button>
+                <button onClick={closeIcon1}> {t("close")}</button>
               </div>
             </div>
           </div>

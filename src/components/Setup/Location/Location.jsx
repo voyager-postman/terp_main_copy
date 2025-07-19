@@ -3,30 +3,32 @@ import { useQuery } from "react-query"
 import { Link, useNavigate } from "react-router-dom"
 import { Card } from "../../../card"
 import { TableView } from "../../table"
+import { useTranslation } from "react-i18next";
 
 const Location = () => {
+	const [t, i18n] = useTranslation("global");
 	const navigate = useNavigate()
 	const { data } = useQuery("getLocation")
 
 	const columns = React.useMemo(
 		() => [
 			{
-				Header: "ID",
+				Header: t("id"),
 				id: "index",
 				accessor: (_row, i) => i + 1,
 			},
 			{
-				Header: "Name",
+				Header: t("name"),
 				accessor: "name",
 			},
 
 			{
-				Header: "Address",
+				Header: t("address"),
 				accessor: "address",
 			},
 
 			{
-				Header: "Gps Location",
+				Header: t("gpsLocation"),
 				accessor: "gps_location",
 			},
 
@@ -35,7 +37,7 @@ const Location = () => {
 			//     accessor:  a => <div style={{marginTop:"-8px"}} ><BlueSwitch {...label}  defaultChecked /> </div>
 			//   },
 			{
-				Header: "Actions",
+				Header: t("actions"),
 				accessor: (a) => (
 					<Link to="/updateLocation" state={{ from: a }}>
 						<i
@@ -51,18 +53,18 @@ const Location = () => {
 				),
 			},
 		],
-		[],
+		[t],
 	)
 	return (
 		<Card
-			title={"Location Management"}
+			title={t("locationManagement")}
 			endElement={
 				<button
 					type="button"
 					onClick={() => navigate("/createLocation")}
 					className="btn button btn-info"
 				>
-					Create
+					{t("create")}
 				</button>
 			}
 		>

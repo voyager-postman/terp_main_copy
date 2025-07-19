@@ -6,7 +6,10 @@ import { API_BASE_URL, API_IMAGE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Autocomplete, TextField } from "@mui/material";
+import { useTranslation } from "react-i18next";
+
 const UpdateProduce = () => {
+  const { t, i18n } = useTranslation("global");
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -99,7 +102,7 @@ const UpdateProduce = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -175,7 +178,7 @@ const UpdateProduce = () => {
   }, []);
 
   return (
-    <Card title={"Produce Management / Edit Form"}>
+    <Card title={t("Produce_Management_Edit")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -187,7 +190,7 @@ const UpdateProduce = () => {
                 <form action="">
                   <div className="row">
                     <div className="col-lg-6 form-group autoComplete mb-3">
-                      <h6>Classification</h6>
+                      <h6>{t("classification")}</h6>
                       <Autocomplete
                         options={classification.map((item) => ({
                           id: item.produce_classification_id,
@@ -205,7 +208,7 @@ const UpdateProduce = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Choose"
+                            placeholder= {t("choose")}
                             variant="outlined"
                             className="form-control"
                           />
@@ -230,51 +233,51 @@ const UpdateProduce = () => {
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-6">
-                      <h6>Name TH</h6>
+                      <h6>{t("nameTh")}</h6>
                       <input
                         type="text"
                         id="name_th"
                         onChange={handleChange}
                         name="produce_name_th"
                         className="form-control"
-                        placeholder="Name TH"
+                        placeholder={t("nameTh")}
                         value={editProduceData.produce_name_th}
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>Name EN</h6>
+                      <h6>{t("nameEn")}</h6>
                       <input
                         type="text"
                         id="name_en"
                         onChange={handleChange}
                         name="produce_name_en"
                         className="form-control"
-                        placeholder="Name EN"
+                        placeholder= {t("nameEn")}
                         value={editProduceData.produce_name_en}
                       />
                     </div>
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-6">
-                      <h6>HS Code</h6>
+                      <h6>{t("hsCode")}</h6>
                       <input
                         type="text"
                         id="hs_code"
                         name="produce_hscode"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="HS Code"
+                        placeholder={t("hsCode")}
                         value={editProduceData.produce_hscode}
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>Scientific Name</h6>
+                      <h6>{t("scientificName")}</h6>
                       <input
                         type="text"
                         id="hs_name"
                         name="produce_scientific_name"
                         className="form-control"
-                        placeholder="Scientific Name"
+                        placeholder= {t("scientificName")}
                         onChange={handleChange}
                         value={editProduceData.produce_scientific_name}
                       />
@@ -283,7 +286,7 @@ const UpdateProduce = () => {
                   <div className="row">
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
                       <h6 style={{ paddingBottom: "2px" }}>
-                        Charts of Accounting
+                        {t("chartOfAccounts")}
                       </h6>
                       {/* <Autocomplete
                         options={
@@ -333,7 +336,7 @@ const UpdateProduce = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Choose"
+                            placeholder= {t("choose")}
                             variant="outlined"
                             className="form-control"
                           />
@@ -356,7 +359,7 @@ const UpdateProduce = () => {
                       />
                     </div>
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
-                      <h6 style={{ paddingBottom: "2px" }}>VAT Type</h6>
+                      <h6 style={{ paddingBottom: "2px" }}> {t("vatType")}</h6>
 
                       <Autocomplete
                         options={classification2.map((item) => ({
@@ -375,7 +378,7 @@ const UpdateProduce = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Choose"
+                            placeholder= {t("choose")}
                             variant="outlined"
                             className="form-control"
                           />
@@ -400,7 +403,7 @@ const UpdateProduce = () => {
                   </div>
                   <div className="row">
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
-                      <h6 style={{ paddingBottom: "2px" }}>Inventory Type</h6>
+                      <h6 style={{ paddingBottom: "2px" }}> {t("inventoryType")}</h6>
                       <Autocomplete
                         options={classification3.map((item) => ({
                           id: item.ID,
@@ -418,7 +421,7 @@ const UpdateProduce = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Choose"
+                            placeholder={t("choose")}
                             variant="outlined"
                             className="form-control"
                           />
@@ -441,7 +444,7 @@ const UpdateProduce = () => {
                       />
                     </div>
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
-                      <h6 style={{ paddingBottom: "2px" }}>WHT Type</h6>
+                      <h6 style={{ paddingBottom: "2px" }}> {t("whtType")}</h6>
                       <Autocomplete
                         options={classification4.map((item) => ({
                           id: item.ID,
@@ -459,7 +462,7 @@ const UpdateProduce = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Choose"
+                            placeholder={t("choose")}
                             variant="outlined"
                             className="form-control"
                           />
@@ -485,7 +488,7 @@ const UpdateProduce = () => {
 
                   <div className="row">
                     <div className="col-lg-6 form-group">
-                      <h6>Image</h6>
+                      <h6>{t("image")}</h6>
                       <input
                         type="file"
                         id="box_image"
@@ -499,12 +502,12 @@ const UpdateProduce = () => {
                           <label htmlFor="box_image">
                             <div className="uploadBorder">
                               <span>
-                                Choose Image <CloudUploadIcon />{" "}
+                                {t("chooseImage")}<CloudUploadIcon />{" "}
                               </span>
                             </div>
                           </label>
                         </div>
-                   
+
                         <div>
                           {selectedImage && (
                             <div>
@@ -520,7 +523,7 @@ const UpdateProduce = () => {
                               <img
                                 crossorigin="anonymous"
                                 src={`${API_IMAGE_URL}/${imagePath}`}
-                                alt="Existing"
+                                alt={t("existing")}
                                 style={{ width: "200px", height: "200px" }}
                               />
                             </div>
@@ -539,10 +542,10 @@ const UpdateProduce = () => {
               className="btn btn-primary"
               type="button" // Change type to "button" to prevent form submission on click
             >
-              Update
+              {t("update")}
             </button>
             <Link className="btn btn-danger" to="/produceNew">
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>

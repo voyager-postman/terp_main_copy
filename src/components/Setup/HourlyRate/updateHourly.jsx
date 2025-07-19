@@ -4,13 +4,15 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import { API_BASE_URL } from "../../../Url/Url"
 import { Card } from "../../../card"
 import { toast } from "react-toastify"
+import { useTranslation } from "react-i18next";
 
 const UpdateHourly = () => {
+	const { t } = useTranslation("global");
 	const location = useLocation()
 	const { from } = location.state || {}
 	const navigate = useNavigate()
 	const [state, setState] = React.useState({
-		user_id:localStorage.getItem("id"),
+		user_id: localStorage.getItem("id"),
 		wages_id: from?.wages_id,
 		from_time:
 			from?.from_time ||
@@ -59,7 +61,7 @@ const UpdateHourly = () => {
 				state,
 			)
 			.then((response) => {
-				toast.success("Wage Added Successfully", {
+				toast.success( t("wageAdded"), {
 					autoClose: 1000,
 					theme: "colored",
 				})
@@ -72,7 +74,7 @@ const UpdateHourly = () => {
 
 	return (
 		<Card
-			title={`Wages Management / ${from?.wages_id ? "Update" : "Create"} Form`}
+			title={`${t("wageManagement")} / ${from?.wages_id ? t("update") :  t("add")}  ${t("form")}`}
 		>
 			<div className="top-space-search-reslute">
 				<div className="tab-content px-2 md:!px-4">
@@ -85,7 +87,7 @@ const UpdateHourly = () => {
 								<form action="">
 									<div className="row cratePurchase">
 										<div className="col-lg-3 form-group">
-											<h6>Shift Name</h6>
+											<h6>{t("shiftName")}</h6>
 											<input
 												type="text"
 												name="shift_name_en"
@@ -95,7 +97,7 @@ const UpdateHourly = () => {
 											/>
 										</div>
 										<div className="col-lg-3 form-group">
-											<h6>From Time</h6>
+											<h6>{t("fromTime")}</h6>
 											<input
 												type="time"
 												name="from_time"
@@ -105,7 +107,7 @@ const UpdateHourly = () => {
 											/>
 										</div>
 										<div className="col-lg-3 form-group">
-											<h6>To Time</h6>
+											<h6>{t("toTime")}</h6>
 											<input
 												type="time"
 												name="to_time"
@@ -115,7 +117,7 @@ const UpdateHourly = () => {
 											/>
 										</div>
 										<div className="col-lg-3 form-group">
-											<h6>Wage</h6>
+											<h6>{t("wage")}</h6>
 											<input
 												type="number"
 												name="wage"
@@ -126,13 +128,13 @@ const UpdateHourly = () => {
 										</div>
 									</div>
 									{[
-										"Monday",
-										"Tuesday",
-										"Wednesday",
-										"Thursday",
-										"Friday",
-										"Saturday",
-										"Sunday",
+										t("monday"),
+										t("tuesday"),
+										t("wednesday"),
+										t("thursday"),
+										t("friday"),
+										t("saturday"),
+										t("sunday"),
 									].map((day) => (
 										<div className="flex gap-2 items-center">
 											<label className="toggleSwitch large" onclick="">
@@ -144,8 +146,8 @@ const UpdateHourly = () => {
 													type="checkbox"
 												/>
 												<span>
-													<span>OFF</span>
-													<span>ON</span>
+													<span>{t("off")}</span>
+													<span>{t("on")}</span>
 												</span>
 												<a></a>
 											</label>
@@ -163,10 +165,10 @@ const UpdateHourly = () => {
 							name="signup"
 							onClick={update}
 						>
-							{from?.wages_id ? "Update" : "Create"}
+							{from?.wages_id ? t("update") : t("create")}
 						</button>
 						<Link className="btn btn-danger" to={"/hourly"}>
-							Cancel
+							{t("cancel")}
 						</Link>
 					</div>
 				</div>

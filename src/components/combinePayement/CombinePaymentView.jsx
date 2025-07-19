@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../Url/Url";
 import { useQuery } from "react-query";
 import { toast } from "react-toastify";
 import { ComboBox } from "../combobox";
+import { useTranslation } from "react-i18next";
+
 import axios from "axios";
 const CombinePaymentView = () => {
+  const [t, i18n] = useTranslation("global");
   const { data: vendorList } = useQuery("getAllVendor");
   const { data: dropdownType } = useQuery("getDropdownType");
   const { data: produceList } = useQuery("getAllProduceItem");
@@ -91,7 +94,7 @@ const CombinePaymentView = () => {
       });
 
       if (response.status === 200) {
-        toast.success("Invoice updated successfully!");
+        toast.success(t("invoiceUpdateSuccess"));
         setInvoiceNumber("");
         setInvoiceDate("");
         // Close modal
@@ -101,7 +104,7 @@ const CombinePaymentView = () => {
       }
     } catch (error) {
       console.error("Error updating invoice:", error);
-      toast.error("Failed to update invoice.");
+      toast.error(t("invoiceUpdateFailed"));
     }
   };
   const formatterTwo = new Intl.NumberFormat("en-US", {
@@ -168,7 +171,7 @@ const CombinePaymentView = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <h6 className="font-weight-bolder mb-0 pt-2">
-                        Combined Payment / View Form
+                        {t("combinedPaymentView")}
                       </h6>
                       {/* <i class="mdi mdi-view-headline"></i> */}
                     </div>
@@ -180,7 +183,7 @@ const CombinePaymentView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Vendor
+                          {t("vendor")}
                           <span>:</span>
                         </strong>
                       </div>
@@ -192,7 +195,7 @@ const CombinePaymentView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Combined Payment Number
+                          {t("combinedPaymentNumber")}
                           <span>:</span>
                         </strong>
                       </div>
@@ -203,7 +206,7 @@ const CombinePaymentView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Combined Payment Date
+                          {t("combinedPaymentDate")}
                           <span>:</span>
                         </strong>
                       </div>
@@ -222,7 +225,7 @@ const CombinePaymentView = () => {
                     <div className="parentPurchaseView">
                       <div className="me-3">
                         <strong>
-                          Due Date
+                          {t("dueDate")}
                           <span>:</span>
                         </strong>
                       </div>
@@ -254,14 +257,14 @@ const CombinePaymentView = () => {
                   >
                     <thead>
                       <tr>
-                        <th>CPN Number</th>
-                        <th>Issue Date</th>
-                        <th>Due Date</th>
-                        <th>Total Before Tax</th>
-                        <th>Past Payment</th>
-                        <th>Net Payment</th>
-                        <th>FX</th>
-                        <th style={{ width: "170px" }}>Amount to Pay</th>
+                        <th>{t("cpnNumber")}</th>
+                        <th>{t("issueDate")}</th>
+                        <th>{t("dueDate")}</th>
+                        <th>{t("totalBeforeTax")}</th>
+                        <th>{t("pastPayment")}</th>
+                        <th>{t("netPayment")}</th>
+                        <th>{t("fx")}</th>
+                        <th style={{ width: "170px" }}>{t("amountToPay")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -300,7 +303,7 @@ const CombinePaymentView = () => {
                                 {formatNumber(items.Payable)}
                               </td>
                               <td className="text-right">
-                                {/* {formatNumber(1232.3434)} */}THB
+                                {/* {formatNumber(1232.3434)} */}{t("thb")}
                               </td>
                               <td className="text-right">
                                 {formatNumber(items.Payment)}
@@ -694,7 +697,7 @@ const CombinePaymentView = () => {
                 {/*--------------------------- table data end--------------------------------*/}
               </div>
               <div className="flex justify-content-end mt-4 totalBefore">
-                <div style={{ width: "250px" }}>
+                <div style={{ width: "300px" }}>
                   {/* <div className="flexBefore">
                     <div>
                       <strong>Payable : </strong>
@@ -707,11 +710,11 @@ const CombinePaymentView = () => {
                   </div> */}
                   <div className="flexBefore">
                     <div>
-                      <strong>Total Before Tax : </strong>
+                     <strong>{t("totalBeforeTax")} : </strong>
                     </div>
                     <div>
                       <span>
-                        {" "}
+                        
                         {formatterTwo.format(
                           totalDataDetails?.total_before_tax
                         )}
@@ -719,9 +722,7 @@ const CombinePaymentView = () => {
                     </div>
                   </div>
                   <div className="flexBefore">
-                    <div>
-                      <strong>VAT : </strong>
-                    </div>
+                     <div><strong>{t("vat")} : </strong></div>
                     <div>
                       <span>
                         {formatterTwo.format(totalDataDetails?.total_vat)}
@@ -729,9 +730,7 @@ const CombinePaymentView = () => {
                     </div>
                   </div>
                   <div className="flexBefore">
-                    <div>
-                      <strong>WHT : </strong>
-                    </div>
+                      <div><strong>{t("wht")} : </strong></div>
                     <div>
                       <span>
                         {formatterTwo.format(totalDataDetails?.total_wht)}
@@ -739,17 +738,13 @@ const CombinePaymentView = () => {
                     </div>
                   </div>
                   <div className=" d-flex flexBefore">
-                    <div>
-                      <strong>Rounding</strong>
-                    </div>
+                    <div><strong>{t("rounding")}</strong></div>
                     <div>
                       <span> {totalDataDetails?.total_rounding}</span>
                     </div>
                   </div>
                   <div className="flexBefore">
-                    <div>
-                      <strong>Amount to Pay : </strong>
-                    </div>
+                     <div><strong>{t("amountToPay")} : </strong></div>
                     <div>
                       <span>
                         {formatterTwo.format(
@@ -769,7 +764,7 @@ const CombinePaymentView = () => {
                 Create
               </button> */}
               <Link className="btn btn-danger" to={"/combinePayment"}>
-                Close
+               {t("close")}
               </Link>
             </div>
           </div>

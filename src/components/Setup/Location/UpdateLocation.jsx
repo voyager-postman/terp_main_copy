@@ -4,8 +4,10 @@ import { Card } from "../../../card";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const UpdateLocation = () => {
+  const [t, i18n] = useTranslation("global");
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -36,7 +38,7 @@ const UpdateLocation = () => {
     };
 
     if (request.name == "" || request.address == "") {
-      toast.warn("Please Fill All The Fields", {
+      toast.warn(t("pleaseFillAllFields"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -46,7 +48,7 @@ const UpdateLocation = () => {
       .post(`${API_BASE_URL}/updateLocation`, request)
       .then((response) => {
         if (response.data.success == true) {
-          toast.success("Location Update Successfully", {
+          toast.success(t("Location_Update"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -60,7 +62,7 @@ const UpdateLocation = () => {
   };
 
   return (
-    <Card title="Location Management / Create Form">
+    <Card title={t("LocationManagementCreate")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -71,19 +73,19 @@ const UpdateLocation = () => {
               <div className="formCreate">
                 <div className="row justify-content-center">
                   <div className="form-group col-lg-3">
-                    <h6>Name</h6>
+                    <h6>{t("name")}</h6>
                     <input
                       onChange={handleClose}
                       type="text"
                       id="name_th"
                       name="name"
                       className="form-control"
-                      placeholder="Maersk"
+                      placeholder={t("name")}
                       value={state.name}
                     />
                   </div>
                   <div className="form-group col-lg-3">
-                    <h6>Address</h6>
+                    <h6>{t("address")}</h6>
                     <input
                       onChange={handleClose}
                       type="text"
@@ -95,14 +97,14 @@ const UpdateLocation = () => {
                     />
                   </div>
                   <div className="form-group col-lg-3">
-                    <h6>GPS Location</h6>
+                    <h6>{t("gpsLocation")}</h6>
                     <input
                       onChange={handleClose}
                       type="text"
                       id="name_th"
                       name="gps_location"
                       className="form-control"
-                      placeholder="GPS location"
+                      placeholder={t("gpsLocation")}
                       value={state.gps_location}
                     />
                   </div>
@@ -117,10 +119,11 @@ const UpdateLocation = () => {
                 onClick={updateLocation}
                 name="signup"
               >
-                Update
+                {t("update")}
               </button>
               <Link className="btn btn-danger" to={"/location"}>
-                Cancel
+                {t("cancel")}
+
               </Link>
             </div>
           </div>

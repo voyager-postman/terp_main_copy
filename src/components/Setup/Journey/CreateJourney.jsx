@@ -7,8 +7,9 @@ import { Card } from "../../../card";
 import { useQuery } from "react-query";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-
+ import { useTranslation } from "react-i18next";
 const CreateJourney = () => {
+  const [t, i18n] = useTranslation("global");
   const { from } = location.state || {};
   console.log(from)
   const navigate = useNavigate();
@@ -73,7 +74,7 @@ const CreateJourney = () => {
       .then((response) => {
         console.log(response, "Check responseee");
         if (response.data.success == true) {
-          toast.success("Journey Added Successfully", {
+          toast.success(t("journeyAddSuccess"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -87,7 +88,7 @@ const CreateJourney = () => {
   };
 
   return (
-    <Card title="Journey / Create Form">
+    <Card title={t("journeyCreateForm")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -99,7 +100,7 @@ const CreateJourney = () => {
                 <form action="">
                   <div className="row">
                     <div className="form-group col-lg-3 autoComplete">
-                      <h6>From Port</h6>
+                      <h6>{t("fromPort")}</h6>
                       {/* <select
                         name="from_port_id"
                         onChange={handleChange}
@@ -124,13 +125,13 @@ const CreateJourney = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Please select From"
+                            placeholder={t("pleaseSelectFrom")}
                           />
                         )}
                       />
                     </div>
                     <div className="form-group col-lg-3 autoComplete">
-                      <h6>Designation Port</h6>
+                      <h6>{t("designationPort")}</h6>
                       {/* <select
                         name="destination_port_id"
                         onChange={handleChange}
@@ -173,7 +174,7 @@ const CreateJourney = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Destination Port" // Adds a placeholder
+                            placeholder={t("selectDestinationPort")} // Adds a placeholder
                             InputLabelProps={{ shrink: false }} // Prevents floating label
                           />
                         )}
@@ -181,7 +182,7 @@ const CreateJourney = () => {
                     </div>
 
                     <div className="form-group col-lg-3 autoComplete">
-                      <h6> Liner</h6>
+                      <h6> {t("liner")}</h6>
                       {/* <select
                         name="liner_id"
                         onChange={handleChange}
@@ -224,14 +225,14 @@ const CreateJourney = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Liner" // Adds a placeholder
+                            placeholder={t("selectLiner")}// Adds a placeholder
                             InputLabelProps={{ shrink: false }} // Prevents floating label
                           />
                         )}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Journey Number</h6>
+                      <h6>{t("journeyNumber")}</h6>
                       <input
                         name="journey_number"
                         onChange={handleChange}
@@ -244,7 +245,7 @@ const CreateJourney = () => {
 
 
                     <div className="form-group col-lg-4">
-                      <h6>Load Time</h6>
+                      <h6>{t("loadTime")}</h6>
                       <input
                         onChange={handleChange}
                         type="time"
@@ -255,20 +256,20 @@ const CreateJourney = () => {
                     </div>
 
                     <div className="form-group col-lg-4">
-                      <h6>Transit to Departure</h6>
+                      <h6>{t("transitToDeparture")}</h6>
                       <input
                         onChange={handleChange}
                         type="number"
                         id="name_en"
                         name="transit_to_departure"
                         className="form-control"
-                        placeholder="Transit to Departure"
+                        placeholder={t("transitToDeparture")}
                         value={state.transit_to_departure}
                       />
                     </div>
 
                     <div className="form-group col-lg-4">
-                      <h6>ETD</h6>
+                      <h6>{t("etd")}</h6>
                       <input
                         onChange={handleChange}
                         type="time"
@@ -278,19 +279,19 @@ const CreateJourney = () => {
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>Transit to Arrival</h6>
+                      <h6>{t("transitToArrival")}</h6>
                       <input
                         onChange={handleChange}
                         type="number"
                         id="name_en"
                         name="transit_to_arrival"
                         className="form-control"
-                        placeholder="Transit to Arrival"
+                        placeholder={t("transitToArrival")}
                         value={state.transit_to_arrival}
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>ETA</h6>
+                      <h6>{t("eta")}</h6>
                       <input
                         onChange={handleChange}
                         type="time"
@@ -311,10 +312,10 @@ const CreateJourney = () => {
               type="submit"
               name="signup"
             >
-              Create
+              {t("create")}
             </button>
             <Link className="btn btn-danger" to="/journey">
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>

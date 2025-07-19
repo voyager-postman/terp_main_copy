@@ -7,7 +7,9 @@ import { Card } from "../../../card";
 import { API_IMAGE_URL } from "../../../Url/Url";
 import { Autocomplete, TextField } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { useTranslation } from "react-i18next";
 const UpdateBox = () => {
+  const { t } = useTranslation("global");
   const location = useLocation();
   const { from } = location.state || {};
   console.log(from);
@@ -255,7 +257,7 @@ const UpdateBox = () => {
   const cal_min = (cbm * 1000) / 6;
   const minload = cal_min.toFixed(2);
   return (
-    <Card title={"Boxes Management / Edit Form"}>
+    <Card title={t("Boxes_Management_Edit")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -268,31 +270,31 @@ const UpdateBox = () => {
                 <form action="">
                   <div className="row">
                     <div className="form-group col-lg-3">
-                      <h6>Name</h6>
+                      <h6>{t("name")}</h6>
                       <input
                         type="text"
                         id="name_th"
                         name="box_name"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="name"
+                        placeholder={t("name")}
                         defaultValue={editBoxData.box_name}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>External Reference</h6>
+                      <h6>{t("externalRefFull")}</h6>
                       <input
                         type="text"
                         id="name_th"
                         name="External_Ref"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="name"
+                        placeholder={t("externalRefFull")}
                         defaultValue={editBoxData.External_Ref}
                       />
                     </div>
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>Brand</h6>
+                      <h6>{t("brand")}</h6>
                       <Autocomplete
                         options={
                           classification5?.map((item) => ({
@@ -314,7 +316,7 @@ const UpdateBox = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Brand"
+                            placeholder={t("selectBrand")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -326,14 +328,14 @@ const UpdateBox = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6> Per Bun</h6>
+                      <h6> {t("perBun")}</h6>
                       <input
                         type="number"
                         id="name_th"
                         name="Per_Bun"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="Per Bun"
+                        placeholder={t("perBun")}
                         defaultValue={editBoxData.Per_Bun}
                       />
                     </div>
@@ -352,7 +354,7 @@ const UpdateBox = () => {
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-3">
-                      <h6>Width</h6>
+                      <h6>{t("width")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
                           <input
@@ -361,17 +363,17 @@ const UpdateBox = () => {
                             name="box_width"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="width"
+                            placeholder={t("width")}
                             defaultValue={editBoxData.box_width}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>cm</span>
+                          <span>{t("cm")}</span>
                         </div>
                       </div>
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Length</h6>
+                      <h6>{t("length")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
                           <input
@@ -380,18 +382,18 @@ const UpdateBox = () => {
                             name="box_length"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="length"
+                            placeholder={t("length")}
                             defaultValue={editBoxData.box_length}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>cm</span>
+                          <span>{t("cm")}</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="form-group col-lg-3">
-                      <h6>Height</h6>
+                      <h6>{t("height")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
                           <input
@@ -400,30 +402,30 @@ const UpdateBox = () => {
                             name="box_height"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="height"
+                            placeholder={t("height")}
                             defaultValue={editBoxData.box_height}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>cm</span>
+                          <span>{t("cm")}</span>
                         </div>
                       </div>
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>CBM</h6>
+                      <h6>{t("cbm")}</h6>
                       <input
                         type="text"
                         id="hs_name"
                         name="hs_name"
                         className="form-control"
-                        placeholder="automatic calculation"
+                        placeholder={t("cbm")}
                         value={cbm}
                       />
                     </div>
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-3">
-                      <h6>Weight</h6>
+                      <h6>{t("weight")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
                           <input
@@ -432,40 +434,40 @@ const UpdateBox = () => {
                             name="box_weight"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="weight"
+                            placeholder={t("weight")}
                             defaultValue={editBoxData.box_weight}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>g</span>
+                          <span>{t("gram")}</span>
                         </div>
                       </div>
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>MinLoad</h6>
+                      <h6>{t("minLoad")}</h6>
                       <input
                         type="text"
                         id="name_en"
                         name="name_en"
                         className="form-control"
-                        placeholder="automatic calculation"
+                        placeholder={t("minLoad")}
                         value={minload}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Box/Pallet</h6>
+                      <h6>{t("box/Pallet")}</h6>
                       <input
                         type="text"
                         id="name_en"
                         name="box_pallet"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="Box/Pallet"
+                        placeholder={t("box/Pallet")}
                         defaultValue={editBoxData.box_pallet}
                       />
                     </div>
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>Charts of Accounting</h6>
+                      <h6>{t("chartOfAccounts")}</h6>
                       <Autocomplete
                         options={
                           classification1.map((item) => ({
@@ -487,7 +489,7 @@ const UpdateBox = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Classification"
+                            placeholder={t("chartOfAccounts")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -499,7 +501,7 @@ const UpdateBox = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>VAT Type</h6>
+                      <h6>{t("vatType")}</h6>
                       <Autocomplete
                         options={
                           classification2.map((item) => ({
@@ -521,7 +523,7 @@ const UpdateBox = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select VAT Classification"
+                            placeholder={t("selectVatClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -534,7 +536,7 @@ const UpdateBox = () => {
                     </div>
 
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>Inventory Type</h6>
+                      <h6>{t("inventoryType")}</h6>
                       <Autocomplete
                         options={
                           classification3.map((item) => ({
@@ -556,7 +558,7 @@ const UpdateBox = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Inventory Classification"
+                            placeholder={t("selectInventoryClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -569,7 +571,7 @@ const UpdateBox = () => {
                     </div>
 
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6> WHT Type</h6>
+                      <h6> {t("whtType")}</h6>
                       <Autocomplete
                         options={
                           classification4?.map((item) => ({
@@ -591,7 +593,7 @@ const UpdateBox = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select WHT Classification"
+                            placeholder={t("selectWhtClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -603,7 +605,7 @@ const UpdateBox = () => {
                       />
                     </div>
                     <div className="form-group col-lg-12">
-                      <h6>Image</h6>
+                      <h6>{t("image")}</h6>
                       <input
                         type="file"
                         id="box_image"
@@ -617,7 +619,7 @@ const UpdateBox = () => {
                           <label htmlFor="box_image">
                             <div className="uploadBorder">
                               <span>
-                                Choose Image <CloudUploadIcon />{" "}
+                                {t("chooseImage")} <CloudUploadIcon />{" "}
                               </span>
                             </div>
                           </label>
@@ -652,13 +654,13 @@ const UpdateBox = () => {
                           className="btn btn-primary w-100px btn-adddev"
                           onClick={updateBoxData}
                         >
-                          Update
+                          {t("update")}
                         </button>
                         <Link
                           to="/boxes"
                           className="btn btn-light w-100px ms-3"
                         >
-                          Cancel
+                          {t("cancel")}
                         </Link>
                       </div>
                     </div>

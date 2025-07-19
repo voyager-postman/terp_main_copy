@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import { TableView } from "../table";
 import { Card } from "../../card";
+import { useTranslation } from "react-i18next";
 
 const InventoryProduce = () => {
+  const { t, i18n } = useTranslation("global");
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState("");
   const [selectedUnitType, setSelectedUnitType] = useState("");
@@ -53,7 +55,7 @@ const InventoryProduce = () => {
           modalInstance.hide();
         }
         console.log(response);
-        toast.success("Stock Adjustment Added Successfully", {
+        toast.success(t("stockAdjustmentSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -63,7 +65,7 @@ const InventoryProduce = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -78,20 +80,20 @@ const InventoryProduce = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: () => <div style={{ textAlign: "center" }}>Produce</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("produce")}</div>,
         accessor: "Item",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Unit</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("unit")}</div>,
         accessor: "Unit",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       // optional: prevents growing beyond this
       {
         Header: () => (
-          <div style={{ textAlign: "center",}}>
-            Quantity Available{" "}
+          <div style={{ textAlign: "center", }}>
+            {t("quantityAvailable")}{" "}
           </div>
         ),
 
@@ -101,7 +103,7 @@ const InventoryProduce = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Average Cost </div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("averageCost")} </div>,
         accessor: "Average Cost",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
@@ -109,7 +111,7 @@ const InventoryProduce = () => {
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <>
             <div className="editIcon">
@@ -134,7 +136,7 @@ const InventoryProduce = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h1 className="modal-title fs-5" id="exampleModalLabel">
-                      Produce on hand
+                      {t("produceOnHand")}
                     </h1>
                     <button
                       type="button"
@@ -147,7 +149,7 @@ const InventoryProduce = () => {
                   </div>
                   <div className="modal-body">
                     <div className="form-group col-lg-12 formCreate">
-                      <h6>Quantity on hand</h6>
+                      <h6>{t("quantityOnHand")}</h6>
                       <div>
                         <input
                           type="text"
@@ -165,7 +167,7 @@ const InventoryProduce = () => {
                       onClick={updateBoxes}
                       className="btn btn-primary"
                     >
-                      Update
+                      {t("update")}
                     </button>
                   </div>
                 </div>
@@ -175,19 +177,19 @@ const InventoryProduce = () => {
         ),
       },
     ],
-    [quantity, handleChange] // Ensure useMemo dependencies are correct
+    [quantity, handleChange, t] // Ensure useMemo dependencies are correct
   );
 
   return (
     <Card
-      title="Available Produce Management"
+      title={t("produceManagement")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/createUser")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

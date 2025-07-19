@@ -7,7 +7,9 @@ import { useQuery } from "react-query";
 import React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { useTranslation } from "react-i18next";
 const UpdateUser = () => {
+  const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
   const location = useLocation();
   const { from } = location.state || {};
@@ -118,7 +120,7 @@ const UpdateUser = () => {
               <div className="row">
                 <div className="col-md-6">
                   <h6 className="font-weight-bolder mb-0 pt-2">
-                    User Management / Update Form
+                  {t("updateForm")}
                   </h6>
                 </div>
               </div>
@@ -136,7 +138,7 @@ const UpdateUser = () => {
                       <form action="">
                         <div className="row">
                           <div className="form-group col-lg-3 autoComplete mb-3">
-                            <h6>Role</h6>
+                           <h6>{t("role")}</h6>
                             <Autocomplete
                               options={[
                                 { label: "Client", value: "Client" },
@@ -155,14 +157,14 @@ const UpdateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Role"
+                                  placeholder={t("selectRole")}
                                   variant="outlined"
                                 />
                               )}
                             />
                           </div>
                           <div className="form-group col-lg-3 autoComplete">
-                            <h6>Permission</h6>
+                           <h6>{t("permission")}</h6>
                             <Autocomplete
                               options={[
                                 { label: "Level 1", value: "Level 1" },
@@ -203,14 +205,14 @@ const UpdateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Permission"
+                                    placeholder={t("selectPermission")}
                                   InputLabelProps={{ shrink: false }}
                                 />
                               )}
                             />
                           </div>
                           <div className="form-group col-lg-3 autoComplete mb-3">
-                            <h6>Select Client</h6>
+                              <h6>{t("select_client")}</h6>
                             <Autocomplete
                               options={SelectClient || []}
                               getOptionLabel={(option) =>
@@ -238,14 +240,14 @@ const UpdateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Client"
+                                    placeholder={t("select_client")}
                                   InputLabelProps={{ shrink: false }}
                                 />
                               )}
                             />
                           </div>
                           <div className="form-group col-lg-3 autoComplete mb-3">
-                            <h6>Consignee</h6>
+                           <h6>{t("consignee")}</h6>
                             <Autocomplete
                               options={consignees || []}
                               getOptionLabel={(option) =>
@@ -267,7 +269,7 @@ const UpdateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Consignee"
+                                   placeholder={t("selectConsignee")}
                                   InputLabelProps={{ shrink: false }}
                                 />
                               )}
@@ -275,36 +277,36 @@ const UpdateUser = () => {
                           </div>
 
                           <div className="form-group col-lg-3">
-                            <h6>Username</h6>
+                              <h6>{t("username")}</h6>
                             <input
                               type="text"
                               className="form-control"
-                              placeholder="name"
+                            placeholder={t("username")}
                               value={name2}
                               onChange={(e) => setName2(e.target.value)}
                             />
                           </div>
                           <div className="form-group col-lg-3 ">
-                            <h6>Name</h6>
+                              <h6>{t("name")}</h6>
                             <input
                               type="text"
                               className="form-control"
-                              placeholder="name"
+                             placeholder={t("name")}
                               value={name}
                               onChange={(e) => setName(e.target.value)}
                             />
                           </div>
                           <div className="form-group col-lg-3">
-                            <h6>Email</h6>
+                        <h6>{t("email")}</h6>
                             <input
                               type="email"
                               className="form-control"
-                              placeholder="email"
+                                placeholder={t("email")}
                               onChange={(e) => setEmailId(e.target.value)}
                             />
                           </div>
                           <div className="form-group col-lg-3 autoComplete">
-                            <h6>Status</h6>
+                         <h6>{t("status")}</h6>
                             <Autocomplete
                               options={[
                                 { label: "Pending", value: "Pending" },
@@ -332,14 +334,14 @@ const UpdateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Status"
+                                placeholder={t("status")}
                                   InputLabelProps={{ shrink: false }}
                                 />
                               )}
                             />
                           </div>
                           <div className="form-group col-lg-4">
-                            <h6>Password Generator</h6>
+                          <h6>{t("passwordGenerator")}</h6>
                             <div className="flex">
                               <div className="passwordGenerator me-2">
                                 <input
@@ -362,27 +364,27 @@ const UpdateUser = () => {
                                   type="btn"
                                   onClick={handleGenerateClick}
                                 >
-                                  Generate
+                                  {t("generate")}
                                 </button>
                               </div>
                             </div>
                           </div>
                           <div className="form-group col-lg-3">
-                            <h6>Password</h6>
+                          <h6> {t("password")}</h6>
                             <input
                               type="text"
                               className="form-control"
-                              placeholder="password"
+                                 placeholder={t("password")}
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
                             />
                           </div>
                           <div className="form-group col-lg-4">
-                            <h6> Confirm Password</h6>
+                           <h6>{t("confirmPassword")}</h6>
                             <input
                               type="password"
                               className="form-control"
-                              placeholder={123456}
+                               placeholder= {t("confirmPassword")} 
                               onChange={(e) =>
                                 setConfirmPassword(e.target.value)
                               }
@@ -401,10 +403,10 @@ const UpdateUser = () => {
                     type="submit"
                     name="signup"
                   >
-                    Update
+                    {t("update")}
                   </button>
                   <Link className="btn btn-danger" to="/user">
-                    Cancel
+                  {t("cancel")}
                   </Link>
                 </div>
               </div>

@@ -10,8 +10,10 @@ import "jspdf-autotable";
 import { Card } from "../../card";
 import { TableView } from "../table";
 import logo from "../../assets/logoNew.png";
+import { useTranslation } from "react-i18next";
 
 const ShipToNew = () => {
+  const { t, i18n } = useTranslation("global");
   const [isOn, setIsOn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,7 +34,7 @@ const ShipToNew = () => {
   const handleSubmit = async () => {
     console.log(selectedClientId);
     if (!selectedClientId?.client_id && !selectedClientId?.consignee_id) {
-      toast.error("Please select a consignee");
+      toast.error(t("pleaseSelectAConsignee"));
       return;
     }
 
@@ -317,10 +319,10 @@ const ShipToNew = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Invoices)
+          ),
           finalY + 1
         );
 
@@ -329,10 +331,10 @@ const ShipToNew = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_claims)
+          ),
           finalY + 5
         );
 
@@ -341,10 +343,10 @@ const ShipToNew = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_payments)
+          ),
           finalY + 9
         );
 
@@ -356,10 +358,10 @@ const ShipToNew = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Totals)
+          ),
           finalY + 16
         );
 
@@ -413,10 +415,10 @@ const ShipToNew = () => {
       setFromDate("");
       setToDate("");
       setSelectedClientId(null); // Reset client_id
-      toast.success("Statement Added successful");
+      toast.success(t("statementSuccess"));
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"))
       // Handle the error as needed
     }
   };
@@ -437,8 +439,7 @@ const ShipToNew = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${
-            selectedClientId?.consignee_name
+          `${API_IMAGE_URL}${selectedClientId?.consignee_name
           }_Statement_${formatDate(new Date())}.pdf`
         );
       } else {
@@ -480,17 +481,17 @@ const ShipToNew = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Id",
+        Header: t("id"),
         id: "index",
         accessor: (_row, i) => i + 1,
       },
 
       {
-        Header: "Name / Company",
+        Header: t("nameCompany"),
         accessor: "consignee_name",
       },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -508,8 +509,8 @@ const ShipToNew = () => {
               defaultChecked
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")} </span>
+              <span>{t("on")}</span>
             </span>
             <a> </a>
           </label>
@@ -517,7 +518,7 @@ const ShipToNew = () => {
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <>
             <Link to="/edit_ship_to" state={{ from: a }}>
@@ -614,8 +615,8 @@ const ShipToNew = () => {
               onClick={() => setSelectedClientId(a)} // Set client_id on button click
               className="SvgAnchor"
               type="button"
-              // data-bs-toggle="modal"
-              // data-bs-target="#modalState"
+            // data-bs-toggle="modal"
+            // data-bs-target="#modalState"
             >
               <svg
                 viewBox="-2 0 26 24"
@@ -650,11 +651,11 @@ const ShipToNew = () => {
       },
 
       {
-        Header: "Salary",
+        Header: t("salary"),
         accessor: (a) => <>{"100000000"}</>,
       },
     ],
-    []
+    [t]
   );
 
   const getAirportData = () => {
@@ -666,7 +667,7 @@ const ShipToNew = () => {
       .catch((error) => {
         console.log(error);
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -682,14 +683,14 @@ const ShipToNew = () => {
   return (
     <>
       <Card
-        title="Consignee Management"
+        title={t("consigneeStatement")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/add_ship_to")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >
@@ -707,7 +708,7 @@ const ShipToNew = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Statement
+                {t("statement")}
               </h1>
               <button
                 type="button"
@@ -719,7 +720,7 @@ const ShipToNew = () => {
               </button>
             </div>
             <div className="modal-body">
-              <label htmlFor="fromDate">From Date</label>
+              <label htmlFor="fromDate">{t("fromDate")}</label>
               <input
                 type="date"
                 className="form-control"
@@ -728,7 +729,7 @@ const ShipToNew = () => {
                 onChange={(e) => setFromDate(e.target.value)}
               />
               <label className="mt-2" htmlFor="toDate">
-                To Date
+                {t("toDate")}
               </label>
               <input
                 type="date"
@@ -744,7 +745,7 @@ const ShipToNew = () => {
                 className="btn btn-primary"
                 onClick={handleSubmit}
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>

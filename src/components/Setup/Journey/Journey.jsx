@@ -6,8 +6,9 @@ import { Card } from "../../../card";
 import { TableView } from "../../table";
 import MySwal from "../../../swal";
 import { toast } from "react-toastify";
-
+import { useTranslation } from "react-i18next";
 const Journey = () => {
+  const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(true);
@@ -49,8 +50,8 @@ const Journey = () => {
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -63,7 +64,7 @@ const Journey = () => {
           toast.success("Journey delete successfully");
           getFreight();
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("genericError"));
         }
       }
     });
@@ -73,45 +74,45 @@ const Journey = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "From Port",
+        Header: t("fromPort"),
         Id: "index",
         accessor: (_rows, i) => _rows.from_port,
       },
       {
-        Header: "Desination Port",
+        Header: t("destinationPort"),
         accessor: (a) => a.destination_port,
       },
       {
-        Header: "Liner ",
+        Header: t("liner"),
         accessor: (a) => a.liner_name,
       },
       {
-        Header: "Journey Number",
+        Header: t("journeyNumber"),
         accessor: (a) => a.journey_number,
       },
       {
-        Header: "Load Time",
+        Header: t("loadTime"),
         accessor: (a) => a.Load_time,
       },
       {
-        Header: "Transit to Departure",
+        Header: t("transitToDeparture"),
         accessor: (a) => a.Transit_to_Departure,
       },
       {
-        Header: "ETD",
+        Header: t("etd"),
         accessor: (a) => a.ETD,
       },
       {
-        Header: "Transit to Arrival",
+        Header: t("transitToArrival"),
         accessor: (a) => a.Transit_to_arrival,
       },
       {
-        Header: "ETA",
+        Header: t("eta"),
         accessor: (a) => a.ETA,
       },
 
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -129,15 +130,15 @@ const Journey = () => {
               defaultChecked={a.Available == "1" ? true : false}
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")}</span>
+              <span>{t("no")}</span>
             </span>
             <a></a>
           </label>
         ),
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <>
             <Link to="/openEditjourney" state={{ from: { ...a } }}>
@@ -167,19 +168,19 @@ const Journey = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
   return (
     <Card
-      title="Journey Setup Management"
+      title={t("journeySetupManagement")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/openjourney")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

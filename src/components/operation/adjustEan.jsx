@@ -202,7 +202,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
-import axios from "axios";
+import axios from "../../Url/Api";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import { Card } from "../../card";
@@ -210,8 +210,11 @@ import { TableView } from "../table";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 export const AdjustEan = () => {
+  const { t, i18n } = useTranslation("global");
+
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -236,7 +239,7 @@ export const AdjustEan = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -348,7 +351,7 @@ export const AdjustEan = () => {
 
         setIsOpen(false);
         if (response.status === 200) {
-          toast.success("Successfully", {
+          toast.success(t("successfully"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -389,7 +392,7 @@ export const AdjustEan = () => {
       })
       .catch((error) => {
         console.error(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -402,47 +405,47 @@ export const AdjustEan = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Date",
+        Header: t("date"),
         accessor: "date_",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
 
       {
-        Header: "Code",
+        Header: t("code"),
         accessor: "pod_code",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: "Name",
+        Header: t("name"),
         accessor: "name",
       },
       {
-        Header: "Brand",
+        Header: t("brand"),
         accessor: "brand",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: "Quantity Available",
+        Header: t("quantityAvailable"),
         accessor: "qty_available",
         Cell: ({ value }) => <div style={{ textAlign: "end" }}>{value}</div>,
       },
       {
-        Header: "Unit",
+        Header: t("unit"),
         accessor: "unit",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: "Average Weight(g)",
+        Header: t("averageWeightG"),
         accessor: "average_weight",
         Cell: ({ value }) => <div style={{ textAlign: "end" }}>{value}</div>,
       },
       {
-        Header: "Average Cost",
+        Header: t("averageCost"),
         accessor: "avg_cost",
         Cell: ({ value }) => <div style={{ textAlign: "end" }}>{value}</div>,
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="editIcon gap-2">
             <button onClick={() => viewPacking(a)}>
@@ -478,7 +481,7 @@ export const AdjustEan = () => {
         ),
       },
     ],
-    [restoredRows]
+    [restoredRows, t]
   );
   return (
     <>
@@ -495,7 +498,7 @@ export const AdjustEan = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Adjust Ean View
+                {t("adjustEanView")}
               </h1>
               <button
                 type="button"
@@ -522,61 +525,61 @@ export const AdjustEan = () => {
                         <div className="row">
                           <div className="col-lg-3">
                             <p>
-                              <span>Used Quantity :</span>
+                              <span> {t("usedQuantity")} :</span>
                               <strong>{totalDetails?.Qty}</strong>
                             </p>
 
                             <p>
                               {" "}
-                              <span>Number of Staff :</span>{" "}
+                              <span> {t("numberOfStaff")} :</span>{" "}
                               <strong>{totalDetails?.Staff} </strong>
                             </p>
 
                             <p>
-                              <span>Start Time :</span>
+                              <span> {t("startTime")} :</span>
                               <strong>
                                 {totalDetails?.Start_Time
                                   ? format(
-                                      new Date(totalDetails?.Start_Time),
-                                      "HH:mm dd-MM-yyyy"
-                                    )
+                                    new Date(totalDetails?.Start_Time),
+                                    "HH:mm dd-MM-yyyy"
+                                  )
                                   : "N/A"}{" "}
                               </strong>
                             </p>
 
                             <p>
                               {" "}
-                              <span>End Time :</span>{" "}
+                              <span> {t("endTime")} :</span>{" "}
                               <strong>
                                 {totalDetails?.End_Time
                                   ? format(
-                                      new Date(totalDetails?.End_Time),
-                                      "HH:mm dd-MM-yyyy"
-                                    )
+                                    new Date(totalDetails?.End_Time),
+                                    "HH:mm dd-MM-yyyy"
+                                  )
                                   : "N/A"}{" "}
                               </strong>
                             </p>
                           </div>
                           <div className="col-lg-3">
                             <p>
-                              <span>Name :</span>
+                              <span> {t("name")}:</span>
                               <strong>{dataId?.name}</strong>
                             </p>
 
                             <p>
                               {" "}
-                              <span>Brand :</span>{" "}
+                              <span> {t("brand")}:</span>{" "}
                               <strong>{dataId?.brand} </strong>
                             </p>
 
                             <p>
-                              <span>Quantity:</span>
+                              <span> {t("quantity")} :</span>
                               <strong>{dataId?.Qty}</strong>
                             </p>
 
                             <p>
                               {" "}
-                              <span>Unit :</span>
+                              <span> {t("unit")}:</span>
                               <strong>{dataId?.unit}</strong>
                             </p>
                           </div>
@@ -608,14 +611,14 @@ export const AdjustEan = () => {
                         >
                           <thead>
                             <tr>
-                              <th>EAN</th>
-                              <th>Quantity</th>
-                              <th>Unit</th>
-                              <th>EAN Cost</th>
-                              <th>Average Weight</th>
-                              <th>EAN Per Kg</th>
-                              <th>EAN Per Hour </th>
-                              <th>Wastage </th>
+                              <th> {t("ean")} </th>
+                              <th> {t("quantity")} </th>
+                              <th> {t("unit")} </th>
+                              <th> {t("eanCost")}</th>
+                              <th> {t("averageWeight")}</th>
+                              <th> {t("eanPerKg")}</th>
+                              <th> {t("eanPerHour")}</th>
+                              <th> {t("wastage")} </th>
                             </tr>
                           </thead>
                           <tbody>
@@ -651,7 +654,7 @@ export const AdjustEan = () => {
                       data-bs-dismiss="modal"
                       aria-label="Close"
                     >
-                      Close
+                      {t("close")}
                     </Link>
                   </div>
                 </div>
@@ -667,7 +670,7 @@ export const AdjustEan = () => {
       </div>
 
       {/* view modal  end*/}
-      <Card title={"EAN"}>
+      <Card title={t("ean")}>
         <TableView columns={columns} data={data} />
       </Card>
       {isOpen && (
@@ -677,10 +680,10 @@ export const AdjustEan = () => {
             onClick={closeModal}
           />
           <div className="bg-white rounded-lg shadow-lg p-4 max-w-md w-full z-50">
-            <h3>Edit Details</h3>
+            <h3> {t("editDetails")}</h3>
             <div className="formEan formCreate">
               <div className="form-group">
-                <label>Quantity on Hand</label>
+                <label> {t("quantityOnHand")}</label>
                 <input
                   type="Quantity"
                   value={adjustQty}
@@ -694,14 +697,14 @@ export const AdjustEan = () => {
                   className="bg-gray-300 px-4 py-2 rounded"
                   onClick={closeModal}
                 >
-                  Close
+                  {t("close")}
                 </button>
                 <button
                   type="button"
                   className="bg-black text-white px-4 py-2 rounded submitButton"
                   onClick={handleSave}
                 >
-                  Submit
+                 {t("submit")}
                 </button>
               </div>
             </div>

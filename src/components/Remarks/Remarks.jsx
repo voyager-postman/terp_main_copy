@@ -1,12 +1,15 @@
-import axios from "axios";
+ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import { Card } from "../../card/";
 import { TableView } from "../table";
+import { useTranslation } from "react-i18next";
 
 const Remarks = () => {
+  const [t, i18n] = useTranslation("global");
+
   const [data, setData] = useState([]);
   const navigate = useNavigate();
   const getEanData = () => {
@@ -34,7 +37,7 @@ const Remarks = () => {
       .post(`${API_BASE_URL}/eanStatus`, request)
       .then((resp) => {
         if (resp.data.success === true) {
-          toast.success("Status Updated Successfully", {
+          toast.success(t("statusUpdated"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -63,11 +66,11 @@ const Remarks = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "EAN",
+        Header: t("ean"),
         accessor: "EAN", // Static value for Produce
       },
       {
-        Header: "Required",
+        Header: t("required"),
         accessor: (a) => (
           <div>
             {formatterTwo.format(a.required)} {/* Static value */}
@@ -75,7 +78,7 @@ const Remarks = () => {
         ),
       },
       {
-        Header: "Available",
+        Header: t("available"),
         accessor: (a) => (
           <div>
             {formatterTwo.format(a.available)} {/* Static value */}
@@ -83,7 +86,7 @@ const Remarks = () => {
         ),
       },
       {
-        Header: "Wastage",
+        Header: t("wastage"),
         accessor: (a) => (
           <div>
             {formatterTwo.format(a.Wastage)} {/* Static value */}
@@ -91,7 +94,7 @@ const Remarks = () => {
         ),
       },
       {
-        Header: "Suggested",
+        Header: t("suggested"),
         accessor: (a) => (
           <div>
             {formatterZero.format(a.Suggested)} {/* Static value */}
@@ -99,19 +102,19 @@ const Remarks = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
   return (
     <Card
-      title={"Suggested Purchase Order Management"}
+      title={t("suggestedPoManagement")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/add_ean")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

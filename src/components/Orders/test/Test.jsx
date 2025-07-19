@@ -25,8 +25,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
+import { useTranslation } from "react-i18next";
+
 import { FaCalendarAlt } from "react-icons/fa"; // Import calendar icon
 const Test = () => {
+  const { t, i18n } = useTranslation("global");
+
   const [isLoading, setIsLoading] = useState(false);
 
   const CustomInput = ({ value, onClick }) => (
@@ -101,27 +105,6 @@ const Test = () => {
 
   const [data, setData] = useState([]);
 
-  // const orderData1 = () => {
-  //   axios
-  //     .get(`${API_BASE_URL}/NewgetOrders`, {
-  //       params: {
-  //         status, // This will pass the selected status value
-  //       },
-  //     })
-  //     .then((res) => {
-  //       setData(res.data.data || []);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching orders:", error);
-  //     });
-  // };
-
-  // Optionally call the API on component mount or when the status changes
-  // useEffect(() => {
-  //   if (status !== "") {
-  //     orderData1();
-  //   }
-  // }, [status]);
   const orderData = () => {
     axios
       .get(`${API_BASE_URL}/NewgetOrders`, {
@@ -179,12 +162,6 @@ const Test = () => {
     console.log(date);
     setStartDate2(date);
   };
-  // const totalDetails = useMemo(() => {
-  //   console.log(totalDetails);
-  //   console.log(id);
-
-  //   // return totalDetails?.find((v) => +v.Order_ID == +id);
-  // }, [id, totalDetails]);
 
   console.log(totalDetails);
   const [inputValue, setInputValue] = useState("");
@@ -217,7 +194,7 @@ const Test = () => {
             ...value,
           });
           oneQoutationDAta();
-          toast.success("Order update successfully");
+          toast.success(t("orderUpdateSuccess"));
           setInputValue("");
           orderData();
           refetch();
@@ -266,10 +243,10 @@ const Test = () => {
         order_id: id,
         user_id: localStorage.getItem("id"),
       });
-      toast.success("Order Approved successfully");
+      toast.success(t("orderApproved"));
       orderData();
     } catch (e) {
-      toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -323,7 +300,7 @@ const Test = () => {
     } catch (error) {
       // Log the error if the request fails
       console.error("Failed to fetch freight details:", error);
-      toast.error("Error fetching freight details");
+      toast.error(t("errorFetchingFreightDetails"));
     }
   };
 
@@ -371,7 +348,7 @@ const Test = () => {
     } catch (error) {
       // Log the error if the request fails
       console.error("Failed to fetch freight details:", error);
-      toast.error("Error fetching freight details");
+      toast.error(t("errorFetchingFreightDetails"));
     }
   };
   const handleEditClick = async () => {
@@ -394,12 +371,12 @@ const Test = () => {
       loadingModal.close();
       setChargeVolume(false);
       orderData();
-      toast.success("Order Copy successfully");
+      toast.success(t("orderCopySuccess"));
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
       loadingModal.close();
-      toast.error("Failed to Order Copy");
+      toast.error(t("orderCopyFailed"));
     }
   };
   const handleChange2 = (e) => {
@@ -422,7 +399,7 @@ const Test = () => {
           modalInstance.hide();
         }
         console.log(response);
-        toast.success("Order Note Updated Successfully", {
+        toast.success(t("orderNoteUpdated"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -456,7 +433,7 @@ const Test = () => {
           modalInstance.hide();
         }
         if (response.data.success) {
-          toast.success("Order Deleted Successfully", {
+          toast.success(t("orderDeleted"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -1165,7 +1142,6 @@ const Test = () => {
               'DATE_FORMAT(Orders.Ship_date, "%d-%m-%Y")'
             ] || "",
         },
-       
       ];
 
       textDataRight.forEach((item) => {
@@ -2225,70 +2201,74 @@ const Test = () => {
       //   doc.text(inputFieldValue, inputX + 2, inputY + 7); // Adjust position for padding
       // }
 
-
       // ****************************************** note and delivery note part
-    function addTextWithPagination(doc, longText, x, y, maxWidth) {
-      const lineHeight = 5; // Adjust line height if needed
-      const pageHeight = doc.internal.pageSize.height;
-      const textLines = doc.splitTextToSize(longText, maxWidth);
-      let currentY = y;
- 
-      for (let i = 0; i < textLines.length; i++) {
-        if (currentY + lineHeight > pageHeight) {
-          doc.addPage();
-          currentY = 10;
+      function addTextWithPagination(doc, longText, x, y, maxWidth) {
+        const lineHeight = 5; // Adjust line height if needed
+        const pageHeight = doc.internal.pageSize.height;
+        const textLines = doc.splitTextToSize(longText, maxWidth);
+        let currentY = y;
+
+        for (let i = 0; i < textLines.length; i++) {
+          if (currentY + lineHeight > pageHeight) {
+            doc.addPage();
+            currentY = 10;
+          }
+
+          doc.text(textLines[i], x, currentY);
+          currentY += lineHeight; // Move Y position down for next line
         }
- 
-        doc.text(textLines[i], x, currentY);
-        currentY += lineHeight; // Move Y position down for next line
+        return currentY;
       }
-      return currentY;
-    }
- 
- 
-    // note end
-    const longText = invoiceResponse.data?.section7_Values.Delivery_Terms || "";
-    const x = 7;
-    const initialY = doc.autoTable.previous.finalY + 24;
-    const maxWidth = 180;
- 
-    let finalY1 = initialY;
- 
-    // 🔹 Step 1: Render longText first (if exists)
-    const hasLongText = longText.trim() !== "";
-    if (hasLongText) {
-      finalY1 = addTextWithPagination(doc, longText, x, finalY1, maxWidth);
-    }
- 
-    const inputFieldValue = invoiceResponse.data?.section8_Values?.NOTES || "";
- 
-    if (inputFieldValue && inputFieldValue.trim() !== "") {
-      const inputX = 7;
-      const inputWidth = 196;
-      const padding = 3;
-      const maxTextWidth = inputWidth - padding * 2;
- 
-      const noteLabelY = finalY1 + 3; // Leave space after longText
- 
-      // 🔹 Only draw line if longText was present
+
+      // note end
+      const longText =
+        invoiceResponse.data?.section7_Values.Delivery_Terms || "";
+      const x = 7;
+      const initialY = doc.autoTable.previous.finalY + 24;
+      const maxWidth = 180;
+
+      let finalY1 = initialY;
+
+      // 🔹 Step 1: Render longText first (if exists)
+      const hasLongText = longText.trim() !== "";
       if (hasLongText) {
-        const lineY = noteLabelY - 4;
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.3);
-        doc.line(inputX, lineY, inputX + inputWidth, lineY);
+        finalY1 = addTextWithPagination(doc, longText, x, finalY1, maxWidth);
       }
- 
-      // 🔹 Render "Notes here" label
-      doc.text(`${invoiceResponse.data?.section8_Labels.Notes}:`, inputX, noteLabelY + 2);
- 
-      // 🔹 Wrapped note text
-      const lines = doc.splitTextToSize(inputFieldValue, maxTextWidth);
-      const textY = noteLabelY + 5;
-      doc.text(lines, inputX, textY + 2);
-    }
- 
- // ****************************************** note and delivery note part end
-     
+
+      const inputFieldValue =
+        invoiceResponse.data?.section8_Values?.NOTES || "";
+
+      if (inputFieldValue && inputFieldValue.trim() !== "") {
+        const inputX = 7;
+        const inputWidth = 196;
+        const padding = 3;
+        const maxTextWidth = inputWidth - padding * 2;
+
+        const noteLabelY = finalY1 + 3; // Leave space after longText
+
+        // 🔹 Only draw line if longText was present
+        if (hasLongText) {
+          const lineY = noteLabelY - 4;
+          doc.setDrawColor(0);
+          doc.setLineWidth(0.3);
+          doc.line(inputX, lineY, inputX + inputWidth, lineY);
+        }
+
+        // 🔹 Render "Notes here" label
+        doc.text(
+          `${invoiceResponse.data?.section8_Labels.Notes}:`,
+          inputX,
+          noteLabelY + 2
+        );
+
+        // 🔹 Wrapped note text
+        const lines = doc.splitTextToSize(inputFieldValue, maxTextWidth);
+        const textY = noteLabelY + 5;
+        doc.text(lines, inputX, textY + 2);
+      }
+
+      // ****************************************** note and delivery note part end
+
       const addPageNumbers = (doc) => {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
@@ -2296,10 +2276,6 @@ const Test = () => {
           doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
         }
       };
-
- 
- 
-    
 
       // Add page numbers
       addPageNumbers(doc);
@@ -2348,27 +2324,27 @@ const Test = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Number",
+        Header: t("number"),
         accessor: "Order_Number",
       },
       {
-        Header: "Client Name",
+        Header: t("clientName"),
         accessor: "client_name",
       },
       {
-        Header: "Destination port ",
+        Header: t("destinationPort"),
         accessor: "port_name",
       },
       {
-        Header: "Consignee Name",
+        Header: t("consigneeName"),
         accessor: "Consignee_name",
       },
       {
-        Header: "Location",
+        Header: t("location"),
         accessor: "Location_name",
       },
       {
-        Header: "Load Date",
+        Header: t("loadDate"),
         accessor: (a) => {
           return a?.load_date
             ? new Date(a?.load_date).toLocaleDateString()
@@ -2376,11 +2352,11 @@ const Test = () => {
         },
       },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: "status_name",
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="editIcon">
             {+a.is_deleted === 1 ? (
@@ -2512,7 +2488,7 @@ const Test = () => {
         ),
       },
     ],
-    [data, form]
+    [data, form, t, i18n.language]
   );
 
   return (
@@ -2528,7 +2504,7 @@ const Test = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Order Copy
+                {t("orderCopy")}
               </h1>
               <button
                 type="button"
@@ -2540,7 +2516,7 @@ const Test = () => {
               </button>
             </div>
             <div className="modal-body">
-              <label htmlFor="">Recalculate</label>
+              <label htmlFor="">{t("recalculate")}</label>
               <br />
               <label className="toggleSwitch large">
                 <input
@@ -2550,8 +2526,8 @@ const Test = () => {
                   onChange={handleAgreedPricingChange1}
                 />
                 <span>
-                  <span>No</span>
-                  <span>Yes</span>
+                  <span>{t("no")}</span>
+                  <span>{t("yes")}</span>
                 </span>
                 <a></a>
               </label>
@@ -2562,27 +2538,30 @@ const Test = () => {
                 className="btn btn-primary"
                 onClick={() => handleEditClick()}
               >
-                Copy
+                {t("copy")}
               </button>
             </div>
           </div>
         </div>
       </div>
       <Card
-        title="Order  Management"
+        title={t("orderManagement")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/create_Order")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >
         <Box sx={{ minWidth: 120 }} className="selectActive">
           <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Status</InputLabel>
+            <InputLabel id="demo-simple-select-label">
+              {" "}
+              {t("status")}
+            </InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
@@ -2590,10 +2569,10 @@ const Test = () => {
               label="Status"
               onChange={handleChange}
             >
-              <MenuItem value="4">All</MenuItem>
-              <MenuItem value="0">Pending</MenuItem>
-              <MenuItem value="1">Active</MenuItem>
-              <MenuItem value="2">Shipped</MenuItem>
+              <MenuItem value="4">{t("all")}</MenuItem>
+              <MenuItem value="0">{t("pending")}</MenuItem>
+              <MenuItem value="1">{t("active")}</MenuItem>
+              <MenuItem value="2">{t("shipped")}</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -2611,7 +2590,7 @@ const Test = () => {
           />
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full ">
             <div className="crossArea">
-              <h3>Edit Details</h3>
+              <h3>{t("editDetails")}</h3>
               <p onClick={closeModal}>
                 <CloseIcon />
               </p>
@@ -2627,7 +2606,7 @@ const Test = () => {
               >
                 <div className="p-3 bottomOrderSp">
                   <div className="form-group">
-                    <label>Consignee Ref</label>
+                    <label>{t("consigneeRef")}</label>
 
                     <input
                       type="text"
@@ -2636,7 +2615,7 @@ const Test = () => {
                     />
                   </div>
                   <div className="form-group mb-3">
-                    <label>Liner</label>
+                    <label> {t("liner")}</label>
                     <form.Field
                       name="Liner"
                       children={(field) => (
@@ -2657,7 +2636,7 @@ const Test = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Journey Number</label>
+                    <label>{t("journeyNumber")}</label>
 
                     <form.Field
                       name="journey_number"
@@ -2678,7 +2657,7 @@ const Test = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>BL</label>
+                    <label> {t("bl")}</label>
                     <form.Field
                       name="bl"
                       children={(field) => (
@@ -2693,7 +2672,7 @@ const Test = () => {
                   </div>
                   <div className="flex gap-2">
                     <div className="form-group w-full">
-                      <label>Load Date</label>
+                      <label>{t("loadDate")}</label>
                       <form.Field
                         name="Load_date"
                         children={(field) => (
@@ -2711,14 +2690,14 @@ const Test = () => {
                             selected={startDate}
                             onChange={handleStartDateChange}
                             dateFormat="dd/MM/yyyy"
-                            placeholderText="Click to select a date"
+                            placeholderText= {t("selectDate")}
                             customInput={<CustomInput />}
                           />
                         )}
                       />
                     </div>
                     <div className="form-group loadTimeS">
-                      <label>Load Time</label>
+                      <label>{t("loadTime")}</label>
                       <form.Field
                         name="Load_time"
                         children={(field) => (
@@ -2735,7 +2714,7 @@ const Test = () => {
                   </div>
                   <div className="flex gap-2">
                     <div className="form-group w-full">
-                      <label>Ship Date</label>
+                      <label>{t("shipDate")}</label>
                       <form.Field
                         name="Ship_date"
                         children={(field) => (
@@ -2750,14 +2729,14 @@ const Test = () => {
                             selected={startDate1}
                             onChange={handleStartDateChange1}
                             dateFormat="dd/MM/yyyy"
-                            placeholderText="Click to select a date"
+                            placeholderText= {t("selectDate")}
                             customInput={<CustomInput />}
                           />
                         )}
                       />
                     </div>
                     <div className="form-group">
-                      <label>ETD</label>
+                      <label>{t("etd")}</label>
                       <form.Field
                         name="ETD"
                         children={(field) => (
@@ -2774,7 +2753,7 @@ const Test = () => {
                   </div>
                   <div className="flex gap-2">
                     <div className="form-group w-full">
-                      <label>Arrival Date</label>
+                      <label>{t("arrivalDate")}</label>
                       <form.Field
                         name="Arrival_date"
                         children={(field) => (
@@ -2789,14 +2768,15 @@ const Test = () => {
                             selected={startDate2}
                             onChange={handleStartDateChange2}
                             dateFormat="dd/MM/yyyy"
-                            placeholderText="Click to select a date"
+                            placeholderText= {t("selectDate")}
+                           
                             customInput={<CustomInput />}
                           />
                         )}
                       />
                     </div>
                     <div className="form-group">
-                      <label>ETA</label>
+                      <label>{t("eta")}</label>
                       <form.Field
                         name="ETA"
                         children={(field) => (
@@ -2817,7 +2797,7 @@ const Test = () => {
                     type="submit"
                     className="bg-black text-white px-4 py-2 rounded"
                   >
-                    Save
+                    {t("save")}
                   </button>
                 </div>
               </form>
@@ -2836,7 +2816,7 @@ const Test = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Orders Note
+                {t("ordersNote")}
               </h1>
               <button
                 type="button"
@@ -2849,7 +2829,7 @@ const Test = () => {
               <textarea
                 value={notes}
                 onChange={handleChange2}
-                placeholder="Type Notes Here"
+                placeholder={t("typeNotes")}
               />
             </div>
             <div className="modal-footer">
@@ -2858,14 +2838,14 @@ const Test = () => {
                 className="btn btn-secondary "
                 data-bs-dismiss="modal"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
                 onClick={dataSubmit}
                 className="btn btn-primary"
               >
-                ok
+                {t("ok")}
               </button>
             </div>
           </div>
@@ -2892,12 +2872,12 @@ const Test = () => {
             </div>
             <div className="modal-body">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Note
+                {t("note")}
               </h1>
               <textarea
                 value={notes1}
                 onChange={handleChange3}
-                placeholder="Type Notes Here"
+                placeholder= {t("typeNotes")}
               />
             </div>
             <div className="modal-footer">
@@ -2906,14 +2886,14 @@ const Test = () => {
                 className="btn btn-secondary "
                 data-bs-dismiss="modal"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
                 onClick={dataSubmit1}
                 className="btn btn-primary"
               >
-                ok
+                {t("ok")}
               </button>
             </div>
           </div>
@@ -2940,7 +2920,7 @@ const Test = () => {
             </div>
             <div className="modal-body">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Note
+                {t("notes")}
               </h1>
               <textarea
                 value={notes2}
@@ -2955,7 +2935,7 @@ const Test = () => {
                 className="btn btn-secondary "
                 data-bs-dismiss="modal"
               >
-                Close
+                {t("close")}
               </button>
               {/* <button
                 type="button"
@@ -2972,7 +2952,7 @@ const Test = () => {
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Order
+              {t("orders")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}

@@ -150,7 +150,10 @@ import logo from "../../assets/logoT.jpg";
 
 import { Card } from "../../card";
 import { TableView } from "../table";
+import { useTranslation } from "react-i18next";
+
 const Claim = () => {
+  const { t } = useTranslation("global");
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [filterData1, setFilterData1] = useState("");
@@ -446,7 +449,7 @@ const Claim = () => {
         2: { halign: "right" },
         3: { halign: "center" },
         4: { halign: "center" },
- 
+
       },
       tableWidth: "auto",
       headStyles: {
@@ -504,7 +507,7 @@ const Claim = () => {
       invoiceResponse.data?.summaryLabels['CONCAT("Total (",@FXName,")")'];
     let value =
       invoiceResponse.data?.summaryValues[
-        'CONCAT(Format(Claim.Claim_FX,2)," (",@FXName,")")'
+      'CONCAT(Format(Claim.Claim_FX,2)," (",@FXName,")")'
       ];
 
     value = fitText(value, maxValueWidth); // Ensure value fits within the max width
@@ -949,7 +952,7 @@ const Claim = () => {
 
       // Step 2: Add actions column
       dynamicColumns.push({
-        Header: "Actions",
+        Header:  t("actions"),
         accessor: "actions",
         Cell: ({ row }) => {
           const rowData = row.original;
@@ -996,8 +999,8 @@ const Claim = () => {
   const deleteOrder = async (id) => {
     if (!id) return;
     const result = await MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -1014,7 +1017,7 @@ const Claim = () => {
         // toast.success(response.data.messageTH);
         listClaim();
       } catch (e) {
-        toast.error("Something went wrong");
+        toast.error(t("genericError"));
       }
     }
   };
@@ -1025,7 +1028,7 @@ const Claim = () => {
 
   return (
     <>
-      <Card title="Claim">
+      <Card title={t("claim")}>
         <TableView columns={columns} data={data} />
       </Card>
       <div
@@ -1039,7 +1042,7 @@ const Claim = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Claim Modal
+                {t("Claim_Modal")}
               </h1>
               <button
                 onClick={clearData}
@@ -1056,7 +1059,7 @@ const Claim = () => {
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Use custom name? </h6>
+                      <h6>{t("useCustomName")}</h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -1074,8 +1077,8 @@ const Claim = () => {
                             onChange={handleAgreedPricingChange1}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
@@ -1083,7 +1086,7 @@ const Claim = () => {
                     </div>
 
                     <div className="invoiceModal">
-                      <h6>Invoice Name Can be -</h6>
+                      <h6> {t("invoiceNameCanBe")}-</h6>
                       <input
                         type="radio"
                         id="html1"
@@ -1092,7 +1095,7 @@ const Claim = () => {
                         checked={selectedInvoice === "Client"}
                         onChange={handleRadioChange}
                       />
-                      <label htmlFor="html1">Client</label>
+                      <label htmlFor="html1">{t("client")}</label>
 
                       <input
                         type="radio"
@@ -1102,7 +1105,7 @@ const Claim = () => {
                         checked={selectedInvoice === "Consignee"}
                         onChange={handleRadioChange}
                       />
-                      <label htmlFor="css1">Consignee</label>
+                      <label htmlFor="css1">{t("consignee")}</label>
                     </div>
                   </div>
                 </div>
@@ -1114,7 +1117,7 @@ const Claim = () => {
                 onClick={generatePdf}
                 className="btn btn-primary mb-4"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>

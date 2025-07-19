@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../Url/Api";
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import MySwal from "../../swal";
 import { ComboBox } from "../combobox";
 import { TableView } from "../table";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from "react-i18next";
 
 import {
   LocalizationProvider,
@@ -19,6 +20,8 @@ import Box from "@mui/material/Box";
 import { Autocomplete } from "@mui/material";
 
 const EanRepack = () => {
+  const { t, i18n } = useTranslation("global");
+
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -216,7 +219,7 @@ const EanRepack = () => {
               !selectedDate ||
               !selectedDate1
             ) {
-              return toast.error("Please fill all fields");
+              return toast.error(t("genericError")); toast.error("Please fill all fields");
             }
           }
           setCloseButton(false);
@@ -246,6 +249,7 @@ const EanRepack = () => {
       .then((response) => {
         if (response.status === 200) {
           setCloseButton(true);
+          // toast.success(t("returnToSupplierSuccess"));
           toast.success("Ean updated successfully");
           setToggle(!toggle);
         }
@@ -258,7 +262,8 @@ const EanRepack = () => {
     const { ean_id, unit_id, brand_id, ean_quantity } = data;
 
     if (!unit_id || brand_id === null || !ean_quantity) {
-      return toast.error("Please fill all fields");
+      return toast.error(t("pleaseFillAllFields"));
+
     }
 
     const request = {
@@ -283,6 +288,7 @@ const EanRepack = () => {
 
         if (response.status === 200) {
           toast.success("Ean Repack  detail added successfully");
+          toast.success(t("eanRepackSuccess"));
           closeModal();
           setToggle(!toggle);
           setCloseButton(true);
@@ -340,7 +346,7 @@ const EanRepack = () => {
                   <div className="grayBgColor" style={{ padding: "18px" }}>
                     <div className="row">
                       <div className="col-md-6">
-                        <h6 className="font-weight-bolder mb-0">Repack Ean</h6>
+                        <h6 className="font-weight-bolder mb-0"> {t("repackEan")}</h6>
                       </div>
                     </div>
                   </div>
@@ -358,19 +364,19 @@ const EanRepack = () => {
                           <div className="formCreate">
                             <div className="row">
                               <div className="form-group col-lg-3 removeBorder">
-                                <h6>Name : </h6>
+                                <h6> {t("name")} : </h6>
                                 <p> {from?.name}</p>
                               </div>
                               <div className="form-group col-lg-3 removeBorder">
-                                <h6>Brand : </h6>
+                                <h6> {t("brand")} : </h6>
                                 <p> {from?.brand}</p>
                               </div>
                               <div className="form-group col-lg-3 removeBorder">
-                                <h6> Quantity : </h6>
+                                <h6> {t("quantity")} : </h6>
                                 <p> {from?.Qty}</p>
                               </div>
                               <div className="form-group col-lg-3 removeBorder">
-                                <h6> Unit : </h6>
+                                <h6>  {t("unit")} : </h6>
                                 <p> {from?.unit}</p>
                               </div>
                             </div>
@@ -379,7 +385,7 @@ const EanRepack = () => {
                             <form action="">
                               <div className="row">
                                 <div className="form-group col-lg-3 ">
-                                  <h6>Quantity used</h6>
+                                  <h6> {t("quantityUsed")}</h6>
                                   <input
                                     onChange={handleChange}
                                     type="number"
@@ -389,7 +395,7 @@ const EanRepack = () => {
                                   />
                                 </div>
                                 <div className="form-group col-lg-3 ">
-                                  <h6>Number of Staff</h6>
+                                  <h6> {t("numberOfStaff")}</h6>
                                   <input
                                     onChange={handleChange}
                                     type="number"
@@ -399,7 +405,7 @@ const EanRepack = () => {
                                   />
                                 </div>
                                 <div className="form-group col-lg-3 eanDateTime">
-                                  <h6>Start Time</h6>
+                                  <h6> {t("endTime")}</h6>
                                   <LocalizationProvider
                                     dateAdapter={AdapterDateFns}
                                   >
@@ -422,7 +428,7 @@ const EanRepack = () => {
                                   </LocalizationProvider>
                                 </div>
                                 <div className="form-group col-lg-3 eanDateTime">
-                                  <h6>End Time</h6>
+                                  <h6> {t("endTime")}</h6>
 
                                   <LocalizationProvider
                                     dateAdapter={AdapterDateFns}
@@ -459,7 +465,7 @@ const EanRepack = () => {
                                     type="button"
                                     onClick={() => checkPackCommonId()}
                                   >
-                                    Add
+                                   {t("add")}
                                   </button>
                                 </div>
                               </div>
@@ -471,13 +477,13 @@ const EanRepack = () => {
                                 >
                                   <thead>
                                     <tr>
-                                      <th>EAN</th>
-                                      <th>Quantity</th>
-                                      <th>Unit</th>
-                                      <th>Ean Cost</th>
-                                      <th>Average Weight</th>
-                                      <th>Ean Per KG</th>
-                                      <th>Ean Per Hour</th>
+                                      <th> {t("ean")}</th>
+                                      <th> {t("quantity")}</th>
+                                      <th> {t("unit")}</th>
+                                      <th> {t("eanCost")}</th>
+                                      <th> {t("averageWeight")}</th>
+                                      <th> {t("eanPerKg")}</th>
+                                      <th> {t("eanPerHour")}</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -503,7 +509,7 @@ const EanRepack = () => {
                     <div className="card-footer">
                       {closeButton ? (
                         <Link className="btn btn-danger" to={"/adjustEan"}>
-                          Close
+                          {t("close")}
                         </Link>
                       ) : (
                         ""
@@ -524,14 +530,14 @@ const EanRepack = () => {
             />
             <div className="bg-white rounded-lg shadow-lg  max-w-md w-full z-50">
               <div className="crossArea">
-                <h3>Edit Details</h3>
+                <h3> {t("editDetails")}</h3>
                 <p onClick={closeModal}>
                   <CloseIcon />
                 </p>
               </div>
               <div className="formEan formCreate">
                 <div className="form-group mb-3 autoComplete">
-                  <label>EAN</label>
+                  <label> {t("ean")}</label>
                   {/* <ComboBox
                     options={eanListData?.map((item) => ({
                       id: item.ean_id,
@@ -552,8 +558,8 @@ const EanRepack = () => {
                       id: item.ean_id,
                       name:
                         (email === "Plaew" && role === "Operation") ||
-                        (email === "Gam" && role === "Operation") ||
-                        (email === "Look Sorn" && role === "Operation")
+                          (email === "Gam" && role === "Operation") ||
+                          (email === "Look Sorn" && role === "Operation")
                           ? item.ean_name_th
                           : item.ean_name_en,
                     }))}
@@ -569,7 +575,7 @@ const EanRepack = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Quantity</label>
+                  <label> {t("quantity")}</label>
                   <input
                     type="number"
                     value={data?.ean_quantity}
@@ -578,7 +584,7 @@ const EanRepack = () => {
                   />
                 </div>
                 <div className="form-group mb-3 autoComplete">
-                  <label>Unit</label>
+                  <label> {t("unit")}</label>
                   {/* <ComboBox
                     options={unitType?.map((item) => ({
                       id: item.unit_id,
@@ -592,9 +598,9 @@ const EanRepack = () => {
                     options={
                       unitType
                         ? unitType?.slice(0, 3).map((item) => ({
-                            id: item.ID,
-                            name: item.Name_EN,
-                          }))
+                          id: item.ID,
+                          name: item.Name_EN,
+                        }))
                         : []
                     }
                     getOptionLabel={(option) => option.name || ""}
@@ -606,11 +612,11 @@ const EanRepack = () => {
                     value={
                       unitType
                         ? unitType
-                            .map((item) => ({
-                              id: item.ID,
-                              name: item.Name_EN,
-                            }))
-                            .find((item) => item.id === data?.unit_id) || null
+                          .map((item) => ({
+                            id: item.ID,
+                            name: item.Name_EN,
+                          }))
+                          .find((item) => item.id === data?.unit_id) || null
                         : null
                     }
                     isOptionEqualToValue={(option, value) =>
@@ -622,7 +628,7 @@ const EanRepack = () => {
                   />
                 </div>
                 <div className="form-group mb-3 autoComplete">
-                  <label>Brand</label>
+                  <label> {t("brand")}</label>
                   {/* <ComboBox
                     options={brands?.map((item) => ({
                       id: item.brand_id,
@@ -637,21 +643,21 @@ const EanRepack = () => {
                     options={
                       brands
                         ? brands.map((item) => ({
-                            id: item.ID,
-                            name: item.Name_EN,
-                          }))
+                          id: item.ID,
+                          name: item.Name_EN,
+                        }))
                         : []
                     }
                     getOptionLabel={(option) => option.name || ""}
                     value={
                       brands
                         ? brands
-                            .map((item) => ({
-                              id: item.ID,
-                              name: item.Name_EN,
-                            }))
-                            .find((brand) => brand.id === data?.brand_id) ||
-                          null
+                          .map((item) => ({
+                            id: item.ID,
+                            name: item.Name_EN,
+                          }))
+                          .find((brand) => brand.id === data?.brand_id) ||
+                        null
                         : null
                     }
                     isOptionEqualToValue={(option, value) =>
@@ -670,7 +676,7 @@ const EanRepack = () => {
                 </div>
 
                 <div className="form-group mb-3 autoComplete">
-                  <label>Assigned Order</label>
+                  <label> {t("AssignedOrder")}</label>
                   {/* <select
                     value={selectedOrder}
                     onChange={(e) => setSelectedOrder(e.target.value)}
@@ -723,7 +729,7 @@ const EanRepack = () => {
                   onClick={() => saveNewDetails()}
                   className="bg-black text-white px-4 py-2 rounded"
                 >
-                  Save
+                   {t("save")}
                 </button>
               </div>
             </div>

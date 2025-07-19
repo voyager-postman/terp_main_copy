@@ -5,8 +5,10 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { Autocomplete, TextField } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const UpdateClearanceNew = () => {
+  const { t } = useTranslation("global");
   const nevigate = useNavigate();
   const location = useLocation();
   const { from } = location.state || {};
@@ -45,7 +47,7 @@ const UpdateClearanceNew = () => {
       .catch((error) => {
         console.log(error);
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -63,7 +65,7 @@ const UpdateClearanceNew = () => {
       .catch((error) => {
         console.log(error);
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -95,8 +97,7 @@ const UpdateClearanceNew = () => {
 
     axios
       .post(
-        `${API_BASE_URL}/${
-          request.clearance_id ? "updateClearance" : "addClearance"
+        `${API_BASE_URL}/${request.clearance_id ? "updateClearance" : "addClearance"
         }`,
         request
       )
@@ -118,7 +119,7 @@ const UpdateClearanceNew = () => {
           return false;
         }
         if (response.data.success == false) {
-          toast.error("Vender is Already exist", {
+          toast.error(t("vendorExists"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -128,7 +129,7 @@ const UpdateClearanceNew = () => {
       })
       .catch((error) => {
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -140,9 +141,8 @@ const UpdateClearanceNew = () => {
   // Update Clearance Api
   return (
     <Card
-      title={`Clearance Management / ${
-        from?.clearance_id ? "Update" : "Create"
-      } Form`}
+      title={`${t("clearanceManagement")} / ${from?.clearance_id ? t("update") : t("create")
+        } ${t("form")}`}
     >
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
@@ -155,56 +155,56 @@ const UpdateClearanceNew = () => {
                 <form action="">
                   <div className="row">
                     <div className="form-group col-lg-3">
-                      <h6>Total Clearance Charge</h6>
+                      <h6>{t("totalClearanceCharge")}</h6>
                       <input
                         onChange={handleChange}
                         type="text"
                         id="name_th"
                         name="custom_clearance_charges"
                         className="form-control"
-                        placeholder="name"
+                        placeholder={t("totalClearanceCharge")}
                         defaultValue={from?.custom_clearance_charges}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Certificates</h6>
+                      <h6>{t("certificates")}</h6>
                       <input
                         onChange={handleChange}
                         type="text"
                         id="name_en"
                         name="phyto_charges"
                         className="form-control"
-                        placeholder="width"
+                        placeholder={t("certificates")}
                         defaultValue={from?.phyto_charges}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Chamber of Commerce</h6>
+                      <h6>{t("chamberOfCommerce")}</h6>
                       <input
                         onChange={handleChange}
                         type="text"
                         id="name_en"
                         name="co_chamber_charges"
                         className="form-control"
-                        placeholder="lenght"
+                        placeholder={t("chamberOfCommerce")}
                         defaultValue={from?.co_chamber_charges}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Extras</h6>
+                      <h6>{t("extras")}</h6>
                       <input
                         onChange={handleChange}
                         type="text"
                         id="hs_code"
                         name="extra_charges"
                         className="form-control"
-                        placeholder="height"
+                        placeholder={t("extras")}
                         defaultValue={from?.extra_charges}
                       />
                     </div>
                     <div className="col-lg-3 form-group autoComplete">
                       <h6>
-                        <h6>Vendor</h6>
+                        <h6>{t("selectVendor")}</h6>
                       </h6>
                       {/* <select
 												name="vendor_id"
@@ -241,7 +241,7 @@ const UpdateClearanceNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Vendor"
+                            placeholder={t("selectVendor")}
                             variant="outlined"
                           />
                         )}
@@ -251,7 +251,7 @@ const UpdateClearanceNew = () => {
                       />
                     </div>
                     <div className="col-lg-3 form-group autoComplete">
-                      <h6>Port of origins</h6>
+                      <h6>{t("portOfOrigins")}</h6>
                       {/* <select
 												name="from_port"
 												value={editClearance.from_port}
@@ -277,7 +277,7 @@ const UpdateClearanceNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Port"
+                            placeholder= {t("searchPortOrigin")}
                             variant="outlined"
                           />
                         )}
@@ -304,10 +304,10 @@ const UpdateClearanceNew = () => {
               type="submit"
               name="signup"
             >
-              {from?.clearance_id ? "Update" : "Create"}
+              {from?.clearance_id ? t("update") : t("create")}
             </button>
             <Link to="/clearanceNew" className="btn btn-danger">
-              Cancel
+               {t("cancel")}
             </Link>
           </div>
         </div>

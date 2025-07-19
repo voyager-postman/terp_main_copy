@@ -9,7 +9,6 @@
 //   };
 //   // pp
 //   const [data, setData] = useState([]);
-  
 
 //   useEffect(() => {
 //     axios.get(`${API_BASE_URL}/GetNotificationList`)
@@ -23,7 +22,7 @@
 //         setLoading(false);
 //       });
 //   }, []);
-  
+
 //   // pp
 //   return (
 //     <div className="container-fluid">
@@ -99,7 +98,7 @@
 //                       </tr>
 
 //                       ))}
-                       
+
 //                     </tbody>
 //                   </table>
 //                   <div className="flex justify-end">
@@ -147,7 +146,7 @@
 //   console.log(error.response.data)
 // })
 //   }
-  
+
 //   const handleclicknavi =(a)=>{
 //     alert(a)
 //     navigate('/updateNotification',{state:{data12:a}})
@@ -166,7 +165,7 @@
 //       {
 //         Header: "Notification Messages",
 //         accessor: "notification_message",
-       
+
 //       },
 //       {
 //         Header: "Client",
@@ -198,7 +197,7 @@
 //                   }}
 //                 />
 //               </Link>
-              
+
 //                 {/* <button type="button" onClick={() => deleteOrder(a.id)}>
 //                   <i className="mdi mdi-delete " />
 //                 </button> */}
@@ -239,8 +238,10 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { TableView } from "../../table";
 import { Card } from "../../../card";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Notification = () => {
+  const [t, i18n] = useTranslation("global");
   const [data, setData] = useState([]);
   const navigate = useNavigate();
 
@@ -249,16 +250,19 @@ const Notification = () => {
   }, []);
 
   const getdataNotification = () => {
-    axios.get(`${API_BASE_URL}/GetNotificationList`).then((response) => {
-      console.log(response.data.data);
-      setData(response.data.data);
-    }).catch((error) => {
-      console.log(error.response.data);
-    });
+    axios
+      .get(`${API_BASE_URL}/GetNotificationList`)
+      .then((response) => {
+        console.log(response.data.data);
+        setData(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error.response.data);
+      });
   };
 
   const handleclicknavi = (a) => {
-    navigate('/updateNotification', { state: { data12: a } });
+    navigate("/updateNotification", { state: { data12: a } });
   };
 
   const columns = React.useMemo(
@@ -269,27 +273,27 @@ const Notification = () => {
         accessor: (row, i) => i + 1,
       },
       {
-        Header: "Notification Name",
+        Header: t("notification_name"),
         accessor: "notification_name",
       },
       {
-        Header: "Notification Messages",
+        Header: t("notification_message"),
         accessor: "notification_message",
       },
       {
-        Header: "Client",
+        Header: t("client"),
         accessor: "client_name",
       },
       {
-        Header: "Consignee",
+        Header: t("consignee"),
         accessor: "consignee_name",
       },
       {
-        Header: "Notify on",
+        Header: t("notify_on"),
         accessor: "notify_on_description",
       },
       {
-        Header: "Actions",
+         Header: t("actions"),
         accessor: (a) => (
           <div className="userIcon">
             <i
@@ -300,7 +304,7 @@ const Notification = () => {
                 marginTop: "10px",
                 paddingTop: "8px",
                 fontSize: "22px",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
               onClick={() => handleclicknavi(a)}
             />
@@ -308,19 +312,19 @@ const Notification = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
   return (
     <Card
-      title="Notification Management"
+      title={t("notification_management")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/createNotification")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

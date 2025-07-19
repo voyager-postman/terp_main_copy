@@ -5,11 +5,13 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 import { API_BASE_URL } from "../../Url/Url";
 import { API_IMAGE_URL } from "../../Url/Url";
 
 const ApexChart = () => {
+  const { t, i18n } = useTranslation("global");
   const [data, setData] = useState([]);
   const [selectedProduceId, setSelectedProduceId] = useState(null);
   const [produceImages, setProduceImages] = useState("");
@@ -112,15 +114,15 @@ const ApexChart = () => {
   const confirmData = () => {
     // Validate required fields
     if (!selectedProduceId) {
-      toast.error("Produce is required");
+      toast.error(t("produceRequired"));
       return;
     }
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
 
@@ -164,17 +166,17 @@ const ApexChart = () => {
           ...prevOptions,
           series: [
             {
-              name: "Price",
+              name: t("price"),
               data: priceData,
               color: "#1E90FF", // Set color for Price series
             },
             {
-              name: "Wastage",
+              name: t("wastage"),
               data: wastageData,
               color: "#32CD32", // Set color for Wastage series
             },
             {
-              name: "Raw Kg Cost",
+              name: t("rawKgCost"),
               data: rawKgCostData,
               color: "#FFA500", // Set color for Raw Kg Cost series
             },
@@ -194,11 +196,12 @@ const ApexChart = () => {
 
               return (
                 '<div class="apexcharts-tooltip-custom">' +
-                `<strong>Price:</strong> ${price}<br/>` +
-                `<strong>Wastage:</strong> ${wastage}<br/>` +
-                `<strong>Raw Kg Cost:</strong> ${rawKgCost}` +
+                `<strong>${t("price")}:</strong> ${price}<br/>` +
+                `<strong>${t("wastage")}:</strong> ${wastage}<br/>` +
+                `<strong>${t("rawKgCost")}:</strong> ${rawKgCost}` +
                 "</div>"
               );
+
             },
           },
         }));
@@ -206,6 +209,7 @@ const ApexChart = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
         toast.error("An error occurred while fetching data.");
+        toast.error(t("genericError"));
       });
   };
 
@@ -236,7 +240,7 @@ const ApexChart = () => {
   const [chartOptions, setChartOptions] = useState({
     series: [
       {
-        name: "Produce Trend",
+        name: t("produceTrend"),
         data: [], // Initial empty data
       },
     ],
@@ -262,7 +266,7 @@ const ApexChart = () => {
         size: 0,
       },
       title: {
-        text: "Produce Price Trend",
+        text: t("produceTrend"),// "Produce Price Trend",
         align: "left",
       },
       fill: {
@@ -277,7 +281,7 @@ const ApexChart = () => {
       },
       yaxis: {
         title: {
-          text: "Price",
+          text: t("price"),
         },
       },
       xaxis: {
@@ -308,24 +312,24 @@ const ApexChart = () => {
         <div className="row">
           <div className="flex flex-wrap">
             <div className="selectProduce me-3">
-              <h6 className="mb-2"> Select Produce</h6>
+              <h6 className="mb-2">{t("selectProduce")}</h6>
               <Autocomplete
                 disablePortal
                 options={data}
-                getOptionLabel={(option) => option.produce_name_en || ""}
+                getOptionLabel={(option) => option.Name_EN || ""}
                 sx={{ width: 300 }}
                 onChange={(event, value) => {
                   setSelectedProduceId(value ? value.produce_id : null);
                   setProduceImages(value ? value.images : null); // Update images state
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} placeholder="Select Produce" />
+                  <TextField {...params} placeholder={t("selectProduce")} />
                 )}
               />
             </div>
             <div>
               <div className="selectTimeHead">
-                <h6>Select Time Period :</h6>
+                <h6>{t("selectTimePeriod")}:</h6>
               </div>
               <div className="selectTimeParent">
                 {dataPeriod.map((item) => (
@@ -341,7 +345,7 @@ const ApexChart = () => {
             </div>
             <div className="selectProduce comparisonNone">
               <h6 className="mb-2" style={{ color: "#fff" }}>
-                Comparison Period
+                {t("comparisonPeriod")}
               </h6>
               <Autocomplete
                 disablePortal
@@ -352,7 +356,7 @@ const ApexChart = () => {
                   setSelectedComparison(value ? value.ID : null);
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} placeholder="Comparison Period" />
+                  <TextField {...params} placeholder= {t("comparisonPeriod")} />
                 )}
               />
             </div>
@@ -394,7 +398,7 @@ const ApexChart = () => {
                 type="submit"
                 onClick={confirmData}
               >
-                Confirm
+                {t("confirm")}
               </button>
             </div>
           </div>

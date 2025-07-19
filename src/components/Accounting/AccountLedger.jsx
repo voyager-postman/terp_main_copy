@@ -6,8 +6,11 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import { Card } from "../../card";
 import { TableView } from "../table";
+import { useTranslation } from "react-i18next";
 
 const AccountLedger = () => {
+  const { t, i18n } = useTranslation("global");
+
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(true);
   const navigate = useNavigate();
@@ -37,7 +40,7 @@ const AccountLedger = () => {
       .then((resp) => {
         // console.log(resp, "Check Resp")
         if (resp.data.success == true) {
-          toast.success("Status Updated Successfully", {
+          toast.success(t("statusUpdated"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -57,7 +60,7 @@ const AccountLedger = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "AL Date",
+        Header: t("AL_Date"),
         accessor: (row) => {
           const date = new Date(row.AL_Date);
           const day = String(date.getDate()).padStart(2, "0");
@@ -67,29 +70,29 @@ const AccountLedger = () => {
         },
       },
       {
-        Header: "AL Number",
+        Header: t("AL_Number"),
         accessor: (a) => <div>{a.AL_Number}</div>,
       },
 
       {
-        Header: "Account No",
+        Header: t("Account_No"),
         accessor: (a) => <div>{a.Account_No}</div>,
       },
 
       {
-        Header: "Client",
-        accessor: (a) =><div>{a.client_name}</div>,
+        Header: t("client"),
+        accessor: (a) => <div>{a.client_name}</div>,
       },
       {
-        Header: "Consignee",
-         accessor: (a) =><div>{a.consignee_name}</div>,
+        Header: t("consignee"),
+        accessor: (a) => <div>{a.consignee_name}</div>,
       },
       {
-        Header: "Vendor",
-        accessor: (a) =><div>{a.vendor_name}</div>,
+        Header: t("vendor"),
+        accessor: (a) => <div>{a.vendor_name}</div>,
       },
       {
-        Header: "Debit",
+        Header: t("Debit"),
         accessor: (a) => (
           <div style={{ textAlign: "right" }}>
             {formatTwoDecimal.format(a.Debit)}
@@ -97,12 +100,12 @@ const AccountLedger = () => {
         ),
       },
       {
-        Header: "Transaction Description",
+        Header:  t("Transaction_Description"),
         accessor: (a) => <div>{a.Transaction_Description}</div>,
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <Link to="/update_ean" state={{ from: a }}>
             <i
@@ -124,19 +127,19 @@ const AccountLedger = () => {
       //   accessor: (a) => <>{"10000000"}</>,
       // },
     ],
-    []
+    [t]
   );
 
   return (
     <Card
-      title={"Accounting Ledger Management"}
+      title={t("AccountingLedgerManagement")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/add_ean")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >

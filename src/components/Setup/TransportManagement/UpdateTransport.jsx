@@ -5,7 +5,10 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import MySwal from "../../../swal";
+import { useTranslation } from "react-i18next";
+
 const UpdateTransport = () => {
+  const { t } = useTranslation("global");
   const location = useLocation();
   const navigate = useNavigate();
   const [tableList, setTableList] = useState([]);
@@ -75,7 +78,7 @@ const UpdateTransport = () => {
       );
       console.log(response.data); // Log the response
       tableData();
-      toast.success("Transport  Update Successfully", {
+      toast.success(t("transportUpdateSuccess"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -86,7 +89,7 @@ const UpdateTransport = () => {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
     }
   };
   const dataClear = () => {
@@ -124,7 +127,7 @@ const UpdateTransport = () => {
         max_pallet: "",
         Cost: "",
       });
-      toast.success("Transport Added Successfully", {
+      toast.success(t("transportAddSuccess"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -135,14 +138,14 @@ const UpdateTransport = () => {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
     }
   };
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -160,18 +163,17 @@ const UpdateTransport = () => {
           );
           console.log(response);
           tableData();
-          toast.success("Transport delete successfully");
+          toast.success(t("transportDeleteSuccess"));
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("tryAgain"));
         }
       }
     });
   };
   return (
     <Card
-      title={`Transportation Management / ${
-        typeof from?.transport_id == "undefined" ? "Create" : "Update"
-      } Form`}
+      title={`${t("transportManagement")} / ${typeof from?.transport_id == "undefined" ? t("create") : t("update")
+        } Form`}
     >
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
@@ -185,18 +187,18 @@ const UpdateTransport = () => {
                   <div className="d-flex">
                     <div className=" form-group">
                       <div className="flex pe-5">
-                        <h6 className="me-2">Vendor : </h6>
+                        <h6 className="me-2">{t("vendor")} : </h6>
                         <p>{from.Transportation_provider_name}</p>
                       </div>
                     </div>
                     <div className="d-flex">
-                      <h6 className="me-2">From location : </h6>
+                      <h6 className="me-2">{t("fromLocation")} : </h6>
                       <p>{from.location}</p>
                     </div>
                   </div>
 
                   <div className="d-flex  form-group">
-                    <h6 className="me-2">Depature Port : </h6>
+                    <h6 className="me-2">{t("depaturePort")}: </h6>
                     <p>{from.port}</p>
                   </div>
 
@@ -207,7 +209,7 @@ const UpdateTransport = () => {
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModalAdd"
                   >
-                    Add
+                    {t("add")}
                   </button>
                   <div
                     id="datatable_wrapper"
@@ -219,14 +221,14 @@ const UpdateTransport = () => {
                       style={{ width: "100%" }}
                     >
                       <tr>
-                        <th> Truck</th>
-                        <th>Max Weight</th>
-                        <th>Max CBM</th>
-                        <th>Max Pallet </th>
-                        <th>Cost</th>
-                        <th>KG Cost</th>
-                        <th>CBM Cost</th>
-                        <th>Action</th>
+                        <th> {t("truck")}</th>
+                        <th>{t("maxWeight")}</th>
+                        <th>{t("maxCBM")}</th>
+                        <th>{t("maxPallet")}</th>
+                        <th>{t("cost")}</th>
+                        <th>{t("kgCost")}</th>
+                        <th>{t("cbmCost")}</th>
+                        <th>{t("action")}</th>
                       </tr>
                       {tableList?.map((item, index) => (
                         <tr key={index}>
@@ -294,7 +296,7 @@ const UpdateTransport = () => {
               <div className="modal-content">
                 <div className="modal-header">
                   <h1 className="modal-title fs-5" id="exampleModalLabel">
-                    Edit Transport
+                   {t("Edit_Transport")}
                   </h1>
                   <button
                     type="button"
@@ -312,7 +314,7 @@ const UpdateTransport = () => {
                         <div className="form-group">
                           <div className="row bottomUnset">
                             <div className="col-lg-6">
-                              <h6>Truck</h6>
+                              <h6> {t("truck")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -323,7 +325,7 @@ const UpdateTransport = () => {
                               </div>
                             </div>
                             <div className="col-lg-6">
-                              <h6>Max Weight</h6>
+                              <h6>{t("maxWeight")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -334,7 +336,7 @@ const UpdateTransport = () => {
                               </div>
                             </div>
                             <div className="col-lg-6">
-                              <h6>Max CBM</h6>
+                              <h6>{t("maxCBM")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -345,7 +347,7 @@ const UpdateTransport = () => {
                               </div>
                             </div>
                             <div className="col-lg-6">
-                              <h6> Max Pallet</h6>
+                              <h6>{t("maxPallet")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -356,7 +358,7 @@ const UpdateTransport = () => {
                               </div>
                             </div>
                             <div className="col-lg-12">
-                              <h6> Cost</h6>
+                              <h6> {t("cost")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -400,7 +402,7 @@ const UpdateTransport = () => {
                     className="btn btn-primary"
                     onClick={updatePort}
                   >
-                    Update
+                    {t("update")}
                   </button>
                 </div>
               </div>
@@ -417,7 +419,7 @@ const UpdateTransport = () => {
               <div className="modal-content">
                 <div className="modal-header">
                   <h1 className="modal-title fs-5" id="exampleModalAdd">
-                    Add Transport
+                    {t("Add_Transport")}
                   </h1>
                   <button
                     type="button"
@@ -436,7 +438,7 @@ const UpdateTransport = () => {
                         <div className="form-group">
                           <div className="row bottomUnset">
                             <div className="col-lg-6">
-                              <h6>Truck</h6>
+                              <h6>{t("truck")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -447,7 +449,7 @@ const UpdateTransport = () => {
                               </div>
                             </div>
                             <div className="col-lg-6">
-                              <h6>Max Weight</h6>
+                              <h6> {t("maxWeight")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -458,7 +460,7 @@ const UpdateTransport = () => {
                               </div>
                             </div>
                             <div className="col-lg-6">
-                              <h6>Max CBM</h6>
+                              <h6> {t("maxCBM")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -469,7 +471,7 @@ const UpdateTransport = () => {
                               </div>
                             </div>
                             <div className="col-lg-6">
-                              <h6> Max Pallet</h6>
+                              <h6> {t("maxPallet")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -480,7 +482,7 @@ const UpdateTransport = () => {
                               </div>
                             </div>
                             <div className="col-lg-12">
-                              <h6> Cost</h6>
+                              <h6> {t("cost")}</h6>
                               <div>
                                 <input
                                   type="text"
@@ -502,7 +504,7 @@ const UpdateTransport = () => {
                     className="btn btn-primary"
                     onClick={updatePort1}
                   >
-                    Submit
+                    {t("submit")}
                   </button>
                 </div>
               </div>
@@ -513,12 +515,12 @@ const UpdateTransport = () => {
               className="btn btn-primary"
               type="submit"
               name="signup"
-              //   onClick={updatePort}
+            //   onClick={updatePort}
             >
-              {typeof from?.transport_id == "undefined" ? "Create" : "Update"}
+              {typeof from?.transport_id == "undefined" ? t("create") : t("update")}
             </button>
             <Link className="btn btn-danger" to={"/transportNew"}>
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>

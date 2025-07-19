@@ -10,8 +10,10 @@ import { useQuery } from "react-query";
 import { toast } from "react-toastify";
 import MySwal from "../../../swal";
 import { Button, Modal } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const TransportNew = () => {
+  const { t } = useTranslation("global");
   const navigate = useNavigate();
   const { from } = location.state || {};
   const [data, setData] = useState([]);
@@ -102,13 +104,13 @@ const TransportNew = () => {
         setShow(true);
       } else {
         // Handle success
-        toast.success("Transport  Create   Successfully", {
+        toast.success(t("transportCreateSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
       }
     } catch (error) {
-      toast.error("Something went Wrong ");
+      toast.error(t("genericError"));
       console.error("Error adding transport route", error);
     }
   };
@@ -125,15 +127,14 @@ const TransportNew = () => {
   const updatePort = () => {
     axios
       .post(
-        `${API_BASE_URL}/${
-          typeof from?.transport_id == "undefined"
-            ? "addTransportation"
-            : "updateTransportation"
+        `${API_BASE_URL}/${typeof from?.transport_id == "undefined"
+          ? "addTransportation"
+          : "updateTransportation"
         }`,
         editProduceData
       )
       .then((response) => {
-        toast[response.data.success == true ? "success" : "error"](
+        toast[response.data.success == true ? t("success") : t("error")](
           response.data.message,
           {
             autoClose: 1000,
@@ -144,7 +145,7 @@ const TransportNew = () => {
       })
       .catch((error) => {
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -162,7 +163,7 @@ const TransportNew = () => {
       .then((resp) => {
         // console.log(resp, "Check Resp")
         if (resp.data.success == true) {
-          toast.success("Status Updated Successfully", {
+          toast.success(t("statusUpdated"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -195,8 +196,8 @@ const TransportNew = () => {
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -214,9 +215,9 @@ const TransportNew = () => {
           );
           console.log(response);
           getTransport();
-          toast.success("Transport delete successfully");
+          toast.success(t("transportDeleteSuccess"));
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("tryAgain"));
         }
       }
     });
@@ -224,29 +225,29 @@ const TransportNew = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "ID",
+        Header: t("id"),
         id: "index",
         accessor: (_row, i) => i + 1,
       },
       {
-        Header: "Vendor",
+        Header: t("vendor"),
         accessor: "Transportation_provider_name",
       },
       {
-        Header: "Location",
+        Header: t("location"),
         accessor: "location",
       },
       {
-        Header: "Port",
+        Header: t("portName"),
         accessor: "port",
       },
       {
-        Header: "Port Type",
+        Header: t("portType"),
         accessor: "port_type",
       },
 
       {
-        Header: "Status",
+        Header:t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -267,15 +268,15 @@ const TransportNew = () => {
               type="checkbox"
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")}</span>
+              <span>{t("on")}</span>
             </span>
             <a></a>
           </label>
         ),
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <>
             <Link to="/updateTransport" state={{ from: a }}>
@@ -306,17 +307,17 @@ const TransportNew = () => {
       },
 
       {
-        Header: "Stats",
+        Header: t("stats"),
         accessor: (a) => "",
       },
     ],
-    []
+    [t]
   );
 
   return (
     <>
       <Card
-        title="Transportation Management"
+        title={t("transportManagement")}
         endElement={
           <div>
             <button
@@ -325,7 +326,7 @@ const TransportNew = () => {
               data-bs-toggle="modal"
               data-bs-target="#exampleModal2"
             >
-              Create
+               {t("create")}
             </button>
 
             <div
@@ -339,7 +340,7 @@ const TransportNew = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="exampleModalLabel">
-                      Transport Route
+                       {t("transportRoute")}
                     </h5>
                     <button
                       type="button"
@@ -354,7 +355,7 @@ const TransportNew = () => {
                   <div className="modal-body">
                     <div className="row">
                       <div className="col-lg-12 form-group vendorInputUnset  mb-2">
-                        <h6>Vendor</h6>
+                        <h6> {t("vendor")}</h6>
                         <div className="ceateTransport">
                           <Autocomplete
                             disablePortal
@@ -363,8 +364,8 @@ const TransportNew = () => {
                             value={
                               clientId
                                 ? clients.find(
-                                    (client) => client.ID === clientId
-                                  )
+                                  (client) => client.ID === clientId
+                                )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) =>
@@ -374,7 +375,7 @@ const TransportNew = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search Vendor" // Adds a placeholder
+                                placeholder={t("selectVendor")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -383,7 +384,7 @@ const TransportNew = () => {
                       </div>
 
                       <div className="col-lg-12 form-group mb-2">
-                        <h6>From Location</h6>
+                        <h6>{t("fromLocation")}</h6>
                         <div className="ceateTransport">
                           <Autocomplete
                             disablePortal
@@ -392,8 +393,8 @@ const TransportNew = () => {
                             value={
                               formData.loading_from
                                 ? fromLocation.find(
-                                    (loc) => loc.id === formData.loading_from
-                                  )
+                                  (loc) => loc.id === formData.loading_from
+                                )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) =>
@@ -408,7 +409,7 @@ const TransportNew = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search Port Of Origin" // Adds a placeholder
+                                placeholder={t("searchPortOrigin")}// Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -416,7 +417,7 @@ const TransportNew = () => {
                         </div>
                       </div>
                       <div className="col-lg-12 form-group mb-2">
-                        <h6>Departure Port</h6>
+                        <h6>{t("departurePort")}</h6>
                         <div className="ceateTransport">
                           <Autocomplete
                             disablePortal
@@ -425,9 +426,9 @@ const TransportNew = () => {
                             value={
                               formData.departure_port // Use departure_port to find the selected value
                                 ? departurePort.find(
-                                    (port) =>
-                                      port.port_id === formData.departure_port
-                                  )
+                                  (port) =>
+                                    port.port_id === formData.departure_port
+                                )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) => {
@@ -449,7 +450,7 @@ const TransportNew = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search Port Of Origin"
+                                placeholder= {t("departurePort")}
                                 InputLabelProps={{ shrink: false }}
                               />
                             )}
@@ -464,7 +465,7 @@ const TransportNew = () => {
                       className="UpdatePopupBtn btn btn-primary "
                       onClick={handleSubmit} // Call handleSubmit when clicking the button
                     >
-                      Submit
+                       {t("submit")}
                     </button>
                   </div>
                 </div>
@@ -483,7 +484,7 @@ const TransportNew = () => {
         <div className="modal-content">
           <div className="modal-header border-0">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Transport Check
+              {t("transportCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}

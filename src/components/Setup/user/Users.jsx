@@ -8,9 +8,10 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { TableView } from "../../table";
 import MySwal from "../../../swal";
+import { useTranslation } from "react-i18next";
 
 const Users = () => {
-
+  const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
 
   const [data, setData] = useState([]);
@@ -26,8 +27,8 @@ const Users = () => {
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -42,9 +43,9 @@ const Users = () => {
           });
           console.log(response);
           getAllUser();
-          toast.success("Order delete successfully");
+          toast.success(t("orderDeleted"));
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("genericError"));
         }
       }
     });
@@ -59,25 +60,25 @@ const Users = () => {
         accessor: (row, i) => i + 1,
       },
       {
-        Header: "Username",
+        Header: t("username"),
         accessor: "email",
       },
       {
-        Header: "Company",
+        Header: t("company"),
         accessor: "produce_name",
         Cell: () => "Siam Eats",
       },
       {
-        Header: "Role",
+        Header: t("role"),
         accessor: "role",
       },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: "status",
       },
 
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <>
             {/* {/ <Link state={{ from: a }} to="/updateUser"> /} */}
@@ -122,7 +123,7 @@ const Users = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
   //  restore
@@ -143,7 +144,7 @@ const Users = () => {
 
   const handleReset = () => {
     if (password !== confirmPassword) {
-      toast.error("Password and Confirm Password do not match");
+      toast.error(t("passwordMismatch"));
       return;
     }
 
@@ -156,7 +157,7 @@ const Users = () => {
       .then((response) => {
         console.log(response);
 
-        toast.success("User Reset Successfully");
+        toast.success(t("userResetSuccess"));
         navigate("/user");
       })
       .catch((error) => {
@@ -182,7 +183,7 @@ const Users = () => {
   const copyPasswordToClipboard = (e) => {
     e.preventDefault(); // Prevent page reload
     navigator.clipboard.writeText(generatedPassword);
-    alert("Password copied to clipboard!");
+    alert(t("passwordCopied"));
   };
 
   const handleGenerateClick = (event) => {
@@ -194,14 +195,14 @@ const Users = () => {
   }, []);
   return (
     <Card
-      title="User Management"
+      title={t("userManagement")}
       endElement={
         <button
           type="button"
           onClick={() => navigate("/createUser")}
           className="btn button btn-info"
         >
-          Create
+          {t("create")}
         </button>
       }
     >
@@ -216,7 +217,7 @@ const Users = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Reset User Form
+                {t("resetUserForm")}
               </h1>
               <button
                 type="button"
@@ -237,7 +238,7 @@ const Users = () => {
                   <div className="resetForm">
                     <div className="row">
                       <div className="form-group col-lg-12">
-                        <h6>Password Generator</h6>
+                        <h6>{t("passwordGenerator")}</h6>
                         <div className="flex">
                           <div className="passwordGenerator me-2">
                             <input
@@ -257,36 +258,36 @@ const Users = () => {
                           </div>
                           <div>
                             <button type="btn" onClick={handleGenerateClick}>
-                              Generate
+                              {t("generate")}
                             </button>
                           </div>
                         </div>
                       </div>
                       <div className="col-lg-6">
-                        <h6>Password</h6>
+                        <h6>{t("password")}</h6>
                         <input
                           type="password"
-                          placeholder="password"
+                          placeholder={t("password")}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                         />
                       </div>
                       <div className="col-lg-6">
-                        <h6>Confirm Password</h6>
+                        <h6>{t("confirmPassword")}</h6>
                         <input
                           type="password"
-                          placeholder="password"
+                          placeholder={t("confirmPassword")}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                       </div>
                       <div className="resetBtn d-flex justify-content-center">
                         <div>
-                          <button onClick={handleReset}>Reset</button>
+                          <button onClick={handleReset}>{t("reset")}</button>
                         </div>
                         <div>
                           <Link to="/user" className="btn btn-danger">
-                            Cancel
+                           {t("cancel")}
                           </Link>
                         </div>
                       </div>
@@ -297,7 +298,7 @@ const Users = () => {
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-primary">
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>

@@ -9,7 +9,10 @@ import { Card } from "../../../card";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { useTranslation } from "react-i18next";
+
 const ProduceCreateNew = () => {
+  const { t, i18n } = useTranslation("global");
   const navigate = useNavigate();
   const defaultState = {
     produce_name_en: "",
@@ -249,7 +252,7 @@ const ProduceCreateNew = () => {
   }, []);
 
   return (
-    <Card title="Produce Management / Create Form">
+    <Card title={t("produceCreateForm")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -261,7 +264,7 @@ const ProduceCreateNew = () => {
                 <form action="">
                   <div className="row">
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
-                      <h6 style={{ paddingBottom: "2px" }}>Classification</h6>
+                      <h6 style={{ paddingBottom: "2px" }}> {t("classification")}</h6>
                       <Autocomplete
                         options={
                           classification.map((item) => ({
@@ -282,7 +285,7 @@ const ProduceCreateNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Classification" // Placeholder text
+                            placeholder=  {t("selectClassification")}// Placeholder text
                             variant="outlined"
                             style={{ padding: "10px" }} // Add padding similar to the original select
                           />
@@ -296,52 +299,52 @@ const ProduceCreateNew = () => {
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-6">
-                      <h6>Name TH</h6>
+                      <h6>{t("nameTh")}</h6>
                       <input
                         onChange={handleChange}
                         type="text"
                         id="name_th"
                         name="produce_name_th"
                         className="form-control"
-                        placeholder="Name TH"
+                        placeholder={t("nameTh")}
                         value={state.produce_name_th}
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>Name EN</h6>
+                      <h6>{t("nameEn")}</h6>
                       <input
                         onChange={handleChange}
                         type="text"
                         id="name_en"
                         name="produce_name_en"
                         className="form-control"
-                        placeholder="Name EN"
+                        placeholder={t("nameEn")}
                         value={state.produce_name_en}
                       />
                     </div>
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-6">
-                      <h6>HS Code</h6>
+                      <h6>{t("hsCode")}</h6>
                       <input
                         onChange={handleChange}
                         type="text"
                         id="hs_code"
                         name="produce_hscode"
                         className="form-control"
-                        placeholder="HS Code"
+                        placeholder={t("hsCode")}
                         value={state.produce_hscode}
                       />
                     </div>
                     <div className="form-group col-lg-6">
-                      <h6>Scientific Name</h6>
+                      <h6>{t("scientificName")}</h6>
                       <input
                         onChange={handleChange}
                         type="text"
                         id="hs_name"
                         name="produce_scientific_name"
                         className="form-control"
-                        placeholder="Scientific Name"
+                        placeholder={t("scientificName")}
                         value={state.produce_scientific_name}
                       />
                     </div>
@@ -349,7 +352,7 @@ const ProduceCreateNew = () => {
                   <div className="row">
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
                       <h6 style={{ paddingBottom: "2px" }}>
-                        Charts of Accounting
+                        {t("chartOfAccounts")}
                       </h6>
                       <Autocomplete
                         options={
@@ -371,7 +374,7 @@ const ProduceCreateNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Classification"
+                            placeholder= {t("chartOfAccounts")} 
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -383,7 +386,7 @@ const ProduceCreateNew = () => {
                       />
                     </div>
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
-                      <h6 style={{ paddingBottom: "2px" }}>VAT Type</h6>
+                      <h6 style={{ paddingBottom: "2px" }}> {t("vatType")}</h6>
                       <Autocomplete
                         options={
                           classification2.map((item) => ({
@@ -404,7 +407,7 @@ const ProduceCreateNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Classification"
+                            placeholder= {t("vatType")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -418,7 +421,7 @@ const ProduceCreateNew = () => {
                   </div>
                   <div className="row">
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
-                      <h6 style={{ paddingBottom: "2px" }}>Inventory Type</h6>
+                      <h6 style={{ paddingBottom: "2px" }}>{t("inventoryType")}</h6>
                       <Autocomplete
                         options={
                           classification3.map((item) => ({
@@ -438,8 +441,8 @@ const ProduceCreateNew = () => {
                         }}
                         renderInput={(params) => (
                           <TextField
-                            {...params}
-                            placeholder="Select Classification"
+                            {...params} 
+                            placeholder= {t("inventoryType")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -451,7 +454,7 @@ const ProduceCreateNew = () => {
                       />
                     </div>
                     <div className="col-lg-6 form-group autoComplete classificationSelect mb-3">
-                      <h6 style={{ paddingBottom: "2px" }}>WHT Type</h6>
+                      <h6 style={{ paddingBottom: "2px" }}> {t("whtType")}</h6>
                       <Autocomplete
                         options={
                           classification4.map((item) => ({
@@ -472,7 +475,7 @@ const ProduceCreateNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Classification"
+                            placeholder= {t("whtType")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -486,7 +489,7 @@ const ProduceCreateNew = () => {
                   </div>
                   <div className="row">
                     <div className="col-lg-6 form-group">
-                      <h6>Image</h6>
+                      <h6> {t("image")}</h6>
                       <input
                         type="file"
                         id="box_image"
@@ -495,14 +498,14 @@ const ProduceCreateNew = () => {
                         // key={fileInputKey}
                         accept="image/*"
                         className="d-none"
-                        // onChange={handleFileSelect}
+                      // onChange={handleFileSelect}
                       />
                       <div className="imgFlex">
                         <div className="pe-4">
                           <label htmlFor="box_image">
                             <div className="uploadBorder">
                               <span>
-                                Choose Image <CloudUploadIcon />{" "}
+                               {t("chooseImage")} <CloudUploadIcon />{" "}
                               </span>
                             </div>
                           </label>
@@ -512,7 +515,7 @@ const ProduceCreateNew = () => {
                             <div>
                               <img
                                 src={selectedImage}
-                                alt="Uploaded"
+                                alt= {t("uploaded")}
                                 style={{ width: "200px", height: "200px" }}
                               />
                             </div>
@@ -532,10 +535,10 @@ const ProduceCreateNew = () => {
               type="button"
               name="signup"
             >
-              Create
+               {t("create")}
             </button>
             <Link className="btn btn-danger" to="/produceNew">
-              Cancel
+               {t("cancel")}
             </Link>
           </div>
         </div>

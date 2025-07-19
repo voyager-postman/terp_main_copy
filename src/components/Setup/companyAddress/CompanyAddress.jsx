@@ -6,10 +6,12 @@ import { Card } from "../../../card";
 import { TableView } from "../../table";
 import { API_BASE_URL } from "../../../Url/Url";
 import { API_IMAGE_URL } from "../../../Url/Url";
+ import { useTranslation } from "react-i18next";
 
 import logo from "../../../assets/logoNew.png";
 
 const CompanyAddress = () => {
+  const [t, i18n] = useTranslation("global");
   const [data, setData] = useState([]);
   const navigate = useNavigate();
   const getEanData = () => {
@@ -37,7 +39,7 @@ const CompanyAddress = () => {
       .post(`${API_BASE_URL}/eanStatus`, request)
       .then((resp) => {
         if (resp.data.success === true) {
-          toast.success("Status Updated Successfully", {
+          toast.success(t("statusUpdated"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -66,23 +68,24 @@ const CompanyAddress = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Line-1",
+        Header: t("line_1"),
         accessor: "Line_1",
       },
       {
-        Header: "Line-2",
+        Header: t("line_2"),
         accessor: "Line_2",
       },
       {
-        Header: "Line-3",
+        Header: t("line_3"),
         accessor: "Line_3",
       },
       {
-        Header: "Line-4",
+        Header: t("line_4"),
+
         accessor: "Line_4",
       },
       {
-        Header: "Logo",
+        Header: t("logo"),
         accessor: (a) => (
           <div className="logoCompany">
             <img
@@ -95,7 +98,7 @@ const CompanyAddress = () => {
         width: 100, // Adjust width for logo column
       },
       {
-        Header: "Action",
+        Header: t("action"),
         accessor: (a) => (
           <div className="editIcon">
             <Link to="/editcompanyaddress" state={{ from: a }}>
@@ -106,12 +109,12 @@ const CompanyAddress = () => {
         width: 80, // Adjust width for action column
       },
     ],
-    []
+    [t]
   );
 
   return (
     <Card
-      title={"Company Address Management"}
+      title={t("company_address_management")}
       endElement={
         <button
           type="button"
@@ -119,7 +122,7 @@ const CompanyAddress = () => {
           className="btn button btn-info"
         >
           {" "}
-          Create
+          {t("create")}
         </button>
       }
     >

@@ -6,7 +6,10 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
+ import { useTranslation } from "react-i18next";
 export default function Updatenotification() {
+     const [t, i18n] = useTranslation("global");
+
   const location = useLocation();
   const navigate = useNavigate();
   const { data12 } = location.state || {};
@@ -90,7 +93,7 @@ export default function Updatenotification() {
       .post(`${API_BASE_URL}/UpdateNotification`, payload)
       .then((response) => {
         console.log(response.data);
-        toast.success("Notification Updated Successfully");
+        toast.success(t("notificationUpdatedSuccessfully"));
         navigate("/notification");
       })
       .catch((error) => {
@@ -123,7 +126,7 @@ export default function Updatenotification() {
         <div className="grayBgColor px-4 py-3 rounded-t">
           <div className="flex justify-between items-center exportPopupBtn">
             <h6 className="font-weight-bolder mb-0">
-              Notification / Update Form
+             {t("notificationUpdateForm")}
             </h6>
           </div>
         </div>
@@ -139,11 +142,11 @@ export default function Updatenotification() {
                     <div className="row">
                       <div className="form-group col-lg-4">
                         <div className="ceateTransport ">
-                          <h6>Notification Name</h6>
+                           <h6>{t("notification_name")}</h6>
                           <input
                             className="w-100"
                             type="text"
-                            placeholder="Please Enter Your Notification Name"
+                            placeholder={t("enter_notification_name")}
                             value={notificationName}
                             onChange={(e) =>
                               setNotificationName(e.target.value)
@@ -153,7 +156,7 @@ export default function Updatenotification() {
                       </div>
                       <div className="form-group col-lg-4 autoComplete">
                         <div className="ceateTransport">
-                          <h6>Client</h6>
+                        <h6>{t("client")}</h6>
                           {/* <select
                             className="form-control"
                             value={selectedClient}
@@ -196,7 +199,7 @@ export default function Updatenotification() {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Client" // Adds a placeholder
+                             placeholder={t("select_client")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -205,7 +208,7 @@ export default function Updatenotification() {
                       </div>
                       <div className="form-group col-lg-4">
                         <div className="ceateTransport autoComplete">
-                          <h6>Consignee</h6>
+                          <h6>{t("consignee")}</h6>
                           {/* <select
                             className="form-control"
                             value={selectedConsignee}
@@ -250,7 +253,7 @@ export default function Updatenotification() {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Consignee" // Adds a placeholder
+                               placeholder={t("selectConsignee")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -259,7 +262,7 @@ export default function Updatenotification() {
                       </div>
                       <div className="form-group col-lg-4 mb-3">
                         <div className="ceateTransport autoComplete">
-                          <h6>Notify On</h6>
+                            <h6>{t("notify_on")}</h6>
                           <Autocomplete
                             options={[
                               { id: "1", name: "New Quotation Created" },
@@ -312,7 +315,7 @@ export default function Updatenotification() {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Select Notify On" // Adds a placeholder
+                              placeholder={t("select_notify_on")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -344,7 +347,7 @@ export default function Updatenotification() {
                       </div>
                       <div className="form-group col-lg-12">
                         <div className="ceateTransport">
-                          <h6>Notification Message</h6>
+                        <h6>{t("notification_message")}</h6>
                           <textarea
                             value={notificationMessage}
                             onChange={(e) =>
@@ -368,7 +371,7 @@ export default function Updatenotification() {
                   data-bs-toggle="modal"
                   data-bs-target="#exampleModalContact"
                 >
-                  Add User
+                {t("add_user")}
                 </Link>
                 {/* modal start */}
                 <div
@@ -382,7 +385,7 @@ export default function Updatenotification() {
                     <div className="modal-content">
                       <div className="modal-header">
                         <h1 className="modal-title fs-5" id="exampleModalLabel">
-                          Add User
+                         {t("add_user")}
                         </h1>
                         <button
                           type="button"
@@ -400,7 +403,7 @@ export default function Updatenotification() {
                             <div className="ceateTransport addUserSelect">
                               <div className="mb-3">
                                 <label htmlFor="users" className="form-label">
-                                  Search Users:
+                                 {t("search_users")} :
                                 </label>
                                 <Select
                                   id="users"
@@ -411,6 +414,7 @@ export default function Updatenotification() {
                                   classNamePrefix="select"
                                   value={selectedUsers}
                                   onChange={setSelectedUsers}
+                                  placeholder={t("search_users")}
                                 />
                               </div>
                             </div>
@@ -426,7 +430,7 @@ export default function Updatenotification() {
                             // Handle Add User functionality
                           }}
                         >
-                          Add User
+                           {t("add_user")}
                         </button>
                       </div>
                     </div>
@@ -441,20 +445,20 @@ export default function Updatenotification() {
                   name="signup"
                   onClick={handleUpdateNotification}
                 >
-                  Update
+                  {t("update")}
                 </button>
                 <Link className="btn btn-danger" to="/notifications">
-                  Cancel
+               {t("cancel")}
                 </Link>
               </div>
               <div className="table-responsive mt-4">
                 <table className="tableContact striped table borderTerpProduce">
                   <thead>
                     <tr>
-                      <th>User Name</th>
-                      <th>Company</th>
-                      <th>Role</th>
-                      <th>Status</th>
+                     <th>{t("user_name")}</th>
+                      <th>{t("company")}</th>
+                      <th>{t("role")}</th>
+                      <th>{t("status")}</th>
                     </tr>
                   </thead>
                   <tbody>

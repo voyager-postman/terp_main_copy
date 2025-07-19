@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
+ import { useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../Url/Url";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
+
 const UpdatePrice = () => {
+  const [t, i18n] = useTranslation("global");
   const [data, setData] = useState([]);
   const [filterValue, setFilterValue] = useState("");
   const [searchApiData, setSearchApiData] = useState([]);
@@ -60,11 +63,11 @@ const UpdatePrice = () => {
       .then((response) => {
         getProduce();
         console.log("Availability update successful", response.data);
-        toast.success("Availability update successful");
+        toast.success(t("availabilityUpdateSuccess"));
       })
       .catch((error) => {
         console.error("There was an error updating the availability!", error);
-        toast.error("Availability update failed");
+        toast.error(t("availabilityUpdateFail"));
       });
 
     type === "on"
@@ -115,7 +118,7 @@ const UpdatePrice = () => {
         // })
         .then((response) => {
           setCost("");
-          toast.success("Second availability update successful");
+          toast.success(t("availabilitySecondUpdateSuccess"));
           console.log("Second update response:", response.data);
           getProduce(); // refresh data after both calls
         })
@@ -151,11 +154,11 @@ const UpdatePrice = () => {
       .then((response) => {
         console.log("Update successful", response.data);
         getProduce();
-        toast.success("Update successful");
+        toast.success(t("updateSuccess"))
       })
       .catch((error) => {
         console.error("There was an error updating the data!", error);
-        toast.error("Update failed");
+        toast.error(t("updateFailed"));
       });
   };
   const handleFilter = (event) => {
@@ -234,7 +237,7 @@ const UpdatePrice = () => {
                       <div className="row">
                         <div className="col-md-6">
                           <h6 className="font-weight-bolder mb-0 pt-2">
-                            Update Price Management
+                            {t("updatePriceManagement")}
                           </h6>
                         </div>
                         <div className="col-md-6">
@@ -248,7 +251,7 @@ const UpdatePrice = () => {
                           <div>
                             <input
                               type="text"
-                              placeholder="search"
+                             placeholder={t("search")} 
                               value={filterValue}
                               onChange={handleFilter}
                             />
@@ -280,7 +283,7 @@ const UpdatePrice = () => {
                                         >
                                           <table className="table-striped">
                                             <tr>
-                                              <th colSpan={2}>Not Available</th>
+                                              <th colSpan={2}>{t("notAvailable")}</th>
                                             </tr>
                                             {filteredAvailabilityOff.map(
                                               (item, index) => (
@@ -313,8 +316,8 @@ const UpdatePrice = () => {
                                                         )}
                                                       />
                                                       <span>
-                                                        <span>OFF</span>
-                                                        <span> ON</span>
+                                                        <span>{t("off")}</span>
+                                                        <span> {t("on")}</span>
                                                       </span>
                                                       <a> </a>
                                                     </label>
@@ -332,7 +335,7 @@ const UpdatePrice = () => {
                                         >
                                           <table className="table-striped">
                                             <tr>
-                                              <th colSpan={2}>Available</th>
+                                              <th colSpan={2}>{t("available")}</th>
                                             </tr>
                                             {filteredAvailabilityOn.map(
                                               (item, index) => (
@@ -365,8 +368,8 @@ const UpdatePrice = () => {
                                                         )}
                                                       />
                                                       <span>
-                                                        <span>OFF</span>
-                                                        <span> ON</span>
+                                                           <span>{t("off")}</span>
+                                                        <span> {t("on")}</span>
                                                       </span>
                                                       <a> </a>
                                                     </label>
@@ -388,17 +391,17 @@ const UpdatePrice = () => {
                                                 style={{ textAlign: "" }}
                                                 colSpan={7}
                                               >
-                                                Updated Price
+                                              {t("updatedPrice")}
                                               </th>
                                             </tr>
                                             <tr>
-                                              <td>Name</td>
-                                              <td>Date</td>
-                                              <td>Unit Value</td>
-                                              <td>Wastage</td>
-                                              <td>Price</td>
+                                              <td>{t("name")}</td>
+                                              <td>{t("date")}</td>
+                                              <td>{t("unitValue")}</td>
+                                              <td>{t("wastage")}</td>
+                                              <td>{t("price")}</td>
                                               <td></td>
-                                              <td>Action</td>
+                                              <td>{t("action")}</td>
                                             </tr>
                                             {data.map((item, index) => (
                                               <tr key={index}>
@@ -430,7 +433,7 @@ const UpdatePrice = () => {
                                                         handleUpdate(item)
                                                       }
                                                     >
-                                                      Update
+                                                      {t("update")}
                                                     </button>
                                                   </div>
                                                 </td>
@@ -467,7 +470,7 @@ const UpdatePrice = () => {
                         <div className="modal-dialog  modalShipTo">
                           <div className="modal-content">
                             <div className="modal-header">
-                              <h5 className="modal-title">Cost</h5>
+                              <h5 className="modal-title">{t("cost")}</h5>
                               <button
                                 type="button"
                                 className="btn-close"
@@ -477,7 +480,7 @@ const UpdatePrice = () => {
                               </button>
                             </div>
                             <div className="modal-body">
-                              <h6>Enter Cost</h6>
+                              <h6>{t("enterCost")}</h6>
                               <input
                                 type="text"
                                 value={cost}
@@ -490,7 +493,7 @@ const UpdatePrice = () => {
                                 className="btn btn-secondary"
                                 onClick={handleModalClose}
                               >
-                                submit
+                                {t("submit")}
                               </button>
                             </div>
                           </div>

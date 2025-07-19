@@ -15,7 +15,9 @@ import { FaCaretDown } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 const CreatePurchaseOrder = () => {
+  const { t, i18n } = useTranslation("global");
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -303,7 +305,7 @@ const CreatePurchaseOrder = () => {
     } catch (error) {
       // Handle error case for first API
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
     }
   };
   function formatNumber(num) {
@@ -393,7 +395,7 @@ const CreatePurchaseOrder = () => {
       await axios.post(`${API_BASE_URL}/deletePurchaseOrderDetails`, {
         pod_id: pod_id,
       });
-      toast.success("Deleted Successfully", {
+      toast.success(t("deleteSuccess"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -519,7 +521,7 @@ const CreatePurchaseOrder = () => {
       setModalOne(false);
       console.log(response);
       setResponceId(response.data.id);
-      toast.success("Successfully", {
+      toast.success(t("successfully"), {
         autoClose: 5000,
         theme: "colored",
       });
@@ -571,7 +573,7 @@ const CreatePurchaseOrder = () => {
       navigate("/purchase_orders");
     } catch (error) {
       console.error("Error during cancel process:", error);
-      toast.error("Something went wrong");
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -671,7 +673,7 @@ const CreatePurchaseOrder = () => {
       }
     } catch (e) {
       console.log(e);
-      toast.error("An error has occurred", {
+      toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
@@ -749,7 +751,7 @@ const CreatePurchaseOrder = () => {
       }
     } catch (e) {
       console.log(e);
-      toast.error("An error has occurred", {
+      toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
@@ -892,10 +894,7 @@ const CreatePurchaseOrder = () => {
       }
     } catch (e) {
       console.log("Error in updateData:", e);
-      toast.error("An error has occurred", {
-        autoClose: 5000,
-        theme: "colored",
-      });
+      toast.error(t("tryAgain"));
     }
   };
 
@@ -1161,7 +1160,9 @@ const CreatePurchaseOrder = () => {
   return (
     <>
       <Card
-        title={`Purchase Order / ${from?.PO_ID ? "Update" : "Create"} Form`}
+        title={`${t("purchase_order")} / ${
+          from?.PO_ID ? t("update") : t("create")
+        } ${t("form")}`}
       >
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -1173,45 +1174,8 @@ const CreatePurchaseOrder = () => {
                 <form action="">
                   <div className="row cratePurchase">
                     <div className="col-lg-3 form-group parentFormPayment autoComplete">
-                      <h6>Vendor</h6>
-                      {/* <Autocomplete
-                        options={
-                          vendorList?.map((vendor) => ({
-                            id: vendor.vendor_id,
-                            name: vendor.name,
-                          })) || []
-                        } // Map vendorList to create options with `id` and `name`
-                        getOptionLabel={(option) => option.name || ""} // Display the vendor name
-                        value={
-                          vendorList
-                            ?.map((vendor) => ({
-                              id: vendor.vendor_id,
-                              name: vendor.name,
-                            }))
-                            .find((option) => option.id === state.vendor_id) ||
-                          null
-                        } // Match the current `vendor_id` in state with the options
-                        onChange={(e, newValue) => {
-                          setState({ ...state, vendor_id: newValue?.id || "" });
-                          setState({
-                            ...state,
-                            vendor_name: newValue?.name || "",
-                          });
+                      <h6>{t("vendor")}</h6>
 
-                          // Update state with selected vendor's `id`
-                        }}
-                        isOptionEqualToValue={(option, value) =>
-                          option.id === value.id
-                        } // Ensure proper option matching
-                        sx={{ width: 300 }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder="Select Vendor" // Adds a placeholder
-                            InputLabelProps={{ shrink: false }} // Prevents floating label
-                          />
-                        )}
-                      /> */}
                       <Autocomplete
                         options={
                           vendorList?.map((vendor) => ({
@@ -1240,14 +1204,14 @@ const CreatePurchaseOrder = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Vendor" // Adds a placeholder
+                            placeholder={t("clickToSelectDate")} // Adds a placeholder
                             InputLabelProps={{ shrink: false }} // Prevents floating label
                           />
                         )}
                       />
                     </div>
                     <div className="col-lg-2 form-group">
-                      <h6>PO Date</h6>
+                      <h6>{t("poDate")}</h6>
                       {/* <input
                         type="date"
                         name="created"
@@ -1272,7 +1236,7 @@ const CreatePurchaseOrder = () => {
                       />
                     </div>
                     <div className="col-lg-3 form-group">
-                      <h6>Invoice Number</h6>
+                      <h6> {t("invoiceNumber")}</h6>
                       <input
                         className="w-full"
                         type="text"
@@ -1282,7 +1246,7 @@ const CreatePurchaseOrder = () => {
                       />
                     </div>
                     <div className="col-lg-2 form-group">
-                      <h6>Invoice Date</h6>
+                      <h6>{t("invoiceDate")}</h6>
                       {/* <input
                         type="date"
                         name="supplier_invoice_date"
@@ -1300,12 +1264,12 @@ const CreatePurchaseOrder = () => {
                           })
                         }
                         dateFormat="dd/MM/yyyy"
-                        placeholderText="Click to select a date"
+                        placeholderText={t("selectDate")}
                         customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
                       />
                     </div>
                     <div className="col-lg-2 form-group">
-                      <h6>Due Date</h6>
+                      <h6> {t("dueDate")}</h6>
                       {/* <input
                         type="date"
                         name="supplier_dua_date"
@@ -1320,7 +1284,7 @@ const CreatePurchaseOrder = () => {
                           })
                         }
                         dateFormat="dd/MM/yyyy"
-                        placeholderText="Click to select a date"
+                        placeholderText={t("clickToSelectDate")}
                         customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
                       />
                     </div>
@@ -1333,7 +1297,7 @@ const CreatePurchaseOrder = () => {
                       // onClick={openModalOne}
                       onClick={update}
                     >
-                      Add
+                      {t("add")}
                     </button>
                     {modalOne && (
                       <div
@@ -1346,7 +1310,7 @@ const CreatePurchaseOrder = () => {
                         />
                         <div className="bg-white rounded-lg shadow-lg max-w-md w-full ">
                           <div className="crossArea">
-                            <h3>Edit Details</h3>
+                            <h3> {t("editDetails")} </h3>
                             <p onClick={handleCloseModalOne}>
                               <CloseIcon />
                             </p>
@@ -1357,7 +1321,7 @@ const CreatePurchaseOrder = () => {
 
                               <div className="addMOdalContent formCreate mt-0 px-2">
                                 <div className="col-lg-12 autoComplete mb-2 ">
-                                  <h6>Select Item</h6>
+                                  <h6> {t("selectItem")} </h6>
 
                                   <Select
                                     value={
@@ -1374,14 +1338,14 @@ const CreatePurchaseOrder = () => {
                                       option.Name_EN || option.Name_TH || ""
                                     }
                                     getOptionValue={(option) => option.ID} // Ensure correct ID selection
-                                    placeholder="Select Item"
+                                    placeholder={t("selectItem")}
                                     isClearable // Adds a clear button
                                     styles={customStyles}
                                     classNamePrefix="react-select" // Add a prefix for CSS class names
                                   />
                                 </div>
                                 <div className="col-lg-12 autoComplete mb-2">
-                                  <h6>Unit</h6>
+                                  <h6>{t("unit")}</h6>
                                   <Autocomplete
                                     disablePortal
                                     options={
@@ -1404,67 +1368,67 @@ const CreatePurchaseOrder = () => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        placeholder="Unit"
+                                        placeholder={t("unit")}
                                       />
                                     )}
                                   />
                                 </div>
                                 <div className="col-lg-12 mb-2">
-                                  <h6>Quantity</h6>
+                                  <h6> {t("quantity")}</h6>
                                   <input
                                     className="mb-0"
                                     type="text"
                                     name="pod_quantity"
                                     value={formDataAdd.pod_quantity || ""}
-                                    placeholder="Quantity"
+                                    placeholder={t("quantity")}
                                     onChange={handleChangeAdd}
                                   />
                                 </div>
                                 <div className="col-lg-12 mb-2">
-                                  <h6>Crate</h6>
+                                  <h6> {t("crate")}</h6>
                                   <input
                                     className="mb-0"
                                     type="text"
                                     name="pod_crate"
                                     value={formDataAdd.pod_crate}
-                                    placeholder="Crate"
+                                    placeholder={t("crate")}
                                     onChange={handleChangeAdd}
                                   />
                                 </div>
 
                                 <div className="col-lg-12 mb-2">
-                                  <h6>Price</h6>
+                                  <h6> {t("price")}</h6>
                                   <input
                                     className="mb-0"
                                     type="number"
                                     name="pod_price"
                                     value={formDataAdd.pod_price}
-                                    placeholder="Price"
+                                    placeholder={t("price")}
                                     onChange={handleChangeAdd}
                                   />
                                 </div>
 
                                 <div className="row mb-2">
                                   <div className="col-lg-6">
-                                    <h6>VAT</h6>
+                                    <h6> {t("vat")}</h6>
                                     <input
                                       className="mb-0"
                                       type="number"
                                       name="pod_vat"
                                       value={formDataAdd.pod_vat}
-                                      placeholder="VAT"
+                                      placeholder={t("vat")}
                                       onChange={handleVatChange}
                                     />
                                   </div>
 
                                   <div className="col-lg-6">
-                                    <h6>WHT</h6>
+                                    <h6>{t("wht")}</h6>
                                     <input
                                       className="mb-0"
                                       type="number"
                                       name="pod_wht_id"
                                       value={formDataAdd.pod_wht_id}
-                                      placeholder="WHT"
+                                      placeholder={t("wht")}
                                       onChange={handleWhtChange} // Handle manual edits
                                     />
                                   </div>
@@ -1485,12 +1449,12 @@ const CreatePurchaseOrder = () => {
                                 </div> */}
                                 <div className="row">
                                   <div className="col-lg-12 mb-2">
-                                    <h6>Total</h6>
+                                    <h6> {t("total")}</h6>
                                     <input
                                       className="mb-0 border-0"
                                       type="number"
                                       name="total"
-                                      placeholder="Total"
+                                      placeholder={t("total")}
                                       value={
                                         formDataAdd.pod_price &&
                                         formDataAdd.pod_quantity
@@ -1521,7 +1485,7 @@ const CreatePurchaseOrder = () => {
                                   className="UpdatePopupBtn btn btn-primary m-0"
                                   onClick={() => addPurchaseOrderDetails(podId)}
                                 >
-                                  Add
+                                  {t("add")}
                                 </button>
                               </div>
                             </div>
@@ -1544,17 +1508,16 @@ const CreatePurchaseOrder = () => {
                     >
                       <thead>
                         <tr>
-                          <th style={{ width: "170px" }}>Pod Code</th>
-                          {/* <th style={{ width: "250px" }}>Type</th> */}
-                          <th style={{ width: "350px" }}>Item</th>
-                          <th style={{ width: "150px" }}>Quantity</th>
-                          <th style={{ width: "100px" }}>Unit</th>
-                          <th style={{ width: "150px" }}>Price</th>
-                          <th style={{ width: "70px" }}>VAT</th>
-                          <th style={{ width: "150px" }}>Total</th>
-                          <th style={{ width: "100px" }}>WHT</th>
-                          <th style={{ width: "100px" }}>Crate</th>
-                          <th style={{ width: "100px" }}>Action</th>
+                          <th style={{ width: "170px" }}> {t("pod_Code")}</th>
+                          <th style={{ width: "350px" }}> {t("item")}</th>
+                          <th style={{ width: "150px" }}> {t("quantity")}</th>
+                          <th style={{ width: "100px" }}> {t("unit")}</th>
+                          <th style={{ width: "150px" }}> {t("price")}</th>
+                          <th style={{ width: "70px" }}> {t("price")}</th>
+                          <th style={{ width: "150px" }}> {t("total")}</th>
+                          <th style={{ width: "100px" }}> {t("vat")}</th>
+                          <th style={{ width: "100px" }}> {t("crate")}</th>
+                          <th style={{ width: "100px" }}> {t("action")}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1612,7 +1575,7 @@ const CreatePurchaseOrder = () => {
                     <div>
                       <div className="flexBefore">
                         <div>
-                          <strong>Total Before Tax : </strong>
+                          <strong> {t("totalBeforeTax")} : </strong>
                         </div>
                         <div>
                           <span>
@@ -1624,7 +1587,7 @@ const CreatePurchaseOrder = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>VAT : </strong>
+                          <strong>VAT {t("vat")} : </strong>
                         </div>
                         <div>
                           <span>
@@ -1634,7 +1597,7 @@ const CreatePurchaseOrder = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>WHT : </strong>
+                          <strong>{t("wht")} : </strong>
                         </div>
                         <div>
                           <span>
@@ -1662,7 +1625,7 @@ const CreatePurchaseOrder = () => {
                       </div> */}
                       <div className="d-flex flexBefore">
                         <div>
-                          <strong>Rounding</strong>
+                          <strong> {t("rounding")}: </strong>
                         </div>
                         <input
                           type="number"
@@ -1714,7 +1677,7 @@ const CreatePurchaseOrder = () => {
 
                       <div className="flexBefore">
                         <div>
-                          <strong>Amount to Pay : </strong>
+                          <strong>{t("amountToPay")}: </strong>
                         </div>
                         <div>
                           <span>
@@ -1729,386 +1692,6 @@ const CreatePurchaseOrder = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* <div
-                    id="datatable_wrapper"
-                    className="information_dataTables dataTables_wrapper dt-bootstrap4 table-responsive mt-"
-                  >
-                    <table
-                      id="example"
-                      className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive purchaseCreateTable"
-                      style={{ width: "100%" }}
-                    >
-                      <thead>
-                        <tr>
-                          <th style={{ width: "170px" }}>Pod Code</th>
-                         
-                          <th style={{ width: "350px" }}>Item</th>
-                          <th style={{ width: "150px" }}>Quantity</th>
-                          <th style={{ width: "100px" }}>Unit</th>
-                          <th style={{ width: "150px" }}>Price</th>
-                          <th style={{ width: "70px" }}>VAT</th>
-                          <th style={{ width: "150px" }}>Total</th>
-                          <th style={{ width: "100px" }}>WHT</th>
-                          <th style={{ width: "100px" }}>Crate</th>
-                          <th style={{ width: "100px" }}>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {details?.map((v, i) => (
-                          <tr key={`b_${i}`} className="rowCursorPointer">
-                            <td className="borderUnsetPod">
-                              {v.pod_status == "1" ? (
-                                <input
-                                  className="border-0"
-                                  value={v.pod_code}
-                                />
-                              ) : (
-                                <>{v.pod_code}</>
-                              )}
-                            </td>
-
-                            <td>
-                              {v.pod_status == "1" ? (
-                                <Autocomplete
-                                  className="unsetPurchaseWidth"
-                                  value={
-                                    dropdownItems?.find(
-                                      (item) => item.ID === v.dropDown_id
-                                    ) || null
-                                  }
-                                  options={dropdownItems}
-                                  getOptionLabel={(option) =>
-                                    option.Name_EN || ""
-                                  }
-                                  onChange={(event, newValue) => {
-                                    if (+v.pod_status !== 1) return;
-                                    const newEditPackaging = [...details];
-                                    newEditPackaging[i].dropDown_id =
-                                      newValue?.ID || null;
-                                    setDetails(newEditPackaging);
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      variant="outlined"
-                                      placeholder="Select Item"
-                                  
-                                    />
-                                  )}
-                                />
-                              ) : (
-                                <> {v.produce_name_en} </>
-                              )}
-                            </td>
-
-                            <td>
-                              {v.pod_status == "1" ? (
-                                <input
-                                  className="border-0"
-                                  type="text"
-                                  name="pod_quantity"
-                                  disabled={+v.pod_status != 1}
-                                  value={v.pod_quantity}
-                                  onChange={(e) => handleEditDatils(i, e)}
-                                />
-                              ) : (
-                                <> {v.pod_quantity}</>
-                              )}
-                            </td>
-                            <td>
-                              {v.pod_status == "1" ? (
-                                <Autocomplete
-                                  options={unitType}
-                                  value={
-                                    unitType?.find(
-                                      (item) => item.ID === v.unit_count_id
-                                    ) || null
-                                  }
-                                  getOptionLabel={(option) =>
-                                    option.Name_EN || ""
-                                  }
-                                  onChange={(event, newValue) => {
-                                    if (+v.pod_status !== 1) return;
-                                    const newEditPackaging = [...details];
-                                    newEditPackaging[i].unit_count_id =
-                                      newValue?.ID || null;
-                                    setDetails(newEditPackaging);
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      variant="outlined"
-                                      placeholder="Select Unit"
-                                    
-                                    />
-                                  )}
-                                />
-                              ) : (
-                                <> {v.unit_count_id}</>
-                              )}
-                            </td>
-                            <td>
-                              {v.pod_status == "1" ? (
-                                <input
-                                  type="number"
-                                  name="pod_price"
-                                  className="border-0"
-                                  defaultValue={v.pod_price}
-                                  disabled={+v.pod_status != 1}
-                                  onChange={(e) => handleEditDatils(i, e)}
-                                />
-                              ) : (
-                                <> {v.pod_price}</>
-                              )}
-                            </td>
-                            <td>
-                              {v.pod_status == "1" ? (
-                                <input
-                                  type="number"
-                                  name="pod_vat"
-                                  className="border-0"
-                                  defaultValue={v.pod_vat}
-                                  disabled={+v.pod_status != 1}
-                                  onChange={(e) => handleEditDatils(i, e)}
-                                  style={{ width: "50px" }}
-                                />
-                              ) : (
-                                <> {v.pod_vat}</>
-                              )}
-                            </td>
-                            <td>
-                              {v.pod_status == "1" ? (
-                                <input
-                                  type="text"
-                                  readOnly
-                                  className="border-0"
-                                  disabled={+v.pod_status != 1}
-                                  value={(
-                                    +(
-                                      +v.pod_price *
-                                      +v.pod_quantity *
-                                      (v.pod_vat / 100)
-                                    ) +
-                                    +v.pod_price * +v.pod_quantity
-                                  ).toLocaleString("en-us")}
-                                />
-                              ) : (
-                                <>
-                                  {" "}
-                                  {(
-                                    +(
-                                      +v.pod_price *
-                                      +v.pod_quantity *
-                                      (v.pod_vat / 100)
-                                    ) +
-                                    +v.pod_price * +v.pod_quantity
-                                  ).toLocaleString("en-us")}
-                                </>
-                              )}
-                            </td>
-                            <td>
-                              {v.pod_status == "1" ? (
-                                <input
-                                  type="text"
-                                  name="pod_wht_id"
-                                  className="border-0"
-                                  disabled={+v.pod_status != 1}
-                                  style={{ width: "50px" }}
-                                  value={v.pod_wht_id}
-                                  onChange={(e) => handleEditDatils(i, e)}
-                                />
-                              ) : (
-                                <> {v.pod_wht_id}</>
-                              )}
-                            </td>
-                            <td>
-                              {v.pod_status == "1" ? (
-                                <input
-                                  type="text"
-                                  name="pod_crate"
-                                  className="border-0"
-                                  style={{ width: "70px" }}
-                                  disabled={+v.pod_status != 1}
-                                  value={v.pod_crate}
-                                  onChange={(e) => handleEditDatils(i, e)}
-                                />
-                              ) : (
-                                <> {v.pod_crate}</>
-                              )}
-                            </td>
-                            <td className="editIcon">
-                              {+v.pod_status == 1 ? (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const i = window.confirm(
-                                      "Do you want to delete this Order details?"
-                                    );
-                                    if (i) {
-                                      deleteDetails(v.pod_id);
-                                    }
-                                  }}
-                                >
-                                  <i className="mdi mdi-trash-can-outline" />
-                                </button>
-                              ) : (
-                                <> </>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                        {formsValue?.map((element, index) => (
-                          <tr
-                            key={`a_${index}`}
-                            className="rowCursorPointer"
-                            data-bs-toggle="modal"
-                            data-bs-target="#myModal"
-                          >
-                            <td> </td>
-
-                            <td>
-                              <Autocomplete
-                                value={
-                                  dropdownItems?.find(
-                                    (item) => item.ID === element.POD_Selection
-                                  ) || null
-                                }
-                                options={dropdownItems}
-                                getOptionLabel={(option) =>
-                                  option.Name_EN || ""
-                                }
-                                onChange={(event, newValue) =>
-                                  addFieldHandleChangeWname(
-                                    index,
-                                    "POD_Selection",
-                                    newValue?.ID || null
-                                  )
-                                }
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select Item"
-                                    variant="outlined"
-                                  
-                                  />
-                                )}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="text"
-                                name="pod_quantity"
-                                className="border-0"
-                                onChange={(e) => addFieldHandleChange(index, e)}
-                                defaultValue={element.pod_quantity}
-                              />
-                            </td>
-                            <td>
-                              <Autocomplete
-                                value={
-                                  unitType?.find(
-                                    (item) => item.ID === element.unit_count_id
-                                  ) || null
-                                }
-                                options={unitType}
-                                getOptionLabel={(option) =>
-                                  option.Name_EN || ""
-                                }
-                                onChange={(event, newValue) =>
-                                  addFieldHandleChangeWname(
-                                    index,
-                                    "unit_count_id",
-                                    newValue?.ID || null
-                                  )
-                                }
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    variant="outlined"
-                                    placeholder="Select Unit"
-                                  />
-                                )}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="number"
-                                name="pod_price"
-                                className="border-0"
-                                onChange={(e) => addFieldHandleChange(index, e)}
-                                defaultValue={element.pod_price}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="number"
-                                name="pod_vat"
-                                className="border-0"
-                                style={{ width: "50px" }}
-                                onChange={(e) => addFieldHandleChange(index, e)}
-                                defaultValue={element.pod_vat}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="text"
-                                readOnly
-                                className="border-0"
-                                value={(
-                                  +(
-                                    +element.pod_price *
-                                    +element.pod_quantity *
-                                    (element.pod_vat / 100)
-                                  ) +
-                                  +element.pod_price * +element.pod_quantity
-                                ).toLocaleString("en-us")}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="text"
-                                name="pod_wht_id"
-                                style={{ width: "50px" }}
-                                className="border-0"
-                                onChange={(e) => addFieldHandleChange(index, e)}
-                                defaultValue={element.pod_wht_id}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="text"
-                                name="pod_crate"
-                                className="border-0"
-                                style={{ width: "70px" }}
-                                onChange={(e) => addFieldHandleChange(index, e)}
-                                defaultValue={element.pod_crate}
-                              />
-                            </td>
-                            <td>
-                              {index == formsValue.length - 1 ? (
-                                <button
-                                  type="button"
-                                  onClick={addFormFields}
-                                  className="cursor-pointer"
-                                >
-                                  <i className="mdi mdi-plus text-xl" />
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  className="cursor-pointer"
-                                  onClick={() => removeFormFields(index)}
-                                >
-                                  <i className="mdi mdi-trash-can-outline text-xl" />
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div> */}
                 </form>
               </div>
             </div>
@@ -2121,7 +1704,7 @@ const CreatePurchaseOrder = () => {
               onClick={updateData}
               disabled={buttonClicked}
             >
-              {from?.PO_ID ? "Update" : "Create"}
+              {from?.PO_ID ? t("update") : t("create")}
             </button>
             {/* <Link
               className="btn btn-danger"
@@ -2143,7 +1726,7 @@ const CreatePurchaseOrder = () => {
                 deleteOrder();
               }}
             >
-              Cancel
+              {t("cancel")}
             </button>
 
             <button
@@ -2151,7 +1734,7 @@ const CreatePurchaseOrder = () => {
               type="button"
               onClick={updateDataPayNow}
             >
-              Pay Now
+              {t("payNow")}
             </button>
           </div>
         </div>
@@ -2168,7 +1751,7 @@ const CreatePurchaseOrder = () => {
             style={{ backgroundColor: color ? "#2f423c" : "" }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Purchase Order Check
+              {t("purchaseOrderCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -2191,7 +1774,7 @@ const CreatePurchaseOrder = () => {
                 {stock.message_th ? stock.message_th : "NULL"}
               </p>
               <div className="closeBtnRece">
-                <button onClick={closeIcon}>Close</button>
+                <button onClick={closeIcon}> {t("close")}</button>
               </div>
             </div>
           </div>
@@ -2214,7 +1797,7 @@ const CreatePurchaseOrder = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Payment
+                {t("payment")}
               </h1>
               <button
                 type="button"
@@ -2233,12 +1816,12 @@ const CreatePurchaseOrder = () => {
                     {/* Payment Date */}
                     <div className="col-lg-6">
                       <div className="parentFormPayment">
-                        <p>Payment Date</p>
+                        <p> {t("paymentDate")}</p>
                         <DatePicker
                           selected={selectedPaymentDate}
                           onChange={(date) => setSelectedPaymentDate(date)}
                           dateFormat="dd/MM/yyyy"
-                          placeholderText="Click to select a date"
+                          placeholderText={t("clickToSelectDate")}
                           customInput={<CustomInput />}
                         />
                       </div>
@@ -2247,7 +1830,7 @@ const CreatePurchaseOrder = () => {
                     {/* Payment Channel */}
                     <div className="col-lg-6">
                       <div className="parentFormPayment autoComplete">
-                        <p>Payment Channel</p>
+                        <p>{t("paymentChannel")}</p>
                         <Autocomplete
                           disablePortal
                           options={paymentChannle || []}
@@ -2267,7 +1850,7 @@ const CreatePurchaseOrder = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Search Payment Channel"
+                              placeholder={t("searchChannel")}
                               InputLabelProps={{ shrink: false }}
                             />
                           )}
@@ -2278,7 +1861,7 @@ const CreatePurchaseOrder = () => {
                     {/* Bank Ref */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Bank Ref</p>
+                        <p> {t("bankRef")} </p>
                         <input
                           type="text"
                           value={bankReference}
@@ -2290,7 +1873,7 @@ const CreatePurchaseOrder = () => {
                     {/* Bank Charges */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Bank Charges</p>
+                        <p> {t("bankRef")} </p>
                         <input
                           type="text"
                           value={bankChargeAmount}
@@ -2301,7 +1884,7 @@ const CreatePurchaseOrder = () => {
 
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Available Deposit</p>
+                        <p> {t("availableDeposit")}</p>
                         <input
                           type="text"
                           value={depositAvailableNew}
@@ -2314,7 +1897,7 @@ const CreatePurchaseOrder = () => {
                     </div>
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Rounding</p>
+                        <p> {t("rounding")}</p>
                         <input
                           type="text"
                           value={roundingNew}
@@ -2327,7 +1910,7 @@ const CreatePurchaseOrder = () => {
                     </div>
 
                     <div className="parentFormPayment col-lg-6 mt-3">
-                      <p>Payment Amount</p>
+                      <p> {t("paymentAmount")}</p>
                       <input
                         type="text"
                         value={paymentAmmountNew}
@@ -2341,7 +1924,7 @@ const CreatePurchaseOrder = () => {
                     {/* Notes */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>Notes</p>
+                        <p> {t("notes")}</p>
                         <textarea
                           type="text"
                           value={paymentNotes}
@@ -2356,7 +1939,7 @@ const CreatePurchaseOrder = () => {
                     <div className="pe-3" style={{ width: "85%" }}>
                       <div className="flexBefore">
                         <div>
-                          <strong>Total Before Tax : </strong>
+                          <strong>{t("totalBeforeTax")} : </strong>
                         </div>
                         <div>
                           <span>
@@ -2367,7 +1950,7 @@ const CreatePurchaseOrder = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>VAT : </strong>
+                          <strong> {t("vat")}: </strong>
                         </div>
                         <div>
                           <span>
@@ -2382,7 +1965,7 @@ const CreatePurchaseOrder = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>WHT : </strong>
+                          <strong> {t("wht")}: </strong>
                         </div>
                         <div>
                           <span>
@@ -2397,7 +1980,7 @@ const CreatePurchaseOrder = () => {
                       <div className=" form-group">
                         <div className="flexBefore">
                           <div>
-                            <strong>Rounding : </strong>
+                            <strong> {t("rounding")}: </strong>
                           </div>
                           <div>
                             <span>
@@ -2407,7 +1990,7 @@ const CreatePurchaseOrder = () => {
                         </div>
                         <div className="flexBefore">
                           <div>
-                            <strong>Deposit : </strong>
+                            <strong> {t("deposit")}: </strong>
                           </div>
                           <div>
                             <span>{Number(depositAvailableNew)}</span>
@@ -2415,7 +1998,7 @@ const CreatePurchaseOrder = () => {
                         </div>
                         <div className="flexBefore">
                           <div>
-                            <strong>Amount to Pay : </strong>{" "}
+                            <strong> {t("amountToPay")}: </strong>{" "}
                           </div>
                           <div>
                             <span>
@@ -2434,7 +2017,7 @@ const CreatePurchaseOrder = () => {
                         </div>
                         <div className="flexBefore">
                           <div>
-                            <strong>Remainder : </strong>{" "}
+                            <strong> {t("remainder")}: </strong>{" "}
                           </div>
                           <div>
                             <span>
@@ -2460,7 +2043,7 @@ const CreatePurchaseOrder = () => {
                 onClick={submitPaymentData}
                 className="btn btn-primary"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>
@@ -2478,7 +2061,7 @@ const CreatePurchaseOrder = () => {
             style={{ backgroundColor: color ? "#2f423c" : "" }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Purchase Payment Check
+              {t("purchasePaymentCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -2496,7 +2079,7 @@ const CreatePurchaseOrder = () => {
             <div className="eanCheck errorMessage recheckReceive">
               {!selectedPaymentDate ? (
                 <p style={{ backgroundColor: color ? "" : "#631f37" }}>
-                  {"Payment Date is Required "}
+                  {t("paymentDateRequired")}
                 </p>
               ) : (
                 ""
@@ -2504,14 +2087,14 @@ const CreatePurchaseOrder = () => {
 
               {!selectedPaymentChannel ? (
                 <p style={{ backgroundColor: color ? "" : "#631f37" }}>
-                  {"Payment Channel is Required"}
+                  {t("paymentChannelRequired")}
                 </p>
               ) : (
                 ""
               )}
 
               <div className="closeBtnRece">
-                <button onClick={closeIcon2}>Close</button>
+                <button onClick={closeIcon2}>{t("close")}</button>
               </div>
             </div>
           </div>

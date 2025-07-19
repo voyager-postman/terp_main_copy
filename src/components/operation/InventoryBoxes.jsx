@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
 import { TableView } from "../table";
 import { Card } from "../../card";
+import { useTranslation } from "react-i18next";
 
 const InventoryBoxes = () => {
+  const { t, i18n } = useTranslation("global");
   const [quantity, setQuantity] = useState("");
   const [selectedUnitType, setSelectedUnitType] = useState("");
   const [selectedPodItem, setSelectedPodItem] = useState("");
@@ -55,7 +57,7 @@ const InventoryBoxes = () => {
           modalInstance.hide();
         }
         console.log(response);
-        toast.success("Stock Adjustment Added Successfully", {
+        toast.success(t("stockAdjustmentSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -65,7 +67,7 @@ const InventoryBoxes = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -75,19 +77,19 @@ const InventoryBoxes = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: () => <div style={{ textAlign: "center" }}>Produce</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("produce")}</div>,
         accessor: "Item",
-        Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
+        Cell: ({ value }) => <div style={{ textAlign: "left" }}>{t("view")}{value}</div>,
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Unit</div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("unit")}</div>,
         accessor: "Unit",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
 
       {
         Header: () => (
-          <div style={{ textAlign: "center" }}>Quantity Available </div>
+          <div style={{ textAlign: "center" }}>{t("quantityAvailable")}</div>
         ),
         accessor: "Quantity Available",
         Cell: ({ value }) => (
@@ -95,14 +97,14 @@ const InventoryBoxes = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>Average Cost </div>,
+        Header: () => <div style={{ textAlign: "center" }}>{t("averageCost")}</div>,
         accessor: "Average Cost",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
         ),
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <div className="editIcon">
             <i className="ps-2 mdi mdi-eye" />
@@ -118,20 +120,20 @@ const InventoryBoxes = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
   return (
     <>
       <Card
-        title="Available Boxes Management"
+        title={t("Available_Boxes_Management")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/createUser")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >
@@ -150,7 +152,7 @@ const InventoryBoxes = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Stock Adjustment PB
+               {t("stockAdjustment")}
               </h1>
               <button
                 type="button"
@@ -164,7 +166,7 @@ const InventoryBoxes = () => {
             </div>
             <div className="modal-body">
               <div className="form-group col-lg-12 formCreate">
-                <h6>Quantity on hand</h6>
+                <h6>{t("quantityOnHand")}</h6>
                 <div>
                   <input
                     type="text"
@@ -182,7 +184,7 @@ const InventoryBoxes = () => {
                 onClick={updatBoxes}
                 className="btn mb-0 btn-primary"
               >
-                Update
+                {t("update")}
               </button>
             </div>
           </div>

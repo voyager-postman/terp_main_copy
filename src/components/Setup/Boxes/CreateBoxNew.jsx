@@ -6,8 +6,10 @@ import { Card } from "../../../card";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useEffect, useState } from "react";
 import { Autocomplete, TextField } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const CreateBoxNew = () => {
+  const { t } = useTranslation("global");
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
   const defaultState = {
@@ -209,7 +211,7 @@ const CreateBoxNew = () => {
       state.Per_Bun === "" ||
       state.box_pallet === "";
     if (fieldCheck) {
-      toast.warn("Please Fill All The Fields", {
+      toast.warn(t("pleaseFillAllFields"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -241,7 +243,7 @@ const CreateBoxNew = () => {
       .catch((error) => {
         console.log(error);
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -262,7 +264,7 @@ const CreateBoxNew = () => {
   const minload = cal_min.toFixed(2);
 
   return (
-    <Card title={"Boxes Management / Create Form"}>
+    <Card title={t("boxesCreateForm")}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -274,32 +276,32 @@ const CreateBoxNew = () => {
                 <form>
                   <div className="row">
                     <div className="form-group col-lg-3">
-                      <h6>Name</h6>
+                      <h6>{t("name")}</h6>
                       <input
                         type="text"
                         id="name_th"
                         name="box_name"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="name"
+                        placeholder={t("name")}
                         value={state.box_name}
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>External Reference</h6>
+                      <h6>{t("externalRefFull")}</h6>
                       <input
                         type="text"
                         id="name_th"
                         name="External_Ref"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="name"
-                        value={state.External_Ref}
+                        placeholder={t("externalRefFull")}
+                      value={state.External_Ref}
                       />
                     </div>
 
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>Brand</h6>
+                      <h6>{t("brand")}</h6>
                       <Autocomplete
                         options={
                           classification5.map((item) => ({
@@ -321,7 +323,7 @@ const CreateBoxNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Brand"
+                            placeholder={t("selectBrand")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -333,7 +335,7 @@ const CreateBoxNew = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6> Per Bun</h6>
+                      <h6>{t("perBun")}</h6>
                       {/* <input
                         type="number"
                         id="name_th"
@@ -345,19 +347,19 @@ const CreateBoxNew = () => {
                       /> */}
 
                       <input
-                         type="number"
+                        type="number"
                         id="name_th"
                         name="Per_Bun"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="Per Bun"
+                        placeholder={t("perBun")}
                         value={state.Per_Bun}
                       />
                     </div>
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-3">
-                      <h6>Width</h6>
+                      <h6>{t("width")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
                           <input
@@ -366,17 +368,17 @@ const CreateBoxNew = () => {
                             name="box_width"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="width"
+                            placeholder={t("width")}
                             value={state.box_width}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>cm</span>
+                          <span>{t("cm")}</span>
                         </div>
                       </div>
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Length</h6>
+                      <h6>{t("length")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
                           <input
@@ -385,17 +387,17 @@ const CreateBoxNew = () => {
                             name="box_length"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="width"
+                            placeholder={t("length")}
                             value={state.box_length}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>cm</span>
+                          <span>{t("cm")}</span>
                         </div>
                       </div>
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Height</h6>
+                      <h6>{t("height")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
                           <input
@@ -404,23 +406,23 @@ const CreateBoxNew = () => {
                             name="box_height"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="width"
+                            placeholder={t("height")}
                             value={state.box_height}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>cm</span>
+                          <span>{t("cm")}</span>
                         </div>
                       </div>
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>CBM</h6>
+                      <h6>{t("cbm")}</h6>
                       <input
                         type="text"
                         id="hs_name"
                         name="box_cbm"
                         className="form-control"
-                        placeholder="automatic calculation"
+                        placeholder={t("cbm")}
                         value={cbm}
                         readOnly
                       />
@@ -428,7 +430,7 @@ const CreateBoxNew = () => {
                   </div>
                   <div className="row">
                     <div className="form-group col-lg-3">
-                      <h6>Weight</h6>
+                      <h6>{t("weight")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
                           <input
@@ -437,41 +439,41 @@ const CreateBoxNew = () => {
                             name="box_weight"
                             onChange={handleChange}
                             className="form-control"
-                            placeholder="weight"
+                            placeholder={t("weight")}
                             value={state.box_weight}
                           />
                         </div>
                         <div className="shipPercent">
-                          <span>g</span>
+                          <span> {t("gram")}</span>
                         </div>
                       </div>
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>MinLoad</h6>
+                      <h6>{t("minLoad")}</h6>
                       <input
                         type="text"
                         id="name_en"
                         name="box_mlw"
                         className="form-control"
-                        placeholder="automatic calculation"
+                        placeholder={t("minLoad")}
                         value={minload}
                         readOnly
                       />
                     </div>
                     <div className="form-group col-lg-3">
-                      <h6>Box/Pallet</h6>
+                      <h6>{t("box/Pallet")}</h6>
                       <input
                         type="text"
                         id="name_en"
                         name="box_pallet"
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="Box/Pallet"
+                        placeholder={t("box/Pallet")}
                         value={state.box_pallet}
                       />
                     </div>
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>Charts of Accounting</h6>
+                      <h6>{t("chartOfAccounts")}</h6>
                       <Autocomplete
                         options={
                           classification1.map((item) => ({
@@ -493,7 +495,7 @@ const CreateBoxNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Classification"
+                            placeholder={t("selectClassification")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -505,7 +507,7 @@ const CreateBoxNew = () => {
                       />
                     </div>
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>VAT Type</h6>
+                      <h6>{t("vatType")}</h6>
                       <Autocomplete
                         options={
                           classification2.map((item) => ({
@@ -527,7 +529,7 @@ const CreateBoxNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select VAT Classification"
+                            placeholder={t("selectVatClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -540,7 +542,7 @@ const CreateBoxNew = () => {
                     </div>
 
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6>Inventory Type</h6>
+                      <h6>{t("inventoryType")}</h6>
                       <Autocomplete
                         options={
                           classification3.map((item) => ({
@@ -562,7 +564,7 @@ const CreateBoxNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Inventory Classification"
+                            placeholder= {t("selectInventoryClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -575,7 +577,7 @@ const CreateBoxNew = () => {
                     </div>
 
                     <div className="form-group col-lg-3 form-group autoComplete classificationSelect mb-3">
-                      <h6> WHT Type</h6>
+                      <h6> {t("whtType")}</h6>
                       <Autocomplete
                         options={
                           classification4.map((item) => ({
@@ -597,7 +599,7 @@ const CreateBoxNew = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select WHT Classification"
+                            placeholder={t("selectWhtClass")}
                             variant="outlined"
                             style={{ padding: "10px" }}
                           />
@@ -609,13 +611,13 @@ const CreateBoxNew = () => {
                       />
                     </div>
                     <div className="form-group col-lg-12">
-                      <h6>Image</h6>
+                      <h6>{t("image")}</h6>
                       <div className="d-flex">
                         <div className="uploadImage">
                           <label htmlFor="box_image">
                             <div className="uploadBorder">
                               <span>
-                                Choose Image <CloudUploadIcon />{" "}
+                                {t("chooseImage")} <CloudUploadIcon />{" "}
                               </span>
                             </div>
                           </label>
@@ -651,10 +653,10 @@ const CreateBoxNew = () => {
               type="button"
               name="signup"
             >
-              Create
+              {t("create")}
             </button>
             <Link className="btn btn-danger" to="/boxes">
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>

@@ -969,8 +969,10 @@ import { Card } from "../../../card";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { useTranslation } from "react-i18next";
 
 const AddItf = () => {
+  const { t } = useTranslation("global");
   const location = useLocation();
   const { from } = location.state || {};
   const [imagePath, setImagePath] = useState(from?.images || "");
@@ -1185,7 +1187,7 @@ const AddItf = () => {
       })
       .then((resp) => {
         if (resp.data.success == true) {
-          toast.success("Deleted Successfully", {
+          toast.success(t("deleteSuccess"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -1216,7 +1218,7 @@ const AddItf = () => {
       })
       .then((response) => {
         console.log(response);
-        toast.success("Itf Cancel Successfully", {
+        toast.success(t("itfCancel"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1224,7 +1226,7 @@ const AddItf = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1238,7 +1240,7 @@ const AddItf = () => {
         itf_id: from?.ID,
         data: editEan,
       })
-      .then((response) => {})
+      .then((response) => { })
       .catch((error) => {
         console.log(error);
       });
@@ -1313,7 +1315,7 @@ const AddItf = () => {
       })
       .then((response) => {
         if (response.data.success == true) {
-          toast.success("Success", {
+          toast.success(t("success"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -1333,7 +1335,7 @@ const AddItf = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1341,7 +1343,7 @@ const AddItf = () => {
   };
 
   const confirmCloseWindow = () => {
-    toast.success("Itf Confirm Successful", {
+    toast.success(t("itfConfirm"), {
       autoClose: 1000,
       theme: "colored",
     });
@@ -1423,7 +1425,7 @@ const AddItf = () => {
   // };
   console.log(editEan);
   return (
-    <Card title={`ITF Management / ${from?.ID ? "Update" : "Add"} Form`}>
+    <Card title={`${t("ITF_Management")} / ${from?.ID ? t("update") : t("add")} ${t("form")}`}>
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -1435,10 +1437,10 @@ const AddItf = () => {
                 <form action="">
                   <div className="row formEan">
                     <div className="col-lg-3 form-group">
-                      <h6>ITF Code</h6>
+                      <h6>{t("itfCode")}</h6>
                       <input
                         type="text"
-                        placeholder="ean code"
+                        placeholder={t("itfCode")}
                         value={state.itf_code}
                         name="itf_code"
                         onChange={handleChange}
@@ -1446,37 +1448,37 @@ const AddItf = () => {
                     </div>
 
                     <div className="col-lg-3 form-group">
-                      <h6>Product Name EN</h6>
+                      <h6>{t("productNameEn")}</h6>
                       <input
                         type="text"
-                        placeholder="product name"
+                        placeholder= {t("productNameEn")}
                         value={state.itf_name_en}
                         name="itf_name_en"
                         onChange={handleChange}
                       />
                     </div>
                     <div className="col-lg-3 form-group">
-                      <h6>Product Name TH</h6>
+                      <h6>{t("productNameTh")}</h6>
                       <input
                         type="text"
-                        placeholder="product name"
+                        placeholder={t("productNameTh")}
                         value={state.itf_name_th}
                         name="itf_name_th"
                         onChange={handleChange}
                       />
                     </div>
                     <div className="col-lg-3 form-group">
-                      <h6>Extra Weight</h6>
+                      <h6>{t("extraWeight")}</h6>
                       <input
                         type="number"
-                        placeholder="Extra weight"
+                        placeholder={t("extraWeight")}
                         value={state.ITF_ean_adjustment}
                         name="ITF_ean_adjustment"
                         onChange={handleChange}
                       />
                     </div>
                     <div className="col-lg-3 form-group itfAutoComplete">
-                      <h6>Brand</h6>
+                      <h6>{t("brand")}</h6>
                       <Autocomplete
                         disablePortal
                         options={brands || []} // Ensure brands is defined
@@ -1494,7 +1496,7 @@ const AddItf = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Please select Brand"
+                            placeholder={t("selectBrand")}
                             style={{ padding: "10px" }}
                           />
                         )}
@@ -1502,7 +1504,7 @@ const AddItf = () => {
                     </div>
 
                     <div className="col-lg-3 form-group">
-                      <h6>Image</h6>
+                      <h6>{t("image")}</h6>
                       <input
                         type="file"
                         id="box_image"
@@ -1511,14 +1513,14 @@ const AddItf = () => {
                         // key={fileInputKey}
                         accept="image/*"
                         className="d-none"
-                        // onChange={handleFileSelect}
+                      // onChange={handleFileSelect}
                       />
                       <div className="imgFlex">
                         <div className="pe-4">
                           <label htmlFor="box_image">
                             <div className="uploadBorder">
                               <span>
-                                Choose Image <CloudUploadIcon />{" "}
+                                {t("chooseImage")}<CloudUploadIcon />{" "}
                               </span>
                             </div>
                           </label>
@@ -1547,7 +1549,7 @@ const AddItf = () => {
                       </div>
                     </div>
                     <div className="col-lg-3 form-group">
-                      <h6>Notes</h6>
+                      <h6>{t("notes")}</h6>
                       <input
                         type="text"
                         placeholder="notes"
@@ -1557,615 +1559,615 @@ const AddItf = () => {
                       />
                     </div>
                     <div className="col-lg-3 form-group">
-                      <h6>ITF vvsw</h6>
+                      <h6>{t("itfVVSW")}</h6>
                       <p
                         className={
-                          `${from?.vvsw}`.toLowerCase() == "volume over weight"
-                            ? "text-red-400"
-                            : ""
+                          `${from?.vvsw}`.toLowerCase() ==  t("Volume_over_Weight")  
+                      ? "text-red-400"
+                      : ""
                         }
                       >
-                        {from?.vvsw || "Weight within Limits"}
-                      </p>
-                    </div>
+                      {from?.vvsw ||  t("Weight_within_Limits") }
+                    </p>
                   </div>
-                  <div className="row">
-                    <div className="addBtnEan">
-                      {itfId || from?.ID ? (
-                        <button
-                          className="my-5"
-                          type="button"
-                          onClick={generateName}
-                        >
-                          Generate Name
-                        </button>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  </div>
-                  <div
-                    id="datatable_wrapper"
-                    className="information_dataTables dataTables_wrapper dt-bootstrap4 table-responsive mt-"
-                  >
-                    <table
-                      id="example"
-                      className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
-                      style={{ width: "100%" }}
+              </div>
+              <div className="row">
+                <div className="addBtnEan">
+                  {itfId || from?.ID ? (
+                    <button
+                      className="my-5"
+                      type="button"
+                      onClick={generateName}
                     >
-                      <thead>
-                        <tr>
-                          <th>Type</th>
-                          <th>Name</th>
-                          <th className="w-5">Quantity</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {editEan.map((element, index) => (
-                          <tr className="rowCursorPointer">
-                            <td style={{ width: "280px" }}>
-                              <select
-                                name="detail_type"
-                                value={element.detail_type}
-                                onChange={(e) => handleEditEan(index, e)}
-                              >
-                                <option value="1">Packaging</option>
-                                <option value="2">Boxes</option>
-                                <option value="3">EAN</option>
-                              </select>
-                            </td>
-                            <td style={{ width: "280px" }}>
-                              {element.detail_type == "3" ? (
-                                // <select
-                                //   name="item_id"
-                                //   onChange={(e) => handleEditEan(index, e)}
-                                //   value={element.item_id}
-                                // >
-                                //   <option value="">Select EAN</option>
-                                //   {eanList?.map((item) => (
-                                //     <option value={item.Item}>
-                                //       {item.Name_EN}
-                                //     </option>
-                                //   ))}
-                                // </select>
-                                <select
-                                  name="item_id"
-                                  onChange={(e) => handleEditEan(index, e)}
-                                  value={element.item_id}
-                                >
-                                  <option value="">Select EAN</option>
-                                  {eanList?.map((item) => (
-                                    <option key={item.ID} value={item.ID}>
-                                      {item.Name_EN}
-                                    </option>
-                                  ))}
-                                </select>
-                              ) : element.detail_type == "1" ? (
-                                // <select
-                                //   name="item_id"
-                                //   onChange={(e) => handleEditEan(index, e)}
-                                //   value={element.item_id}
-                                // >
-                                //   <option value="">Select Packaging</option>
-                                //   {packagingList?.map((item) => (
-                                //     <option value={item.Item}>
-                                //       {item.Name_EN}
-                                //     </option>
-                                //   ))}
-                                // </select>
-                                <select
-                                  name="item_id"
-                                  onChange={(e) => handleEditEan(index, e)}
-                                  value={element.item_id}
-                                >
-                                  <option value="">Select Packaging</option>
-                                  {packagingList?.map((item) => (
-                                    <option key={item.ID} value={item.ID}>
-                                      {item.Name_EN}
-                                    </option>
-                                  ))}
-                                </select>
-                              ) : element.detail_type == "2" ? (
-                                // <select
-                                //   name="item_id"
-                                //   onChange={(e) => handleEditEan(index, e)}
-                                //   value={element.item_id}
-                                // >
-                                //   <option value="">Select Box</option>
-                                //   {boxList?.map((item) => (
-                                //     <option value={item.Item}>
-                                //       {item.Name_EN}
-                                //     </option>
-                                //   ))}
-                                // </select>
-
-                                <select
-                                  name="item_id"
-                                  onChange={(e) => handleEditEan(index, e)}
-                                  value={element.item_id}
-                                >
-                                  <option value="">Select Box</option>
-                                  {boxList?.map((item) => (
-                                    <option key={item.ID} value={item.ID}>
-                                      {item.Name_EN}
-                                    </option>
-                                  ))}
-                                </select>
-                              ) : (
-                                <></>
-                              )}
-                            </td>
-                            <td>
-                              <input
-                                type="number"
-                                name="qty_per_itf"
-                                value={element.qty_per_itf}
-                                onChange={(e) => handleEditEan(index, e)}
-                              />
-                            </td>
-                            <td className="editIcon">
-                              <a
-                                onClick={() =>
-                                  handleClickOpen(element.itf_details_id)
-                                }
-                              >
-                                <i className="mdi mdi-trash-can-outline" />
-                              </a>
-                              <Dialog
-                                fullWidth
-                                open={open}
-                                onClose={handleClose}
-                                aria-labelledby="alert-dialog-title"
-                                aria-describedby="alert-dialog-description"
-                              >
-                                <DialogTitle
-                                  id="alert-dialog-title"
-                                  className="text-center"
-                                >
-                                  {"Are you sure you want to delete?"}
-                                </DialogTitle>
-                                <DialogContent className="text-center p-0 m-0 alertDel">
-                                  <DialogContentText id="alert-dialog-description">
-                                    <DeleteSweepIcon
-                                      style={{
-                                        color: "#AF2655",
-                                        fontSize: "70px",
-                                        marginBottom: "20px",
-                                      }}
-                                    />
-                                  </DialogContentText>
-                                </DialogContent>
-                                <DialogActions className="text-center d-flex align-items-center justify-content-center">
-                                  <button
-                                    type="button"
-                                    className="btn btn-primary btn-lg btn-block make-an-offer-btn"
-                                    onClick={() => {
-                                      deleteItfEan(selectedItfDetailsId);
-                                      handleClose();
-                                    }}
-                                  >
-                                    Yes
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="btn btn-primary btn-lg btn-block make-an-offer-btn me-1"
-                                    onClick={handleClose}
-                                  >
-                                    No
-                                  </button>
-                                </DialogActions>
-                              </Dialog>
-                            </td>
-                          </tr>
-                        ))}
-                        {formValues.map((element, index) => (
-                          <tr className="rowCursorPointer">
-                            <td
-                              style={{ width: "280px" }}
-                              className="itfAutoComplete"
+                      {t("generateName")}
+                    </button>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
+              <div
+                id="datatable_wrapper"
+                className="information_dataTables dataTables_wrapper dt-bootstrap4 table-responsive mt-"
+              >
+                <table
+                  id="example"
+                  className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
+                  style={{ width: "100%" }}
+                >
+                  <thead>
+                    <tr>
+                      <th>{t("type")}</th>
+                      <th>{t("name")}</th>
+                      <th className="w-5">{t("quantity")}</th>
+                      <th>{t("action")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {editEan.map((element, index) => (
+                      <tr className="rowCursorPointer">
+                        <td style={{ width: "280px" }}>
+                          <select
+                            name="detail_type"
+                            value={element.detail_type}
+                            onChange={(e) => handleEditEan(index, e)}
+                          >
+                            <option value="1">{t("packaging")}</option>
+                            <option value="2">{t("boxes")}</option>
+                            <option value="3">{t("ean")}</option>
+                          </select>
+                        </td>
+                        <td style={{ width: "280px" }}>
+                          {element.detail_type == "3" ? (
+                            // <select
+                            //   name="item_id"
+                            //   onChange={(e) => handleEditEan(index, e)}
+                            //   value={element.item_id}
+                            // >
+                            //   <option value="">Select EAN</option>
+                            //   {eanList?.map((item) => (
+                            //     <option value={item.Item}>
+                            //       {item.Name_EN}
+                            //     </option>
+                            //   ))}
+                            // </select>
+                            <select
+                              name="item_id"
+                              onChange={(e) => handleEditEan(index, e)}
+                              value={element.item_id}
                             >
-                              <Autocomplete
-                                disablePortal
-                                options={[
-                                  { label: "Packaging", value: "1" },
-                                  { label: "Boxes", value: "2" },
-                                  { label: "EAN", value: "3" },
-                                ]}
-                                getOptionLabel={(option) =>
-                                  option.label || "Select Type"
+                              <option value="">{t("selectEan")}</option>
+                              {eanList?.map((item) => (
+                                <option key={item.ID} value={item.ID}>
+                                  {item.Name_EN}
+                                </option>
+                              ))}
+                            </select>
+                          ) : element.detail_type == "1" ? (
+                            // <select
+                            //   name="item_id"
+                            //   onChange={(e) => handleEditEan(index, e)}
+                            //   value={element.item_id}
+                            // >
+                            //   <option value="">Select Packaging</option>
+                            //   {packagingList?.map((item) => (
+                            //     <option value={item.Item}>
+                            //       {item.Name_EN}
+                            //     </option>
+                            //   ))}
+                            // </select>
+                            <select
+                              name="item_id"
+                              onChange={(e) => handleEditEan(index, e)}
+                              value={element.item_id}
+                            >
+                              <option value="">{t("selectPackaging")}</option>
+                              {packagingList?.map((item) => (
+                                <option key={item.ID} value={item.ID}>
+                                  {item.Name_EN}
+                                </option>
+                              ))}
+                            </select>
+                          ) : element.detail_type == "2" ? (
+                            // <select
+                            //   name="item_id"
+                            //   onChange={(e) => handleEditEan(index, e)}
+                            //   value={element.item_id}
+                            // >
+                            //   <option value="">Select Box</option>
+                            //   {boxList?.map((item) => (
+                            //     <option value={item.Item}>
+                            //       {item.Name_EN}
+                            //     </option>
+                            //   ))}
+                            // </select>
+
+                            <select
+                              name="item_id"
+                              onChange={(e) => handleEditEan(index, e)}
+                              value={element.item_id}
+                            >
+                              <option value="">{t("selectBox")}</option>
+                              {boxList?.map((item) => (
+                                <option key={item.ID} value={item.ID}>
+                                  {item.Name_EN}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <></>
+                          )}
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            name="qty_per_itf"
+                            value={element.qty_per_itf}
+                            onChange={(e) => handleEditEan(index, e)}
+                          />
+                        </td>
+                        <td className="editIcon">
+                          <a
+                            onClick={() =>
+                              handleClickOpen(element.itf_details_id)
+                            }
+                          >
+                            <i className="mdi mdi-trash-can-outline" />
+                          </a>
+                          <Dialog
+                            fullWidth
+                            open={open}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                          >
+                            <DialogTitle
+                              id="alert-dialog-title"
+                              className="text-center"
+                            >
+                              {"Are you sure you want to delete?"}
+                            </DialogTitle>
+                            <DialogContent className="text-center p-0 m-0 alertDel">
+                              <DialogContentText id="alert-dialog-description">
+                                <DeleteSweepIcon
+                                  style={{
+                                    color: "#AF2655",
+                                    fontSize: "70px",
+                                    marginBottom: "20px",
+                                  }}
+                                />
+                              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions className="text-center d-flex align-items-center justify-content-center">
+                              <button
+                                type="button"
+                                className="btn btn-primary btn-lg btn-block make-an-offer-btn"
+                                onClick={() => {
+                                  deleteItfEan(selectedItfDetailsId);
+                                  handleClose();
+                                }}
+                              >
+                                 {t("yes")}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-primary btn-lg btn-block make-an-offer-btn me-1"
+                                onClick={handleClose}
+                              >
+                                 {t("no")}
+                              </button>
+                            </DialogActions>
+                          </Dialog>
+                        </td>
+                      </tr>
+                    ))}
+                    {formValues.map((element, index) => (
+                      <tr className="rowCursorPointer">
+                        <td
+                          style={{ width: "280px" }}
+                          className="itfAutoComplete"
+                        >
+                          <Autocomplete
+                            disablePortal
+                            options={[
+                              { label: "Packaging", value: "1" },
+                              { label: "Boxes", value: "2" },
+                              { label: "EAN", value: "3" },
+                            ]}
+                            getOptionLabel={(option) =>
+                              option.label || t("selectType") 
                                 }
-                                value={
-                                  [
-                                    { label: "Packaging", value: "1" },
-                                    { label: "Boxes", value: "2" },
-                                    { label: "EAN", value: "3" },
-                                  ].find(
-                                    (item) => item.value === element.detail_type
+                          value={
+                            [
+                              { label: "Packaging", value: "1" },
+                              { label: "Boxes", value: "2" },
+                              { label: "EAN", value: "3" },
+                            ].find(
+                              (item) => item.value === element.detail_type
+                            ) || null
+                          }
+                          onChange={(event, value) => {
+                            addFieldHandleChange(index, {
+                              target: {
+                                name: "detail_type",
+                                value: value?.value || "",
+                              },
+                            });
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("selectType")}
+                              variant="outlined"
+                            />
+                          )}
+                              />
+                        </td>
+                        <td
+                          style={{ width: "280px" }}
+                          className="itfAutoComplete"
+                        >
+                          {element.detail_type === "3" ? (
+                            // <Autocomplete
+                            //   disablePortal
+                            //   options={eanList?.map((item) => ({
+                            //     label: item.Name_EN,
+                            //     value: item.Item,
+                            //   }))}
+                            //   getOptionLabel={(option) =>
+                            //     option.label || "Select EAN"
+                            //   }
+                            //   value={
+                            //     eanList
+                            //       ?.map((item) => ({
+                            //         label: item.Name_EN,
+                            //         value: item.Item,
+                            //       }))
+                            //       .find(
+                            //         (option) =>
+                            //           option.value === element.item_id
+                            //       ) || null
+                            //   }
+                            //   onChange={(event, value) => {
+                            //     addFieldHandleChange(index, {
+                            //       target: {
+                            //         name: "item_id",
+                            //         value: value?.value || "",
+                            //       },
+                            //     });
+                            //     if (value?.value) {
+                            //       const selectedItem = eanList.find(
+                            //         (item) => item.Item === value.value
+                            //       );
+                            //       addFieldHandleChange(index, {
+                            //         target: {
+                            //           name: "COA",
+                            //           value: selectedItem?.COA || "", // set the COA directly
+                            //         },
+                            //       });
+                            //     }
+                            //   }}
+                            //   renderInput={(params) => (
+                            //     <TextField
+                            //       {...params}
+                            //       placeholder="Select EAN"
+                            //       variant="outlined"
+                            //     />
+                            //   )}
+                            // />
+                            <Autocomplete
+                              disablePortal
+                              options={eanList?.map((item) => ({
+                                label: item.Name_EN,
+                                value: item.ID, // ✅ Now using ID instead of Item
+                                fullItem: item, // Optional: keep full object if needed later
+                              }))}
+                              getOptionLabel={(option) =>
+                                option.label || t("selectEan")
+                              }
+                              value={
+                                eanList
+                                  ?.map((item) => ({
+                                    label: item.Name_EN,
+                                    value: item.ID,
+                                  }))
+                                  .find(
+                                    (option) =>
+                                      option.value === element.item_id
                                   ) || null
-                                }
-                                onChange={(event, value) => {
+                              }
+                              onChange={(event, value) => {
+                                addFieldHandleChange(index, {
+                                  target: {
+                                    name: "item_id",
+                                    value: value?.value || "", // ✅ now passing ID
+                                  },
+                                });
+
+                                if (value?.value) {
+                                  const selectedItem = eanList.find(
+                                    (item) => item.ID === value.value
+                                  ); // ✅ match on ID
                                   addFieldHandleChange(index, {
                                     target: {
-                                      name: "detail_type",
-                                      value: value?.value || "",
+                                      name: "COA",
+                                      value: selectedItem?.COA || "",
                                     },
                                   });
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select Type"
-                                    variant="outlined"
-                                  />
-                                )}
-                              />
-                            </td>
-                            <td
-                              style={{ width: "280px" }}
-                              className="itfAutoComplete"
+                                }
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("selectEan")}
+                                  variant="outlined"
+                                />
+                              )}
+                            />
+                          ) : element.detail_type === "1" ? (
+                            // <Autocomplete
+                            //   disablePortal
+                            //   options={packagingList?.map((item) => ({
+                            //     label: item.Name_EN,
+                            //     value: item.Item,
+                            //   }))}
+                            //   getOptionLabel={(option) =>
+                            //     option.label || "Select Packaging"
+                            //   }
+                            //   value={
+                            //     packagingList
+                            //       ?.map((item) => ({
+                            //         label: item.Name_EN,
+                            //         value: item.Item,
+                            //       }))
+                            //       .find(
+                            //         (option) =>
+                            //           option.value === element.item_id
+                            //       ) || null
+                            //   }
+                            //   onChange={(event, value) => {
+                            //     addFieldHandleChange(index, {
+                            //       target: {
+                            //         name: "item_id",
+                            //         value: value?.value || "",
+                            //       },
+                            //     });
+                            //     if (value?.value) {
+                            //       const selectedItem = packagingList.find(
+                            //         (item) => item.Item === value.value
+                            //       );
+                            //       addFieldHandleChange(index, {
+                            //         target: {
+                            //           name: "COA",
+                            //           value: selectedItem?.COA || "",
+                            //         },
+                            //       });
+                            //     }
+                            //   }}
+                            //   renderInput={(params) => (
+                            //     <TextField
+                            //       {...params}
+                            //       placeholder="Select Packaging"
+                            //       variant="outlined"
+                            //     />
+                            //   )}
+                            // />
+                            <Autocomplete
+                              disablePortal
+                              options={packagingList?.map((item) => ({
+                                label: item.Name_EN,
+                                value: item.ID, // ✅ Use ID instead of Item
+                              }))}
+                              getOptionLabel={(option) =>
+                                option.label || t("selectPackaging")
+                              }
+                              value={
+                                packagingList
+                                  ?.map((item) => ({
+                                    label: item.Name_EN,
+                                    value: item.ID,
+                                  }))
+                                  .find(
+                                    (option) =>
+                                      option.value === element.item_id
+                                  ) || null
+                              }
+                              onChange={(event, value) => {
+                                addFieldHandleChange(index, {
+                                  target: {
+                                    name: "item_id",
+                                    value: value?.value || "", // ✅ Pass ID
+                                  },
+                                });
+
+                                if (value?.value) {
+                                  const selectedItem = packagingList.find(
+                                    (item) => item.ID === value.value // ✅ Match on ID
+                                  );
+                                  addFieldHandleChange(index, {
+                                    target: {
+                                      name: "COA",
+                                      value: selectedItem?.COA || "",
+                                    },
+                                  });
+                                }
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("selectPackaging")}
+                                  variant="outlined"
+                                />
+                              )}
+                            />
+                          ) : element.detail_type === "2" ? (
+                            // <Autocomplete
+                            //   disablePortal
+                            //   options={boxList?.map((item) => ({
+                            //     label: item.Name_EN,
+                            //     value: item.Item,
+                            //   }))}
+                            //   getOptionLabel={(option) =>
+                            //     option.label || "Select Box"
+                            //   }
+                            //   value={
+                            //     boxList
+                            //       ?.map((item) => ({
+                            //         label: item.Name_EN,
+                            //         value: item.Item,
+                            //       }))
+                            //       .find(
+                            //         (option) =>
+                            //           option.value === element.item_id
+                            //       ) || null
+                            //   }
+                            //   onChange={(event, value) => {
+                            //     addFieldHandleChange(index, {
+                            //       target: {
+                            //         name: "item_id",
+                            //         value: value?.value || "",
+                            //       },
+                            //     });
+                            //     if (value?.value) {
+                            //       const selectedItem = boxList.find(
+                            //         (item) => item.Item === value.value
+                            //       );
+                            //       addFieldHandleChange(index, {
+                            //         target: {
+                            //           name: "COA",
+                            //           value: selectedItem?.COA || "",
+                            //         },
+                            //       });
+                            //     }
+                            //   }}
+                            //   renderInput={(params) => (
+                            //     <TextField
+                            //       {...params}
+                            //       placeholder="Select Box"
+                            //       variant="outlined"
+                            //     />
+                            //   )}
+                            // />
+                            <Autocomplete
+                              disablePortal
+                              options={boxList?.map((item) => ({
+                                label: item.Name_EN,
+                                value: item.ID, // ✅ Use ID instead of Item
+                              }))}
+                              getOptionLabel={(option) =>
+                                option.label || t("selectBox")
+                              }
+                              value={
+                                boxList
+                                  ?.map((item) => ({
+                                    label: item.Name_EN,
+                                    value: item.ID,
+                                  }))
+                                  .find(
+                                    (option) =>
+                                      option.value === element.item_id
+                                  ) || null
+                              }
+                              onChange={(event, value) => {
+                                addFieldHandleChange(index, {
+                                  target: {
+                                    name: "item_id",
+                                    value: value?.value || "", // ✅ Now using ID
+                                  },
+                                });
+
+                                if (value?.value) {
+                                  const selectedItem = boxList.find(
+                                    (item) => item.ID === value.value // ✅ Match on ID
+                                  );
+                                  addFieldHandleChange(index, {
+                                    target: {
+                                      name: "COA",
+                                      value: selectedItem?.COA || "",
+                                    },
+                                  });
+                                }
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("selectBox")}
+                                  variant="outlined"
+                                />
+                              )}
+                            />
+                          ) : (
+                            <></>
+                          )}
+                        </td>
+                        <td>
+                          <div className="ceateTransport">
+                            <input
+                              type="number"
+                              name="qty_per_itf"
+                              value={element.qty_per_itf}
+                              onChange={(e) =>
+                                addFieldHandleChange(index, e)
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="editIcon">
+                          {index == formValues.length - 1 ? (
+                            <button type="button" onClick={addFormFields}>
+                              <i className="mdi mdi-plus" />
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => removeFormFields(index)}
                             >
-                              {element.detail_type === "3" ? (
-                                // <Autocomplete
-                                //   disablePortal
-                                //   options={eanList?.map((item) => ({
-                                //     label: item.Name_EN,
-                                //     value: item.Item,
-                                //   }))}
-                                //   getOptionLabel={(option) =>
-                                //     option.label || "Select EAN"
-                                //   }
-                                //   value={
-                                //     eanList
-                                //       ?.map((item) => ({
-                                //         label: item.Name_EN,
-                                //         value: item.Item,
-                                //       }))
-                                //       .find(
-                                //         (option) =>
-                                //           option.value === element.item_id
-                                //       ) || null
-                                //   }
-                                //   onChange={(event, value) => {
-                                //     addFieldHandleChange(index, {
-                                //       target: {
-                                //         name: "item_id",
-                                //         value: value?.value || "",
-                                //       },
-                                //     });
-                                //     if (value?.value) {
-                                //       const selectedItem = eanList.find(
-                                //         (item) => item.Item === value.value
-                                //       );
-                                //       addFieldHandleChange(index, {
-                                //         target: {
-                                //           name: "COA",
-                                //           value: selectedItem?.COA || "", // set the COA directly
-                                //         },
-                                //       });
-                                //     }
-                                //   }}
-                                //   renderInput={(params) => (
-                                //     <TextField
-                                //       {...params}
-                                //       placeholder="Select EAN"
-                                //       variant="outlined"
-                                //     />
-                                //   )}
-                                // />
-                                <Autocomplete
-                                  disablePortal
-                                  options={eanList?.map((item) => ({
-                                    label: item.Name_EN,
-                                    value: item.ID, // ✅ Now using ID instead of Item
-                                    fullItem: item, // Optional: keep full object if needed later
-                                  }))}
-                                  getOptionLabel={(option) =>
-                                    option.label || "Select EAN"
-                                  }
-                                  value={
-                                    eanList
-                                      ?.map((item) => ({
-                                        label: item.Name_EN,
-                                        value: item.ID,
-                                      }))
-                                      .find(
-                                        (option) =>
-                                          option.value === element.item_id
-                                      ) || null
-                                  }
-                                  onChange={(event, value) => {
-                                    addFieldHandleChange(index, {
-                                      target: {
-                                        name: "item_id",
-                                        value: value?.value || "", // ✅ now passing ID
-                                      },
-                                    });
-
-                                    if (value?.value) {
-                                      const selectedItem = eanList.find(
-                                        (item) => item.ID === value.value
-                                      ); // ✅ match on ID
-                                      addFieldHandleChange(index, {
-                                        target: {
-                                          name: "COA",
-                                          value: selectedItem?.COA || "",
-                                        },
-                                      });
-                                    }
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder="Select EAN"
-                                      variant="outlined"
-                                    />
-                                  )}
-                                />
-                              ) : element.detail_type === "1" ? (
-                                // <Autocomplete
-                                //   disablePortal
-                                //   options={packagingList?.map((item) => ({
-                                //     label: item.Name_EN,
-                                //     value: item.Item,
-                                //   }))}
-                                //   getOptionLabel={(option) =>
-                                //     option.label || "Select Packaging"
-                                //   }
-                                //   value={
-                                //     packagingList
-                                //       ?.map((item) => ({
-                                //         label: item.Name_EN,
-                                //         value: item.Item,
-                                //       }))
-                                //       .find(
-                                //         (option) =>
-                                //           option.value === element.item_id
-                                //       ) || null
-                                //   }
-                                //   onChange={(event, value) => {
-                                //     addFieldHandleChange(index, {
-                                //       target: {
-                                //         name: "item_id",
-                                //         value: value?.value || "",
-                                //       },
-                                //     });
-                                //     if (value?.value) {
-                                //       const selectedItem = packagingList.find(
-                                //         (item) => item.Item === value.value
-                                //       );
-                                //       addFieldHandleChange(index, {
-                                //         target: {
-                                //           name: "COA",
-                                //           value: selectedItem?.COA || "",
-                                //         },
-                                //       });
-                                //     }
-                                //   }}
-                                //   renderInput={(params) => (
-                                //     <TextField
-                                //       {...params}
-                                //       placeholder="Select Packaging"
-                                //       variant="outlined"
-                                //     />
-                                //   )}
-                                // />
-                                <Autocomplete
-                                  disablePortal
-                                  options={packagingList?.map((item) => ({
-                                    label: item.Name_EN,
-                                    value: item.ID, // ✅ Use ID instead of Item
-                                  }))}
-                                  getOptionLabel={(option) =>
-                                    option.label || "Select Packaging"
-                                  }
-                                  value={
-                                    packagingList
-                                      ?.map((item) => ({
-                                        label: item.Name_EN,
-                                        value: item.ID,
-                                      }))
-                                      .find(
-                                        (option) =>
-                                          option.value === element.item_id
-                                      ) || null
-                                  }
-                                  onChange={(event, value) => {
-                                    addFieldHandleChange(index, {
-                                      target: {
-                                        name: "item_id",
-                                        value: value?.value || "", // ✅ Pass ID
-                                      },
-                                    });
-
-                                    if (value?.value) {
-                                      const selectedItem = packagingList.find(
-                                        (item) => item.ID === value.value // ✅ Match on ID
-                                      );
-                                      addFieldHandleChange(index, {
-                                        target: {
-                                          name: "COA",
-                                          value: selectedItem?.COA || "",
-                                        },
-                                      });
-                                    }
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder="Select Packaging"
-                                      variant="outlined"
-                                    />
-                                  )}
-                                />
-                              ) : element.detail_type === "2" ? (
-                                // <Autocomplete
-                                //   disablePortal
-                                //   options={boxList?.map((item) => ({
-                                //     label: item.Name_EN,
-                                //     value: item.Item,
-                                //   }))}
-                                //   getOptionLabel={(option) =>
-                                //     option.label || "Select Box"
-                                //   }
-                                //   value={
-                                //     boxList
-                                //       ?.map((item) => ({
-                                //         label: item.Name_EN,
-                                //         value: item.Item,
-                                //       }))
-                                //       .find(
-                                //         (option) =>
-                                //           option.value === element.item_id
-                                //       ) || null
-                                //   }
-                                //   onChange={(event, value) => {
-                                //     addFieldHandleChange(index, {
-                                //       target: {
-                                //         name: "item_id",
-                                //         value: value?.value || "",
-                                //       },
-                                //     });
-                                //     if (value?.value) {
-                                //       const selectedItem = boxList.find(
-                                //         (item) => item.Item === value.value
-                                //       );
-                                //       addFieldHandleChange(index, {
-                                //         target: {
-                                //           name: "COA",
-                                //           value: selectedItem?.COA || "",
-                                //         },
-                                //       });
-                                //     }
-                                //   }}
-                                //   renderInput={(params) => (
-                                //     <TextField
-                                //       {...params}
-                                //       placeholder="Select Box"
-                                //       variant="outlined"
-                                //     />
-                                //   )}
-                                // />
-                                <Autocomplete
-                                  disablePortal
-                                  options={boxList?.map((item) => ({
-                                    label: item.Name_EN,
-                                    value: item.ID, // ✅ Use ID instead of Item
-                                  }))}
-                                  getOptionLabel={(option) =>
-                                    option.label || "Select Box"
-                                  }
-                                  value={
-                                    boxList
-                                      ?.map((item) => ({
-                                        label: item.Name_EN,
-                                        value: item.ID,
-                                      }))
-                                      .find(
-                                        (option) =>
-                                          option.value === element.item_id
-                                      ) || null
-                                  }
-                                  onChange={(event, value) => {
-                                    addFieldHandleChange(index, {
-                                      target: {
-                                        name: "item_id",
-                                        value: value?.value || "", // ✅ Now using ID
-                                      },
-                                    });
-
-                                    if (value?.value) {
-                                      const selectedItem = boxList.find(
-                                        (item) => item.ID === value.value // ✅ Match on ID
-                                      );
-                                      addFieldHandleChange(index, {
-                                        target: {
-                                          name: "COA",
-                                          value: selectedItem?.COA || "",
-                                        },
-                                      });
-                                    }
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder="Select Box"
-                                      variant="outlined"
-                                    />
-                                  )}
-                                />
-                              ) : (
-                                <></>
-                              )}
-                            </td>
-                            <td>
-                              <div className="ceateTransport">
-                                <input
-                                  type="number"
-                                  name="qty_per_itf"
-                                  value={element.qty_per_itf}
-                                  onChange={(e) =>
-                                    addFieldHandleChange(index, e)
-                                  }
-                                />
-                              </div>
-                            </td>
-                            <td className="editIcon">
-                              {index == formValues.length - 1 ? (
-                                <button type="button" onClick={addFormFields}>
-                                  <i className="mdi mdi-plus" />
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => removeFormFields(index)}
-                                >
-                                  <i className="mdi mdi-trash-can-outline" />
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </form>
+                              <i className="mdi mdi-trash-can-outline" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </div>
-          </div>
-          <div className="card-footer">
-            {itfId ? (
-              <button
-                className="btn btn-primary"
-                type="submit"
-                name="signup"
-                onClick={confirmCloseWindow}
-              >
-                Confirm and Close
-              </button>
-            ) : (
-              <button
-                className="btn btn-primary"
-                type="submit"
-                name="signup"
-                onClick={update}
-              >
-                {from?.ID ? "Update" : "Create"}
-              </button>
-            )}
-            {itfId ? (
-              <button className="btn btn-danger" onClick={cancelData}>
-                Cancel
-              </button>
-            ) : (
-              <Link className="btn btn-danger" to="/itfNew">
-                Close
-              </Link>
-            )}
+            </form>
           </div>
         </div>
       </div>
-    </Card>
+      <div className="card-footer">
+        {itfId ? (
+          <button
+            className="btn btn-primary"
+            type="submit"
+            name="signup"
+            onClick={confirmCloseWindow}
+          >
+            {t("confirmClose")}
+          </button>
+        ) : (
+          <button
+            className="btn btn-primary"
+            type="submit"
+            name="signup"
+            onClick={update}
+          >
+            {from?.ID ? t("update") : t("create")}
+          </button>
+        )}
+        {itfId ? (
+          <button className="btn btn-danger" onClick={cancelData}>
+            {t("cancel")}
+          </button>
+        ) : (
+          <Link className="btn btn-danger" to="/itfNew">
+            {t("close")}
+          </Link>
+        )}
+      </div>
+    </div>
+      </div >
+    </Card >
   );
 };
 

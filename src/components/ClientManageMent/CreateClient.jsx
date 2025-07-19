@@ -1,4 +1,4 @@
-import axios from "axios";
+ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -12,7 +12,9 @@ import "jspdf-autotable";
 import ChartConsi from "./ChartConsi";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { useTranslation } from "react-i18next";
 const CreateClient = () => {
+  const [t, i18n] = useTranslation("global");
   const location = useLocation();
   const { data: clients } = useQuery("getClientDataAsOptions");
   const { data: consignee } = useQuery("getConsignee");
@@ -112,15 +114,15 @@ const CreateClient = () => {
     console.log("confirm data is", obj);
     // Validate required fields
     if (!selectedProduceId) {
-      toast.error("Produce is required");
+      toast.error(t("produceRequired"));
       return;
     }
     if (!date1) {
-      toast.error("Start Date is required");
+      toast.error(t("startDateRequired"));
       return;
     }
     if (!date2) {
-      toast.error("Stop Date is required");
+      toast.error(t("stopDateRequired"));
       return;
     }
   };
@@ -738,7 +740,7 @@ const CreateClient = () => {
 
     // Check if parsedFxPayment is not equal to totalPaidAmount
     if (parsedFxPayment.toFixed(2) !== totalPaidAmount.toFixed(2)) {
-      toast.error("Total Paid Amount does not match FX Payment value.");
+      toast.error(t("paymentMismatch"));
       return;
     }
 
@@ -816,7 +818,7 @@ const CreateClient = () => {
     } catch (error) {
       // Handle error case
       console.error("Error submitting payment data", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
   const clearAllFields = () => {
@@ -927,8 +929,8 @@ const CreateClient = () => {
   const deleteOrder1 = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -948,7 +950,7 @@ const CreateClient = () => {
           getAllContact();
           toast.success("Contact delete successfully");
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("genericError"));
         }
       }
     });
@@ -994,7 +996,7 @@ const CreateClient = () => {
 
   const submitCusomizationData = () => {
     if (!dataCustomization.ITF) {
-      toast.warn("Please enter ITF", {
+      toast.warn(t("enterItf"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1002,7 +1004,7 @@ const CreateClient = () => {
     }
 
     if (!dataCustomization.Unit) {
-      toast.warn("Please enter Unit", {
+      toast.warn(t("enterUnit"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1016,7 +1018,7 @@ const CreateClient = () => {
       )
       .then((response) => {
         console.log(response);
-        toast.success("Customization Data Added Successfully", {
+        toast.success(t("customizationAdd"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1038,7 +1040,7 @@ const CreateClient = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1060,7 +1062,7 @@ const CreateClient = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1069,7 +1071,7 @@ const CreateClient = () => {
   };
   const customizationDataSubmit = (e) => {
     if (!dataCustomization.ITF) {
-      toast.warn("Please enter ITF", {
+      toast.warn(t("enterItf"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1077,7 +1079,7 @@ const CreateClient = () => {
     }
 
     if (!dataCustomization.Unit) {
-      toast.warn("Please enter Unit", {
+      toast.warn(t("enterUnit"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1091,7 +1093,7 @@ const CreateClient = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Customize Update  Successfully", {
+        toast.success(t("customizationUpdate"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1115,7 +1117,7 @@ const CreateClient = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1147,7 +1149,7 @@ const CreateClient = () => {
     const { contact_type_id, first_name, last_name, Email, mobile } = state1;
 
     if (!contact_type_id) {
-      toast.error("Contact Type is required", {
+      toast.error(t("contactTypeRequired"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1155,7 +1157,7 @@ const CreateClient = () => {
     }
 
     if (!first_name) {
-      toast.error("First Name is required", {
+      toast.error(t("firstNameRequired"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1163,7 +1165,7 @@ const CreateClient = () => {
     }
 
     if (!last_name) {
-      toast.error("Last Name is required", {
+      toast.error(t("lastNameRequired"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1171,7 +1173,7 @@ const CreateClient = () => {
     }
 
     if (!Email) {
-      toast.error("Email is required", {
+      toast.error(t("emailRequired"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1179,7 +1181,7 @@ const CreateClient = () => {
     }
 
     if (!mobile) {
-      toast.error("Mobile number is required", {
+      toast.error(t("mobileRequired"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1189,7 +1191,7 @@ const CreateClient = () => {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(Email)) {
-      toast.error("Invalid email format", {
+      toast.error(t("invalidEmail"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1202,7 +1204,7 @@ const CreateClient = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Contact added Successfully", {
+        toast.success(t("contactAddSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1233,7 +1235,7 @@ const CreateClient = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1329,7 +1331,7 @@ const CreateClient = () => {
       .then((response) => {
         console.log(response);
         getAllContact();
-        toast.success("Contact Update Successfully", {
+        toast.success(t("contactUpdate"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1358,7 +1360,7 @@ const CreateClient = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Network Error", {
+        toast.error(t("networkError"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1427,17 +1429,14 @@ const CreateClient = () => {
     style: "decimal",
     minimumFractionDigits: 0,
   });
-  // const formatDate = (dateString) => {
-  //   if (!dateString) return "";
-  //   const date = new Date(dateString);
-  //   const day = date.getDate().toString().padStart(2, "0");
-  //   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-based
-  //   const year = date.getFullYear();
-  //   return `${day}-${month}-${year}`;
-  // };
+
   console.log(state.Commission_Currency);
   return (
-    <Card title={`Clients / ${from?.consignee_id ? "Update" : "Create"} Form`}>
+    <Card
+      title={`${t("clients")} / ${
+        from?.consignee_id ? t("update") : t("create")
+      } ${t("form")}`}
+    >
       <div className="top-space-search-reslute newSmallCard">
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -1452,7 +1451,7 @@ const CreateClient = () => {
                   role="tab"
                   aria-controls="first-tab-pane"
                 >
-                  Details
+                  {t("details")}
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -1465,7 +1464,7 @@ const CreateClient = () => {
                   role="tab"
                   aria-controls="home-tab-pane"
                 >
-                  Contact
+                  {t("contact")}
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -1479,7 +1478,7 @@ const CreateClient = () => {
                   aria-controls="profile-tab-pane"
                   aria-selected="false"
                 >
-                  Customization
+                  {t("customization")}
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -1492,7 +1491,7 @@ const CreateClient = () => {
                   role="tab"
                   aria-controls="notify-tab-pane"
                 >
-                  Statistics
+                  {t("statistics")}
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -1505,7 +1504,7 @@ const CreateClient = () => {
                   role="tab"
                   aria-controls="notifyNew-pane"
                 >
-                  Notify
+                  {t("notify")}
                 </button>
               </li>
               {localStorage.getItem("level") !== "Level 5" && (
@@ -1520,7 +1519,7 @@ const CreateClient = () => {
                     aria-controls="contact-tab-pane"
                     aria-selected="false"
                   >
-                    Accounting
+                    {t("accounting")}
                   </button>
                 </li>
               )}
@@ -1541,7 +1540,7 @@ const CreateClient = () => {
                     <form action="">
                       <div className="row">
                         <div className="form-group col-lg-4">
-                          <h6>Name</h6>
+                          <h6>{t("name")}</h6>
                           <input
                             type="text"
                             name="client_name"
@@ -1551,7 +1550,7 @@ const CreateClient = () => {
                           />
                         </div>
                         <div className="form-group col-lg-4">
-                          <h6>Tax Number</h6>
+                          <h6>{t("taxNumber")}</h6>
                           <input
                             type="text"
                             className="w-full"
@@ -1561,7 +1560,7 @@ const CreateClient = () => {
                           />
                         </div>
                         <div className="form-group col-lg-4">
-                          <h6> Brand</h6>
+                          <h6> {t("brand")}</h6>
                           <div className="ceateTransport autoComplete">
                             <Autocomplete
                               options={brands || []}
@@ -1577,7 +1576,7 @@ const CreateClient = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Brand"
+                                  placeholder={t("selectBrand")}
                                   variant="outlined"
                                 />
                               )}
@@ -1593,7 +1592,7 @@ const CreateClient = () => {
                           </div>
                         </div>
                         <div className="form-group col-lg-4">
-                          <h6>Address</h6>
+                          <h6>{t("address")}</h6>
                           <div>
                             <input
                               name="client_address"
@@ -1629,7 +1628,7 @@ const CreateClient = () => {
                         </div>
                         <div className="form-group col-lg-4">
                           <div>
-                            <h6>Email</h6>
+                            <h6>{t("email")}</h6>
                             <input
                               type="email"
                               className="w-full"
@@ -1639,7 +1638,7 @@ const CreateClient = () => {
                             />
                           </div>
                           <div>
-                            <h6>Phone Number</h6>
+                            <h6>{t("phoneNumber")}</h6>
                             <input
                               type="email"
                               className="w-full"
@@ -1659,11 +1658,11 @@ const CreateClient = () => {
                               fontSize: "20px",
                             }}
                           >
-                            Bank Informations
+                            {t("bankInformations")}
                           </h6>
                           <div className="row ">
                             <div className="form-group col-lg-4">
-                              <h6>Bank Name</h6>
+                              <h6>{t("bankName")}</h6>
 
                               <input
                                 onChange={handleChange}
@@ -1671,31 +1670,28 @@ const CreateClient = () => {
                                 id="name_en"
                                 name="client_bank_account"
                                 className="form-control"
-                                placeholder="axis "
                                 value={state.client_bank_account}
                               />
                             </div>
                             <div className="form-group col-lg-4">
-                              <h6>Account Name</h6>
+                              <h6>{t("accountName")}</h6>
                               <input
                                 onChange={handleChange}
                                 type="text"
                                 id="name_en"
                                 name="client_bank_name"
                                 className="form-control"
-                                placeholder="xxxxx "
                                 value={state.client_bank_name}
                               />
                             </div>
                             <div className="form-group col-lg-4">
-                              <h6>Account Number</h6>
+                              <h6>{t("accountNumber")}</h6>
                               <input
                                 onChange={handleChange}
                                 type="text"
                                 id="name_en"
                                 name="client_bank_number"
                                 className="form-control"
-                                placeholder="3345345435 "
                                 value={state.client_bank_number}
                               />
                             </div>
@@ -1710,10 +1706,10 @@ const CreateClient = () => {
                       onClick={update}
                       type="button"
                     >
-                      {from?.client_id ? "Update" : "Create"}
+                      {from?.client_id ? t("update") : t("create")}
                     </button>
                     <Link className="btn btn-danger" to="/shipToNew">
-                      Cancel
+                      {t("cancel")}
                     </Link>
                   </div>
                 </div>
@@ -1729,14 +1725,14 @@ const CreateClient = () => {
                 <div className="table-responsive">
                   <table className="  tableContact striped  table borderTerpProduce">
                     <tr className="">
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Nick Name</th>
-                      <th>Position </th>
-                      <th>Type</th>
-                      <th>Email</th>
-                      <th>Mobile</th>
-                      <th>Action</th>
+                      <th>{t("firstName")}</th>
+                      <th>{t("lastName")}</th>
+                      <th>{t("nickName")}</th>
+                      <th>{t("position")}</th>
+                      <th>{t("type")}</th>
+                      <th>{t("email")}</th>
+                      <th>{t("mobile")}</th>
+                      <th>{t("action")}</th>
                     </tr>
 
                     {data?.map((item) => {
@@ -1758,7 +1754,6 @@ const CreateClient = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#exampleModalEdit"
                               >
-                                {" "}
                                 <i class="mdi mdi-pencil"></i>
                                 {/* edit popup */}
                               </button>
@@ -1776,7 +1771,7 @@ const CreateClient = () => {
                                         class="modal-title fs-5"
                                         id="exampleModalLabel"
                                       >
-                                        Contact Update
+                                        {t("contactUp")}
                                       </h1>
                                       <button
                                         type="button"
@@ -1792,38 +1787,38 @@ const CreateClient = () => {
                                         <form action="">
                                           <div className="row">
                                             {/* <div className="col-lg-12">
-                                              <div class="form-group col-lg-3">
-                                                <h6>Client </h6>
-                                                <div class="ceateTransport">
-                                                  <select
-                                                    name="client_id"
-                                                    onChange={handleChange1}
-                                                    value={state1.client_id}
-                                                  >
-                                                    <option value="">
-                                                      Select Client
-                                                    </option>
-                                                    {client?.map((item) => (
-                                                      <option
-                                                        key={item.client_id}
-                                                        value={item.client_id}
-                                                      >
-                                                        {item.client_name}
-                                                      </option>
-                                                    ))}
-                                                  </select>
-                                                </div>
-                                              </div>
-                                            </div> */}
+                                               <div class="form-group col-lg-3">
+                                                 <h6>Client </h6>
+                                                 <div class="ceateTransport">
+                                                   <select
+                                                     name="client_id"
+                                                     onChange={handleChange1}
+                                                     value={state1.client_id}
+                                                   >
+                                                     <option value="">
+                                                       Select Client
+                                                     </option>
+                                                     {client?.map((item) => (
+                                                       <option
+                                                         key={item.client_id}
+                                                         value={item.client_id}
+                                                       >
+                                                         {item.client_name}
+                                                       </option>
+                                                     ))}
+                                                   </select>
+                                                 </div>
+                                               </div>
+                                             </div> */}
                                             <div class="form-group col-lg-3">
-                                              <h6>Contact Type </h6>
+                                              <h6>{t("contactType")}</h6>
                                               <div class="ceateTransport autoComplete">
                                                 <Autocomplete
                                                   disablePortal
                                                   options={contactType || []} // Use your contactType array as options
                                                   getOptionLabel={(option) =>
                                                     option.type_en || ""
-                                                  } // Display the contact type name
+                                                  }
                                                   onChange={(e, newValue) =>
                                                     setState1((prevState) => ({
                                                       ...prevState,
@@ -1831,7 +1826,7 @@ const CreateClient = () => {
                                                         newValue?.contact_type_id ||
                                                         "",
                                                     }))
-                                                  } // Update the state with the selected contact_type_id
+                                                  }
                                                   value={
                                                     contactType.find(
                                                       (item) =>
@@ -1843,7 +1838,9 @@ const CreateClient = () => {
                                                   renderInput={(params) => (
                                                     <TextField
                                                       {...params}
-                                                      placeholder="Select Type" // Adds a placeholder
+                                                      placeholder={t(
+                                                        "selectType"
+                                                      )}
                                                       InputLabelProps={{
                                                         shrink: false,
                                                       }} // Prevents floating label
@@ -1853,104 +1850,104 @@ const CreateClient = () => {
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6> First Name </h6>
+                                              <h6>{t("firstName")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="text"
                                                   name="first_name"
                                                   onChange={handleChange1}
                                                   value={state1.first_name}
-                                                  placeholder="first name"
+                                                  placeholder={t("firstName")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Last Name </h6>
+                                              <h6>{t("lastName")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="text"
                                                   name="last_name"
                                                   onChange={handleChange1}
                                                   value={state1.last_name}
-                                                  placeholder="last name"
+                                                  placeholder={t("lastName")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Nick Name</h6>
+                                              <h6>{t("nickName")}</h6>
                                               <div>
                                                 <input
                                                   type="text"
                                                   name="Nick_name"
                                                   onChange={handleChange1}
                                                   value={state1.Nick_name}
-                                                  placeholder="nick name"
+                                                  placeholder={t("nickName")}
                                                 />
                                               </div>
                                             </div>
 
                                             <div class="form-group col-lg-3">
-                                              <h6>Position </h6>
+                                              <h6>{t("position")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="text"
                                                   name="position"
                                                   onChange={handleChange1}
                                                   value={state1.position}
-                                                  placeholder="position"
+                                                  placeholder={t("position")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Email</h6>
+                                              <h6>{t("email")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="email"
                                                   name="Email"
                                                   onChange={handleChange1}
                                                   value={state1.Email}
-                                                  placeholder="email"
+                                                  placeholder={t("email")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Mobile</h6>
+                                              <h6>{t("mobile")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="number"
                                                   name="mobile"
                                                   onChange={handleChange1}
                                                   value={state1.mobile}
-                                                  placeholder="mobile"
+                                                  placeholder={t("mobile")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-3">
-                                              <h6>Landline</h6>
+                                              <h6>{t("landline")}</h6>
                                               <div class=" ">
                                                 <input
                                                   type="number"
                                                   name="landline"
                                                   onChange={handleChange1}
                                                   value={state1.landline}
-                                                  placeholder="landline"
+                                                  placeholder={t("landline")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-4">
-                                              <h6>Birthday</h6>
+                                              <h6>{t("birthday")}</h6>
                                               <div>
                                                 <input
                                                   type="date"
                                                   name="birthday"
                                                   onChange={handleChange1}
                                                   value={state1.birthday}
-                                                  placeholder="birthday"
+                                                  placeholder={t("birthday")}
                                                 />
                                               </div>
                                             </div>
                                             <div class="form-group col-lg-8">
-                                              <h6>Notes</h6>
+                                              <h6>{t("notes")}</h6>
                                               <div>
                                                 <textarea
                                                   name="Notes"
@@ -1971,7 +1968,7 @@ const CreateClient = () => {
                                         type="button"
                                         class="btn btn-primary mb-0"
                                       >
-                                        Update
+                                        {t("update")}
                                       </button>
                                     </div>
                                   </div>
@@ -2001,7 +1998,7 @@ const CreateClient = () => {
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModalContact"
                   >
-                    Add Contact
+                    {t("addContact")}
                   </Link>
                   {/* modal */}
                   <div
@@ -2015,7 +2012,7 @@ const CreateClient = () => {
                       <div class="modal-content">
                         <div class="modal-header">
                           <h1 class="modal-title fs-5" id="exampleModalLabel">
-                            Contact
+                            {t("contact")}
                           </h1>
                           <button
                             type="button"
@@ -2032,7 +2029,7 @@ const CreateClient = () => {
                             <form action="">
                               <div className="row">
                                 <div class="form-group col-lg-3">
-                                  <h6>Contact Type </h6>
+                                  <h6>{t("contactType")}</h6>
                                   <div class="ceateTransport autoComplete">
                                     <Autocomplete
                                       disablePortal
@@ -2064,7 +2061,7 @@ const CreateClient = () => {
                                         <TextField
                                           {...params}
                                           // label="Select Type"
-                                          placeholder="Select Type"
+                                          placeholder={t("selectType")}
                                           variant="outlined"
                                         />
                                       )}
@@ -2072,104 +2069,105 @@ const CreateClient = () => {
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6> First Name </h6>
+                                  <h6>{t("firstName")}</h6>
                                   <div class=" ">
                                     <input
                                       type="text"
                                       name="first_name"
                                       onChange={handleChange1}
                                       value={state1.first_name}
-                                      placeholder="first name"
+                                      placeholder={t("firstName")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Last Name </h6>
+                                  <h6>{t("lastName")}</h6>
                                   <div class=" ">
                                     <input
                                       type="text"
                                       name="last_name"
                                       onChange={handleChange1}
                                       value={state1.last_name}
-                                      placeholder="last name"
+                                      placeholder={t("lastName")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Nick Name</h6>
+                                  <h6>{t("nickName")}</h6>
                                   <div>
                                     <input
                                       type="text"
                                       name="Nick_name"
                                       onChange={handleChange1}
                                       value={state1.Nick_name}
-                                      placeholder="nick name"
+                                      placeholder={t("nickName")}
                                     />
                                   </div>
                                 </div>
 
                                 <div class="form-group col-lg-3">
-                                  <h6>Position </h6>
+                                  <h6>{t("position")}</h6>
+
                                   <div class=" ">
                                     <input
                                       type="text"
                                       name="position"
                                       onChange={handleChange1}
                                       value={state1.position}
-                                      placeholder="position"
+                                      placeholder={t("position")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Email</h6>
+                                  <h6>{t("email")}</h6>
                                   <div class=" ">
                                     <input
                                       type="email"
                                       name="Email"
                                       onChange={handleChange1}
                                       value={state1.Email}
-                                      placeholder="email"
+                                      placeholder={t("email")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Mobile</h6>
+                                  <h6>{t("mobile")}</h6>
                                   <div class=" ">
                                     <input
                                       type="number"
                                       name="mobile"
                                       onChange={handleChange1}
                                       value={state1.mobile}
-                                      placeholder="mobile"
+                                      placeholder={t("mobile")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                  <h6>Landline</h6>
+                                  <h6>{t("landline")}</h6>
                                   <div class=" ">
                                     <input
                                       type="number"
                                       name="landline"
                                       onChange={handleChange1}
                                       value={state1.landline}
-                                      placeholder="landline"
+                                      placeholder={t("landline")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-4">
-                                  <h6>Birthday</h6>
+                                  <h6>{t("birthday")}</h6>
                                   <div>
                                     <input
                                       type="date"
                                       name="birthday"
                                       onChange={handleChange1}
                                       value={state1.birthday}
-                                      placeholder="birthday"
+                                      placeholder={t("birthday")}
                                     />
                                   </div>
                                 </div>
                                 <div class="form-group col-lg-8">
-                                  <h6>Notes</h6>
+                                  <h6>{t("notes")}</h6>
                                   <div>
                                     <textarea
                                       name="Notes"
@@ -2190,7 +2188,7 @@ const CreateClient = () => {
                             class="btn btn-primary mb-0"
                             onClick={contactDataSubmit}
                           >
-                            Submit
+                            {t("submit")}
                           </button>
                         </div>
                       </div>
@@ -2211,26 +2209,26 @@ const CreateClient = () => {
                   <div className="row newSmallCard ">
                     <div className="flex flex-wrap">
                       {/* <div className="selectProduce me-3">
-            <h6 className="mb-2"> Select Produce</h6>
-            <Autocomplete
-              disablePortal
-              options={data}
-        value={data.find((item) => item.produce_id === selectedProduceId) || null}
-
-              getOptionLabel={(option) => option.produce_name_en || ""}
-              sx={{ width: 300 }}
-              onChange={(event, value) => {
-                setSelectedProduceId(value ? value.produce_id : null);
-                // setProduceImages(value ? value.images : null); // Update images state
-              }}
-              renderInput={(params) => (
-                <TextField {...params} placeholder="Select Produce" />
-              )}
-            />
-          </div> */}
+             <h6 className="mb-2"> Select Produce</h6>
+             <Autocomplete
+               disablePortal
+               options={data}
+         value={data.find((item) => item.produce_id === selectedProduceId) || null}
+ 
+               getOptionLabel={(option) => option.produce_name_en || ""}
+               sx={{ width: 300 }}
+               onChange={(event, value) => {
+                 setSelectedProduceId(value ? value.produce_id : null);
+                 // setProduceImages(value ? value.images : null); // Update images state
+               }}
+               renderInput={(params) => (
+                 <TextField {...params} placeholder="Select Produce" />
+               )}
+             />
+           </div> */}
                       <div>
                         <div className="selectTimeHead">
-                          <h6>Select Time Period :</h6>
+                          <h6>{t("selectTimePeriod")} :</h6>
                         </div>
                         <div className="selectTimeParent">
                           {dataPeriod.map((item) => (
@@ -2247,7 +2245,9 @@ const CreateClient = () => {
                         </div>
                       </div>
                       <div className="selectProduce comparisonNone mt-2">
-                        <h6 style={{ color: "#fff" }}>Comparison Period</h6>
+                        <h6 style={{ color: "#fff" }}>
+                          {t("comparisonPeriod")}
+                        </h6>
                         <Autocomplete
                           disablePortal
                           options={dataComparison}
@@ -2259,7 +2259,7 @@ const CreateClient = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Comparison Period"
+                              placeholder={t("comparisonPeriod")}
                             />
                           )}
                         />
@@ -2302,7 +2302,7 @@ const CreateClient = () => {
                           type="submit"
                           onClick={confirmData}
                         >
-                          Confirm
+                          {t("confirm")}
                         </button>
                       </div>
                     </div>
@@ -2324,7 +2324,7 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Shipments
+                              {t("totalShipments")}
                             </p>
                             <h4 className="mb-0">
                               {formatter.format(
@@ -2339,7 +2339,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +55%{" "}
                             </span>
-                            than lask week
+                            {t("thanLastWeek")}
                           </p>
                         </div>
                       </div>
@@ -2360,7 +2360,7 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Claims
+                              {t("totalClaims")}
                             </p>
                             <h4 className="mb-0">
                               {" "}
@@ -2376,7 +2376,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%{" "}
                             </span>
-                            than yesterday
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -2401,8 +2401,7 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              {" "}
-                              Total Payment{" "}
+                              {t("totalPayment")}
                             </p>
                             <h4 className="mb-0">
                               {" "}
@@ -2417,8 +2416,8 @@ const CreateClient = () => {
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
                               -2%
-                            </span>{" "}
-                            than yesterday
+                            </span>
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -2431,7 +2430,7 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Pending Payment
+                              {t("pendingPayment")}
                             </p>
                             <h4 className="mb-0">
                               {formatter.format(consigeeDetails?.Balance)}
@@ -2444,7 +2443,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%{" "}
                             </span>
-                            than yesterday
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -2460,7 +2459,7 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Net Weigt Shipped
+                              {t("totalNetWeightShipped")}
                             </p>
                             <h4 className="mb-0">
                               {formatter.format(consigeeDetails?.Total_NW)}
@@ -2473,7 +2472,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%
                             </span>
-                            than yesterday
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -2486,7 +2485,7 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Gross Weight Shipped
+                              {t("totalGrossWeightShipped")}
                             </p>
                             <h4 className="mb-0">
                               {formatter.format(consigeeDetails?.Total_GW)}
@@ -2499,7 +2498,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%
                             </span>
-                            than yesterday
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -2512,7 +2511,7 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Boxes Shipped
+                              {t("totalBoxesShipped")}
                             </p>
                             <h4 className="mb-0">
                               {formatter.format(consigeeDetails?.Total_Box)}
@@ -2525,60 +2524,60 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%
                             </span>
-                            than yesterday
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
                     </div>
                     {/* <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
-            <div className="card  ">
-              <div className="card-header p-3 pt-2">
-                <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                  <i className=" material-icons  mdi mdi-calendar-range" />
-                </div>
-                <div className="text-end pt-1">
-                  <p className="text-sm mb-0 text-capitalize">
-                    Date of First Shipment
-                  </p>
-                  <h4 className="mb-0" />
-                  {consigeeDetails?.First_Shipment}
-                </div>
-              </div>
-              <hr className="dark horizontal my-0" />
-              <div className="card-footer p-3">
-                <p className="mb-0">
-                  <span className="text-success text-sm font-weight-bolder">
-                    +55%{" "}
-                  </span>
-                  than lask week
-                </p>
-              </div>
-            </div>
-          </div> */}
+             <div className="card  ">
+               <div className="card-header p-3 pt-2">
+                 <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                   <i className=" material-icons  mdi mdi-calendar-range" />
+                 </div>
+                 <div className="text-end pt-1">
+                   <p className="text-sm mb-0 text-capitalize">
+                     Date of First Shipment
+                   </p>
+                   <h4 className="mb-0" />
+                   {consigeeDetails?.First_Shipment}
+                 </div>
+               </div>
+               <hr className="dark horizontal my-0" />
+               <div className="card-footer p-3">
+                 <p className="mb-0">
+                   <span className="text-success text-sm font-weight-bolder">
+                     +55%{" "}
+                   </span>
+                   than lask week
+                 </p>
+               </div>
+             </div>
+           </div> */}
                     {/* <div className="col-xl-3 col-sm-6 mb-xl-0 mb- mb20">
-            <div className="card">
-              <div className="card-header p-3 pt-2">
-                <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                  <i className=" material-icons mdi mdi-calendar-range" />
-                </div>
-                <div className="text-end pt-1">
-                  <p className="text-sm mb-0 text-capitalize">
-                    Date of Last Shipment
-                  </p>
-                  <h4 className="mb-0" /> {consigeeDetails?.Last_Shipment}
-                </div>
-              </div>
-              <hr className="dark horizontal my-0" />
-              <div className="card-footer p-3">
-                <p className="mb-0">
-                  <span className="text-success text-sm font-weight-bolder">
-                    +3% 
-                  </span>
-                  than lask month
-                </p>
-              </div>
-            </div>
-          </div> */}
+             <div className="card">
+               <div className="card-header p-3 pt-2">
+                 <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                   <i className=" material-icons mdi mdi-calendar-range" />
+                 </div>
+                 <div className="text-end pt-1">
+                   <p className="text-sm mb-0 text-capitalize">
+                     Date of Last Shipment
+                   </p>
+                   <h4 className="mb-0" /> {consigeeDetails?.Last_Shipment}
+                 </div>
+               </div>
+               <hr className="dark horizontal my-0" />
+               <div className="card-footer p-3">
+                 <p className="mb-0">
+                   <span className="text-success text-sm font-weight-bolder">
+                     +3% 
+                   </span>
+                   than lask month
+                 </p>
+               </div>
+             </div>
+           </div> */}
                     <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
                       <div className="card">
                         <div className="card-header p-3 pt-2">
@@ -2587,44 +2586,40 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Shipments
+                              {t("totalShipments")}
                             </p>
                             <div className="parentFirstShip mt-4">
-                              <p>Date of First Shipment</p>
+                              <p>{t("dateOfFirstShipment")}</p>
                               <p> {consigeeDetails?.First_Shipment} </p>
                             </div>
                             <div className="parentFirstShip">
-                              <p>Date of Last Shipment</p>
+                              <p>{t("dateOfLastShipment")}</p>
                               <p>{consigeeDetails?.Last_Shipment}</p>
                             </div>
                             <div className="parentFirstShip">
-                              <p> Shipments in Pipe Line</p>
+                              <p>{t("shipmentsInPipeLine")}</p>
                               <p>
-                                {" "}
-                                {formatter.format(
-                                  consigeeDetails?.Pipe_Line
-                                )}{" "}
+                                {formatter.format(consigeeDetails?.Pipe_Line)}
                               </p>
                             </div>
                           </div>
                         </div>
                         <hr className="dark horizontal my-0" />
                         {/* <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                <p className="mb-0">
-                  <span className="text-success text-sm font-weight-bolder">
-                    -2%
-                  </span>
-                  than yesterday
-                </p>
-              </div> */}
+                 <p className="mb-0">
+                   <span className="text-success text-sm font-weight-bolder">
+                     -2%
+                   </span>
+                   than yesterday
+                 </p>
+               </div> */}
                       </div>
                     </div>
                   </div>
                   <div className="row">
                     <div className="col-lg-6 mb20">
                       <div className="itemsOrderSearch">
-                        <h3 className="itemOrder">Top 5 Items Ordered</h3>
-
+                        <h3 className="itemOrder">{t("topItems")}</h3>
                         <div className="selectProduce">
                           <Autocomplete
                             disablePortal
@@ -2647,7 +2642,7 @@ const CreateClient = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Invoice Value"
+                                placeholder={t("invoiceValue")}
                               />
                             )}
                           />
@@ -2657,11 +2652,11 @@ const CreateClient = () => {
                       <div className="tableCreateClient">
                         <table>
                           <tr>
-                            <th>ITF Name</th>
-                            <th> Last Period Kg</th>
-                            <th> Current Period Kg</th>
-                            <th> DIFF </th>
-                            <th> % Change </th>
+                            <th>{t("itfName")}</th>
+                            <th>{t("lastPeriodKg")}</th>
+                            <th>{t("currentPeriodKg")}</th>
+                            <th>{t("diff")}</th>
+                            <th>{t("percentChange")}</th>
                           </tr>
                           <tbody>
                             <tr>
@@ -2680,17 +2675,17 @@ const CreateClient = () => {
                             </tr>
                           </tbody>
                           {/* {orderItem?.map((item) => {
-                return (
-                  <tr key={item?.id}>
+                 return (
+                   <tr key={item?.id}>
+                    
+                     <td>{item?.itf_name}</td>
+                     <td>{item?.Total_Kg}</td>
+                     <td>{item?.Total_Kg}</td>
+                     <td>{item?.Total_Kg}</td>
+                   </tr>
                    
-                    <td>{item?.itf_name}</td>
-                    <td>{item?.Total_Kg}</td>
-                    <td>{item?.Total_Kg}</td>
-                    <td>{item?.Total_Kg}</td>
-                  </tr>
-                  
-                );
-              })} */}
+                 );
+               })} */}
                         </table>
                       </div>
                     </div>
@@ -2704,7 +2699,7 @@ const CreateClient = () => {
 
                 <div className="card-footer text-center">
                   <Link className="btn btn-danger" to="/shipToNew">
-                    Close
+                    {t("close")}
                   </Link>
                 </div>
               </div>
@@ -2719,13 +2714,13 @@ const CreateClient = () => {
                 <div className="table-responsive">
                   <table className="  tableContact striped  table borderTerpProduce">
                     <tr className="">
-                      <th> ITF Name</th>
-                      <th>Custom Name</th>
-                      <th>Dummy Price</th>
-                      <th>Brand</th>
-                      <th>Unit</th>
-                      <th>Barcode</th>
-                      <th>Action</th>
+                      <th>{t("itfName")}</th>
+                      <th>{t("customName")}</th>
+                      <th>{t("dummyPrice")}</th>
+                      <th>{t("brand")}</th>
+                      <th>{t("unit")}</th>
+                      <th>{t("barcode")}</th>
+                      <th>{t("action")}</th>
                     </tr>
                     {customization?.map((item) => {
                       return (
@@ -2763,7 +2758,7 @@ const CreateClient = () => {
                                         className="modal-title fs-5"
                                         id="exampleModalLabel"
                                       >
-                                        Update customization
+                                        {t("updateCustomization")}
                                       </h1>
                                       <button
                                         type="button"
@@ -2778,25 +2773,8 @@ const CreateClient = () => {
                                       <div className="formCreate">
                                         <div className="row">
                                           <div className="form-group col-lg-12 mb-2">
-                                            <h6>ITF Name </h6>
+                                            <h6>{t("itfName")}</h6>
                                             <div className="ceateTransport autoComplete">
-                                              {/* <select
-                                                name="ITF"
-                                                onChange={handleChange2}
-                                                value={dataCustomization.ITF}
-                                              >
-                                                <option value="">
-                                                  Select ITF
-                                                </option>
-                                                {getItf?.map((item) => (
-                                                  <option
-                                                    key={item.itf_id}
-                                                    value={item.itf_id}
-                                                  >
-                                                    {item.itf_name_en}
-                                                  </option>
-                                                ))}
-                                              </select> */}
                                               <Autocomplete
                                                 disablePortal
                                                 options={getItf || []}
@@ -2823,7 +2801,7 @@ const CreateClient = () => {
                                                 renderInput={(params) => (
                                                   <TextField
                                                     {...params}
-                                                    placeholder="Select ITF"
+                                                    placeholder={t("selectItf")}
                                                     InputLabelProps={{
                                                       shrink: false,
                                                     }}
@@ -2833,7 +2811,7 @@ const CreateClient = () => {
                                             </div>
                                           </div>
                                           <div class="form-group col-lg-12">
-                                            <h6> Custom Name </h6>
+                                            <h6>{t("customName")}</h6>
                                             <div>
                                               <input
                                                 type="text"
@@ -2842,13 +2820,13 @@ const CreateClient = () => {
                                                 value={
                                                   dataCustomization.Custom_Name
                                                 }
-                                                placeholder="Custom Name"
+                                                placeholder={t("customName")}
                                                 className="mb-2"
                                               />
                                             </div>
                                           </div>
                                           <div class="form-group col-lg-12">
-                                            <h6> Agreed price </h6>
+                                            <h6>{t("agreedPrice")}</h6>
                                             <div>
                                               <input
                                                 type="number"
@@ -2857,13 +2835,13 @@ const CreateClient = () => {
                                                 value={
                                                   dataCustomization.Dummy_Price
                                                 }
-                                                placeholder="Custom Name"
+                                                placeholder={t("agreedPrice")}
                                               />
                                             </div>
                                           </div>
 
                                           <div className="form-group col-lg-12 ">
-                                            <h6>Brand </h6>
+                                            <h6>{t("brand")}</h6>
                                             <div className="ceateTransport autoComplete">
                                               <Autocomplete
                                                 options={brands || []} // List of brand options
@@ -2883,7 +2861,9 @@ const CreateClient = () => {
                                                 renderInput={(params) => (
                                                   <TextField
                                                     {...params}
-                                                    placeholder="Select Brand"
+                                                    placeholder={t(
+                                                      "selectBrand"
+                                                    )}
                                                     variant="outlined"
                                                   />
                                                 )}
@@ -2903,7 +2883,7 @@ const CreateClient = () => {
                                           </div>
 
                                           <div className="form-group col-lg-12 ">
-                                            <h6>Unit </h6>
+                                            <h6>{t("unit")}</h6>
                                             <div className="ceateTransport autoComplete">
                                               <Autocomplete
                                                 options={unitDropdown || []} // List of ITFs
@@ -2923,7 +2903,9 @@ const CreateClient = () => {
                                                 renderInput={(params) => (
                                                   <TextField
                                                     {...params}
-                                                    placeholder="Select ITF"
+                                                    placeholder={t(
+                                                      "selectUnit"
+                                                    )}
                                                     variant="outlined"
                                                   />
                                                 )}
@@ -2941,7 +2923,7 @@ const CreateClient = () => {
                                               />
                                             </div>
                                             <div class="form-group col-lg-12 mt-2">
-                                              <h6> Barcode </h6>
+                                              <h6>{t("barcode")}</h6>
                                               <div className=" ">
                                                 <input
                                                   type="text"
@@ -2950,7 +2932,7 @@ const CreateClient = () => {
                                                   value={
                                                     dataCustomization.Barcode
                                                   }
-                                                  placeholder="BarCode Name"
+                                                  placeholder={t("barcode")}
                                                 />
                                               </div>
                                             </div>
@@ -2964,7 +2946,7 @@ const CreateClient = () => {
                                         onClick={customizationDataSubmit}
                                         className="btn mb-0 btn-primary"
                                       >
-                                        Update{" "}
+                                        {t("update")}
                                       </button>
                                     </div>
                                   </div>
@@ -2993,7 +2975,7 @@ const CreateClient = () => {
                   data-bs-toggle="modal"
                   data-bs-target="#exampleModalCustomization"
                 >
-                  Add
+                  {t("add")}
                 </Link>
                 {/* customixation modal */}
                 <div
@@ -3007,7 +2989,7 @@ const CreateClient = () => {
                     <div className="modal-content">
                       <div className="modal-header">
                         <h1 className="modal-title fs-5" id="exampleModalLabel">
-                          Add customization
+                          {t("addCustomization")}
                         </h1>
                         <button
                           type="button"
@@ -3023,7 +3005,7 @@ const CreateClient = () => {
                         <div className="formCreate">
                           <div className="row">
                             <div className="form-group col-lg-12 mb-3">
-                              <h6>ITF Name </h6>
+                              <h6>{t("itfName")}</h6>
                               <div className="ceateTransport autoComplete">
                                 <Autocomplete
                                   options={getItf || []}
@@ -3039,7 +3021,7 @@ const CreateClient = () => {
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
-                                      placeholder="Select ITF"
+                                      placeholder={t("selectItf")}
                                       variant="outlined"
                                     />
                                   )}
@@ -3056,31 +3038,31 @@ const CreateClient = () => {
                               </div>
                             </div>
                             <div class="form-group col-lg-12">
-                              <h6> Custom Name </h6>
+                              <h6>{t("customName")}</h6>
                               <div className=" ">
                                 <input
                                   type="text"
                                   name="Custom_Name"
                                   onChange={handleChange2}
                                   value={dataCustomization.Custom_Name}
-                                  placeholder="Custom Name"
+                                  placeholder={t("customName")}
                                 />
                               </div>
                             </div>
                             <div class="form-group col-lg-12">
-                              <h6> Agreed price </h6>
+                              <h6>{t("agreedPrice")}</h6>
                               <div className=" ">
                                 <input
                                   type="number"
                                   name="Dummy_Price"
                                   onChange={handleChange2}
                                   value={dataCustomization.Dummy_Price}
-                                  placeholder="Custom Name"
+                                  placeholder={t("agreedPrice")}
                                 />
                               </div>
                             </div>
                             <div className="form-group col-lg-12 ">
-                              <h6>Brand </h6>
+                              <h6>{t("brand")}</h6>
                               <div className="ceateTransport autoComplete">
                                 <Autocomplete
                                   options={brands || []} // List of brand options
@@ -3098,7 +3080,7 @@ const CreateClient = () => {
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
-                                      placeholder="Select Brand"
+                                      placeholder={t("selectBrand")}
                                       variant="outlined"
                                     />
                                   )}
@@ -3116,7 +3098,7 @@ const CreateClient = () => {
                             </div>
 
                             <div className="form-group col-lg-12 ">
-                              <h6>Unit </h6>
+                              <h6>{t("unit")}</h6>
                               <div className="ceateTransport autoComplete">
                                 <Autocomplete
                                   options={unitDropdown || []} // List of ITFs
@@ -3134,7 +3116,7 @@ const CreateClient = () => {
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
-                                      placeholder="Select ITF"
+                                      placeholder={t("selectUnit")}
                                       variant="outlined"
                                     />
                                   )}
@@ -3150,14 +3132,14 @@ const CreateClient = () => {
                                 />
                               </div>
                               <div class="form-group col-lg-12 mt-2">
-                                <h6> Barcode </h6>
+                                <h6>{t("barcode")}</h6>
                                 <div className=" ">
                                   <input
                                     type="text"
                                     name="Barcode"
                                     onChange={handleChange2}
                                     value={dataCustomization.Barcode}
-                                    placeholder="BarCode Name"
+                                    placeholder={t("barcode")}
                                   />
                                 </div>
                               </div>
@@ -3171,7 +3153,7 @@ const CreateClient = () => {
                           onClick={submitCusomizationData}
                           className="btn mb-0 btn-primary"
                         >
-                          Add
+                          {t("add")}
                         </button>
                       </div>
                     </div>
@@ -3190,55 +3172,54 @@ const CreateClient = () => {
               >
                 <div className="row formCreate my-3">
                   <div className="form-group col-lg-6">
-                    <h6> Name</h6>
-
+                    <h6>{t("name")}</h6>
                     <input
                       type="text"
                       id="name_en"
                       className="form-control"
-                      placeholder=" name "
+                      placeholder={t("name")}
                       value={state.notify_name}
                       name="notify_name"
                       onChange={handleChange}
                     />
                   </div>
                   <div className="form-group col-lg-6">
-                    <h6>Tax Number</h6>
+                    <h6>{t("taxNumber")}</h6>
                     <input
                       type="number"
                       id="name_en"
                       className="form-control"
-                      placeholder="123 "
+                      placeholder={t("taxNumber")}
                       value={state.notify_tax_number}
                       name="notify_tax_number"
                       onChange={handleChange}
                     />
                   </div>
                   <div className="form-group col-lg-6">
-                    <h6> Email</h6>
+                    <h6> {t("email")}</h6>
                     <input
                       onChange={handleChange}
                       type="email"
                       id="hs_name"
                       className="form-control"
-                      placeholder="admin@gmail.com"
+                      placeholder={t("email")}
                       value={state.notify_email}
                       name="notify_email"
                     />
                   </div>
                   <div className="form-group col-lg-6">
-                    <h6> Phone Number</h6>
+                    <h6>{t("phoneNumber")}</h6>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="123456789"
+                      placeholder={t("phoneNumber")}
                       value={state.notify_phone}
                       name="notify_phone"
                       onChange={handleChange}
                     />
                   </div>
                   <div className="form-group col-lg-12">
-                    <h6>Address</h6>
+                    <h6>{t("address")}</h6>
                     <textarea
                       className="col-lg-12 rounded h-20 w-full"
                       style={{ border: "2px solid #245486" }}
@@ -3266,7 +3247,7 @@ const CreateClient = () => {
                     data-bs-toggle="modal"
                     data-bs-target="#modalState"
                   >
-                    Statement
+                    {t("statement")}
                   </button>
                   {/* Modal */}
                   <div
@@ -3283,7 +3264,7 @@ const CreateClient = () => {
                             className="modal-title fs-5"
                             id="exampleModalLabel"
                           >
-                            Statement
+                            {t("statement")}
                           </h1>
                           <button
                             type="button"
@@ -3296,7 +3277,7 @@ const CreateClient = () => {
                           </button>
                         </div>
                         <div className="modal-body">
-                          <label htmlFor="fromDate">From Date</label>
+                          <label htmlFor="fromDate">{t("fromDate")}</label>
                           <input
                             type="date"
                             className="form-control"
@@ -3305,7 +3286,7 @@ const CreateClient = () => {
                             onChange={(e) => setFromDate(e.target.value)}
                           />
                           <label className="mt-2" htmlFor="toDate">
-                            To Date
+                            {t("toDate")}
                           </label>
                           <input
                             type="date"
@@ -3321,313 +3302,313 @@ const CreateClient = () => {
                             className="btn btn-primary"
                             onClick={handleSubmit}
                           >
-                            Submit
+                            {t("submit")}
                           </button>
                         </div>
                       </div>
                     </div>
                   </div>
                   {/* <div className="paymentSec">
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      data-bs-toggle="modal"
-                      data-bs-target="#modalPayment"
-                    >
-                      Payment
-                    </button>
-                    <div
-                      className="modal fade"
-                      id="modalPayment"
-                      tabIndex={-1}
-                      aria-labelledby="exampleModalLabel"
-                      aria-hidden="true"
-                    >
-                      <div className="modal-dialog modalShipTo modal-xl">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <h1
-                              className="modal-title fs-5"
-                              id="exampleModalLabel"
-                            >
-                              Payment
-                            </h1>
-                            <button
-                              type="button"
-                              className="btn-close"
-                              data-bs-dismiss="modal"
-                              aria-label="Close"
-                            >
-                              <i className="mdi mdi-close"></i>
-                            </button>
-                          </div>
-                          <div className="modal-body">
-                            <form onSubmit={handleSubmit1}>
-                              <div className="row">
-                                <div className="col-lg-4">
-                                  <div className="parentFormPayment">
-                                    <p>Client </p>
-                                    <select
-                                      value={clientId}
-                                      onChange={(e) =>
-                                        setClientId(e.target.value)
-                                      }
-                                    >
-                                      <option value="0">
-                                        select client Id
-                                      </option>
-                                      <option value="1">
-                                        select client Id
-                                      </option>
-                                      <option value="2">
-                                        select client Id
-                                      </option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4">
-                                  <div className="parentFormPayment">
-                                    <p>Consignee Id</p>
-                                    <select
-                                      value={consigneeId}
-                                      onChange={(e) =>
-                                        setConsigneeId(e.target.value)
-                                      }
-                                    >
-                                      <option value="0">
-                                        select Consignee Id
-                                      </option>
-                                      <option value="1">option 1</option>
-                                      <option value="2">option 2</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4">
-                                  <div className="parentFormPayment">
-                                    <p>Payment Date</p>
-                                    <input
-                                      type="date"
-                                      value={paymentDate}
-                                      onChange={(e) =>
-                                        setPaymentDate(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>Client Payment Ref</p>
-                                    <input
-                                      type="text"
-                                      value={clientPaymentRef}
-                                      onChange={(e) =>
-                                        setClientPaymentRef(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>Payment Channel</p>
-                                    <input
-                                      type="text"
-                                      value={paymentChannel}
-                                      onChange={(e) =>
-                                        setPaymentChannel(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>Bank Ref</p>
-                                    <input
-                                      type="text"
-                                      value={bankRef}
-                                      onChange={(e) =>
-                                        setBankRef(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>FX Payment</p>
-                                    <input
-                                      type="text"
-                                      value={fxPayment}
-                                      onChange={(e) =>
-                                        setFxPayment(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>FX Rate</p>
-                                    <input
-                                      type="text"
-                                      value={fxRate}
-                                      onChange={(e) =>
-                                        setFxRate(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p> FX Id</p>
-                                    <select
-                                      value={fxId}
-                                      onChange={(e) => setFxId(e.target.value)}
-                                    >
-                                      <option value="0">234</option>
-                                      <option value="1">4534</option>
-                                      <option value="2">#435</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div className="col-lg-6 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>Intermittent Bank Charges</p>
-                                    <input
-                                      type="text"
-                                      value={intermittentBankCharges}
-                                      onChange={(e) =>
-                                        setIntermittentBankCharges(
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-6 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>Local Bank Charges</p>
-                                    <input
-                                      type="text"
-                                      value={localBankCharges}
-                                      onChange={(e) =>
-                                        setLocalBankCharges(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-6 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>THB Received</p>
-                                    <input
-                                      type="text"
-                                      value={thbReceived}
-                                      onChange={(e) =>
-                                        setThbReceived(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-6 mt-3">
-                                  <div className="parentFormPayment">
-                                    <p>Loss/Gain on Exchange Rate</p>
-                                    <input
-                                      type="text"
-                                      value={lossGainOnExchangeRate}
-                                      onChange={(e) =>
-                                        setLossGainOnExchangeRate(
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
-
-                            <div className="row mt-4">
-                              <div className="tableCreateClient tablepayment">
-                                <table>
-                                  <tr>
-                                    <th>Check</th>
-                                    <th>Document Number</th>
-                                    <th>Ship Date</th>
-                                    <th>AWB Number</th>
-                                    <th>Net Amount</th>
-                                    <th>Amount To Pay</th>
-                                    <th>Paid Amount</th>
-                                  </tr>
-                                  <tbody>
-                                    <tr>
-                                      <td>
-                                        <input type="checkbox" />
-                                      </td>
-                                      <td>
-                                        <input
-                                          type="text"
-                                          value={documentNumber}
-                                          onChange={(e) =>
-                                            setDocumentNumber(e.target.value)
-                                          }
-                                        />
-                                      </td>
-                                      <td>
-                                        <input
-                                          type="date"
-                                          value={shipDate}
-                                          onChange={(e) =>
-                                            setShipDate(e.target.value)
-                                          }
-                                        />
-                                      </td>
-                                      <td>
-                                        <input
-                                          type="text"
-                                          value={awbNumber}
-                                          onChange={(e) =>
-                                            setAwbNumber(e.target.value)
-                                          }
-                                        />
-                                      </td>
-                                      <td>
-                                        <input
-                                          type="text"
-                                          value={netAmount}
-                                          onChange={(e) =>
-                                            setNetAmount(e.target.value)
-                                          }
-                                        />
-                                      </td>
-                                      <td>
-                                        <input
-                                          type="text"
-                                          value={amountToPay}
-                                          onChange={(e) =>
-                                            setAmountToPay(e.target.value)
-                                          }
-                                        />
-                                      </td>
-                                      <td>
-                                        <input
-                                          type="text"
-                                          value={paidAmount}
-                                          onChange={(e) =>
-                                            setPaidAmount(e.target.value)
-                                          }
-                                        />
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                            <div className="modal-footer">
-                              <button type="button" className="btn btn-primary">
-                                Submit
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div> */}
+                     <button
+                       type="button"
+                       className="btn btn-danger"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalPayment"
+                     >
+                       Payment
+                     </button>
+                     <div
+                       className="modal fade"
+                       id="modalPayment"
+                       tabIndex={-1}
+                       aria-labelledby="exampleModalLabel"
+                       aria-hidden="true"
+                     >
+                       <div className="modal-dialog modalShipTo modal-xl">
+                         <div className="modal-content">
+                           <div className="modal-header">
+                             <h1
+                               className="modal-title fs-5"
+                               id="exampleModalLabel"
+                             >
+                               Payment
+                             </h1>
+                             <button
+                               type="button"
+                               className="btn-close"
+                               data-bs-dismiss="modal"
+                               aria-label="Close"
+                             >
+                               <i className="mdi mdi-close"></i>
+                             </button>
+                           </div>
+                           <div className="modal-body">
+                             <form onSubmit={handleSubmit1}>
+                               <div className="row">
+                                 <div className="col-lg-4">
+                                   <div className="parentFormPayment">
+                                     <p>Client </p>
+                                     <select
+                                       value={clientId}
+                                       onChange={(e) =>
+                                         setClientId(e.target.value)
+                                       }
+                                     >
+                                       <option value="0">
+                                         select client Id
+                                       </option>
+                                       <option value="1">
+                                         select client Id
+                                       </option>
+                                       <option value="2">
+                                         select client Id
+                                       </option>
+                                     </select>
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-4">
+                                   <div className="parentFormPayment">
+                                     <p>Consignee Id</p>
+                                     <select
+                                       value={consigneeId}
+                                       onChange={(e) =>
+                                         setConsigneeId(e.target.value)
+                                       }
+                                     >
+                                       <option value="0">
+                                         select Consignee Id
+                                       </option>
+                                       <option value="1">option 1</option>
+                                       <option value="2">option 2</option>
+                                     </select>
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-4">
+                                   <div className="parentFormPayment">
+                                     <p>Payment Date</p>
+                                     <input
+                                       type="date"
+                                       value={paymentDate}
+                                       onChange={(e) =>
+                                         setPaymentDate(e.target.value)
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-4 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>Client Payment Ref</p>
+                                     <input
+                                       type="text"
+                                       value={clientPaymentRef}
+                                       onChange={(e) =>
+                                         setClientPaymentRef(e.target.value)
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-4 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>Payment Channel</p>
+                                     <input
+                                       type="text"
+                                       value={paymentChannel}
+                                       onChange={(e) =>
+                                         setPaymentChannel(e.target.value)
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-4 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>Bank Ref</p>
+                                     <input
+                                       type="text"
+                                       value={bankRef}
+                                       onChange={(e) =>
+                                         setBankRef(e.target.value)
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-4 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>FX Payment</p>
+                                     <input
+                                       type="text"
+                                       value={fxPayment}
+                                       onChange={(e) =>
+                                         setFxPayment(e.target.value)
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-4 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>FX Rate</p>
+                                     <input
+                                       type="text"
+                                       value={fxRate}
+                                       onChange={(e) =>
+                                         setFxRate(e.target.value)
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-4 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p> FX Id</p>
+                                     <select
+                                       value={fxId}
+                                       onChange={(e) => setFxId(e.target.value)}
+                                     >
+                                       <option value="0">234</option>
+                                       <option value="1">4534</option>
+                                       <option value="2">#435</option>
+                                     </select>
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-6 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>Intermittent Bank Charges</p>
+                                     <input
+                                       type="text"
+                                       value={intermittentBankCharges}
+                                       onChange={(e) =>
+                                         setIntermittentBankCharges(
+                                           e.target.value
+                                         )
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-6 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>Local Bank Charges</p>
+                                     <input
+                                       type="text"
+                                       value={localBankCharges}
+                                       onChange={(e) =>
+                                         setLocalBankCharges(e.target.value)
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-6 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>THB Received</p>
+                                     <input
+                                       type="text"
+                                       value={thbReceived}
+                                       onChange={(e) =>
+                                         setThbReceived(e.target.value)
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                                 <div className="col-lg-6 mt-3">
+                                   <div className="parentFormPayment">
+                                     <p>Loss/Gain on Exchange Rate</p>
+                                     <input
+                                       type="text"
+                                       value={lossGainOnExchangeRate}
+                                       onChange={(e) =>
+                                         setLossGainOnExchangeRate(
+                                           e.target.value
+                                         )
+                                       }
+                                     />
+                                   </div>
+                                 </div>
+                               </div>
+                             </form>
+ 
+                             <div className="row mt-4">
+                               <div className="tableCreateClient tablepayment">
+                                 <table>
+                                   <tr>
+                                     <th>Check</th>
+                                     <th>Document Number</th>
+                                     <th>Ship Date</th>
+                                     <th>AWB Number</th>
+                                     <th>Net Amount</th>
+                                     <th>Amount To Pay</th>
+                                     <th>Paid Amount</th>
+                                   </tr>
+                                   <tbody>
+                                     <tr>
+                                       <td>
+                                         <input type="checkbox" />
+                                       </td>
+                                       <td>
+                                         <input
+                                           type="text"
+                                           value={documentNumber}
+                                           onChange={(e) =>
+                                             setDocumentNumber(e.target.value)
+                                           }
+                                         />
+                                       </td>
+                                       <td>
+                                         <input
+                                           type="date"
+                                           value={shipDate}
+                                           onChange={(e) =>
+                                             setShipDate(e.target.value)
+                                           }
+                                         />
+                                       </td>
+                                       <td>
+                                         <input
+                                           type="text"
+                                           value={awbNumber}
+                                           onChange={(e) =>
+                                             setAwbNumber(e.target.value)
+                                           }
+                                         />
+                                       </td>
+                                       <td>
+                                         <input
+                                           type="text"
+                                           value={netAmount}
+                                           onChange={(e) =>
+                                             setNetAmount(e.target.value)
+                                           }
+                                         />
+                                       </td>
+                                       <td>
+                                         <input
+                                           type="text"
+                                           value={amountToPay}
+                                           onChange={(e) =>
+                                             setAmountToPay(e.target.value)
+                                           }
+                                         />
+                                       </td>
+                                       <td>
+                                         <input
+                                           type="text"
+                                           value={paidAmount}
+                                           onChange={(e) =>
+                                             setPaidAmount(e.target.value)
+                                           }
+                                         />
+                                       </td>
+                                     </tr>
+                                   </tbody>
+                                 </table>
+                               </div>
+                             </div>
+                             <div className="modal-footer">
+                               <button type="button" className="btn btn-primary">
+                                 Submit
+                               </button>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   </div> */}
                   <div className="paymentSec">
                     <>
                       {/* Button trigger modal */}
@@ -3637,7 +3618,7 @@ const CreateClient = () => {
                         data-bs-toggle="modal"
                         data-bs-target="#modalPayment"
                       >
-                        Payment
+                        {t("payment")}
                       </button>
                       {/* Modal */}
                       <div
@@ -3654,7 +3635,7 @@ const CreateClient = () => {
                                 class="modal-title fs-5"
                                 id="exampleModalLabel"
                               >
-                                Payment
+                                {t("payment")}
                               </h1>
                               <button
                                 type="button"
@@ -3670,8 +3651,7 @@ const CreateClient = () => {
                               <div className="row">
                                 <div className="col-lg-4">
                                   <div className="parentFormPayment autoComplete">
-                                    <p>Client </p>
-
+                                    <p>{t("client")}</p>
                                     <Autocomplete
                                       options={clients || []}
                                       getOptionLabel={(option) =>
@@ -3685,7 +3665,7 @@ const CreateClient = () => {
                                       renderInput={(params) => (
                                         <TextField
                                           {...params}
-                                          placeholder="Select Client" // Use placeholder instead of label
+                                          placeholder={t("selectClient")} // Use placeholder instead of label
                                           variant="outlined"
                                         />
                                       )}
@@ -3705,7 +3685,7 @@ const CreateClient = () => {
                                 </div>
                                 <div className="col-lg-4">
                                   <div className="parentFormPayment autoComplete">
-                                    <p>Consignee </p>
+                                    <p>{t("consignee")}</p>
                                     <Autocomplete
                                       options={consignees || []}
                                       getOptionLabel={(option) =>
@@ -3719,7 +3699,7 @@ const CreateClient = () => {
                                       renderInput={(params) => (
                                         <TextField
                                           {...params}
-                                          placeholder="Select Consignee" // Placeholder text
+                                          placeholder={t("selectConsignee")}
                                           variant="outlined"
                                         />
                                       )}
@@ -3739,7 +3719,7 @@ const CreateClient = () => {
                                 <div className="col-lg-4">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>Payment Date</p>
+                                      <p>{t("paymentDate")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3755,7 +3735,7 @@ const CreateClient = () => {
                                 <div className="col-lg-4 mt-3">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>Client Payment Ref</p>
+                                      <p>{t("clientPaymentRef")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3770,21 +3750,21 @@ const CreateClient = () => {
                                 </div>
                                 <div className="col-lg-4 mt-3">
                                   {/* <div className="parentFormPayment">
-                                    <div>
-                                      <p>Payment Channel</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={paymentChannel}
-                                        onChange={(e) =>
-                                          setPaymentChannel(e.target.value)
-                                        }
-                                      />
-                                    </div>
-                                  </div> */}
+                                     <div>
+                                       <p>Payment Channel</p>
+                                     </div>
+                                     <div>
+                                       <input
+                                         type="text"
+                                         value={paymentChannel}
+                                         onChange={(e) =>
+                                           setPaymentChannel(e.target.value)
+                                         }
+                                       />
+                                     </div>
+                                   </div> */}
                                   <div className="parentFormPayment autoComplete">
-                                    <p>Payment Channel </p>
+                                    <p>{t("paymentChannel")}</p>
                                     <Autocomplete
                                       options={paymentChannle || []}
                                       getOptionLabel={(option) =>
@@ -3798,7 +3778,9 @@ const CreateClient = () => {
                                       renderInput={(params) => (
                                         <TextField
                                           {...params}
-                                          placeholder="Select Payment Channel" // Placeholder text
+                                          placeholder={t(
+                                            "selectPaymentChannel"
+                                          )}
                                           variant="outlined"
                                         />
                                       )}
@@ -3819,7 +3801,7 @@ const CreateClient = () => {
                                 <div className="col-lg-4 mt-3">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>Bank Ref</p>
+                                      <p>{t("bankRef")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3835,7 +3817,7 @@ const CreateClient = () => {
                                 <div className="col-lg-4 mt-3">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>FX Payment</p>
+                                      <p>{t("fxPayment")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3850,7 +3832,7 @@ const CreateClient = () => {
                                 </div>
                                 <div className="col-lg-4 mt-3">
                                   <div className="parentFormPayment autoComplete">
-                                    <p> FX </p>
+                                    <p>{t("fx")}</p>
                                     <div>
                                       <Autocomplete
                                         options={currency || []}
@@ -3869,7 +3851,7 @@ const CreateClient = () => {
                                         renderInput={(params) => (
                                           <TextField
                                             {...params}
-                                            placeholder="Select Fx" // Placeholder instead of label
+                                            placeholder={t("selectFx")}
                                             variant="outlined"
                                           />
                                         )}
@@ -3889,7 +3871,7 @@ const CreateClient = () => {
                                 <div className="col-lg-4 mt-3">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>FX Rate</p>
+                                      <p>{t("fxRate")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3906,7 +3888,7 @@ const CreateClient = () => {
                                 <div className="col-lg-6 mt-3">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>Intermittent Bank Charges</p>
+                                      <p>{t("interBankCharges")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3924,7 +3906,7 @@ const CreateClient = () => {
                                 <div className="col-lg-6 mt-3">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>Local Bank Charges</p>
+                                      <p>{t("localBankCharges")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3940,7 +3922,7 @@ const CreateClient = () => {
                                 <div className="col-lg-6 mt-3">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>THB Received</p>
+                                      <p>{t("thbReceived")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3956,7 +3938,8 @@ const CreateClient = () => {
                                 <div className="col-lg-6 mt-3">
                                   <div className="parentFormPayment">
                                     <div>
-                                      <p>Loss/Gain on Exchange Rate</p>
+                                      {/* <p>Loss/Gain on Exchange Rate</p> */}
+                                      <p>{t("lossGainExchange")}</p>
                                     </div>
                                     <div>
                                       <input
@@ -3976,13 +3959,13 @@ const CreateClient = () => {
                                 <div className="tableCreateClient tablepayment">
                                   <table>
                                     <tr>
-                                      <th>Check</th>
-                                      <th> Document Number</th>
-                                      <th> Ship Date</th>
-                                      <th> AWB Number</th>
-                                      <th> Net Amount</th>
-                                      <th>Amount To Pay </th>
-                                      <th> Paid Amount</th>
+                                      <th>{t("check")}</th>
+                                      <th>{t("documentNumber")}</th>
+                                      <th>{t("shipDate")}</th>
+                                      <th>{t("awbNumber")}</th>
+                                      <th>{t("netAmount")}</th>
+                                      <th>{t("amountToPay")}</th>
+                                      <th>{t("paidAmount")}</th>
                                     </tr>
                                     {paymentTable1?.map((item) => {
                                       return (
@@ -4039,7 +4022,7 @@ const CreateClient = () => {
                                 onClick={handleSubmit1}
                                 className="btn btn-primary"
                               >
-                                Submit
+                                {t("submit")}
                               </button>
                             </div>
                           </div>
@@ -4054,7 +4037,7 @@ const CreateClient = () => {
                       data-bs-toggle="modal"
                       data-bs-target="#modalClaim"
                     >
-                      CLAIM LIST
+                      {t("claimList")}
                     </button>
 
                     <div
@@ -4071,7 +4054,7 @@ const CreateClient = () => {
                               className="modal-title fs-5"
                               id="exampleModalLabel"
                             >
-                              Claim
+                              {t("claim")}
                             </h1>
                             <button
                               type="button"
@@ -4085,42 +4068,42 @@ const CreateClient = () => {
                           <div className="modal-body">
                             <div className="claimParent">
                               <div>
-                                <strong>Invoice Number : </strong>{" "}
-                                <span>INV-202407019</span>{" "}
+                                <strong>{t("invoiceNumber")} : </strong> 
+                                <span>INV-202407019</span> 
                               </div>
                               <div>
-                                <strong>Client :</strong>{" "}
-                                <span>Finley DWC-LLC</span>{" "}
+                                <strong>{t("client")} :</strong> 
+                                <span>Finley DWC-LLC</span> 
                               </div>
                               <div>
-                                <strong>Ship To :</strong>{" "}
-                                <span> Cape Fresh Industries LLC</span>{" "}
+                                <strong>{t("shipTo")} :</strong> 
+                                <span> Cape Fresh Industries LLC</span> 
                               </div>
                               <div>
-                                <strong>Currency : </strong> <span>USD</span>{" "}
+                                <strong>{t("currency")} : </strong> <span>USD</span> 
                               </div>
                               <div>
-                                <strong>Items Info : </strong> <span>USD</span>{" "}
+                                <strong>{t("itemsInfo")} : </strong> <span>USD</span> 
                               </div>
                               <div>
-                                <strong>Claim Date</strong>
+                                 <strong>{t("claimDate")}</strong>
                                 <input type="date" />{" "}
                               </div>
                             </div>
                             <div className="tableClaim">
                               <table>
                                 <tr>
-                                  <th>ITF</th>
-                                  <th>Brand Name</th>
-                                  <th>Quantity</th>
-                                  <th>Unit</th>
-                                  <th>Number Box</th>
-                                  <th>Claim Quantity</th>
-                                  <th>Unit</th>
-                                  <th>Amount</th>
+                                  <th className="text-start">{t("itf")}</th>
+                                  <th>{t("brandName")}</th>
+                                  <th>{t("quantity")}</th>
+                                  <th>{t("unit")}</th>
+                                  <th>{t("numberBox")}</th>
+                                  <th>{t("claimQuantity")}</th>
+                                  <th>{t("unit")}</th>
+                                  <th>{t("amount")}</th>
                                 </tr>
                                 <tr>
-                                  <td>Papaya Holland - Kg x 3 (Frutulip)</td>
+                                  <td className="text-start"> Papaya Holland - Kg x 3 (Frutulip)</td>
                                   <td>None</td>
                                   <td>16.00</td>
                                   <td>KG</td>
@@ -4136,7 +4119,7 @@ const CreateClient = () => {
                                   </td>
                                 </tr>
                                 <tr>
-                                  <td>
+                                  <td className="text-start">
                                     Lemongrass - 500g (38cm) x 20 (F) 1,600.00
                                   </td>
                                   <td>None</td>
@@ -4154,7 +4137,7 @@ const CreateClient = () => {
                                   </td>
                                 </tr>
                                 <tr>
-                                  <td>
+                                 <td className="text-start">
                                     Lemongrass - 500g (38cm) x 20 (F) 1,600.00
                                   </td>
                                   <td>None</td>
@@ -4180,7 +4163,7 @@ const CreateClient = () => {
                               className="btn btn-primary"
                               // onClick={handleSubmit}
                             >
-                              Submit
+                              {("submit")}
                             </button>
                           </div>
                         </div>
@@ -4207,10 +4190,10 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Shipments
+                             {t("totalPayment")}
                             </p>
                             <h4 className="mb-0">
-                              {" "}
+                             
                               {formatter.format(
                                 consigneeData?.Total_invoiced_value
                               )}
@@ -4221,9 +4204,9 @@ const CreateClient = () => {
                         <div className="card-footer p-3">
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
-                              +55%{" "}
-                            </span>
-                            than lask week
+                              +55% 
+                            </span>{" "}
+                       {t("totalShipments")}
                           </p>
                         </div>
                       </div>
@@ -4245,7 +4228,7 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Total Claims
+                              {t("totalClaims")}
                             </p>
                             <h4 className="mb-0">
                               {formatter.format(
@@ -4258,9 +4241,9 @@ const CreateClient = () => {
                         <div className="card-footer p-3">
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
-                              +5%{" "}
-                            </span>
-                            than yesterday
+                              +5% 
+                            </span>{" "}
+                           {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4282,14 +4265,14 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              {" "}
-                              Total Payment{" "}
+                              
+                           {t("totalPayment")}
                             </p>
                             <h4 className="mb-0">
-                              {" "}
+                             
                               {formatter.format(
                                 consigneeData?.Total_payments_value
-                              )}{" "}
+                              )} 
                             </h4>
                           </div>
                         </div>
@@ -4298,8 +4281,8 @@ const CreateClient = () => {
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
                               -2%
-                            </span>{" "}
-                            than yesterday
+                            </span> {" "}
+                          {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4312,11 +4295,11 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              Pending Payment
+                             {t("pendingPayment")}
                             </p>
                             <h4 className="mb-0">
-                              {" "}
-                              {formatter.format(consigneeData?.Balance)}{" "}
+                             
+                              {formatter.format(consigneeData?.Balance)} 
                             </h4>
                           </div>
                         </div>
@@ -4324,9 +4307,10 @@ const CreateClient = () => {
                         <div className="card-footer p-3">
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
-                              +5%{" "}
+                              +5%  
                             </span>
-                            than yesterday
+{" "}
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4344,9 +4328,9 @@ const CreateClient = () => {
                             </p>
                             <h4 className="mb-0">
                               {/* {" "}
-                              {formatter.format(
-                                consigneeData?.Total_invoiced_value
-                              )} */}
+                               {formatter.format(
+                                 consigneeData?.Total_invoiced_value
+                               )} */}
                               0
                             </h4>
                           </div>
@@ -4357,7 +4341,8 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +3%{" "}
                             </span>
-                            than lask month
+
+                            {t("thanLastMonth")}
                           </p>
                         </div>
                       </div>
@@ -4381,7 +4366,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%{" "}
                             </span>
-                            than yesterday
+                              {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4407,7 +4392,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%{" "}
                             </span>
-                            than yesterday
+                           {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4416,7 +4401,7 @@ const CreateClient = () => {
                 </div>
                 <div className="card-footer text-center">
                   <Link className="btn btn-danger" to="/shipToNew">
-                    Close
+                    {t ("close")}
                   </Link>
                 </div>
               </div>

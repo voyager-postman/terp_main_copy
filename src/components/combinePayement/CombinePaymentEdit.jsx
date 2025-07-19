@@ -1,4 +1,4 @@
-import axios from "axios";
+ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -16,7 +16,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import MySwal from "../../swal";
+import { useTranslation } from "react-i18next";
+
 const CombinePaymentEdit = () => {
+  const [t, i18n] = useTranslation("global");
+
   const [buttonClicked, setButtonClicked] = React.useState(false);
   const location = useLocation();
   const [dropdownItems, setDropdownItems] = useState([]);
@@ -152,7 +156,7 @@ const CombinePaymentEdit = () => {
       await axios.post(`${API_BASE_URL}/deletePurchaseOrderDetails`, {
         pod_id: pod_id,
       });
-      toast.success("Deleted Successfully", {
+      toast.success(t("deleteSuccess"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -276,7 +280,7 @@ const CombinePaymentEdit = () => {
       .filter((_, index) => childChecked?.[index]); // Ensure `childChecked` exists
 
     if (selectedRows.length === 0) {
-      toast.error("Please select at least one record before submitting.");
+      toast.error(t("selectRecordError"));
       return;
     }
 
@@ -298,16 +302,16 @@ const CombinePaymentEdit = () => {
       console.log("API Response:", result);
 
       if (result.success) {
-        toast.success("CPN Details submitted successfully!");
+        toast.success(t("cpnDetailsSuccess"));
         paymentTable10();
 
         setModalOne(false); // Close modal only when success is true
       } else {
-        toast.error(result.message || "Submission failed. Please try again.");
+        toast.error(result.message || t("submissionFailed"));
       }
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Something went wrong! Please try again.");
+      toast.error(t("genericError"));
     }
   };
 
@@ -379,7 +383,7 @@ const CombinePaymentEdit = () => {
       // toast.success(response.data.Message_TH);
       navigate("/combinePayment");
     } catch (e) {
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
       console.log(e);
     }
   };
@@ -443,7 +447,7 @@ const CombinePaymentEdit = () => {
       }
     } catch (e) {
       console.log(e);
-      toast.error("An error has occurred", {
+      toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
@@ -504,7 +508,7 @@ const CombinePaymentEdit = () => {
       }
     } catch (e) {
       console.log(e);
-      toast.error("An error has occurred", {
+      toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
@@ -656,8 +660,8 @@ const CombinePaymentEdit = () => {
   const deleteOrderPayment = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -675,9 +679,9 @@ const CombinePaymentEdit = () => {
           );
           console.log(response);
           paymentTable10();
-          toast.success("Combined Payment  delete successfully");
+          toast.success(t("combinedPaymentDeleteSuccess"));
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("genericError"));
         }
       }
     });
@@ -942,7 +946,7 @@ const CombinePaymentEdit = () => {
   console.log(totalDataDetails);
   const handleSubmitVenderData1 = async () => {
     if (!state.supplier_dua_date || !state.supplier_invoice_date) {
-      toast.error("Missing required fields! Please check the form.");
+      toast.error(t("missingRequiredFields"));
       return;
     }
 
@@ -979,19 +983,21 @@ const CombinePaymentEdit = () => {
 
       const result = await response.json();
       console.log("API Response:", result);
-      toast.success("Payment Updated  successfully!");
+      toast.success(t("paymentUpdateSuccess"));
       paymentTable10();
       navigate("/combinePayment");
     } catch (error) {
       console.error("API Error:", error);
-      toast.error("Something went wrong! Please try again.");
+      toast.error(t("genericError"));
     }
   };
 
   return (
     <>
       <Card
-        title={`Combined Payment / ${from?.ID ? " Update" : "Create"} Form`}
+        title={`${t("combinedPayment")} / ${
+          from?.ID ? t("update") : t("create")
+        } ${t("form")}`}
       >
         <div className="tab-content px-2 md:!px-4">
           <div className="tab-pane active" id="header" role="tabpanel">
@@ -1005,18 +1011,18 @@ const CombinePaymentEdit = () => {
                     <div className="row cratePurchase">
                       <div className="col-lg-3 form-group autoComplete">
                         <div className="d-flex">
-                          <h6 className="me-2">Combine Payment Number : </h6>
+                          <h6 className="me-2">{t("combinePaymentNumber")}:</h6>
                           <p>{from?.CPNCODE}</p>
                         </div>
 
                         <div className="d-flex">
-                          <h6 className="me-2">Vendor : </h6>
+                          <h6 className="me-2">{t("vendor")}:</h6>
                           <p>{from?.vendor_name}</p>
                         </div>
                       </div>
 
                       <div className="col-lg-3 form-group">
-                        <h6>Combined Payment Date</h6>
+                        <h6>{t("combinedPaymentDate")}</h6>
                         <DatePicker
                           selected={state.supplier_dua_date}
                           onChange={(date) =>
@@ -1028,12 +1034,12 @@ const CombinePaymentEdit = () => {
                             })
                           }
                           dateFormat="dd/MM/yyyy"
-                          placeholderText="dd/MM/yyyy"
+                          placeholderText={"dateFormat"}
                           customInput={<CustomInput />} // Ensure you have the `CustomInput` component defined or imported
                         />
                       </div>
                       <div className="col-lg-3 form-group">
-                        <h6>Due Date</h6>
+                        <h6>{t("dueDate")}</h6>
                         <DatePicker
                           selected={state?.supplier_invoice_date || null} // Ensuring it works even if the value is initially undefined
                           onChange={(date) =>
@@ -1045,7 +1051,7 @@ const CombinePaymentEdit = () => {
                             })
                           }
                           dateFormat="dd/MM/yyyy"
-                          placeholderText="dd/MM/yyyy"
+                          placeholderText={"dateFormat"}
                           customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
                         />
                       </div>
@@ -1054,7 +1060,7 @@ const CombinePaymentEdit = () => {
                     <div className="row cratePurchase">
                       <div className="col-lg-3 form-group autoComplete">
                         <div className="d-flex">
-                          <h6 className="me-2">Vendor : </h6>
+                          <h6 className="me-2">{t("vendor")}</h6>
                         </div>
 
                         <Autocomplete
@@ -1086,18 +1092,18 @@ const CombinePaymentEdit = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Vendor" // Adds a placeholder
+                              placeholder={t("selectVendor")}
                               InputLabelProps={{ shrink: false }} // Prevents floating label
                             />
                           )}
                         />
                       </div>
                       <div className="col-lg-3">
-                        <h6 className="me-2">Combined Payment Number : </h6>
+                        <h6 className="me-2">{t("combinePaymentNumber")}</h6>
                         <input type="number" />
                       </div>
                       <div className="col-lg-3 form-group">
-                        <h6>Combined Payment Date</h6>
+                        <h6>{t("combinedPaymentDate")}</h6>
                         <DatePicker
                           selected={state.supplier_dua_date}
                           onChange={(date) =>
@@ -1109,7 +1115,7 @@ const CombinePaymentEdit = () => {
                             })
                           }
                           dateFormat="dd/MM/yyyy"
-                          placeholderText="dd/MM/yyyy"
+                          placeholderText={"dateFormat"}
                           customInput={<CustomInput />} // Ensure you have the `CustomInput` component defined or imported
                         />
                       </div>
@@ -1126,7 +1132,7 @@ const CombinePaymentEdit = () => {
                             })
                           }
                           dateFormat="dd/MM/yyyy"
-                          placeholderText="dd/MM/yyyy"
+                          placeholderText={"dateFormat"}
                           customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
                         />
                       </div>
@@ -1138,7 +1144,7 @@ const CombinePaymentEdit = () => {
                       className="btn btn-primary"
                       onClick={update}
                     >
-                      Add
+                      {t("add")}
                     </button>
                     {modalOne && (
                       <div
@@ -1154,7 +1160,7 @@ const CombinePaymentEdit = () => {
                           style={{ maxWidth: "1530px" }}
                         >
                           <div className="crossArea">
-                            <h3>Edit Details</h3>
+                            <h3>{t("editDetails")}</h3>
                             <p onClick={handleCloseModalOne}>
                               <CloseIcon />
                             </p>
@@ -1177,46 +1183,43 @@ const CombinePaymentEdit = () => {
                                           />
                                         </th>
                                         <th style={{ width: "130px" }}>
-                                          {" "}
-                                          CPN Number
+                                          {t("cpnNumber")}
                                         </th>
                                         <th style={{ width: "130px" }}>
-                                          {" "}
-                                          Issue Date{" "}
+                                          {t("issueDate")}
                                         </th>
                                         <th style={{ width: "130px" }}>
-                                          {" "}
-                                          Due Date
+                                          {t("dueDate")}
                                         </th>
                                         <th
                                           style={{ width: "150px" }}
                                           className="text-center"
                                         >
-                                          Total Before Tax
+                                          {t("totalBeforeTax")}
                                         </th>
                                         <th
                                           style={{ width: "150px" }}
                                           className="text-center"
                                         >
-                                          Past Payment
+                                          {t("pastPayment")}
                                         </th>
                                         <th
                                           style={{ width: "150px" }}
                                           className="text-center"
                                         >
-                                          Net Payable{" "}
+                                          {t("netPayable")}
                                         </th>
                                         <th
                                           className="text-center"
                                           style={{ width: "150px" }}
                                         >
-                                          FX
+                                          {t("fx")}
                                         </th>
                                         <th
                                           style={{ width: "150px" }}
                                           className="text-center"
                                         >
-                                          Amount To Pay
+                                          {t("amountToPay")}
                                         </th>
                                       </tr>
                                       <tr>
@@ -1270,7 +1273,9 @@ const CombinePaymentEdit = () => {
                                               child.Payable
                                             )}
                                           </td>
-                                          <td className="text-center">THB</td>
+                                          <td className="text-center">
+                                            {t("thb")}
+                                          </td>
                                           <td className="pe-3">
                                             <input
                                               type="number"
@@ -1297,7 +1302,7 @@ const CombinePaymentEdit = () => {
                               className="UpdatePopupBtn btn btn-primary mb-4"
                               onClick={() => handleSubmitVenderData()}
                             >
-                              Submit
+                              {t("submit")}
                             </button>
                           </div>
                         </div>
@@ -1317,15 +1322,15 @@ const CombinePaymentEdit = () => {
                     >
                       <thead>
                         <tr>
-                          <th>CPN Number</th>
-                          <th>Issue Date</th>
-                          <th>Due Date</th>
-                          <th>Total Before Tax</th>
-                          <th>Past Payment</th>
-                          <th>Net Payment</th>
-                          <th>FX</th>
-                          <th>Amount to Pay</th>
-                          <th>Active</th>
+                          <th>{t("cpnNumber")}</th>
+                          <th>{t("issueDate")}</th>
+                          <th>{t("dueDate")}</th>
+                          <th>{t("totalBeforeTax")}</th>
+                          <th>{t("pastPayment")}</th>
+                          <th>{t("netPayment")}</th>
+                          <th>{t("fx")}</th>
+                          <th>{t("amountToPay")}</th>
+                          <th>{t("active")}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1361,7 +1366,7 @@ const CombinePaymentEdit = () => {
                             <td className="text-right">
                               {formatNumber(child.Payable)}
                             </td>
-                            <td className="text-right">THB</td>
+                            <td className="text-right">{t("thb")}</td>
                             <td style={{ width: "250px" }}>
                               <input
                                 style={{ border: "2px solid #203764" }}
@@ -1403,7 +1408,7 @@ const CombinePaymentEdit = () => {
                       </div> */}
                       <div className="flexBefore">
                         <div>
-                          <strong>Total Before Tax : </strong>
+                          <strong>{t("totalBeforeTax")} : </strong>
                         </div>
                         <div>
                           <span> {formatterTwo.format(sumAmountToPay)}</span>
@@ -1411,7 +1416,7 @@ const CombinePaymentEdit = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>VAT : </strong>
+                          <strong>{t("vat")} : </strong>
                         </div>
                         <div>
                           <span>{formatterTwo.format(VATTotal)}</span>
@@ -1419,7 +1424,7 @@ const CombinePaymentEdit = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>WHT : </strong>
+                          <strong>{t("wht")} : </strong>
                         </div>
                         <div>
                           <span>{formatterTwo.format(WHTTotal)}</span>
@@ -1427,7 +1432,7 @@ const CombinePaymentEdit = () => {
                       </div>
                       <div className=" d-flex flexBefore">
                         <div>
-                          <strong>Rounding</strong>
+                          <strong>{t("rounding")}</strong>
                         </div>
                         <input
                           type="number"
@@ -1439,7 +1444,7 @@ const CombinePaymentEdit = () => {
                       </div>
                       <div className="flexBefore">
                         <div>
-                          <strong>Amount to Pay : </strong>
+                          <strong>{t("amountToPay")} : </strong>
                         </div>
                         <div>
                           <span>
@@ -1466,7 +1471,7 @@ const CombinePaymentEdit = () => {
               onClick={handleSubmitVenderData1}
               disabled={buttonClicked}
             >
-              {from?.ID ? "Update" : "Create"}
+              {from?.ID ? t("update") : t("create")}
             </button>
             <Link
               className="btn btn-danger"
@@ -1478,7 +1483,7 @@ const CombinePaymentEdit = () => {
                 deleteOrder(podId); // Call delete function
               }}
             >
-              Cancel
+              {t("cancel")}
             </Link>
           </div>
         </div>
@@ -1495,7 +1500,7 @@ const CombinePaymentEdit = () => {
             style={{ backgroundColor: color ? "#2f423c" : "" }}
           >
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Purchase Order Check
+              {t("purchaseOrderCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
@@ -1518,7 +1523,7 @@ const CombinePaymentEdit = () => {
                 {stock.message_th ? stock.message_th : "NULL"}
               </p>
               <div className="closeBtnRece">
-                <button onClick={closeIcon}>Close</button>
+                <button onClick={closeIcon}>{t("close")}</button>
               </div>
             </div>
           </div>

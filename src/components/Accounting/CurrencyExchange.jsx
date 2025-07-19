@@ -4,9 +4,11 @@ import { API_BASE_URL } from "../../Url/Url";
 import { toast } from "react-toastify";
 import ReactApexChart from "react-apexcharts";
 import { useQuery } from "react-query";
+import { useTranslation } from "react-i18next";
 
 import { Autocomplete, TextField, Box } from "@mui/material";
 const CurrencyExchange = () => {
+  const { t, i18n } = useTranslation("global");
   const { data: currency } = useQuery("getCurrency");
   const [data, setData] = useState([]);
   const [filterValue, setFilterValue] = useState("");
@@ -44,7 +46,7 @@ const CurrencyExchange = () => {
         "#27ae60", // Emerald Gre,
       ],
       yaxis: {
-        title: { text: "Exchange Rate" },
+        title: { text: t("exchangeRate")},
         labels: { formatter: (value) => `${value}` },
         max: rangeValue.overallMax, // Using value from API
         min: rangeValue.overallMin, // Using value from API
@@ -156,8 +158,8 @@ const CurrencyExchange = () => {
               title: {
                 ...prevState.options.title,
                 text: fx_id
-                  ? `Exchange Rate History - ${data[0].currency}`
-                  : "Combined Exchange Rate History",
+                  ? `${t("rateHistory")} - ${data[0].currency}`
+                  : t("combinedRateHistory"),
               },
             },
           }));
@@ -174,7 +176,7 @@ const CurrencyExchange = () => {
               },
               title: {
                 ...prevState.options.title,
-                text: "No exchange rate data available",
+                text: t("noExchangeRate"),
               },
             },
           }));
@@ -275,10 +277,10 @@ const CurrencyExchange = () => {
       })
       .then((response) => {
         getAllFx();
-        toast.success("Update successful");
+         toast.success(t("updateSuccess"));
       })
       .catch((error) => {
-        toast.error("Update failed");
+         toast.error(t("updateFailed"))
       });
   };
 
@@ -445,7 +447,7 @@ const CurrencyExchange = () => {
         size: 0,
       },
       title: {
-        text: "Exchange Rate History",
+        text: t("rateHistory"),
         align: "left",
       },
       fill: {
@@ -462,7 +464,7 @@ const CurrencyExchange = () => {
         min: 0,
         max: 100,
         title: {
-          text: "Exchange Rate",
+          text: t("exchangeRate"),
         },
       },
       xaxis: {
@@ -511,7 +513,7 @@ const CurrencyExchange = () => {
                           <div className="row">
                             <div className="col-md-6">
                               <h6 className="font-weight-bolder mb-0 pt-2">
-                                Currency Exchange Update
+                                {t("updateRate")}
                               </h6>
                             </div>
                           </div>
@@ -520,7 +522,7 @@ const CurrencyExchange = () => {
                           <div className="tab-content px-2 md:!px-4">
                             <div className="parentProduceSearch">
                               <div className="entries">
-                                <small>Show</small>{" "}
+                                <small>{t("show")}</small>{" "}
                                 <select
                                   value={entriesPerPage}
                                   onChange={handleEntriesChange}
@@ -530,7 +532,7 @@ const CurrencyExchange = () => {
                                   <option value={50}>50</option>
                                   <option value={100}>100</option>
                                 </select>{" "}
-                                <small>entries</small>
+                                <small>{t("entries")}</small>
                               </div>
                               <div className="autoComplete currencyAuto">
                                 {/* <Autocomplete
@@ -591,7 +593,7 @@ const CurrencyExchange = () => {
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
-                                      placeholder="Select Currency"
+                                      placeholder= {t("selectCurrency")}
                                     />
                                   )}
                                 />
@@ -626,7 +628,7 @@ const CurrencyExchange = () => {
                                                       textAlign: "left",
                                                     }}
                                                   >
-                                                    Updated Price
+                                                   {t("updatedPrice")}
                                                   </th>
                                                 </tr>
                                                 {data
@@ -660,7 +662,7 @@ const CurrencyExchange = () => {
                                                               handleUpdate(item)
                                                             }
                                                           >
-                                                            Update
+                                                             {t("update")}
                                                           </button>
                                                         </div>
                                                       </td>

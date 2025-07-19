@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
+import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from "../../../Url/Url";
 import { useQuery } from "react-query";
 
@@ -10,8 +10,8 @@ import React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 const CreateUser = () => {
+  const [t, i18n] = useTranslation("global");
   const navigate = useNavigate();
-
   const { data: SelectClient } = useQuery("getClientDataAsOptions");
   const [selectedClientId, setSelectedClientId] = useState("");
   const [consignees, setConsignees] = useState([]);
@@ -52,7 +52,7 @@ const CreateUser = () => {
 
   const createForm = () => {
     if (password !== confirmPassword) {
-      toast.error("Password and Confirm Password do not match");
+      toast.error(t("passwordMismatch"));
       return;
     }
     // Use all individual states here as needed
@@ -91,7 +91,7 @@ const CreateUser = () => {
         setUserName("");
         setPassword("");
         setConfirmPassword("");
-        toast.success("User Create Successfully");
+        toast.success(t("userCreateSuccess"));
         navigate("/user");
       })
       .catch((error) => {
@@ -125,7 +125,7 @@ const CreateUser = () => {
   const copyPasswordToClipboard = (e) => {
     e.preventDefault(); // Prevent page reload
     navigator.clipboard.writeText(generatedPassword);
-    alert("Password copied to clipboard!");
+    alert(t("passwordCopied"));
   };
 
   const handleGenerateClick = (event) => {
@@ -144,7 +144,7 @@ const CreateUser = () => {
               <div className="row">
                 <div className="col-md-6">
                   <h6 className="font-weight-bolder mb-0 pt-2">
-                    User Management / Create Form
+                    {t("userCreateForm")}
                   </h6>
                 </div>
               </div>
@@ -163,7 +163,7 @@ const CreateUser = () => {
                       <form action="">
                         <div className="row">
                           <div className="form-group col-lg-3 autoComplete mb-3">
-                            <h6>Role</h6>
+                          <h6>{t("role")}</h6>
                             <Autocomplete
                               disablePortal
                               options={[
@@ -183,13 +183,13 @@ const CreateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Please select Role"
+                                  placeholder={t("selectRole")}
                                 />
                               )}
                             />
                           </div>
                           <div className="form-group col-lg-3 autoComplete mb-3">
-                            <h6>Permission</h6>
+                           <h6>{t("permission")}</h6>
                             <Autocomplete
                               value={
                                 permission
@@ -219,14 +219,14 @@ const CreateUser = () => {
                                 <TextField
                                   {...params}
                                   variant="outlined"
-                                  placeholder="Select Permission"
+                              placeholder={t("selectPermission")}
                                 />
                               )}
                               disableClearable // Prevent clearing the selected value by clicking on the input
                             />
                           </div>
                           <div className="form-group col-lg-3 autoComplete mb-3">
-                            <h6>Select Client</h6>
+                         <h6>{t("select_client")}</h6>
                             <Autocomplete
                               options={SelectClient || []} // Provide options for autocomplete
                               getOptionLabel={(option) =>
@@ -241,7 +241,7 @@ const CreateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Client" // Set placeholder text
+                                placeholder={t("select_client")}
                                   variant="outlined"
                                 />
                               )}
@@ -260,7 +260,7 @@ const CreateUser = () => {
                             />
                           </div>
                           <div className="form-group col-lg-3 autoComplete mb-3">
-                            <h6>Consignee</h6>
+                        <h6>{t("consignee")}</h6>
                             <Autocomplete
                               options={consignees || []} // Provide options for autocomplete
                               getOptionLabel={(option) =>
@@ -275,7 +275,7 @@ const CreateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Consignee" // Placeholder text
+                              placeholder={t("selectConsignee")}
                                   variant="outlined"
                                 />
                               )}
@@ -291,36 +291,36 @@ const CreateUser = () => {
                           </div>
 
                           <div className="form-group col-lg-3">
-                            <h6>Username</h6>
+                           <h6>{t("username")}</h6>
                             <input
                               type="text"
                               className="form-control"
-                              placeholder="harry potter"
+                              placeholder={t("username")}
                               onChange={(e) => setUserName(e.target.value)}
                             />
                           </div>
 
                           <div className="form-group col-lg-3">
-                            <h6>Name</h6>
+                            <h6>{t("name")}</h6>
                             <input
                               type="text"
                               className="form-control"
-                              placeholder="name"
+                              placeholder={t("name")}
                               onChange={(e) => setName(e.target.value)}
                             />
                           </div>
 
                           <div className="form-group col-lg-3">
-                            <h6>Email</h6>
+                            <h6>{t("email")}</h6>
                             <input
                               type="email"
                               className="form-control"
-                              placeholder="email"
+                              placeholder={t("email")}
                               onChange={(e) => setEmailId(e.target.value)}
                             />
                           </div>
                           <div className="form-group col-lg-3 autoComplete mb-3">
-                            <h6>Status</h6>
+                            <h6>{t("status")}</h6>
                             <Autocomplete
                               options={statusOptions}
                               getOptionLabel={(option) => option.status || ""}
@@ -330,7 +330,7 @@ const CreateUser = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Status" // Placeholder text for the input
+                          placeholder={t("status")}
                                   variant="outlined"
                                 />
                               )}
@@ -346,7 +346,7 @@ const CreateUser = () => {
                           </div>
 
                           <div className="form-group col-lg-4">
-                            <h6>Password Generator</h6>
+                            <h6>{t("passwordGenerator")}</h6>
                             <div className="flex">
                               <div className="passwordGenerator me-2">
                                 <input
@@ -369,27 +369,27 @@ const CreateUser = () => {
                                   type="btn"
                                   onClick={handleGenerateClick}
                                 >
-                                  Generate
+                                  {t("generate")}
                                 </button>
                               </div>
                             </div>
                           </div>
                           <div className="form-group col-lg-4">
-                            <h6> Password</h6>
+                            <h6> {t("password")}</h6>
                             <input
                               type="password"
                               className="form-control"
-                              placeholder={123456}
+                              placeholder={t("password")}
                               onChange={(e) => setPassword(e.target.value)}
                             />
                           </div>
 
                           <div className="form-group col-lg-4">
-                            <h6> Confirm Password</h6>
+                         <h6>{t("confirmPassword")}</h6>
                             <input
                               type="password"
                               className="form-control"
-                              placeholder={123456}
+                              placeholder= {t("confirmPassword")} 
                               onChange={(e) =>
                                 setConfirmPassword(e.target.value)
                               }
@@ -408,10 +408,10 @@ const CreateUser = () => {
                     type="submit"
                     name="signup"
                   >
-                    Create
+                    {t("create")}
                   </button>
                   <a className="btn btn-danger" href="#">
-                    Cancel
+                    {t("cancel")}
                   </a>
                 </div>
               </div>

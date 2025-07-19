@@ -10,11 +10,13 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { useQuery } from "react-query";
 import { toast } from "react-toastify";
 import { Button, Modal } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 // import TextField from "@mui/material/TextField";
 // import Autocomplete from "@mui/material/Autocomplete";
 // import { useQuery } from "react-query";
 const FreightNew = () => {
+  const { t } = useTranslation("global");
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(true);
@@ -61,7 +63,7 @@ const FreightNew = () => {
         setShow(true);
       } else {
         // Handle success
-        toast.success("Freight  Added  Successfully", {
+        toast.success(t("freightAddSuccess"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -79,7 +81,7 @@ const FreightNew = () => {
       // You can show a success message here
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Something went Wrong ");
+      toast.error(t("tryAgain"));
       // Handle error appropriately
     }
   };
@@ -96,8 +98,8 @@ const FreightNew = () => {
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -115,9 +117,9 @@ const FreightNew = () => {
           );
           console.log(response);
           getFreight();
-          toast.success("Freight delete successfully");
+          toast.success(t("freightDeleteSuccess"));
         } catch (e) {
-          toast.error("Something went wrong");
+          toast.error(t("tryAgain"));
         }
       }
     });
@@ -133,7 +135,7 @@ const FreightNew = () => {
       .then((resp) => {
         // console.log(resp, "Check Resp")
         if (resp.data.success == true) {
-          toast.success("Status Updated Successfully", {
+          toast.success(t("statusUpdated"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -149,28 +151,28 @@ const FreightNew = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "ID",
+        Header: t("id"),
         Id: "index",
         accessor: (_rows, i) => i + 1,
       },
       {
-        Header: "Freight Provider",
+        Header: t("freightProvider"),
         accessor: (a) => a.Freight_provider_name,
       },
       {
-        Header: "From Port",
+        Header: t("fromPort"),
         accessor: (a) => a.FromPort,
       },
       {
-        Header: "Destination Port",
+        Header: t("destinationPort"),
         accessor: (a) => a.DestinationPort,
       },
       {
-        Header: "Liner",
+        Header: t("liner"),
         accessor: (a) => a.Airline,
       },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -191,8 +193,8 @@ const FreightNew = () => {
               type="checkbox"
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")}</span>
+              <span>{t("on")}</span>
             </span>
             <a></a>
           </label>
@@ -217,7 +219,7 @@ const FreightNew = () => {
       // 	),
       // },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => (
           <>
             <Link to="/update_freight" state={{ from: a }}>
@@ -247,17 +249,17 @@ const FreightNew = () => {
         ),
       },
       {
-        Header: "Stats",
+        Header: t("stats"),
         accessor: (a) => " ",
       },
     ],
-    []
+    [t]
   );
 
   return (
     <>
       <Card
-        title="Freight Management"
+        title={t("freightManagement")}
         endElement={
           <div>
             <button
@@ -273,7 +275,7 @@ const FreightNew = () => {
                 setLinerId("");
               }}
             >
-              Create
+               {t("create")}
             </button>
 
             <div
@@ -287,7 +289,7 @@ const FreightNew = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="exampleModalLabel">
-                      Freight Route
+                      {t("freightRoute")}
                     </h5>
                     <button
                       type="button"
@@ -301,7 +303,7 @@ const FreightNew = () => {
                   <div className="modal-body">
                     <div className="row">
                       <div className="col-lg-12 form-group vendorInputUnset mb-2">
-                        <h6>Vendor</h6>
+                        <h6> {t("vendor")}</h6>
                         <div className="ceateTransport">
                           <Autocomplete
                             disablePortal
@@ -310,8 +312,8 @@ const FreightNew = () => {
                             value={
                               vendorId
                                 ? vendors.find(
-                                    (vendors) => vendors.ID === vendorId
-                                  )
+                                  (vendors) => vendors.ID === vendorId
+                                )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) =>
@@ -321,7 +323,7 @@ const FreightNew = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search Vendor" // Adds a placeholder
+                                placeholder={t("searchVendor")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -330,7 +332,7 @@ const FreightNew = () => {
                       </div>
 
                       <div className="col-lg-12 form-group mb-2">
-                        <h6>Port of origin</h6>
+                        <h6>{t("portOfOrigin")}</h6>
                         <div className="ceateTransport">
                           <Autocomplete
                             disablePortal
@@ -339,8 +341,8 @@ const FreightNew = () => {
                             value={
                               portOfOrigin
                                 ? ports.find(
-                                    (ports) => ports.port_id === portOfOrigin
-                                  )
+                                  (ports) => ports.port_id === portOfOrigin
+                                )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) =>
@@ -350,7 +352,7 @@ const FreightNew = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search Port Of Origin"
+                                placeholder={t("searchPortOrigin")}
                                 InputLabelProps={{ shrink: false }}
                               />
                             )}
@@ -359,7 +361,7 @@ const FreightNew = () => {
                       </div>
 
                       <div className="col-lg-12 form-group mb-2">
-                        <h6>Destination Port</h6>
+                        <h6> {t("destinationPort")}</h6>
                         <Autocomplete
                           disablePortal
                           options={ports || []} // Use the same ports array for destination port
@@ -367,8 +369,8 @@ const FreightNew = () => {
                           value={
                             destinationPort
                               ? ports.find(
-                                  (ports) => ports.port_id === destinationPort
-                                )
+                                (ports) => ports.port_id === destinationPort
+                              )
                               : null
                           } // Bind to state
                           onChange={(e, newValue) =>
@@ -378,7 +380,7 @@ const FreightNew = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Search Destination Port"
+                              placeholder={t("searchDestinationPort")}
                               InputLabelProps={{ shrink: false }}
                             />
                           )}
@@ -386,7 +388,7 @@ const FreightNew = () => {
                       </div>
 
                       <div className="col-lg-12 form-group mb-2">
-                        <h6>Liner</h6>
+                        <h6>{t("liner")}</h6>
                         <Autocomplete
                           disablePortal
                           options={liners || []} // Use the liners array as options
@@ -394,8 +396,8 @@ const FreightNew = () => {
                           value={
                             linerId
                               ? liners.find(
-                                  (liner_id) => liner_id.liner_id === linerId
-                                )
+                                (liner_id) => liner_id.liner_id === linerId
+                              )
                               : null
                           } // Bind to state
                           onChange={(e, newValue) =>
@@ -405,7 +407,7 @@ const FreightNew = () => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Search Liner"
+                              placeholder={t("searchLiner")}
                               InputLabelProps={{ shrink: false }}
                             />
                           )}
@@ -419,7 +421,7 @@ const FreightNew = () => {
                       className="UpdatePopupBtn btn btn-primary"
                       onClick={handleSubmit}
                     >
-                      Submit
+                      {t("submit")}
                     </button>
                   </div>
                 </div>
@@ -438,7 +440,7 @@ const FreightNew = () => {
         <div className="modal-content">
           <div className="modal-header border-0">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-              Freight Check
+             {t("freightCheck")} 
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}

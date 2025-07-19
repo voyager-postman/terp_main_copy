@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import BarCode from "react-barcode";
@@ -6,11 +7,12 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
 import { TableView } from "../../table";
+import { useTranslation } from "react-i18next";
 
 const BoxesNew = () => {
+  const { t } = useTranslation("global");
   const navigate = useNavigate();
   const [isOn, setIsOn] = useState(true);
-
   const [data, setData] = useState([]);
 
   const getBoxData = () => {
@@ -22,7 +24,7 @@ const BoxesNew = () => {
       .catch((error) => {
         console.log(error);
         if (error) {
-          toast.error("Network Error", {
+          toast.error(t("networkError"), {
             autoClose: 1000,
             theme: "colored",
           });
@@ -30,6 +32,7 @@ const BoxesNew = () => {
         }
       });
   };
+
   const updateAirportStatus = (airportId) => {
     const request = {
       boxId: airportId,
@@ -59,20 +62,19 @@ const BoxesNew = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Code",
+        Header: t("code"),
         accessor: (a) => (
           <div>
             <BarCode width={0.8} height={30} value={a.Inventory_code} />
           </div>
         ),
       },
-
       {
-        Header: "Name",
+        Header: t("name"),
         accessor: "Name_EN",
       },
       {
-        Header: "Status",
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -90,15 +92,15 @@ const BoxesNew = () => {
               defaultChecked={a.Available == "1" ? true : false}
             />
             <span>
-              <span>OFF</span>
-              <span>ON</span>
+              <span>{t("off")}</span>
+              <span>{t("on")}</span>
             </span>
             <a></a>
           </label>
         ),
       },
       {
-        Header: "Actions",
+        Header: t("actions"),
         accessor: (a) => [
           <Link to="/updateBox" state={{ from: a }}>
             <i
@@ -111,24 +113,23 @@ const BoxesNew = () => {
               }}
             />
           </Link>,
-        
         ],
       },
     ],
-    []
+    [t]
   );
 
   return (
     <>
       <Card
-        title="Boxes Management"
+        title={t("Boxe_Management")}
         endElement={
           <button
             type="button"
             onClick={() => navigate("/createBoxNew")}
             className="btn button btn-info"
           >
-            Create
+            {t("create")}
           </button>
         }
       >
@@ -139,3 +140,4 @@ const BoxesNew = () => {
 };
 
 export default BoxesNew;
+
