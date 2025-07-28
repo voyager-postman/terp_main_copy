@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import BillingNote from "./components/Orders/BillingNote";
 import { IsLoginAuthenticateContext } from "./Contexts/LoginContext";
 import PrivateRoute from "./PrivateRoute";
 import Trends from "./components/Packing/Trends";
@@ -48,6 +49,7 @@ import PurchaseOrder from "./components/PurchaseOrder/PurchaseOrder";
 import Receiving from "./components/Receiving/Receiving";
 import Acceptreceiving from "./components/Receiving/acceptReceving";
 import AddAirline from "./components/Setup/AirlineManageMent/AddAirline";
+import IncomeState from "./components/Accounting/IncomeState";
 import AirlineNew from "./components/Setup/AirlineManageMent/AirlineNew";
 import AirportCreate from "./components/Setup/AirportManagement/AirportCreate";
 import AirportNew from "./components/Setup/AirportManagement/AirportNew";
@@ -180,6 +182,9 @@ import MenuManagement from "./components/hr/MenuManagement";
 import InvoiceEdit2 from "./components/Orders/test/InvoiceEdit2";
 import AccountLedger from "./components/Accounting/AccountLedger";
 import Wastage from "./components/operation/Wastage";
+import Receipt from "./components/Orders/Receipt";
+import ReceiptCreate from "./components/Orders/ReceiptCreate";
+
 function App() {
   const location = useLocation(); // Hook to get the current URL location
   const navigate = useNavigate();
@@ -187,8 +192,6 @@ function App() {
   const [isAuthenticate] = useContext(IsLoginAuthenticateContext);
   useEffect(() => {
     const level = localStorage.getItem("level");
-
-    // 🔹 If Level 5 users visit `/`, immediately redirect them to `/purchase_orders`
     if (level === "Level 5" && location.pathname === "/") {
       navigate("/purchase_orders", { replace: true });
     }
@@ -344,6 +347,8 @@ function App() {
                 <Route path="/openjourney" element={<CreateJourney />} />
                 <Route path="/openEditjourney" element={<EditJourney />} />
                 <Route path="/claim" element={<Claim />} />
+                <Route path="/reciept" element={<Receipt />} />
+                <Route path="/receipt_create" element={<ReceiptCreate />} />
                 <Route path="/claimPdf" element={<ClaimPdf />} />
 
                 <Route path="/claim_details" element={<ClaimDetails />} />
@@ -463,7 +468,7 @@ function App() {
                 <Route path="/debitnote" element={<DebitNotes />} />
                 <Route path="/hplNew" element={<HplNew />} />
                 <Route path="/currencyex" element={<CurrencyExchange />} />
-
+                <Route path="/billing_note" element={<BillingNote />} />
                 <Route path="/createUser" element={<CreateUser />} />
                 <Route path="/updateUser" element={<UpdateUser />} />
                 <Route path="/userResetPass" element={<UserResetPass />} />
@@ -482,6 +487,7 @@ function App() {
                   path="/combinePaymenEdit"
                   element={<CombinePaymentEdit />}
                 />
+                <Route path="/incomeState" element={<IncomeState />} />
                 <Route
                   path="/orderPackaging"
                   element={<OrderPackagingList />}

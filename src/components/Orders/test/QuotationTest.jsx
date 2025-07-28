@@ -21,7 +21,6 @@ import { useTranslation } from "react-i18next";
 
 const QuotationTest = () => {
   const { t, i18n } = useTranslation("global");
-
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(false);
@@ -39,7 +38,6 @@ const QuotationTest = () => {
   });
   const [data, setData] = useState([]);
   const [chargeVolume, setChargeVolume] = useState(false);
-
   const [idData, setIdData] = useState("");
   const [status, setStatus] = useState("");
   const [filterData1, setFilterData1] = useState("");
@@ -53,7 +51,7 @@ const QuotationTest = () => {
   const getAllQuotation = () => {
     axios
       .get(`${API_BASE_URL}/NewgetOrders`, {
-        params: { is_quotation: 1 }, // or is_quotation: 1
+        params: { is_quotation: 1 },
       })
       .then((res) => {
         console.log(res);
@@ -114,13 +112,14 @@ const QuotationTest = () => {
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("areYouSure"),
+      text: t("irreversible"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Delete",
+      confirmButtonText: t("delete"),
+      cancelButtonText: t("cancel"),
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -129,7 +128,7 @@ const QuotationTest = () => {
           });
           if (response.data.success === true) {
             console.log("API response:", response);
-            toast.success("Quotation deleted successfully");
+            toast.success(t("quotationDeletedSuccessfully"));
             getAllQuotation();
           } else {
             console.log("API response:", response);
@@ -138,7 +137,7 @@ const QuotationTest = () => {
           }
         } catch (e) {
           console.error("API call error:", e);
-          toast.error("Something went wrong");
+          toast.error(t("tryAgain"));
         }
       }
     });
@@ -150,11 +149,11 @@ const QuotationTest = () => {
       });
       console.log("API response:", response);
       getAllQuotation();
-      toast.success("Quotation Expired  successfully");
+      toast.success(t("quotationExpiredSuccess"));
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
-      toast.error("Failed to Quotation Expired  ");
+      toast.error(t("quotationExpiredFailed"));
     }
   };
   const handleEditClick1 = async (quotation_id) => {
@@ -180,12 +179,12 @@ const QuotationTest = () => {
       loadingModal.close();
       setChargeVolume(false);
       getAllQuotation();
-      toast.success("Quotation Copy successfully");
+      toast.success(t("quotationCopySuccess"));
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
       loadingModal.close();
-      toast.error("Failed to Quotation Copy");
+      toast.error(t("quotationCopyFailed"));
     }
   };
   const quotationConfirmation = async (quotation_id) => {
@@ -199,12 +198,12 @@ const QuotationTest = () => {
       console.log("API response:", response);
       loadingModal.close();
       getAllQuotation();
-      toast.success("Quotation Confirmation successfully");
+      toast.success(t("quotationConfirmationSuccess"));
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
       loadingModal.close();
-      toast.error("Failed to Quotation Confirmation");
+      toast.error(t("quotationConfirmationFailed"));
     }
   };
 
@@ -219,12 +218,12 @@ const QuotationTest = () => {
       console.log("API response:", response);
       loadingModal.close();
       getAllQuotation();
-      toast.success("Quotation Confirmation successfully");
+      toast.success(t("quotationConfirmationSuccess"));
       // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
       loadingModal.close();
-      toast.error("Failed to Quotation Confirmation");
+      toast.error(t("quotationConfirmationFailed"));
     }
   };
   const performaOrder = async (a) => {
@@ -1429,7 +1428,7 @@ const QuotationTest = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Invoice Modal
+                {t("invoiceModal")}
               </h1>
               <button
                 onClick={clearData}
@@ -1446,7 +1445,7 @@ const QuotationTest = () => {
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6> Use Agreed pricing ?</h6>
+                      <h6> {t("useAgreedPricing")} ?</h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -1464,15 +1463,15 @@ const QuotationTest = () => {
                             onChange={handleAgreedPricingChange2}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
                       </div>
                     </div>
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Use custom name? </h6>
+                      <h6> {t("useCustomName")} </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -1490,15 +1489,15 @@ const QuotationTest = () => {
                             onChange={handleAgreedPricingChange4}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span> {t("no")}</span>
+                            <span> {t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
                       </div>
                     </div>
                     <div className="invoiceModal">
-                      <h6>Invoice Name Can be -</h6>
+                      <h6> {t("invoiceNameCanBe")}-</h6>
                       <input
                         type="radio"
                         id="html1"
@@ -1507,7 +1506,7 @@ const QuotationTest = () => {
                         checked={selectedInvoice === "Client"}
                         onChange={handleRadioChange}
                       />
-                      <label htmlFor="html1">Client</label>
+                      <label htmlFor="html1"> {t("clients")}</label>
 
                       <input
                         type="radio"
@@ -1517,11 +1516,11 @@ const QuotationTest = () => {
                         checked={selectedInvoice === "Consignee"}
                         onChange={handleRadioChange}
                       />
-                      <label htmlFor="css1">Consignee</label>
+                      <label htmlFor="css1"> {t("consignee")}</label>
                     </div>
 
                     <div className="invoiceModal d-flex justify-content-between">
-                      <h6>Do you want image ? </h6>
+                      <h6> {t("doYouWantImage")} ? </h6>
                       <div>
                         <label
                           className="toggleSwitch large"
@@ -1539,8 +1538,8 @@ const QuotationTest = () => {
                             onChange={handleAgreedPricingChange3}
                           />
                           <span>
-                            <span>No</span>
-                            <span> Yes</span>
+                            <span>{t("no")}</span>
+                            <span>{t("yes")}</span>
                           </span>
                           <a> </a>
                         </label>
@@ -1556,7 +1555,7 @@ const QuotationTest = () => {
                 onClick={generatePdf}
                 className="btn btn-primary mb-4"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </div>

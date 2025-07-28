@@ -201,7 +201,6 @@ const ApexChart = () => {
                 `<strong>${t("rawKgCost")}:</strong> ${rawKgCost}` +
                 "</div>"
               );
-
             },
           },
         }));
@@ -237,74 +236,80 @@ const ApexChart = () => {
     [1627728000000, 140],
   ];
 
-  const [chartOptions, setChartOptions] = useState({
-    series: [
-      {
-        name: t("produceTrend"),
-        data: [], // Initial empty data
-      },
-    ],
-    options: {
-      chart: {
-        type: "area",
-        stacked: false,
-        height: 350,
-        zoom: {
-          type: "x",
-          enabled: true,
-          autoScaleYaxis: true,
+  const [chartOptions, setChartOptions] = useState({ series: [], options: {} });
+
+  useEffect(() => {
+    setChartOptions({
+      series: [
+        {
+          name: t("produceTrend"),
+          data: [], // Your actual data can be added later
         },
-        toolbar: {
-          autoSelected: "zoom",
+      ],
+      options: {
+        chart: {
+          type: "area",
+          stacked: false,
+          height: 350,
+          zoom: {
+            type: "x",
+            enabled: true,
+            autoScaleYaxis: true,
+          },
+          toolbar: {
+            autoSelected: "zoom",
+          },
         },
-      },
-      colors: ["#203764"],
-      dataLabels: {
-        enabled: false,
-      },
-      markers: {
-        size: 0,
-      },
-      title: {
-        text: t("produceTrend"),// "Produce Price Trend",
-        align: "left",
-      },
-      fill: {
-        type: "gradient",
-        gradient: {
-          shadeIntensity: 1,
-          inverseColors: false,
-          opacityFrom: 0.5,
-          opacityTo: 0,
-          stops: [0, 90, 100],
+        colors: ["#203764"],
+        dataLabels: {
+          enabled: false,
         },
-      },
-      yaxis: {
+        markers: {
+          size: 0,
+        },
         title: {
-          text: t("price"),
+          text: t("produceTrend"),
+          align: "left",
         },
-      },
-      xaxis: {
-        type: "datetime",
-        labels: {
-          formatter: function (val) {
-            const date = new Date(val);
-            const day = date.getDate();
-            const month = date.toLocaleString("default", { month: "short" });
-            return `${day} ${month}`; // e.g., "12 Jul"
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.5,
+            opacityTo: 0,
+            stops: [0, 90, 100],
+          },
+        },
+        yaxis: {
+          title: {
+            text: t("price"),
+          },
+        },
+        xaxis: {
+          type: "datetime",
+          labels: {
+            formatter: function (val) {
+              const date = new Date(val);
+              const day = date.getDate();
+              const month = date.toLocaleString(i18n.language, {
+                month: "short",
+              });
+              return `${day} ${month}`;
+            },
+          },
+        },
+        tooltip: {
+          shared: false,
+          y: {
+            formatter: function (val) {
+              return val.toFixed(0);
+            },
           },
         },
       },
-      tooltip: {
-        shared: false,
-        y: {
-          formatter: function (val) {
-            return val.toFixed(0);
-          },
-        },
-      },
-    },
-  });
+    });
+  }, [t, i18n.language]); // Reactively update when language changes
 
   return (
     <div className="bg-white py-5">
@@ -356,7 +361,7 @@ const ApexChart = () => {
                   setSelectedComparison(value ? value.ID : null);
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} placeholder= {t("comparisonPeriod")} />
+                  <TextField {...params} placeholder={t("comparisonPeriod")} />
                 )}
               />
             </div>

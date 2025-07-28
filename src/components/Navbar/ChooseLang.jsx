@@ -2,14 +2,15 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const ChooseLang = () => {
-  const { t, i18n } = useTranslation("global");
+  const [t, i18n] = useTranslation("global");
+
   const changeLanguage = (lng) => {
     if (lng === "en") {
       localStorage.setItem("lang_code", "1");
-      localStorage.setItem("language", lng)
+      localStorage.setItem("language", lng);
     } else if (lng === "th") {
       localStorage.setItem("lang_code", "2");
-      localStorage.setItem("language", lng)
+      localStorage.setItem("language", lng);
     }
     i18n.changeLanguage(lng);
     setIsOpen(false); // close dropdown
@@ -62,7 +63,7 @@ const ChooseLang = () => {
               className="block px-2 py-2 text-sm text-white hover-underline-animation-profilemenu"
               role="menuitem"
             >
-              Thai
+              {t("thai")}
             </button>
           </div>
         </div>

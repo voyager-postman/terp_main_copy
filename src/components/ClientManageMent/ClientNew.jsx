@@ -922,7 +922,7 @@ const ClientNew = () => {
             onClick={() => navigate("/createClient")}
             className="btn button btn-info"
           >
-            {"create"}
+            {t("create")}
           </button>
         }
       >

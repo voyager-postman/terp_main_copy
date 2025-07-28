@@ -16,7 +16,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-const CreatePurchaseOrder = () => {
+const ReceiptCreate = () => {
   const { t, i18n } = useTranslation("global");
   const CustomInput = ({ value, onClick }) => (
     <div
@@ -158,47 +158,7 @@ const CreatePurchaseOrder = () => {
         console.log(error);
       });
   };
-  const formatCurrency = (value) => {
-    if (!value || isNaN(value)) return "";
-    return new Intl.NumberFormat("en-IN", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
 
-  const handleChangeAmount = (e) => {
-    const input = e.target;
-    const cursorPosition = input.selectionStart; // Get cursor position
-    let rawValue = e.target.value.replace(/[^0-9.]/g, ""); // Remove non-numeric characters except '.'
-
-    // Prevent multiple decimal points
-    if ((rawValue.match(/\./g) || []).length > 1) return;
-
-    // Allow only two decimals
-    const parts = rawValue.split(".");
-    if (parts.length === 2 && parts[1].length > 2) {
-      rawValue = `${parts[0]}.${parts[1].slice(0, 2)}`; // Limit to 2 decimal places
-    }
-
-    // Update state
-    setTotalPaymentAmount(rawValue);
-
-    // Recalculate cursor position after updating the value
-    let newCursorPosition = cursorPosition;
-
-    // Adjust cursor position if deleting after decimal point
-    if (
-      rawValue[cursorPosition - 1] === "." ||
-      rawValue[cursorPosition - 1] === ""
-    ) {
-      newCursorPosition = cursorPosition - 1;
-    }
-
-    // Preserve cursor position after setting state
-    setTimeout(() => {
-      inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
-    }, 0);
-  };
   useEffect(() => {
     const deposit = parseFloat(depositAvailableNew) || 0;
     const finalPayment = basePayment - deposit;
@@ -328,50 +288,7 @@ const CreatePurchaseOrder = () => {
     newEditPackaging[i][e.target.name] = e.target.value;
     setDetails(newEditPackaging);
   };
-  // const itemData1 = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_BASE_URL}/PurchaseTypeItemsList`
-  //     );
-  //     setDropdownItems(response.data.data || []);
-  //   } catch (error) {
-  //     console.error("Error fetching purchase type items:", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   itemData1();
-  // }, []);
-  // useEffect(() => {
-  //   const fetchOptions = async () => {
-  //     try {
-  //       const response = await axios.post(
-  //         `${API_BASE_URL}/PurchaseTypeItemsList`
-  //       );
-  //       console.log(response.data);
-  //       setOptionItem(response.data.data); // Assuming data is already an array of objects
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
 
-  //   fetchOptions();
-  // }, []);
-  // useEffect(() => {
-  //   const fetchUnits = async () => {
-  //     try {
-  //       const response = await axios.get(`${API_BASE_URL}/getAllUnit`);
-  //       console.log("API Response:", response.data.data);
-
-  //       // Assuming response.data.data is the correct array
-  //       setUnitItem(response.data.data || []);
-  //     } catch (error) {
-  //       console.error("Error fetching units:", error);
-  //       setUnitItem([]); // Fallback to an empty array
-  //     }
-  //   };
-
-  //   fetchUnits();
-  // }, []);
   const fetchDropdownData = async () => {
     try {
       const [purchaseTypeRes, unitRes] = await Promise.all([
@@ -432,45 +349,9 @@ const CreatePurchaseOrder = () => {
     item_Name_TH: 0,
   });
 
-  const addFieldHandleChange = (e) => {
-    const { name, value } = e.target;
-    setFormsvalue((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
-  };
-  const addFieldHandleChangeWname = (name, value) => {
-    setFormsvalue((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
-  };
-
-  const addFormFields = () => {
-    setFormsvalue((prevValues) => ({
-      ...prevValues,
-      pod_type_id: 0,
-      unit_count_id: 0,
-      POD_Selection: 0,
-      pod_quantity: 0,
-      pod_price: 0,
-      pod_vat: 0,
-      pod_wht_id: 0,
-      pod_crate: 0,
-      Unit_Name_EN: 0,
-      Unit_Name_TH: 0,
-      item_Name_EN: 0,
-      item_Name_TH: 0,
-    }));
-  };
-
-  const removeFormFields = (i) => {
-    const newFormValues = [...formsValue];
-    newFormValues.splice(i, 1);
-    setFormsvalue(newFormValues);
-  };
-
   const { data: vendorList } = useQuery("getAllVendor");
+  const { data: recieptDroupDown } = useQuery("RecieptsDropdown");
+
   const { data: dropdownType } = useQuery("getDropdownType");
   const { data: produceList } = useQuery("getAllProduceItem");
   const { data: packagingList } = useQuery("getAllPackaging");
@@ -490,21 +371,6 @@ const CreatePurchaseOrder = () => {
     });
   };
 
-  const updatePurchaseOrderDetils = (id) => {
-    if (!from?.PO_ID) return;
-    axios
-      .post(`${API_BASE_URL}/updatePurchaseOrderDetails`, {
-        po_id: id,
-        data: details,
-      })
-      .then((response) => {
-        // window.location.reload(navigate("/purchase_orders"));
-        navigate("/purchase_orders");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
   const addPurchaseOrderDetails = async (id) => {
     try {
       const response = await axios.post(
@@ -565,11 +431,7 @@ const CreatePurchaseOrder = () => {
           accessResponse.data
         );
       }
-      // Optional: show toast
-      // toast.success(deleteResponse.data.Message_EN);
-      // toast.success(deleteResponse.data.Message_TH);
 
-      // Finally: navigate
       navigate("/purchase_orders");
     } catch (error) {
       console.error("Error during cancel process:", error);
@@ -626,8 +488,6 @@ const CreatePurchaseOrder = () => {
       );
       console.log(response);
       setStock(response?.data);
-
-      // 🔥 Clear the item form fields for new entry
       setFormDataAdd({
         pod_type_id: 0,
         unit_count_id: 0,
@@ -770,21 +630,6 @@ const CreatePurchaseOrder = () => {
     setRoundingNew(data?.rounding || 0);
   };
 
-  const canccelStatusdata = async () => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/updateaccessfile`, {
-        id: from.PO_ID,
-        type: 1,
-        accesstype: 0, // Cancel action
-      });
-      console.log("Access file updated (button click):", response.data);
-      // Optionally show toast
-      // toast.success("Access updated successfully!");
-    } catch (error) {
-      console.error("Error calling access file API:", error);
-      // toast.error("Failed to update access.");
-    }
-  };
   useEffect(() => {
     console.log(state?.po_id);
     const modalElement = document.getElementById("modalCombine");
@@ -814,7 +659,6 @@ const CreatePurchaseOrder = () => {
   }, [state?.po_id]);
   const updateData = async (e) => {
     try {
-      // ✅ Second: proceed to add purchase order
       const response = await axios.post(
         `${API_BASE_URL}/addPurchaseOrder`,
         state
@@ -897,70 +741,6 @@ const CreatePurchaseOrder = () => {
       toast.error(t("tryAgain"));
     }
   };
-
-  // const updateData = async (e) => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_BASE_URL}/${"addPurchaseOrder"}`,
-  //       state
-  //     );
-  //     console.log(response);
-  //     setStock(response?.data);
-
-  //     // 🔥 Clear the item form fields for new entry
-  //     setFormDataAdd({
-  //       pod_type_id: 0,
-  //       unit_count_id: 0,
-  //       POD_Selection: 0,
-  //       pod_quantity: 0,
-  //       pod_price: 0,
-  //       pod_vat: 0,
-  //       pod_wht_id: 0,
-  //       pod_crate: 0,
-  //       Unit_Name_EN: 0,
-  //       Unit_Name_TH: 0,
-  //       item_Name_EN: 0,
-  //       item_Name_TH: 0,
-  //     });
-
-  //     // ✅ Keep the purchase order ID and vendor details
-  //     setState((prevState) => ({
-  //       ...prevState,
-  //       po_id: response.data?.po_id || from?.po_id || prevState.po_id,
-  //       vendor_id: prevState.vendor_id,
-  //       created: prevState.created,
-  //       supplier_invoice_number: prevState.supplier_invoice_number,
-  //       supplier_invoice_date: prevState.supplier_invoice_date,
-  //       rounding: prevState.rounding,
-  //     }));
-
-  //     if (response.status === 200) {
-  //       if (response.data.success) {
-  //         const id = response.data?.po_id || from?.po_id;
-  //         console.log(id);
-
-  //         setPodId(id);
-  //         navigate("/purchase_orders");
-
-  //         //  Clear podId to avoid fetching last item data
-  //         // toast.success("Create Purchase Orders", {
-  //         //   autoClose: 5000,
-  //         //   theme: "colored",
-  //         // });
-  //       } else {
-  //         setShow(true);
-  //       }
-  //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //     toast.error("An error has occurred", {
-  //       autoClose: 5000,
-  //       theme: "colored",
-  //     });
-  //   }
-  // };
-  // console.log(details);
-  // console.log(formsValue);
 
   // js pratima
   const [optionItem, setOptionItem] = useState([]);
@@ -1122,13 +902,6 @@ const CreatePurchaseOrder = () => {
     });
   };
 
-  const DropdownIndicator = (props) => {
-    return (
-      <components.DropdownIndicator {...props}>
-        <FaCaretDown style={{ color: "black" }} />
-      </components.DropdownIndicator>
-    );
-  };
   const customStyles = {
     control: (base) => ({
       ...base,
@@ -1160,7 +933,7 @@ const CreatePurchaseOrder = () => {
   return (
     <>
       <Card
-        title={`${t("purchase_order")} / ${
+        title={`${t("receipts")} / ${
           from?.PO_ID ? t("update") : t("create")
         } ${t("form")}`}
       >
@@ -1174,21 +947,21 @@ const CreatePurchaseOrder = () => {
                 <form action="">
                   <div className="row cratePurchase">
                     <div className="col-lg-3 form-group parentFormPayment autoComplete">
-                      <h6>{t("vendor")}</h6>
+                      <h6>{t("vendorsAndClients")}</h6>
 
-                      <Autocomplete
+                      {/* <Autocomplete
                         options={
-                          vendorList?.map((vendor) => ({
-                            id: vendor.ID,
-                            name: vendor.name,
+                          recieptDroupDown?.map((vendor) => ({
+                            id: vendor.VendorID,
+                            name: vendor.receipt_create,
                           })) || []
                         } // Map the vendor list to create options with `id` and `name`
                         getOptionLabel={(option) => option.name || ""} // Display the vendor name
                         value={
-                          vendorList
+                          recieptDroupDown
                             ?.map((vendor) => ({
-                              id: vendor.ID,
-                              name: vendor.name,
+                              id: vendor.VendorID,
+                              name: vendor.receipt_create,
                             }))
                             .find((option) => option.id === state.vendor_id) ||
                           null
@@ -1208,16 +981,43 @@ const CreatePurchaseOrder = () => {
                             InputLabelProps={{ shrink: false }} // Prevents floating label
                           />
                         )}
+                      /> */}
+                      <Autocomplete
+                        options={
+                          recieptDroupDown?.map((vendor) => ({
+                            id: vendor.VendorID,
+                            name: vendor.Payor, // ✅ Use `Payor` from API instead of `receipt_create`
+                          })) || []
+                        }
+                        getOptionLabel={(option) => option.name || ""}
+                        value={
+                          recieptDroupDown
+                            ?.map((vendor) => ({
+                              id: vendor.VendorID,
+                              name: vendor.Payor, // ✅ Same fix here
+                            }))
+                            .find((option) => option.id === state.vendor_id) ||
+                          null
+                        }
+                        onChange={(e, newValue) => {
+                          setState({
+                            ...state,
+                            vendor_id: newValue?.id || "",
+                            vendor_name: newValue?.name || "",
+                          });
+                        }}
+                        sx={{ width: 300 }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("vendorsAndClients")}
+                            InputLabelProps={{ shrink: false }}
+                          />
+                        )}
                       />
                     </div>
-                    <div className="col-lg-2 form-group">
-                      <h6>{t("poDate")}</h6>
-                      {/* <input
-                        type="date"
-                        name="created"
-                        value={state.created}
-                        onChange={handleChange}
-                      /> */}
+                    <div className="col-lg-3 form-group">
+                      <h6>{t("receiptDate")}</h6>
                       <DatePicker
                         selected={
                           state.created && !isNaN(new Date(state.created))
@@ -1236,56 +1036,13 @@ const CreatePurchaseOrder = () => {
                       />
                     </div>
                     <div className="col-lg-3 form-group">
-                      <h6> {t("invoiceNumber")}</h6>
+                      <h6> {t("bankRef")}</h6>
                       <input
                         className="w-full"
                         type="text"
                         name="supplier_invoice_number"
                         onChange={handleChange}
                         value={state.supplier_invoice_number}
-                      />
-                    </div>
-                    <div className="col-lg-2 form-group">
-                      <h6>{t("invoiceDate")}</h6>
-                      {/* <input
-                        type="date"
-                        name="supplier_invoice_date"
-                        value={state.supplier_invoice_date}
-                        onChange={handleChange}
-                      />   */}
-                      <DatePicker
-                        selected={state?.supplier_invoice_date || null}
-                        onChange={(date) =>
-                          handleChange({
-                            target: {
-                              name: "supplier_invoice_date",
-                              value: date,
-                            },
-                          })
-                        }
-                        dateFormat="dd/MM/yyyy"
-                        placeholderText={t("selectDate")}
-                        customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
-                      />
-                    </div>
-                    <div className="col-lg-2 form-group">
-                      <h6> {t("dueDate")}</h6>
-                      {/* <input
-                        type="date"
-                        name="supplier_dua_date"
-                        value={state.supplier_dua_date}
-                        onChange={handleChange}
-                      /> */}
-                      <DatePicker
-                        selected={state?.supplier_dua_date || null}
-                        onChange={(date) =>
-                          handleChange({
-                            target: { name: "supplier_dua_date", value: date },
-                          })
-                        }
-                        dateFormat="dd/MM/yyyy"
-                        placeholderText={t("clickToSelectDate")}
-                        customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
                       />
                     </div>
                   </div>
@@ -1435,18 +1192,18 @@ const CreatePurchaseOrder = () => {
                                 </div>
 
                                 {/* <div className="row">
-                                  <div className="col-lg-12 mb-2">
-                                    <h6>Total</h6>
-                                    <input
-                                      className="mb-0"
-                                      type="number"
-                                      name="total"
-                                      value={formDataAdd.total}
-                                      placeholder="Total"
-                                      onChange={handleChangeAdd}
-                                    />
-                                  </div>
-                                </div> */}
+                                   <div className="col-lg-12 mb-2">
+                                     <h6>Total</h6>
+                                     <input
+                                       className="mb-0"
+                                       type="number"
+                                       name="total"
+                                       value={formDataAdd.total}
+                                       placeholder="Total"
+                                       onChange={handleChangeAdd}
+                                     />
+                                   </div>
+                                 </div> */}
                                 <div className="row">
                                   <div className="col-lg-12 mb-2">
                                     <h6> {t("total")}</h6>
@@ -1606,23 +1363,23 @@ const CreatePurchaseOrder = () => {
                         </div>
                       </div>
                       {/* <div className=" d-flex flexBefore">
-                        <div>
-                          <strong>Rounding</strong>
-                        </div>
-                        <input
-                          type="number"
-                          name="rounding"
-                          value={state.rounding}
-                          onChange={(e) =>
-                            handleChange({
-                              target: {
-                                name: "rounding",
-                                value: parseFloat(e.target.value) || 0,
-                              },
-                            })
-                          }
-                        />
-                      </div> */}
+                         <div>
+                           <strong>Rounding</strong>
+                         </div>
+                         <input
+                           type="number"
+                           name="rounding"
+                           value={state.rounding}
+                           onChange={(e) =>
+                             handleChange({
+                               target: {
+                                 name: "rounding",
+                                 value: parseFloat(e.target.value) || 0,
+                               },
+                             })
+                           }
+                         />
+                       </div> */}
                       <div className="d-flex flexBefore">
                         <div>
                           <strong> {t("rounding")}: </strong>
@@ -1697,32 +1454,29 @@ const CreatePurchaseOrder = () => {
             </div>
           </div>
           <div className="card-footer">
-            {((details.length > 0 && !from?.PO_ID) || from?.PO_ID) && (
-              <button
-                className="btn btn-primary"
-                type="submit"
-                name="signup"
-                onClick={updateData}
-                disabled={buttonClicked}
-              >
-                {details.length > 0 && !from?.PO_ID ? t("create") : t("update")}
-              </button>
-            )}
-
-            {/* <Link
-              className="btn btn-danger"
-              to={from?.PO_ID ? "/purchase_orders" : "/purchase_orders"} // Redirect if PO_ID exists
-              onClick={(e) => {
-                if (!podId) return; // Do nothing if podId is missing
-                e.preventDefault(); // Prevent navigation if deleting
-
-                canccelStatusdata();
-
-                deleteOrder(podId); // Call delete function
-              }}
+            {/* <button
+              className="btn btn-primary"
+              type="submit"
+              name="signup"
+              onClick={updateData}
+              disabled={buttonClicked}
             >
-              Cancel
-            </Link> */}
+              {from?.PO_ID ? t("update") : t("create")}
+            </button> */}
+            {/* <Link
+               className="btn btn-danger"
+               to={from?.PO_ID ? "/purchase_orders" : "/purchase_orders"} // Redirect if PO_ID exists
+               onClick={(e) => {
+                 if (!podId) return; // Do nothing if podId is missing
+                 e.preventDefault(); // Prevent navigation if deleting
+ 
+                 canccelStatusdata();
+ 
+                 deleteOrder(podId); // Call delete function
+               }}
+             >
+               Cancel
+             </Link> */}
             <button
               className="btn btn-danger"
               onClick={() => {
@@ -1732,15 +1486,13 @@ const CreatePurchaseOrder = () => {
               {t("cancel")}
             </button>
 
-            {details.length > 0 && (
-              <button
-                className="btn btn-primary"
-                type="button"
-                onClick={updateDataPayNow}
-              >
-                {t("payNow")}
-              </button>
-            )}
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={updateDataPayNow}
+            >
+              {t("payNow")}
+            </button>
           </div>
         </div>
       </Card>
@@ -2113,4 +1865,4 @@ const CreatePurchaseOrder = () => {
   );
 };
 
-export default CreatePurchaseOrder;
+export default ReceiptCreate;

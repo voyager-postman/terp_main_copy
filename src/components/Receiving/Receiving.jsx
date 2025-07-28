@@ -95,9 +95,7 @@ const Receiving = () => {
         );
         modal.show();
       } else {
-        toast.warning(
-          accessResponse?.data?.message || t("fileInUse")
-        );
+        toast.warning(accessResponse?.data?.message || t("fileInUse"));
       }
     } catch (error) {
       console.error("Error fetching access status:", error);
@@ -108,12 +106,16 @@ const Receiving = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: () => <div style={{ textAlign: "center" }}> {t("poCode")} </div>,
+        Header: () => (
+          <div style={{ textAlign: "center" }}> {t("poCode")} </div>
+        ),
         accessor: "PODCODE",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>{t("vendorName")}</div>,
+        Header: () => (
+          <div style={{ textAlign: "center" }}>{t("vendorName")}</div>
+        ),
         accessor: "Vendor_Name",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
         // if your table supports it
@@ -143,7 +145,7 @@ const Receiving = () => {
         // },
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>  {t("crates")}</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("crates")}</div>,
         accessor: "Crates",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>
@@ -153,7 +155,9 @@ const Receiving = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>  {t("quantity")}</div>,
+        Header: () => (
+          <div style={{ textAlign: "center" }}> {t("quantity")}</div>
+        ),
         accessor: "Quantity",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
@@ -161,7 +165,7 @@ const Receiving = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>  {t("unit")}</div>,
+        Header: () => <div style={{ textAlign: "center" }}> {t("unit")}</div>,
         accessor: "Unit",
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
@@ -174,7 +178,9 @@ const Receiving = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>  {t("qtyPerCrate")}</div>,
+        Header: () => (
+          <div style={{ textAlign: "center" }}> {t("qtyPerCrate")}</div>
+        ),
 
         accessor: "Qty/Crate",
         Cell: ({ value }) => (
@@ -190,7 +196,9 @@ const Receiving = () => {
       },
 
       {
-        Header: () => <div style={{ textAlign: "center" }}>  {t("actions")}</div>,
+        Header: () => (
+          <div style={{ textAlign: "center" }}> {t("actions")}</div>
+        ),
         accessor: (a) => (
           <>
             {/* {a.Open === 1 ? (
@@ -461,7 +469,6 @@ const Receiving = () => {
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
       toast.error(t("closingError"));
-
     }
   };
 
@@ -490,7 +497,6 @@ const Receiving = () => {
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
       toast.error(t("closingError"));
-
     }
   };
   console.log(viewData);
@@ -528,7 +534,8 @@ const Receiving = () => {
                   <div className="parentPurchaseView mb-3">
                     <div className="me-3">
                       <strong>
-                        {t("user_name")}<span>:</span>
+                        {t("user_name")}
+                        <span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -541,7 +548,7 @@ const Receiving = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        {t("user_name")}  Quantity<span>:</span>
+                        {t("user_name")} Quantity<span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -553,7 +560,8 @@ const Receiving = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        {t("unit")}<span>:</span>
+                        {t("unit")}
+                        <span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -565,7 +573,8 @@ const Receiving = () => {
                   <div className="parentPurchaseView">
                     <div className="me-3">
                       <strong>
-                        {t("crate")}<span>:</span>
+                        {t("crate")}
+                        <span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -577,7 +586,8 @@ const Receiving = () => {
                   <div className="parentPurchaseView">
                     <div className="me-0">
                       <strong>
-                        {t("quantityPerCrate")}<span>:</span>
+                        {t("quantityPerCrate")}
+                        <span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -618,7 +628,7 @@ const Receiving = () => {
               <h1 className="modal-title fs-5" id="exampleModalLabel">
                 {t("operationReceiving")}
               </h1>
-              <button
+              {/* <button
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="modal"
@@ -626,7 +636,7 @@ const Receiving = () => {
                 onClick={dataClear}
               >
                 <i class="mdi mdi-close"></i>
-              </button>
+              </button> */}
             </div>
             <div className="modal-body">
               <main className="main-content">
@@ -769,7 +779,6 @@ const Receiving = () => {
                           to="/receiving"
                         >
                           {t("cancel")}
-
                         </Link>
                       </div>
                     </div>
@@ -821,7 +830,7 @@ const Receiving = () => {
                           {stock.message ? stock.message: "NULL"}
                         </p> */}
                         <div className="closeBtnRece">
-                          <button onClick={closeIcon}>  {t("close")}</button>
+                          <button onClick={closeIcon}> {t("close")}</button>
                         </div>
                       </div>
                     </div>

@@ -1,4 +1,4 @@
-  import axios from "axios";
+import axios from "axios";
 import { useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -1738,81 +1738,81 @@ const AddShipTo = () => {
   useEffect(() => {
     orderData2();
   }, []);
- const [chartOptions, setChartOptions] = useState({
-  series: [
-    {
-      name: "Produce Trend",
-      data: [],
-    },
-  ],
-  options: {}, // initially empty
-});
+  const [chartOptions, setChartOptions] = useState({
+    series: [
+      {
+        name: "Produce Trend",
+        data: [],
+      },
+    ],
+    options: {}, // initially empty
+  });
 
-useEffect(() => {
-  setChartOptions((prev) => ({
-    ...prev,
-    options: {
-      chart: {
-        type: "area",
-        stacked: false,
-        height: 350,
-        zoom: {
-          type: "x",
-          enabled: true,
-          autoScaleYaxis: true,
+  useEffect(() => {
+    setChartOptions((prev) => ({
+      ...prev,
+      options: {
+        chart: {
+          type: "area",
+          stacked: false,
+          height: 350,
+          zoom: {
+            type: "x",
+            enabled: true,
+            autoScaleYaxis: true,
+          },
+          toolbar: {
+            autoSelected: "zoom",
+          },
         },
-        toolbar: {
-          autoSelected: "zoom",
+        colors: ["#203764"],
+        dataLabels: {
+          enabled: false,
         },
-      },
-      colors: ["#203764"],
-      dataLabels: {
-        enabled: false,
-      },
-      markers: {
-        size: 0,
-      },
-      title: {
-        text: t("producePriceConsignee"),
-        align: "left",
-      },
-      fill: {
-        type: "gradient",
-        gradient: {
-          shadeIntensity: 1,
-          inverseColors: false,
-          opacityFrom: 0.5,
-          opacityTo: 0,
-          stops: [0, 90, 100],
+        markers: {
+          size: 0,
         },
-      },
-      yaxis: {
         title: {
-          text: t("price"),
+          text: t("producePriceConsignee"),
+          align: "left",
         },
-      },
-      xaxis: {
-        type: "datetime",
-        labels: {
-          formatter: function (val) {
-            const date = new Date(val);
-            const day = date.getDate();
-            const month = date.toLocaleString("default", { month: "short" });
-            return `${day} ${month}`;
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.5,
+            opacityTo: 0,
+            stops: [0, 90, 100],
+          },
+        },
+        yaxis: {
+          title: {
+            text: t("price"),
+          },
+        },
+        xaxis: {
+          type: "datetime",
+          labels: {
+            formatter: function (val) {
+              const date = new Date(val);
+              const day = date.getDate();
+              const month = date.toLocaleString("default", { month: "short" });
+              return `${day} ${month}`;
+            },
+          },
+        },
+        tooltip: {
+          shared: false,
+          y: {
+            formatter: function (val) {
+              return val.toFixed(0);
+            },
           },
         },
       },
-      tooltip: {
-        shared: false,
-        y: {
-          formatter: function (val) {
-            return val.toFixed(0);
-          },
-        },
-      },
-    },
-  }));
-}, [t]); // run again if t() changes due to language switch
+    }));
+  }, [t]); // run again if t() changes due to language switch
 
   return (
     <Card
@@ -3115,6 +3115,8 @@ useEffect(() => {
                       <th>{t("itfName")}</th>
                       <th>{t("customName")}</th>
                       <th>{t("dummyPrice")}</th>
+                      <th>{t("customMargin")}</th>
+                      <th>{t("maxPrice")}</th>
                       <th>{t("brand")}</th>
                       <th>{t("unit")}</th>
                       <th>{t("barcode")}</th>
@@ -3126,6 +3128,8 @@ useEffect(() => {
                           <td>{item.Name_EN}</td>
                           <td>{item.Custom_Name}</td>
                           <td>{item.Dummy_Price}</td>
+                          <td>{item.Custom_Margin}</td>
+                          <td>{item.MAX_Price}</td>
                           <td>{item.brand_name}</td>
                           <td>{item.unit_name}</td>
                           <td>{item.Barcode}</td>
@@ -3847,7 +3851,7 @@ useEffect(() => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                               placeholder={t("selectPaymentTerms")}
+                              placeholder={t("selectPaymentTerms")}
                               variant="outlined"
                             />
                           )}
@@ -3875,7 +3879,7 @@ useEffect(() => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                               placeholder={t("selectStatementDueDate")}
+                              placeholder={t("selectStatementDueDate")}
                               InputLabelProps={{ shrink: false }} // Prevents floating label
                             />
                           )}
@@ -3895,7 +3899,7 @@ useEffect(() => {
                         />
                       </div> */}
                       <div className="col-lg-2 form-group autoComplete">
-                       <h6>{t("rounding")}</h6>
+                        <h6>{t("rounding")}</h6>
                         <Autocomplete
                           options={RoundingDataList || []} // List of delivery terms and incoterms
                           getOptionLabel={(option) => option.DropDown || ""} // Label to display (Incoterms)
@@ -3910,7 +3914,7 @@ useEffect(() => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                          placeholder={t("selectRounding")}
+                              placeholder={t("selectRounding")}
                               variant="outlined"
                             />
                           )}
@@ -3930,7 +3934,7 @@ useEffect(() => {
                           type="text"
                           name="extraCost"
                           className="form-control"
-                         placeholder={t("extraCost")}
+                          placeholder={t("extraCost")}
                           value={state5.extraCost}
                           onChange={handleChange5}
                         />
@@ -3941,7 +3945,7 @@ useEffect(() => {
                           type="text"
                           name="freightAdjust"
                           className="form-control"
-                           placeholder={t("freightAdjustment")}
+                          placeholder={t("freightAdjustment")}
                           value={state5.freightAdjust}
                           onChange={handleChange5}
                         />
@@ -3954,7 +3958,7 @@ useEffect(() => {
                               type="text"
                               name="markupValue"
                               className="form-control"
-                            placeholder={t("markupValue")}
+                              placeholder={t("markupValue")}
                               value={state5.markupValue}
                               onChange={handleChange5}
                             />
@@ -3985,7 +3989,7 @@ useEffect(() => {
                       </div>
 
                       <div className="col-lg-2 form-group">
-                      <h6>{t("quotation")}</h6>
+                        <h6>{t("quotation")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
@@ -4004,14 +4008,14 @@ useEffect(() => {
                       </div>
 
                       <div className="col-lg-2 form-group">
-                       <h6>{t("claim")}</h6>
+                        <h6>{t("claim")}</h6>
                         <div className="parentShip">
                           <div className="markupShip">
                             <input
                               type="text"
                               name="claim"
                               className="form-control"
-                               placeholder={t("claim")}
+                              placeholder={t("claim")}
                               value={claimValue1}
                               onChange={handleChange5}
                             />
@@ -4088,7 +4092,7 @@ useEffect(() => {
                     <div className="flex flex-wrap">
                       <div>
                         <div className="selectTimeHead">
-                        <h6>{t("selectTimePeriod")} :</h6>
+                          <h6>{t("selectTimePeriod")} :</h6>
                         </div>
                         <div className="selectTimeParent">
                           {dataPeriod.map((item) => (
@@ -4117,7 +4121,7 @@ useEffect(() => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                             placeholder={t("comparisonPeriod")}
+                              placeholder={t("comparisonPeriod")}
                             />
                           )}
                         />
@@ -4160,7 +4164,7 @@ useEffect(() => {
                           type="submit"
                           onClick={confirmData}
                         >
-                           {t("confirm")}
+                          {t("confirm")}
                         </button>
                       </div>
                     </div>
@@ -4183,7 +4187,7 @@ useEffect(() => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                             {t("totalShipments")}
+                              {t("totalShipments")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.CNF?.Total ? boxsData?.CNF?.Total : 0}
@@ -4220,7 +4224,7 @@ useEffect(() => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                             {t("totalClaims")}
+                              {t("totalClaims")}
                             </p>
                             <h4 className="mb-0">
                               {" "}
@@ -4301,7 +4305,7 @@ useEffect(() => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                            {t("pendingPayment")}
+                              {t("pendingPayment")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.Pending?.Total
@@ -4362,7 +4366,7 @@ useEffect(() => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                            {t("totalGrossWeightShipped")}
+                              {t("totalGrossWeightShipped")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.grossWeight?.Total_GW
@@ -4391,7 +4395,7 @@ useEffect(() => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                             {t("totalBoxesShipped")}
+                              {t("totalBoxesShipped")}
                             </p>
                             <h4 className="mb-0">
                               {boxsData?.Box?.Total_GW
@@ -4421,7 +4425,7 @@ useEffect(() => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                             {t("totalShipments")}
+                              {t("totalShipments")}
                             </p>
                             <div className="parentFirstShip mt-4">
                               <p>{t("dateOfFirstShipment")}</p>
@@ -4442,7 +4446,7 @@ useEffect(() => {
                               </p>
                             </div>
                             <div className="parentFirstShip">
-                             <p>{t("shipmentsInPipeLine")}</p>
+                              <p>{t("shipmentsInPipeLine")}</p>
                               <p>
                                 {boxsData?.Shipments?.Pipe_Line
                                   ? boxsData?.Shipments?.Pipe_Line
@@ -4458,7 +4462,7 @@ useEffect(() => {
                   <div className="row">
                     <div className="col-lg-6 mb20">
                       <div className="itemsOrderSearch">
-                      <h3 className="itemOrder">{t("topItems")}</h3>
+                        <h3 className="itemOrder">{t("topItems")}</h3>
 
                         <div className="selectProduce">
                           <Autocomplete
@@ -4488,7 +4492,7 @@ useEffect(() => {
                       <div className="tableCreateClient">
                         <table>
                           <tr>
-                           <th>{t("itfName")}</th>
+                            <th>{t("itfName")}</th>
                             <th>{t("lastPeriodKg")}</th>
                             <th>{t("currentPeriodKg")}</th>
                             <th>{t("diff")}</th>

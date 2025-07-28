@@ -21,6 +21,8 @@ import { Autocomplete } from "@mui/material";
 
 const EanRepack = () => {
   const { t, i18n } = useTranslation("global");
+  const role = localStorage.getItem("role");
+  const email = localStorage.getItem("email");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,29 +31,42 @@ const EanRepack = () => {
   const [closeButton, setCloseButton] = useState(true);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [eanListData, setEanListData] = useState([]);
+  const [pcId, setPcId] = useState("");
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDate1, setSelectedDate1] = useState(new Date());
+
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
-  console.log(from?.packing_ean_produce_id);
+  console.log(from?.Produce_id);
   const eanList = () => {
     axios
-      .post(`${API_BASE_URL}/getEANList`, {
-        item_id: from?.packing_ean_produce_id,
+      .post(`${API_BASE_URL}/PEANDropdownList`, {
+        produce_id: from?.Produce_id,
       })
       .then((response) => {
-        console.log(response);
+        console.log(response.data);
         setEanListData(response.data.data);
       })
       .catch((error) => {
         console.error("There was an error updating the data!", error);
       });
   };
-  console.log(eanListData);
   useEffect(() => {
     eanList();
   }, []);
+  const options =
+    eanListData?.map((item) => ({
+      id: item.ID,
+      name:
+        (email === "Plaew" && role === "Operation") ||
+        (email === "Gam" && role === "Operation") ||
+        (email === "Look Sorn" && role === "Operation")
+          ? item.EAN_Internal_TH
+          : item.EAN_Internal_EN,
+    })) || [];
+
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
   };
@@ -121,8 +136,6 @@ const EanRepack = () => {
   const { data: brands } = useQuery("getBrand");
   const { data: eanData } = useQuery("getEan");
   console.log(packingCommonId);
-  const email = localStorage.getItem("email");
-  const role = localStorage.getItem("role");
 
   useEffect(() => {
     getPackingCommon();
@@ -199,44 +212,52 @@ const EanRepack = () => {
   };
 
   const checkPackCommonId = async () => {
-    axios
-      .post(`${API_BASE_URL}/CheckstartEndTime`, {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/CheckstartEndTime`, {
         start_time: formatDate(selectedDate1),
         end_time: formatDate(selectedDate),
-      })
-      .then((response) => {
-        console.log(response);
-        const responseData = response.data;
-
-        if (responseData.success === true) {
-          console.log(packingCommonId);
-          if (!packingCommonId) {
-            const { oldqty, number_of_staff, start_time, end_time } = state;
-
-            if (
-              !oldqty ||
-              !number_of_staff ||
-              !selectedDate ||
-              !selectedDate1
-            ) {
-              return toast.error(t("genericError")); toast.error("Please fill all fields");
-            }
-          }
-          setCloseButton(false);
-          openModal();
-        } else if (responseData.success === false) {
-          closeModal();
-          // Remove unwanted line breaks and concatenate messages
-          const message = `${responseData.message.en.trim()} ${responseData.message.th.trim()}`;
-
-          toast.error(message, {
-            className: "toast-error",
-          });
-        }
-      })
-      .catch((error) => {
-        return toast.error(error);
       });
+
+      const responseData = res.data;
+
+      if (responseData.success === true) {
+        if (!packingCommonId) {
+          const { oldqty, number_of_staff } = state;
+
+          if (!oldqty || !number_of_staff || !selectedDate || !selectedDate1) {
+            return toast.error(t("genericError")); // or a specific message
+          }
+        }
+
+        // Proceed with repack API call
+        const repackRes = await axios.post(`${API_BASE_URL}/doRepackEan`, {
+          number_of_staff: state.number_of_staff,
+          packing_ean_id: from?.packing_ean_id,
+          start_time: formatDate(selectedDate1),
+          end_time: formatDate(selectedDate),
+          user_id: localStorage.getItem("id"),
+          oldqty: state.oldqty,
+          PODCODE: from?.pod_code,
+          packing_common_id: from?.packing_common_id,
+          PC_ID: pcId,
+        });
+        console.log(repackRes);
+        setPcId(repackRes.data.data);
+        setCloseButton(false);
+        openModal();
+      } else {
+        closeModal();
+        const message = `${responseData.message.en?.trim() || ""} ${
+          responseData.message.th?.trim() || ""
+        }`;
+        toast.error(message.trim(), {
+          className: "toast-error",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(t("genericError"));
+    }
   };
 
   const calculate = async () => {
@@ -245,6 +266,13 @@ const EanRepack = () => {
     await axios
       .post(`${API_BASE_URL}createEanPacking`, {
         packing_common_id: packingCommonId,
+        number_of_staff: state.number_of_staff,
+        packing_ean_id: from?.packing_ean_id,
+        start_time: formatDate(selectedDate1),
+        end_time: formatDate(selectedDate),
+        user_id: localStorage.getItem("id"),
+        oldqty: state.oldqty,
+        PODCODE: from?.pod_code,
       })
       .then((response) => {
         if (response.status === 200) {
@@ -263,7 +291,6 @@ const EanRepack = () => {
 
     if (!unit_id || brand_id === null || !ean_quantity) {
       return toast.error(t("pleaseFillAllFields"));
-
     }
 
     const request = {
@@ -278,16 +305,19 @@ const EanRepack = () => {
       user_id: localStorage.getItem("id"),
       assigned_order: selectedOrder,
       oldqty: state.oldqty,
+      PODCODE: from?.pod_code,
+      packing_common_id: from?.packing_common_id,
+      OD_ID: selectedOrder,
+      PC_ID: pcId,
     };
 
     axios
-      .post(`${API_BASE_URL}/doRepackEan`, request)
+      .post(`${API_BASE_URL}/doRepackEanDetails`, request)
       .then((response) => {
         console.log(response);
         setPackingCommonId(response.data.packing_common_id);
 
         if (response.status === 200) {
-          toast.success("Ean Repack  detail added successfully");
           toast.success(t("eanRepackSuccess"));
           closeModal();
           setToggle(!toggle);
@@ -306,25 +336,98 @@ const EanRepack = () => {
       });
   };
 
-  const handleNewSlecter = () => {
-    axios
-      .post(`${API_BASE_URL}/AssignOrderDropDownList`, {
-        produce_id: from?.Produce_id,
-      })
-      .then((response) => {
-        console.log(response.data.data[0], "this is new item");
-        setAssigned(response.data.data[0]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  useEffect(() => {
-    handleNewSlecter();
-  }, []);
+  // const handleNewSlecter = () => {
+  //   axios
+  //     .post(`${API_BASE_URL}/AssignOrderDropDownList`, {
+  //       produce_id: from?.Produce_id,
+  //     })
+  //     .then((response) => {
+  //       console.log(response.data.data[0], "this is new item");
+  //       setAssigned(response.data.data[0]);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
+  // useEffect(() => {
+  //   handleNewSlecter();
+  // }, []);
 
   console.log(selectedOrder, "this is selected value");
+  const formatDate1 = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+  const formatterTwo = new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const formatTwoDecimals = (value) => {
+    return new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+  useEffect(() => {
+    console.log(data.brand_id);
+    console.log(data?.ean_id);
+    if (data?.ean_id && data?.brand_id) {
+      // Call the PEANORDER API
+      fetchPEANORDER(data.ean_id, data.brand_id);
+    }
+  }, [data?.ean_id, data?.brand_id]);
 
+  const fetchPEANORDER = (eanId, brandId) => {
+    axios
+      .post(`${API_BASE_URL}/PEANORDER`, {
+        EAN: eanId,
+        Brand: brandId,
+      })
+      .then((res) => {
+        setAssigned(res?.data?.data);
+        console.log("PEANORDER API response:", res.data);
+        // Handle response if needed
+      })
+      .catch((err) => {
+        console.error("Error calling PEANORDER:", err);
+      });
+  };
+  const getPackingCommonCancel = async () => {
+    console.log(packingCommonId);
+    try {
+      loadingModal.fire(); // Show loading modal
+      if (packingCommonId) {
+        const response = await axios.post(`${API_BASE_URL}/PEANRESTORE`, {
+          packing_common_id: packingCommonId,
+        });
+
+        console.log(response);
+
+        if (response.data?.message === "success") {
+          toast.success(t("packingFetchSuccess"), {
+            position: "top-right",
+            autoClose: 3000,
+          });
+
+          // Optional: you can handle response data here
+          // setData(response.data.data);
+        }
+      }
+
+      // 3. Navigate after everything
+      navigate("/adjustEan");
+    } catch (error) {
+      console.error("Error in getPackingCommonCancel:", error);
+      toast.error(t("packingFetchFail"));
+    } finally {
+      loadingModal.close(); // Always close modal
+    }
+  };
   return (
     <main className="main-content">
       <div>
@@ -346,7 +449,10 @@ const EanRepack = () => {
                   <div className="grayBgColor" style={{ padding: "18px" }}>
                     <div className="row">
                       <div className="col-md-6">
-                        <h6 className="font-weight-bolder mb-0"> {t("repackEan")}</h6>
+                        <h6 className="font-weight-bolder mb-0">
+                          {" "}
+                          {t("rePacking")}
+                        </h6>
                       </div>
                     </div>
                   </div>
@@ -363,22 +469,100 @@ const EanRepack = () => {
                         >
                           <div className="formCreate">
                             <div className="row">
-                              <div className="form-group col-lg-3 removeBorder">
-                                <h6> {t("name")} : </h6>
-                                <p> {from?.name}</p>
+                              <div className="form-group col-lg-3">
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      {t("podCode")} <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.pod_code}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>{t("date")}:</strong>
+                                  </div>
+                                  <div>{from?.date_}</div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      {t("name")} <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.name}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      {t("location")} <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.Location}</p>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="form-group col-lg-3 removeBorder">
-                                <h6> {t("brand")} : </h6>
-                                <p> {from?.brand}</p>
+                              <div className="form-group col-lg-3">
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      {t("quantity")}
+                                      <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.Qty}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      {t("unit")}
+                                      <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.unit}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      {t("averageWeight")}
+                                      <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.average_weight}</p>
+                                  </div>
+                                </div>
+                                <div className="parentPurchaseView">
+                                  <div className="me-3">
+                                    <strong>
+                                      {t("crate")}
+                                      <span>:</span>
+                                    </strong>
+                                  </div>
+                                  <div>
+                                    <p>{from?.Crates}</p>
+                                  </div>
+                                </div>
+                                {/* <h6> {t("brand")} : </h6>
+                                <p> {from?.brand}</p> */}
                               </div>
-                              <div className="form-group col-lg-3 removeBorder">
+                              {/* <div className="form-group col-lg-3 removeBorder">
                                 <h6> {t("quantity")} : </h6>
                                 <p> {from?.Qty}</p>
                               </div>
                               <div className="form-group col-lg-3 removeBorder">
                                 <h6>  {t("unit")} : </h6>
                                 <p> {from?.unit}</p>
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                           <div className="formCreate">
@@ -405,7 +589,7 @@ const EanRepack = () => {
                                   />
                                 </div>
                                 <div className="form-group col-lg-3 eanDateTime">
-                                  <h6> {t("endTime")}</h6>
+                                  <h6> {t("startTime")}</h6>
                                   <LocalizationProvider
                                     dateAdapter={AdapterDateFns}
                                   >
@@ -463,9 +647,15 @@ const EanRepack = () => {
                                   </button> */}
                                   <button
                                     type="button"
+                                    onClick={() => calculate()}
+                                  >
+                                    {t("calculate")}
+                                  </button>
+                                  <button
+                                    type="button"
                                     onClick={() => checkPackCommonId()}
                                   >
-                                   {t("add")}
+                                    {t("add")}
                                   </button>
                                 </div>
                               </div>
@@ -484,6 +674,7 @@ const EanRepack = () => {
                                       <th> {t("averageWeight")}</th>
                                       <th> {t("eanPerKg")}</th>
                                       <th> {t("eanPerHour")}</th>
+                                      <th> {t("wastage")}</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -496,6 +687,7 @@ const EanRepack = () => {
                                         <td>{item.average_weight}</td>
                                         <td>{item.EanPerKg}</td>
                                         <td>{item.EanPerHour}</td>
+                                        <td>{item.Wastage}</td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -507,6 +699,12 @@ const EanRepack = () => {
                       </div>
                     </div>
                     <div className="card-footer">
+                      <button
+                        className="btn btn-danger"
+                        onClick={getPackingCommonCancel}
+                      >
+                        {t("cancel")}
+                      </button>
                       {closeButton ? (
                         <Link className="btn btn-danger" to={"/adjustEan"}>
                           {t("close")}
@@ -552,14 +750,14 @@ const EanRepack = () => {
                     onChange={(e) => handleChangeData(e, "ean_id")}
                   /> */}
 
-                  <Autocomplete
+                  {/* <Autocomplete
                     disablePortal
                     options={eanListData?.map((item) => ({
                       id: item.ean_id,
                       name:
                         (email === "Plaew" && role === "Operation") ||
-                          (email === "Gam" && role === "Operation") ||
-                          (email === "Look Sorn" && role === "Operation")
+                        (email === "Gam" && role === "Operation") ||
+                        (email === "Look Sorn" && role === "Operation")
                           ? item.ean_name_th
                           : item.ean_name_en,
                     }))}
@@ -572,6 +770,28 @@ const EanRepack = () => {
                     renderInput={(params) => (
                       <TextField {...params} placeholder="Select EAN" />
                     )}
+                  /> */}
+                  <Autocomplete
+                    disablePortal
+                    options={options}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, newValue) => {
+                      if (newValue) {
+                        handleChangeData(newValue.id, "ean_id");
+                      }
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder={t("selectEan")}
+                        variant="outlined"
+                      />
+                    )}
+                    value={
+                      options.find((option) => option.id === data?.ean_id) ||
+                      null
+                    }
+                    sx={{ width: 300 }}
                   />
                 </div>
                 <div className="form-group">
@@ -598,9 +818,9 @@ const EanRepack = () => {
                     options={
                       unitType
                         ? unitType?.slice(0, 3).map((item) => ({
-                          id: item.ID,
-                          name: item.Name_EN,
-                        }))
+                            id: item.ID,
+                            name: item.Name_EN,
+                          }))
                         : []
                     }
                     getOptionLabel={(option) => option.name || ""}
@@ -612,11 +832,11 @@ const EanRepack = () => {
                     value={
                       unitType
                         ? unitType
-                          .map((item) => ({
-                            id: item.ID,
-                            name: item.Name_EN,
-                          }))
-                          .find((item) => item.id === data?.unit_id) || null
+                            .map((item) => ({
+                              id: item.ID,
+                              name: item.Name_EN,
+                            }))
+                            .find((item) => item.id === data?.unit_id) || null
                         : null
                     }
                     isOptionEqualToValue={(option, value) =>
@@ -643,21 +863,21 @@ const EanRepack = () => {
                     options={
                       brands
                         ? brands.map((item) => ({
-                          id: item.ID,
-                          name: item.Name_EN,
-                        }))
+                            id: item.ID,
+                            name: item.Name_EN,
+                          }))
                         : []
                     }
                     getOptionLabel={(option) => option.name || ""}
                     value={
                       brands
                         ? brands
-                          .map((item) => ({
-                            id: item.ID,
-                            name: item.Name_EN,
-                          }))
-                          .find((brand) => brand.id === data?.brand_id) ||
-                        null
+                            .map((item) => ({
+                              id: item.ID,
+                              name: item.Name_EN,
+                            }))
+                            .find((brand) => brand.id === data?.brand_id) ||
+                          null
                         : null
                     }
                     isOptionEqualToValue={(option, value) =>
@@ -688,7 +908,7 @@ const EanRepack = () => {
                       </option>
                     ))}
                   </select> */}
-                  <Autocomplete
+                  {/* <Autocomplete
                     disablePortal
                     options={assigned.map((item) => ({
                       id: item.od_id,
@@ -713,6 +933,36 @@ const EanRepack = () => {
                         variant="outlined"
                       />
                     )}
+                  /> */}
+                  <Autocomplete
+                    options={[
+                      { Display: "Not Allocated", OD_ID: "" },
+                      ...assigned,
+                    ]}
+                    getOptionLabel={(option) => option.Display || ""}
+                    onChange={(event, newValue) => {
+                      setSelectedOrder(newValue?.OD_ID || ""); // If "Not Allocated" or null is selected, set blank
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder={t("selectOrder")}
+                        variant="outlined"
+                      />
+                    )}
+                    value={
+                      [
+                        { Display: "Not Allocated", OD_ID: "" },
+                        ...assigned,
+                      ].find((option) => option.OD_ID === selectedOrder) || null
+                    }
+                    isOptionEqualToValue={(option, value) =>
+                      option.OD_ID === value.OD_ID
+                    }
+                    clearOnEscape
+                    clearIcon={<i className="mdi mdi-close" />}
+                    disablePortal
+                    sx={{ width: 300 }}
                   />
                 </div>
               </div>
@@ -729,7 +979,7 @@ const EanRepack = () => {
                   onClick={() => saveNewDetails()}
                   className="bg-black text-white px-4 py-2 rounded"
                 >
-                   {t("save")}
+                  {t("save")}
                 </button>
               </div>
             </div>

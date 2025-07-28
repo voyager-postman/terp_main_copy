@@ -3,8 +3,9 @@ import Chart from "chart.js/auto";
 import Select from "react-select";
 import { API_BASE_URL } from "../../Url/Url";
 import axios from "axios";
-
+import { useTranslation } from "react-i18next";
 const ChartConsi = () => {
+  const [t, i18n] = useTranslation("global");
   const chartRef = useRef(null);
   const [data, setData] = useState([]);
   const [options, setOptions] = useState([]);
@@ -79,7 +80,7 @@ const ChartConsi = () => {
         options={options}
         onChange={handleDropdownChange}
         value={options.find((option) => option.value === selectedDataset)}
-        placeholder="Select..."
+        placeholder={t("select")}
         isSearchable
         styles={{
           container: (provided) => ({

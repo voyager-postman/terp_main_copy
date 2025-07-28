@@ -2416,7 +2416,7 @@ const CreateClient = () => {
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
                               -2%
-                            </span>
+                            </span>{" "}
                             {t("thanYesterday")}
                           </p>
                         </div>
@@ -2471,8 +2471,8 @@ const CreateClient = () => {
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
                               +5%
-                            </span>
-                            {t("thanYesterday")}
+                            </span>{" "}
+                            {t("thanYesterday")}{" "}
                           </p>
                         </div>
                       </div>
@@ -2497,7 +2497,7 @@ const CreateClient = () => {
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
                               +5%
-                            </span>
+                            </span>{" "}
                             {t("thanYesterday")}
                           </p>
                         </div>
@@ -2523,7 +2523,7 @@ const CreateClient = () => {
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
                               +5%
-                            </span>
+                            </span>{" "}
                             {t("thanYesterday")}
                           </p>
                         </div>
@@ -4163,7 +4163,7 @@ const CreateClient = () => {
                               className="btn btn-primary"
                               // onClick={handleSubmit}
                             >
-                              {("submit")}
+                              {t("submit")}
                             </button>
                           </div>
                         </div>

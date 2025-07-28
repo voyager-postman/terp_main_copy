@@ -482,7 +482,6 @@ const NewEanPacking = () => {
 
             setCloseButton(true);
             toast.success("Ean updated successfully");
-            // toast.success(t("returnToSupplierSuccess"));
             setToggle(!toggle);
           }
         });
@@ -521,9 +520,7 @@ const NewEanPacking = () => {
         setPackingCommonId(response.data.data);
         const packingEanId = response.data.packing_ean_id?.[0]?.[0]?.["@LID"];
         setPackingEanId(packingEanId);
-        // const lidValue = response.data.data[0][0]["@LID"];
-        // console.log(lidValue);
-        // setFilterdata(lidValue);
+    
         if (response.status === 200) {
           toast.success(t("eanPackingAddSuccess"));
           closeModal();

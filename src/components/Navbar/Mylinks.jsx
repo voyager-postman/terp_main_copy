@@ -135,6 +135,7 @@ export const getLinks = () => {
             { name: t("invoice"), link: "/invoice" },
             { name: t("claim"), link: "/claim" },
             { name: t("receipts"), link: "/reciept" },
+               { name: t("billingNote"), link: "/billing_note" },
           ],
         },
       ],

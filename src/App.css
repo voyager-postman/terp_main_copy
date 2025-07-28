@@ -1889,6 +1889,7 @@ input.p-multiselect-filter.p-inputtext.p-component:focus {
   font-size: 20px;
   margin-top: 10px;
   font-weight: 500;
+  white-space: break-spaces;
 }
 
 .positionNav .dropdown-item:hover,
@@ -1915,7 +1916,7 @@ input.p-multiselect-filter.p-inputtext.p-component:focus {
   font-size: 15px;
   white-space: normal;
   border-bottom: 1px solid #20376482;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
 }
 
 .positionNav .dropdown-menu.show:before {
@@ -3979,21 +3980,78 @@ td {
   padding: unset;
   text-align: center;
 }
-.addBtnEan .MuiButtonBase-root{
-padding: 0px !important;
-background-color: unset !important;
-margin-top: unset;
+.addBtnEan .MuiButtonBase-root {
+  padding: 0px !important;
+  background-color: unset !important;
+  margin-top: unset;
 }
-.IncludeClaim>div {
-    padding-right: 40px;
+.IncludeClaim > div {
+  padding-right: 40px;
 }
 .IncludeClaim {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 }
-.tableEditInv td:first-child{
+.tableEditInv td:first-child {
   text-align: left !important;
 }
 .parentInsideUp input {
-    cursor: pointer;
+  cursor: pointer;
+}
+.deleteModal {
+  background: #631f37;
+}
+.deleteModal h3 {
+  color: #fff;
+  text-align: center;
+}
+.deleteModal label {
+  color: #fff;
+}
+.deleteModal input {
+  border: unset !important;
+}
+.tableCreateClient input {
+  margin-bottom: 0px;
+}
+.tableCombinePayment {
+  overflow: auto;
+  max-height: 400px;
+}
+.addPeriod {
+  background-color: #fff;
+  color: #000;
+  padding: 8px 20px;
+  font-size: 15px;
+  border-radius: 20px;
+}
+.parentIncome {
+  display: flex;
+}
+.parentIncome p {
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.incomeState th,
+.innerBorderDebit th:nth-child(3n) {
+  border-right: 3px solid #ffff;
+  white-space: nowrap;
+}
+.innerBorderDebit th,
+.outerBorderAcc th:first-child {
+  border-right: unset;
+}
+.incomeState p {
+  font-size: 13px;
+}
+.incomeState td {
+  border-right: 3px solid #203764;
+}
+
+.incomeState td:nth-child(3n) {
+  border-right: none;
+}
+.incomeState td:nth-child(3n-2) {
+  border-right: none;
 }

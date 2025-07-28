@@ -14,10 +14,12 @@ import { FaCaretDown } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 const InvoiceEdit2 = () => {
+  const [t, i18n] = useTranslation("global");
   const { data: RoundingDataList } = useQuery("GetRoundingTable");
   const [state5, setState5] = useState({
-    Rounding: "", // Initial state
+    Rounding: "",
   });
   // round
   const [color, setColor] = useState(false);
@@ -468,9 +470,9 @@ const InvoiceEdit2 = () => {
       const modalInstance = bootstrap.Modal.getInstance(modalEl);
       if (modalInstance) modalInstance.hide();
       setState5("");
-      toast.success("Invoice Price updated  successfully");
+      toast.success(t("invoicePriceUpdated"));
     } catch (e) {
-      console.error("Something went wrong", e);
+      console.error(t("genericError"), e);
     }
   };
   const handleSubmit2 = async () => {
@@ -481,7 +483,7 @@ const InvoiceEdit2 = () => {
       console.log(response);
       getOrdersDetails();
 
-      toast.success("Agreed Price updated  successfully");
+      toast.success(t("agreedPriceUpdated"));
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -501,7 +503,7 @@ const InvoiceEdit2 = () => {
       console.log(response);
       getOrdersDetails();
 
-      toast.success("Invoice Price updated  successfully");
+      toast.success(t("invoicePriceUpdated"));
     } catch (e) {
       console.error("Something went wrong", e);
     }
@@ -578,7 +580,7 @@ const InvoiceEdit2 = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -606,7 +608,7 @@ const InvoiceEdit2 = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -634,7 +636,7 @@ const InvoiceEdit2 = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -662,7 +664,7 @@ const InvoiceEdit2 = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -690,7 +692,7 @@ const InvoiceEdit2 = () => {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to update status", {
+      toast.error(t("failedToUpdateStatus"), {
         autoClose: 1500,
         theme: "colored",
       });
@@ -834,7 +836,7 @@ const InvoiceEdit2 = () => {
         oneQoutationDAta();
         oneQoutationDAta();
         getOrdersDetails();
-        toast.success("Invoice Calculated successfully", {
+        toast.success(t("invoiceCalculated"), {
           autoClose: 1000,
           theme: "colored",
         });
@@ -1074,7 +1076,7 @@ const InvoiceEdit2 = () => {
       is_changed: true,
     };
     if (!values.ITF || !values.itf_quantity || !values.itf_unit)
-      return toast.error("Please fill all fields");
+      return toast.error(t("pleaseFillAllFields"));
     loadingModal.fire();
     closeModal();
     try {
@@ -1095,7 +1097,7 @@ const InvoiceEdit2 = () => {
       setOrderId(data?.order_id);
       console.log(data);
       getOrdersDetails();
-      toast.success("Order detail added successfully");
+      toast.success(t("orderDetailAddedy"));
       setState((prevState) => {
         return {
           ...prevState,
@@ -1112,7 +1114,7 @@ const InvoiceEdit2 = () => {
       console.error(e);
       MySwal.close();
       closeModal();
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     } finally {
       MySwal.close();
       closeModal();
@@ -1445,7 +1447,7 @@ const InvoiceEdit2 = () => {
       getOrdersDetails();
       oneQoutationDAta();
       loadingModal.close();
-      toast.success("Invoice Calculated successfully", {
+      toast.success(t("invoiceCalculated"), {
         autoClose: 1000,
         theme: "colored",
       });
@@ -1454,7 +1456,7 @@ const InvoiceEdit2 = () => {
     } catch (error) {
       console.error("API call error:", error);
       loadingModal.close();
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
   const invoicePrice = async () => {
@@ -1485,13 +1487,13 @@ const InvoiceEdit2 = () => {
       console.log(response);
       getOrdersDetails();
       oneQoutationDAta();
-      toast.success("Reduce Rebate successfully", {
+      toast.success("c", {
         autoClose: 1000,
         theme: "colored",
       });
     } catch (error) {
       console.error("API call error:", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
   const recordRebate = async () => {
@@ -1502,13 +1504,13 @@ const InvoiceEdit2 = () => {
       console.log(response);
       getOrdersDetails();
       oneQoutationDAta();
-      toast.success("Record Rebate successfully", {
+      toast.success(t("recordRebateSuccess"), {
         autoClose: 1000,
         theme: "colored",
       });
     } catch (error) {
       console.error("API call error:", error);
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     }
   };
   const closeFunction = () => {
@@ -1525,7 +1527,7 @@ const InvoiceEdit2 = () => {
       })
       .catch((error) => {
         console.error("API call error:", error);
-        toast.error("Something went wrong");
+        toast.error(t("genericError"));
       });
   };
 
@@ -1669,6 +1671,7 @@ const InvoiceEdit2 = () => {
         unit_id: newValue,
       });
       console.log("API response:", response);
+      calculated();
       getOrdersDetails();
     } catch (error) {
       console.error("API call error:", error);
@@ -1719,7 +1722,7 @@ const InvoiceEdit2 = () => {
                         <div className="row">
                           <div className="col-md-6">
                             <h6 className="font-weight-bolder mb-0 pt-2">
-                              Invoice / Edit Form
+                              {t("invoiceEditForm")}
                             </h6>
                           </div>
                         </div>
@@ -1729,13 +1732,13 @@ const InvoiceEdit2 = () => {
                           <div className="row formEan">
                             {state.quote_id && (
                               <div className="col-lg-3 form-group">
-                                <h6>Quote</h6>
+                                <h6>{t("quote")}</h6>
                                 <div className="ceateTransport">
                                   <select
                                     value={computedState.quote_id}
                                     name="quote_id"
                                   >
-                                    <option>Select Quote</option>
+                                    <option>{t("selectQuote")}</option>
                                     {quote?.map((v) => (
                                       <option value={v.quote_id}>
                                         {v.client_name}
@@ -1750,7 +1753,7 @@ const InvoiceEdit2 = () => {
                             <div className="col-lg-4 form-group mb-3 quotationSelectSer">
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Client :</strong>
+                                  <strong>{t("client")} :</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1763,7 +1766,7 @@ const InvoiceEdit2 = () => {
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Consignee :</strong>
+                                  <strong>{t("consignee")} :</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1778,7 +1781,7 @@ const InvoiceEdit2 = () => {
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Brand :</strong>
+                                  <strong>{t("brand")} :</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1792,7 +1795,7 @@ const InvoiceEdit2 = () => {
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Port of Destination :</strong>
+                                  <strong>{t("destinationPort")} :</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1800,25 +1803,25 @@ const InvoiceEdit2 = () => {
                                       (port) =>
                                         port.port_id ===
                                         computedState.destination_port_id
-                                    )?.port_name || "None selected"}
+                                    )?.port_name || t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Currency :</strong>
+                                  <strong>{t("currency")} :</strong>
                                 </div>
                                 <div>
                                   <p>
                                     {currency?.find(
                                       (c) => c.ID === computedState.fx_id
-                                    )?.FX || "None selected"}
+                                    )?.FX || t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>EX Rate :</strong>
+                                  <strong>{t("exRate")} :</strong>
                                 </div>
                                 <div>
                                   <p>{computedState.fx_rate}</p>
@@ -1829,7 +1832,7 @@ const InvoiceEdit2 = () => {
                             <div className="col-lg-4 form-group mb-3 quotationSelectSer">
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Loading Date :</strong>
+                                  <strong>{t("loadingDate")}:</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1837,13 +1840,13 @@ const InvoiceEdit2 = () => {
                                       ? new Date(
                                           computedState.load_date
                                         ).toLocaleDateString("en-GB")
-                                      : "Not selected"}
+                                      : t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Loading Location :</strong>
+                                  <strong>{t("loadingLocation")}:</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1851,13 +1854,13 @@ const InvoiceEdit2 = () => {
                                       (loc) =>
                                         loc.id ===
                                         computedState.loading_location
-                                    )?.name || "None selected"}
+                                    )?.name || t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Port of Origin :</strong>
+                                  <strong>{t("portOfOrigin")}:</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1865,13 +1868,13 @@ const InvoiceEdit2 = () => {
                                       (port) =>
                                         port.port_id ===
                                         computedState.from_port_
-                                    )?.port_name || "None selected"}
+                                    )?.port_name || t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Airline :</strong>
+                                  <strong>{t("airline")}:</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1879,7 +1882,7 @@ const InvoiceEdit2 = () => {
                                       (liner) =>
                                         liner.liner_id ===
                                         computedState.liner_id
-                                    )?.liner_name || "None selected"}
+                                    )?.liner_name || t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
@@ -1888,7 +1891,7 @@ const InvoiceEdit2 = () => {
                             <div className="col-lg-4 form-group mb-3 quotationSelectSer">
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Transportation :</strong>
+                                  <strong>{t("transportation")}:</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1896,14 +1899,14 @@ const InvoiceEdit2 = () => {
                                       (provider) =>
                                         provider.Transportation_provider ===
                                         computedState.Transportation_provider
-                                    )?.name || "None selected"}
+                                    )?.name || t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
 
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Clearance :</strong>
+                                  <strong>{t("clearance")}:</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1912,13 +1915,13 @@ const InvoiceEdit2 = () => {
                                       (provider) =>
                                         provider.Clearance_provider ===
                                         computedState.Clearance_provider
-                                    )?.name || "None selected"}
+                                    )?.name || t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
                               <div className="parentPurchaseView">
                                 <div className="me-3">
-                                  <strong>Freight Provider :</strong>
+                                  <strong>{t("freightProvider")}:</strong>
                                 </div>
                                 <div>
                                   <p>
@@ -1927,14 +1930,14 @@ const InvoiceEdit2 = () => {
                                       (provider) =>
                                         provider.Freight_provider ===
                                         computedState.Freight_provider_
-                                    )?.name || "None selected"}
+                                    )?.name || t("noneSelected")}
                                   </p>
                                 </div>
                               </div>
                             </div>
 
                             <div className="col-lg-2 form-group  ">
-                              <h6>Markup Rate</h6>
+                              <h6>{t("markupRate")}</h6>
                               <div className="parentShip">
                                 <div className="markupShip">
                                   <input
@@ -1951,7 +1954,7 @@ const InvoiceEdit2 = () => {
                               </div>
                             </div>
                             <div className="col-lg-2 form-group">
-                              <h6> Rebate</h6>
+                              <h6>{t("rebate")}</h6>
                               <div className="parentShip">
                                 <div className="markupShip">
                                   <input
@@ -1981,7 +1984,7 @@ const InvoiceEdit2 = () => {
                             <div className="col-lg-8">
                               <div className="IncludeClaim">
                                 <div>
-                                  <h6>Include Claim</h6>
+                                  <h6>{t("includeClaim")}</h6>
                                   <div className="flex gap-2 items-center">
                                     <label
                                       className="toggleSwitch large"
@@ -1994,15 +1997,15 @@ const InvoiceEdit2 = () => {
                                         onChange={handleAgreedPricingChange8}
                                       />
                                       <span>
-                                        <span>OFF</span>
-                                        <span>ON</span>
+                                        <span>{t("off")}</span>
+                                        <span>{t("on")}</span>
                                       </span>
                                       <a></a>
                                     </label>
                                   </div>
                                 </div>
                                 <div>
-                                  <h6>Charge Volume</h6>
+                                  <h6>{t("chargeVolume")}</h6>
                                   <div className="flex gap-2 items-center">
                                     <label
                                       className="toggleSwitch large"
@@ -2015,15 +2018,15 @@ const InvoiceEdit2 = () => {
                                         onChange={handleAgreedPricingChange4}
                                       />
                                       <span>
-                                        <span>OFF</span>
-                                        <span>ON</span>
+                                        <span>{t("off")}</span>
+                                        <span>{t("on")}</span>
                                       </span>
                                       <a></a>
                                     </label>
                                   </div>
                                 </div>
                                 <div>
-                                  <h6>Palletized</h6>
+                                  <h6>{t("palletized")}</h6>
                                   <div className="flex gap-2 items-center">
                                     <label className="toggleSwitch large">
                                       <input
@@ -2033,15 +2036,15 @@ const InvoiceEdit2 = () => {
                                         onChange={handleAgreedPricingChange5}
                                       />
                                       <span>
-                                        <span>OFF</span>
-                                        <span>ON</span>
+                                        <span>{t("off")}</span>
+                                        <span>{t("on")}</span>
                                       </span>
                                       <a></a>
                                     </label>
                                   </div>
                                 </div>
                                 <div>
-                                  <h6>CO from Chamber</h6>
+                                  <h6>{t("coFromChamber")}</h6>
                                   <div className="flex gap-2 items-center">
                                     <label className="toggleSwitch large">
                                       <input
@@ -2051,15 +2054,15 @@ const InvoiceEdit2 = () => {
                                         onChange={handleAgreedPricingChange6}
                                       />
                                       <span>
-                                        <span>OFF</span>
-                                        <span>ON</span>
+                                        <span>{t("off")}</span>
+                                        <span>{t("on")}</span>
                                       </span>
                                       <a></a>
                                     </label>
                                   </div>
                                 </div>
                                 <div>
-                                  <h6>Precooling</h6>
+                                  <h6>{t("precooling")}</h6>
                                   <div className="flex gap-2 items-center">
                                     <label className="toggleSwitch large">
                                       <input
@@ -2069,8 +2072,8 @@ const InvoiceEdit2 = () => {
                                         onChange={handleAgreedPricingChange7}
                                       />
                                       <span>
-                                        <span>OFF</span>
-                                        <span>ON</span>
+                                        <span>{t("off")}</span>
+                                        <span>{t("on")}</span>
                                       </span>
                                       <a></a>
                                     </label>
@@ -2089,7 +2092,7 @@ const InvoiceEdit2 = () => {
                                       onClick={calculated}
                                       className="me-2"
                                     >
-                                      Calculate
+                                      {t("calculate")}
                                     </button>
                                   </div>
                                   <div>
@@ -2098,7 +2101,7 @@ const InvoiceEdit2 = () => {
                                       className="me-2"
                                       onClick={handleSubmit1}
                                     >
-                                      Use Invoice Price
+                                      {t("useInvoicePrice")}
                                     </button>
                                   </div>
                                   <div>
@@ -2107,7 +2110,7 @@ const InvoiceEdit2 = () => {
                                       className="me-2"
                                       onClick={handleSubmit2}
                                     >
-                                      Agreed Price
+                                      {t("agreedPrice")}
                                     </button>
                                   </div>
                                   <div>
@@ -2116,7 +2119,7 @@ const InvoiceEdit2 = () => {
                                       className="me-2"
                                       onClick={reduceRebate}
                                     >
-                                      Reduce Rebate
+                                      {t("reduceRebate")}
                                     </button>
                                   </div>
                                   <div className="me-3">
@@ -2124,7 +2127,7 @@ const InvoiceEdit2 = () => {
                                       type="button"
                                       onClick={recordRebate}
                                     >
-                                      Record Rebate
+                                      {t("recordRebate")}
                                     </button>
                                   </div>
                                   <div>
@@ -2134,7 +2137,7 @@ const InvoiceEdit2 = () => {
                                       data-bs-toggle="modal"
                                       data-bs-target="#exampleModal"
                                     >
-                                      Round Price
+                                      {t("roundPrice")}
                                     </button>
 
                                     {/* Button trigger modal */}
@@ -2154,7 +2157,7 @@ const InvoiceEdit2 = () => {
                                               className="modal-title fs-5"
                                               id="exampleModalLabel"
                                             >
-                                              Price Rounding
+                                              {t("priceRounding")}
                                             </h1>
                                             <button
                                               type="button"
@@ -2172,7 +2175,7 @@ const InvoiceEdit2 = () => {
                                           </div>
                                           <div className="modal-body">
                                             <div className="col-lg-12 form-group autoComplete">
-                                              <h6>Rounding</h6>
+                                              <h6>{t("rounding")}</h6>
                                               <Autocomplete
                                                 options={RoundingDataList || []}
                                                 getOptionLabel={(option) =>
@@ -2200,7 +2203,9 @@ const InvoiceEdit2 = () => {
                                                 renderInput={(params) => (
                                                   <TextField
                                                     {...params}
-                                                    placeholder="Select Rounding"
+                                                    placeholder={t(
+                                                      "selectRounding"
+                                                    )}
                                                     variant="outlined"
                                                   />
                                                 )}
@@ -2213,7 +2218,7 @@ const InvoiceEdit2 = () => {
                                               className="btn btn-primary"
                                               onClick={handleSubmit}
                                             >
-                                              Submit
+                                              {t("submit")}
                                             </button>
                                           </div>
                                         </div>
@@ -2697,8 +2702,9 @@ const InvoiceEdit2 = () => {
                                 <div>
                                   <b>
                                     {details?.section6_Labels?.[
-                                      "Total Net Weight :"
-                                    ] || "Total Net Weight :"}
+                                      t("totalNetWeight")
+                                    ] || t("totalNetWeight")}{" "}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section6_Values?.Row1 || 0
@@ -2707,8 +2713,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section6_Labels?.[
-                                      "Total Gross Weight :"
-                                    ] || "Total Gross Weight :"}
+                                      t("totalGrossWeight")
+                                    ] || t("totalGrossWeight")}
+                                    :{" "}
                                   </b>
 
                                   {(
@@ -2718,8 +2725,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section6_Labels?.[
-                                      "Total Box :"
-                                    ] || "Total Box :"}
+                                      t("totalBox")
+                                    ] || t("totalBox")}{" "}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section6_Values?.Row3 || 0
@@ -2729,8 +2737,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section6_Labels?.[
-                                      "Total Volume :"
-                                    ] || "Total Volume :"}
+                                      t("totalVolume")
+                                    ] || t("totalVolume")}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section6_Values?.Row4 || 0
@@ -2739,8 +2748,9 @@ const InvoiceEdit2 = () => {
 
                                 <b>
                                   {details?.section6_Labels?.[
-                                    "Total Items :"
-                                  ] || "Total Items :"}
+                                    t("totalItems")
+                                  ] || t("totalItems")}{" "}
+                                  :{""}
                                 </b>
                                 {(
                                   +details?.section6_Values?.Row5 || 0
@@ -2750,8 +2760,9 @@ const InvoiceEdit2 = () => {
                               <div className="col-lg-3">
                                 <div>
                                   <b>
-                                    {details?.section7_Labels?.["Freight :"] ||
-                                      "Freight :"}
+                                    {details?.section7_Labels?.[t("freight")] ||
+                                      t("freight")}{" "}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section7_Values?.Row1 || 0
@@ -2760,8 +2771,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section7_Labels?.[
-                                      "Transport :"
-                                    ] || "Transport :"}
+                                      t("transport")
+                                    ] || t("transport")}{" "}
+                                    :{" "}
                                   </b>
 
                                   {(
@@ -2771,8 +2783,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section7_Labels?.[
-                                      "Clearance :"
-                                    ] || "Clearance :"}
+                                      t("clearance")
+                                    ] || t("clearance")}{" "}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section7_Values?.Row3 || 0
@@ -2781,8 +2794,9 @@ const InvoiceEdit2 = () => {
 
                                 <div className="">
                                   <b>
-                                    {details?.section7_Labels?.["Extra :"] ||
-                                      "Extra :"}
+                                    {details?.section7_Labels?.[t("extra")] ||
+                                      t("extra")}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section7_Values?.Row4 || 0
@@ -2791,8 +2805,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section7_Labels?.[
-                                      "Pre Cooling"
-                                    ] || "Pre Cooling"}
+                                      t("precooling")
+                                    ] || t("precooling")}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section7_Values?.Row5 || 0
@@ -2808,8 +2823,9 @@ const InvoiceEdit2 = () => {
                                 <div>
                                   <b>
                                     {details?.section8_Labels?.[
-                                      "Total CNF :"
-                                    ] || "Total CNF :"}
+                                      t("totalCNF")
+                                    ] || t("totalCNF")}{" "}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section8_Values?.Row1 || 0
@@ -2818,8 +2834,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section8_Labels?.[
-                                      "Total FOB :"
-                                    ] || "Total FOB :"}
+                                      t("totalFOB")
+                                    ] || t("totalFOB")}
+                                    :{" "}
                                   </b>
 
                                   {(
@@ -2829,8 +2846,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section8_Labels?.[
-                                      "Total Commission :"
-                                    ] || "Total Commission :"}
+                                      t("totalCommission")
+                                    ] || t("totalCommission")}{" "}
+                                    :{" "}
                                     {(
                                       +details?.section8_Values?.Row3 || 0
                                     ).toLocaleString()}
@@ -2840,8 +2858,9 @@ const InvoiceEdit2 = () => {
                                 <div className="">
                                   <b>
                                     {details?.section8_Labels?.[
-                                      "Total Rebate :"
-                                    ] || "Total Rebate :"}
+                                      t("totalRebate")
+                                    ] || t("totalRebate")}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section8_Values?.Row4 || 0
@@ -2849,8 +2868,9 @@ const InvoiceEdit2 = () => {
                                 </div>
                                 <div className="">
                                   <b>
-                                    {details?.section8_Labels?.["Row5"] ||
-                                      "Row5"}
+                                    {details?.section8_Labels?.[t("row5")] ||
+                                      t("row5")}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section8_Values?.Row5 || 0
@@ -2868,8 +2888,9 @@ const InvoiceEdit2 = () => {
                               <div className="col-lg-3">
                                 <div>
                                   <b>
-                                    {details?.section9_Labels?.["Profit :"] ||
-                                      "Profit :"}
+                                    {details?.section9_Labels?.[t("profit")] ||
+                                      t("profit")}
+                                    :{" "}
                                   </b>
                                   {(
                                     +details?.section9_Values?.Row1 || 0
@@ -2877,8 +2898,10 @@ const InvoiceEdit2 = () => {
                                 </div>
                                 <div className="">
                                   <b>
-                                    {details?.section9_Labels?.["Profit % :"] ||
-                                      "Profit % :"}
+                                    {details?.section9_Labels?.[
+                                      t("profitPprofitPercentageercent")
+                                    ] || t("profitPercentage")}
+                                    :{" "}
                                   </b>
 
                                   {(
@@ -2887,8 +2910,9 @@ const InvoiceEdit2 = () => {
                                 </div>
                                 <div className="">
                                   <b>
-                                    {details?.section9_Labels?.["Row3"] ||
-                                      "Row3"}
+                                    {details?.section9_Labels?.[t("row3")] ||
+                                      t("row3")}
+                                    :{" "}
                                   </b>
 
                                   {(
@@ -2897,8 +2921,9 @@ const InvoiceEdit2 = () => {
                                 </div>
                                 <div className="">
                                   <b>
-                                    {details?.section9_Labels?.["Row4"] ||
-                                      "Row4"}
+                                    {details?.section9_Labels?.[t("row4")] ||
+                                      t("row4")}
+                                    :{" "}
                                   </b>
 
                                   {(
@@ -2907,8 +2932,9 @@ const InvoiceEdit2 = () => {
                                 </div>
                                 <div className="">
                                   <b>
-                                    {details?.section9_Labels?.["Row5"] ||
-                                      "Row5"}
+                                    {details?.section9_Labels?.[t("row5")] ||
+                                      t("row5")}
+                                    :{" "}
                                   </b>
 
                                   {(
@@ -2924,7 +2950,7 @@ const InvoiceEdit2 = () => {
                   </div>
                   <div className="card-footer">
                     <button className="btn btn-danger" onClick={closeFunction}>
-                      Close
+                      {t("close")}
                     </button>
                   </div>
                 </div>
@@ -2938,20 +2964,20 @@ const InvoiceEdit2 = () => {
           <div>
             <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
               <div className="crossArea">
-                <h3>Edit Details</h3>
+                <h3>{t("editDetails")}</h3>
                 <p onClick={closeModal}>
                   <CloseIcon />
                 </p>
               </div>
               <div className="formEan formCreate">
                 <div className="form-group mb-3 itfHeight quotationSelectSer">
-                  <label>ITF</label>
+                  <label>{t("itf")}</label>
 
                   <Select
                     value={selectedOption || null} // The selected value
                     onChange={handleChangeSe} // Handle selection
                     options={options} // The dropdown options
-                    placeholder="Search or Select ITF"
+                    placeholder={t("selectItf")}
                     isClearable // Adds a clear button
                     styles={customStyles}
                     components={{ DropdownIndicator }} // Use the custom indicator
@@ -2959,7 +2985,7 @@ const InvoiceEdit2 = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Quantity</label>
+                  <label>{t("quantity")}</label>
                   <input
                     type="number"
                     value={
@@ -2972,8 +2998,7 @@ const InvoiceEdit2 = () => {
                   />
                 </div>
                 <div className="form-group mb-3 quotationSelectSer">
-                  <h6>Brands</h6>
-
+                  <h6>{t("brands")}</h6>
                   <Autocomplete
                     disablePortal
                     options={
@@ -3011,14 +3036,13 @@ const InvoiceEdit2 = () => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        placeholder="Select Brand"
+                        placeholder={t("selectBrand")}
                       />
                     )}
                   />
                 </div>
                 <div className="form-group mb-3 quotationSelectSer">
-                  <label>Unit</label>
-
+                  <label>{t("unit")}</label>
                   <Autocomplete
                     disablePortal
                     options={
@@ -3056,13 +3080,13 @@ const InvoiceEdit2 = () => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        placeholder="Select Unit"
+                        placeholder={t("selectUnit")}
                       />
                     )}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Adjustment price</label>
+                  <label>{t("adjustmentPrice")}</label>
                   <input
                     type="number"
                     value={
@@ -3081,7 +3105,7 @@ const InvoiceEdit2 = () => {
                   onClick={saveNewDetails}
                   className="bg-black text-white px-4 py-2 rounded"
                 >
-                  Save
+                  {t("save")}
                 </button>
               </div>
             </div>
@@ -3189,7 +3213,7 @@ const InvoiceEdit2 = () => {
                   className="btn btn-secondary"
                   onClick={handleCloseModal}
                 >
-                  Close
+                  {t("close")}
                 </button>
               </div>
             </div>

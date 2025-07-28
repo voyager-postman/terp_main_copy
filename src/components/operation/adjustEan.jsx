@@ -540,9 +540,9 @@ export const AdjustEan = () => {
                               <strong>
                                 {totalDetails?.Start_Time
                                   ? format(
-                                    new Date(totalDetails?.Start_Time),
-                                    "HH:mm dd-MM-yyyy"
-                                  )
+                                      new Date(totalDetails?.Start_Time),
+                                      "HH:mm dd-MM-yyyy"
+                                    )
                                   : "N/A"}{" "}
                               </strong>
                             </p>
@@ -553,9 +553,9 @@ export const AdjustEan = () => {
                               <strong>
                                 {totalDetails?.End_Time
                                   ? format(
-                                    new Date(totalDetails?.End_Time),
-                                    "HH:mm dd-MM-yyyy"
-                                  )
+                                      new Date(totalDetails?.End_Time),
+                                      "HH:mm dd-MM-yyyy"
+                                    )
                                   : "N/A"}{" "}
                               </strong>
                             </p>
@@ -673,13 +673,13 @@ export const AdjustEan = () => {
       <Card title={t("ean")}>
         <TableView columns={columns} data={data} />
       </Card>
-      {isOpen && (
+      {/* {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div
             className="fixed w-screen h-screen bg-black/20"
             onClick={closeModal}
           />
-          <div className="bg-white rounded-lg shadow-lg p-4 max-w-md w-full z-50">
+          <div className="deleteModal rounded-lg shadow-lg p-4 max-w-md w-full z-50">
             <h3> {t("editDetails")}</h3>
             <div className="formEan formCreate">
               <div className="form-group">
@@ -704,7 +704,45 @@ export const AdjustEan = () => {
                   className="bg-black text-white px-4 py-2 rounded submitButton"
                   onClick={handleSave}
                 >
-                 {t("submit")}
+                  {t("submit")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )} */}
+      {isOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div
+            className="fixed w-screen h-screen bg-black/20"
+            onClick={closeModal}
+          />
+          <div className="deleteModal rounded-lg shadow-lg p-4 max-w-md w-full z-50">
+            <h3> {t("editDetails")}</h3>
+            <div className="formEan formCreate">
+              <div className="form-group">
+                <label> {t("quantityOnHand")}</label>
+                <input
+                  type="Quantity"
+                  value={adjustQty}
+                  onChange={(e) => setAdjustQty(e.target.value)}
+                />
+              </div>
+
+              <div className="flex gap-2 justify-content-center">
+                <button
+                  type="button"
+                  className="bg-white px-4 py-2 rounded text-dark"
+                  onClick={closeModal}
+                >
+                  {t("close")}
+                </button>
+                <button
+                  type="button"
+                  className="bg-black text-dark px-4 py-2 rounded submitButton bg-white"
+                  onClick={handleSave}
+                >
+                  {t("submit")}
                 </button>
               </div>
             </div>

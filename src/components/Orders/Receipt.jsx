@@ -26,10 +26,9 @@ import Select from "@mui/material/Select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
-
 import { useTranslation } from "react-i18next";
 import moment from "moment";
-const PurchaseOrder = () => {
+const Receipt = () => {
   const { t, i18n } = useTranslation("global");
   const CustomInput = ({ value, onClick }) => (
     <div
@@ -69,8 +68,7 @@ const PurchaseOrder = () => {
     setExchangeRate3(e.target.checked);
   };
   const [hasUserChangedValues, setHasUserChangedValues] = useState(false);
-  const [basePayment, setBasePayment] = useState(0); // from left_pay
-  // const [mode, setMode] = useState("po"); // default is "po"
+  const [basePayment, setBasePayment] = useState(0);
   const [consigneeId, setConsigneeId] = useState("");
   const [data, setData] = useState([]);
   const [notes2, setNotes2] = useState("");
@@ -80,20 +78,15 @@ const PurchaseOrder = () => {
   const [depositUsedNew, newDepositUsedNew] = useState("");
   const [vatNew, setVatNew] = useState("");
   const [whtNew, setWhtNew] = useState("");
-
   const [leftRoundingNew, setLeftRoundingNew] = useState("");
-
   const [dataShow, setDataShow] = useState("");
   const [roundingNew, setRoundingNew] = useState("0");
   const [roundingNew1, setRoundingNew1] = useState("0");
   const [totalBeforText, setTotalBeforText] = useState("0");
-
   const [procesureResult, setProcesureResult] = useState("");
-
   const [amountToPay, setAmountToPay] = useState({});
   const [responceId, setResponceId] = useState("");
   const [singlePodId, setSinglePodId] = useState("");
-
   const [podId, setPodId] = useState("");
   const [numericvalueofdata, setNumericvalueofdata] = useState("");
   const [stock1, setStock1] = useState("");
@@ -233,7 +226,7 @@ const PurchaseOrder = () => {
     axios
       .get(`${API_BASE_URL}/getPurchaseOrder`, {
         params: {
-          status, // This will pass the selected status value
+          status,
         },
       })
       .then((res) => {
@@ -244,9 +237,8 @@ const PurchaseOrder = () => {
       });
   };
   const handleDateChange = (e) => {
-    setSelectedDate(e.target.value); // Update state with selected date
+    setSelectedDate(e.target.value);
   };
-  // create page
   const paymentTable3 = () => {
     axios
       .post(`${API_BASE_URL}/RecordCommission`, {
@@ -255,7 +247,6 @@ const PurchaseOrder = () => {
       .then((res) => {
         console.log(res);
         setPaymentTable2(res.data.data);
-        // setData(res.data.data);
       })
       .catch((error) => {
         console.log("There was an error fetching the data!", error);
@@ -312,9 +303,9 @@ const PurchaseOrder = () => {
       const initialAmounts = {};
 
       claimTable.forEach((item) => {
-        initialPaidAmounts[item.POD_ID] = item.paidAmount || "";
-        initialUnits[item.POD_ID] = item.unit || "";
-        initialAmounts[item.POD_ID] = item.amount || "";
+        initialPaidAmounts[item.po_id] = item.paidAmount || "";
+        initialUnits[item.po_id] = item.unit || "";
+        initialAmounts[item.po_id] = item.amount || "";
       });
 
       setPaidAmounts1(initialPaidAmounts);
@@ -326,23 +317,6 @@ const PurchaseOrder = () => {
     console.log(units);
     console.log(amounts);
   }, [claimTable]);
-  const handleCheckboxChange1 = (index, isChecked) => {
-    setSelectedRows((prevState) => {
-      const updatedRows = { ...prevState };
-      if (isChecked) {
-        updatedRows[index] = { ...updatedRows[index], checked: true };
-      } else {
-        delete updatedRows[index]; // Remove the row if unchecked
-      }
-      return updatedRows;
-    });
-  };
-  const handleAmountChange = (index, value) => {
-    setSelectedRows((prevState) => ({
-      ...prevState,
-      [index]: { ...prevState[index], amount: value },
-    }));
-  };
   const handleAmountChange1 = (pod_id, value) => {
     setAmounts((prev) => ({
       ...prev,
@@ -373,16 +347,6 @@ const PurchaseOrder = () => {
     });
   };
 
-  // const calculateCheckedAmount = (checkedState, amountData = amountToPay) => {
-  //   let sum = 0;
-  //   paymentTableVender.forEach((_, index) => {
-  //     if (checkedState[index]) {
-  //       sum += parseFloat(amountData[index] || 0);
-  //     }
-  //   });
-
-  //   setRoundingData(sum); // Update rounding field with the sum of checked amounts
-  // };
   const handlePaidAmountChange1 = (pod_id, value) => {
     setPaidAmounts1((prev) => ({
       ...prev,
@@ -390,40 +354,17 @@ const PurchaseOrder = () => {
     }));
   };
   const handleUnitChange = (pod_id, value) => {
-    console.log("Unit changed:", pod_id, value); // Debugging
+    console.log("Unit changed:", pod_id, value);
     setUnits((prev) => ({
       ...prev,
       [pod_id]: value,
     }));
   };
   const handleModalClose = () => {
-    setClientId(""); // Clear vendor selection
-    setFromDate(""); // Clear fromDate field
-    setToDate(""); // Clear toDate field
+    setClientId("");
+    setFromDate("");
+    setToDate("");
     setExchangeRate3(false);
-  };
-  const handleSubmit2 = () => {
-    const rowsToSubmit = paymentTable2
-      .map((item, index) => {
-        if (selectedRows[index]?.checked) {
-          return {
-            documentNumber: item["Transaction Ref"],
-            shipDate: item.Date,
-            ttRef: item["TT REF"],
-            fx: item.FX,
-            invoiceAmount: item["Invoice Amount"],
-            commissionThb: item["Commission Amount"],
-            commissionFx: item.Currnecy,
-            paidAmount: selectedRows[index]?.amount || 0,
-          };
-        }
-        return null;
-      })
-      .filter((row) => row !== null);
-
-    console.log("Data to submit:", rowsToSubmit);
-    // Call your API here with rowsToSubmit
-    // axios.post('/your-api-endpoint', rowsToSubmit).then(...).catch(...);
   };
 
   const [buttonClicked, setButtonClicked] = React.useState(false);
@@ -455,55 +396,6 @@ const PurchaseOrder = () => {
     setButtonClicked(false);
     setShow(false);
     navigate("/purchase_orders");
-  };
-  const handleEditDatils = (i, e) => {
-    const newEditPackaging = [...details];
-    newEditPackaging[i][e.target.name] = e.target.value;
-    setDetails(newEditPackaging);
-  };
-  // const itemData1 = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_BASE_URL}/PurchaseTypeItemsList`
-  //     );
-  //     setDropdownItems(response.data.data || []);
-  //   } catch (error) {
-  //     console.error("Error fetching purchase type items:", error);
-  //   }
-  // };
-  console.log(selectedRows);
-  const handleCurrencyChange5 = (e) => {
-    const selectedCurrencyId = e.target.value;
-    setFxId(selectedCurrencyId);
-    const selectedCurrency = currency.find(
-      (item) => item.currency_id === parseInt(selectedCurrencyId)
-    );
-    if (selectedCurrency) {
-      setFxRate(selectedCurrency.fx_rate);
-    } else {
-      setFxRate("");
-    }
-  };
-  // useEffect(() => {
-  //   itemData1();
-  // }, []);
-
-  const deleteDetails = async (pod_id) => {
-    try {
-      await axios.post(`${API_BASE_URL}/deletePurchaseOrderDetails`, {
-        pod_id: pod_id,
-      });
-      toast.success("Deleted Successfully", {
-        autoClose: 1000,
-        theme: "colored",
-      });
-      getDetils();
-    } catch (e) {}
-  };
-
-  const formatDate5 = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB"); // Outputs as DD/MM/YYYY
   };
 
   const fetchConsignees1 = async () => {
@@ -575,38 +467,6 @@ const PurchaseOrder = () => {
     setWHTTotal(0);
     setTotalBeforeTaxTotal(0);
   };
-  const addFieldHandleChange = (i, e) => {
-    const newFormValues = [...formsValue];
-    newFormValues[i][e.target.name] = e.target.value;
-    setFormsvalue(newFormValues);
-  };
-  const addFieldHandleChangeWname = (i, name, e) => {
-    const newFormValues = [...formsValue];
-    newFormValues[i][name] = e;
-    setFormsvalue(newFormValues);
-  };
-
-  const addFormFields = () => {
-    setFormsvalue([
-      ...formsValue,
-      {
-        pod_type_id: 0,
-        unit_count_id: 0,
-        POD_Selection: 0,
-        pod_quantity: 0,
-        pod_price: 0,
-        pod_vat: 0,
-        pod_wht_id: 0,
-        pod_crate: 0,
-      },
-    ]);
-  };
-
-  const removeFormFields = (i) => {
-    const newFormValues = [...formsValue];
-    newFormValues.splice(i, 1);
-    setFormsvalue(newFormValues);
-  };
 
   const { data: vendorList } = useQuery("getAllVendor");
   const { data: dropdownType } = useQuery("getDropdownType");
@@ -626,78 +486,6 @@ const PurchaseOrder = () => {
         [name]: value,
       };
     });
-  };
-  const handlePaidAmountChange5 = (invoiceNumber, value) => {
-    setPaidAmounts((prev) => {
-      const updatedPaidAmounts = {
-        ...prev,
-        [invoiceNumber]: value,
-      };
-
-      // Calculate the total of all paid amounts for checked items only
-      // const totalPaidAmount = paymentTable2.reduce((sum, item) => {
-      //   if (checkedItems[item.transaction_ref]) {
-      //     return (
-      //       sum + (parseFloat(updatedPaidAmounts[item.transaction_ref]) || 0)
-      //     );
-      //   }
-      //   return sum;
-      // }, 0);
-      const totalPaidAmount = paymentTable2.reduce((sum, item) => {
-        if (checkedItems[item["Transaction Ref"]]) {
-          return (
-            sum + (parseFloat(updatedPaidAmounts[item["Transaction Ref"]]) || 0)
-          );
-        }
-
-        return sum;
-      }, 0);
-
-      setTotalPaidAmount(totalPaidAmount);
-      setFxPayment(totalPaidAmount.toFixed(2));
-      return updatedPaidAmounts;
-    });
-  };
-  const updatePurchaseOrderDetils = () => {
-    if (!from?.po_id) return;
-    axios
-      .post(`${API_BASE_URL}/updatePurchaseOrderDetails`, {
-        // po_id: id,
-        data: details,
-      })
-      .then((response) => {
-        getPurchaseOrder();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  const addPurchaseOrderDetails = (id) => {
-    axios
-      .post(`${API_BASE_URL}/addPurchaseOrderDetails`, {
-        po_id: id,
-        user_id: localStorage.getItem("id"),
-        data: formsValue.filter((v) => v.POD_Selection),
-      })
-      .then((response) => {
-        console.log(response);
-        setFormsvalue([
-          {
-            pod_type_id: 0,
-            unit_count_id: 0,
-            POD_Selection: 0,
-            pod_quantity: 0,
-            pod_price: 0,
-            pod_vat: 0,
-            pod_wht_id: 0,
-            pod_crate: 0,
-          },
-        ]);
-        getPurchaseOrder();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   const cancelOrder = async () => {
@@ -798,35 +586,10 @@ const PurchaseOrder = () => {
   const handleChange1 = (event) => {
     setStatus(event.target.value);
   };
-  const handleCurrencyChange = (currencyId) => {
-    if (!currencyId) {
-      setFxId(null);
-      setFxRate("");
-      return;
-    }
 
-    setFxId(currencyId);
-    const selectedCurrency = currency.find(
-      (item) => item.currency_id === parseInt(currencyId)
-    );
-
-    if (selectedCurrency) {
-      setFxRate(selectedCurrency.fx_rate);
-    } else {
-      setFxRate("");
-    }
-  };
-
-  // const handleLossGainChange = (e) => {
-  //   const value = e.target.value;
-
-  //   // Recalculate THB Paid
-  //   const thbPaidValue = fxPayment? fxPayment:thbPaid - (value);
-  //   setThbPaid(thbPaidValue); // Update THB Paid value
-  // };
   const handleLossGainChange = (e) => {
-    const value = e.target.value || 0; // Ensure value is a number
-    setThbPaid(value); // Update THB Paid state
+    const value = e.target.value || 0;
+    setThbPaid(value);
   };
   const getOrdersDetails = () => {
     axios
@@ -852,11 +615,7 @@ const PurchaseOrder = () => {
         console.log(e);
       });
   };
-  const newFormatter5 = new Intl.NumberFormat("en-US", {
-    style: "decimal",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
+
   const formatTwoDecimal = new Intl.NumberFormat("en-US", {
     style: "decimal",
     minimumFractionDigits: 2,
@@ -915,42 +674,6 @@ const PurchaseOrder = () => {
     everyDataSet1();
   }, [responceId]);
 
-  // const everyDataSet = async (a) => {
-  //   console.log(a);
-  //   setHasUserChangedValues(false); // reset change flag
-  //   setSinglePodId(a);
-  //   if (a?.PO_ID) {
-  //     axios
-  //       .get(`${API_BASE_URL}/getPurchaseOrderDetails?po_id=${a?.PO_ID}`)
-  //       .then((response) => {
-  //         console.log(response);
-
-  //         setDepositAvailableNew(response?.data?.data1?.Available_deposit);
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //       });
-  //   }
-
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_BASE_URL}/GetRightTotalBeforTaxPOPayment`,
-  //       {
-  //         PO_ID: a?.PO_ID,
-  //       }
-  //     );
-  //     console.log(response);
-  //     setPaymentAmmountNew(response?.data?.left_pay - depositAvailableNew);
-  //     setProcesureResult(response?.data?.procedure_result);
-  //     setAmountToPayNew(response?.data?.procedure_result?.["Amount to Pay"]);
-  //     newDepositUsedNew(response?.data?.procedure_result?.Deposit);
-  //     setVatNew(response?.data?.procedure_result?.VAT);
-  //     setWhtNew(response?.data?.procedure_result?.WHT);
-  //     setLeftRoundingNew(response?.data?.procedure_result?.Rounding);
-  //   } catch (error) {
-  //     console.error("Error fetching orders:", error);
-  //   }
-  // };
   const everyDataSet = async (a) => {
     console.log(a);
     setHasUserChangedValues(false); // reset change flag
@@ -1040,38 +763,14 @@ const PurchaseOrder = () => {
     }
   };
 
-  // const claimDetails = async (po_id, a) => {
-  //   console.log(a);
-  //   setClaimPageData(a);
-  //   try {
-  //     const accessResponse = await axios.post(
-  //       `${API_BASE_URL}/updateaccessfile`,
-  //       {
-  //         id: a.PO_ID,
-  //         type: 1,
-  //         accesstype: 1, // Mark as in use
-  //       }
-  //     );
-  //     console.log(accessResponse);
-  //     const response = await axios.post(`${API_BASE_URL}/purchaseOrderView`, {
-  //       po_id: po_id,
-  //     });
-  //     console.log(response);
-  //     setClaimTable(response.data.data);
-  //   } catch (error) {
-  //     console.error("Error fetching statement:", error);
-  //   }
-  // };
   const handleRoundingChange = (e) => {
     let value = e.target.value;
 
-    // Allow empty input (do not force 0 immediately)
     if (value === "") {
       setRoundingData("");
       return;
     }
 
-    // Allow "-" or "+" at the start for negative/positive input
     if (value === "-" || value === "+") {
       setRoundingData(value);
       return;
@@ -1506,20 +1205,13 @@ const PurchaseOrder = () => {
           .toString()
           .padStart(2, "0")}-${date.getFullYear().toString().slice(2)}`;
       };
-      function formatDate1(val) {
-        const date = new Date(val);
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
-        const year = date.getFullYear(); // 4-digit year
-        return `${day}-${month}-${year}`;
-      }
 
       // Prepare rows
       const rows = tableData.map((rowItem) =>
         keys.map((key) => {
           const val = rowItem[key];
           if (isDate(val)) {
-            return formatDate1(val);
+            return formatDate(val);
           }
           return val !== null && val !== undefined ? val : "";
         })
@@ -2725,17 +2417,17 @@ const PurchaseOrder = () => {
       const selectedPaymentDetails = claimTable
         .filter(
           (item) =>
-            paidAmounts1[item.POD_ID] ||
-            units[item.POD_ID] ||
-            amounts[item.POD_ID]
+            paidAmounts1[item.pod_id] ||
+            units[item.pod_id] ||
+            amounts[item.pod_id]
         )
         .map((item) => ({
           Debit_Note_ID: V_payment_id,
           POD_ID: item.POD_ID,
           Item: item.Item,
-          QTY: paidAmounts1[item.POD_ID] || 0,
-          Unit: units[item.POD_ID] || 0,
-          Debit_Amount: amounts[item.POD_ID] || 0,
+          QTY: paidAmounts1[item.pod_id] || 0,
+          Unit: units[item.pod_id] || 0,
+          Debit_Amount: amounts[item.pod_id] || 0,
         }));
       console.log(selectedPaymentDetails);
       const commissionResponse = await axios.post(
@@ -3103,17 +2795,15 @@ const PurchaseOrder = () => {
   const columns = useMemo(
     () => [
       {
-        Header: t("poNumber"),
+        Header: t("receipts"),
         accessor: "POCODE",
       },
-
       {
-        Header: t("vendor"),
-        accessor: "Vendor_name",
+        Header: t("Payor"),
+        accessor: () => "Fresh4U Produce Ltd",
       },
-
       {
-        Header: t("poDate"),
+        Header: t("date"),
         accessor: (a) =>
           `${new Date(a.PO_date).getDate().toString().padStart(2, "0")}-${(
             new Date(a.PO_date).getMonth() + 1
@@ -3122,18 +2812,15 @@ const PurchaseOrder = () => {
             .padStart(2, "0")}-${new Date(a.PO_date).getFullYear()}`,
       },
       {
-        Header: t("total"),
+        Header: t("value"),
         accessor: (a) =>
           `${(+(a.Total_Before_Tax + a.VAT || "0")).toLocaleString()} THB`,
       },
       {
-        Header: t("invoices"),
-        accessor: "supplier_invoice_number",
+        Header: t("account"),
+        accessor: () => "55466345435",
       },
-      {
-        Header: t("status"),
-        accessor: "PO_Status",
-      },
+
       {
         Header: t("actions"),
         accessor: (a) => (
@@ -3185,8 +2872,7 @@ const PurchaseOrder = () => {
                   </button>
                 )}
 
-              {/* {a.Payment_Status === 1 && a.Receiving_Status === 2 && ( */}
-              {a.PO_Status === "1/1/1/1/1" && (
+              {a.Payment_Status === 1 && a.Receiving_Status === 2 && (
                 <button
                   type="button"
                   onClick={() => deleteOrder(a.PO_ID)}
@@ -3326,7 +3012,7 @@ const PurchaseOrder = () => {
     setModalOne(true); // Show the modal
   };
   const handleNavigate = () => {
-    navigate("/updatePurchaseOrder"); // Replace '/target-route' with your desired path
+    navigate("/receipt_create"); // Replace '/target-route' with your desired path
   };
   const [optionItem, setOptionItem] = useState([]);
   const [unitItem, setUnitItem] = useState([]);
@@ -3412,34 +3098,6 @@ const PurchaseOrder = () => {
     calculateCheckedAmount(updatedChildren, newChecked ? amountToPay : {});
   };
 
-  // const calculateCheckedAmount = (checkedState, amountData = amountToPay) => {
-  //   let sumAmountToPay = 0;
-  //   let sumVAT = 0;
-  //   let sumWHT = 0;
-  //   let sumTotalBeforeTax = 0;
-  //   let sumRounding = 0;
-
-  //   paymentTableVender.forEach((child, index) => {
-  //     if (checkedState[index]) {
-  //       const amountToPayValue = parseFloat(amountData[index] || 0);
-  //       const totalBeforeTax = parseFloat(child.Total_Before_Tax || 1); // Avoid division by zero
-  //       const vatValue = parseFloat(child.VAT || 0);
-  //       const whtValue = parseFloat(child.WHT || 0);
-
-  //       sumAmountToPay += amountToPayValue;
-  //       sumVAT += (amountToPayValue * vatValue) / totalBeforeTax;
-  //       sumWHT += (amountToPayValue * whtValue) / totalBeforeTax;
-  //       sumTotalBeforeTax += totalBeforeTax;
-  //       sumRounding += parseFloat(child.Rounding || 0);
-  //     }
-  //   });
-
-  //   // Set state for the dynamically calculated values
-  //   setRoundingData(sumRounding);
-  //   setVATTotal(sumVAT);
-  //   setWHTTotal(sumWHT);
-  //   setTotalBeforeTaxTotal(sumTotalBeforeTax);
-  // };
   const calculateCheckedAmount = (checkedState, amountData = amountToPay) => {
     let sumAmountToPay = 0;
     let sumVAT = 0;
@@ -3514,21 +3172,6 @@ const PurchaseOrder = () => {
     }
   };
 
-  // const handleChildChange = (index) => {
-  //   const updatedChildren = {
-  //     ...childChecked,
-  //     [index]: !childChecked[index], // Toggle individual checkbox
-  //   };
-
-  //   setChildChecked(updatedChildren);
-
-  //   // Check if all children are selected
-  //   const allChecked = Object.values(updatedChildren).every(Boolean);
-  //   setParentChecked(allChecked);
-
-  //   // Update sum based on selection
-  //   calculateCheckedAmount(updatedChildren);
-  // };
   useEffect(() => {
     const deposit = parseFloat(depositAvailableNew) || 0;
     const finalPayment = basePayment - deposit;
@@ -3543,144 +3186,7 @@ const PurchaseOrder = () => {
 
   return (
     <>
-      <Card title={t("purchase_order")}>
-        <div className="row dashCard53 mb-5 mt-5 justify-content-center">
-          <div className=" col-lg-3 col-md-4">
-            <h6 className="payableHead"> {t("payables")}</h6>
-
-            <div id="chart">
-              <ReactApexChart
-                options={options}
-                series={series1}
-                type="pie"
-                width="100%" // Make the chart take the full width of its container
-                height="auto" // Ensure height is auto-adjusted
-                style={{ maxWidth: "100vw" }} // Ensure it doesn't exceed viewport width
-              />
-            </div>
-            <div id="html-dist"></div>
-          </div>
-          <div className="col-lg-3 col-md-4">
-            <h3 className="itemOrder mt-0 mb-2">{t("payableAmounts")}</h3>
-            <div className="tableCreateClient">
-              <table>
-                <tbody>
-                  <tr>
-                    <th>{t("name")}</th>
-                    <th>{t("payable")}</th>
-                  </tr>
-
-                  <tr>
-                    <td> {t("total")}</td>
-                    <td>{purchaseStatistic1["Format(@Payables,2)"]}</td>
-                  </tr>
-                  <tr>
-                    <td> {t("produce")}</td>
-                    <td>{purchaseStatistic1["@produce_Payable"]} </td>
-                  </tr>
-                  <tr>
-                    <td> {t("freight")}</td>
-                    <td> {purchaseStatistic1["@Freight_Payable"]}</td>
-                  </tr>
-                  <tr data-bs-toggle="modal" data-bs-target="#exampleModal3">
-                    <td> {t("packaging")}</td>
-                    <td>{purchaseStatistic1["@packaging_Payable"]} </td>
-                  </tr>
-                  <div
-                    className="modal fade freightModalCreate "
-                    id="exampleModal3"
-                    tabIndex="-1"
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                  >
-                    <div className="modal-dialog  ">
-                      <div className="modal-content">
-                        <div className="modal-header">
-                          <h5 className="modal-title" id="exampleModalLabel">
-                            {t("packaging")}
-                          </h5>
-                          <button
-                            type="button"
-                            className="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                          >
-                            <i className="mdi mdi-close" />
-                          </button>
-                        </div>
-                        <div className="modal-body">
-                          <div className="row">
-                            <table>
-                              <tr>
-                                <th> {t("name")}</th>
-                                <th> {t("payable")} </th>
-                              </tr>
-                              {packagingTableData?.map((item) => {
-                                return (
-                                  <>
-                                    <tr>
-                                      <td> {item.Vendor_name}</td>
-
-                                      <td> {item.Total}</td>
-                                    </tr>
-                                  </>
-                                );
-                              })}
-                            </table>
-                          </div>
-                        </div>
-                        <div className="modal-footer justify-content-center">
-                          <button
-                            type="button"
-                            className="UpdatePopupBtn btn btn-primary "
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                          >
-                            {t("close")}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className=" col-lg-3 col-md-4">
-            <h3 className="itemOrder mt-0 mb-2"> {t("topPayables")}</h3>
-            <div className="tableCreateClient">
-              <table>
-                <tbody>
-                  <tr>
-                    <th>{t("name")}</th>
-                    <th>{t("payable")}</th>
-                  </tr>
-                  {purchaseStatistic?.map((item) => {
-                    return (
-                      <tr>
-                        <td>{item.name}</td>
-                        <td>{item.Payable}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className=" col-lg-3 col-md-4">
-            <h6 className="payableHead"> {t("totalExpenses")}</h6>
-            <div id="chart">
-              <ReactApexChart
-                options={options}
-                series={series}
-                type="pie"
-                width={350}
-              />
-            </div>
-            <div id="html-dist"></div>
-          </div>
-        </div>
+      <Card>
         <div className="d-flex justify-content-center domesticPayment">
           <button
             type="button"
@@ -3688,7 +3194,7 @@ const PurchaseOrder = () => {
             data-bs-toggle="modal"
             data-bs-target="#modalCombine1"
           >
-            {t("combinedPayment")}
+            {t("billingNote")}
           </button>
           <button
             type="button"
@@ -3698,14 +3204,7 @@ const PurchaseOrder = () => {
           >
             {t("statement")}
           </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModalComm"
-          >
-            {t("recordCommission")}
-          </button>
+
           <button
             type="button"
             className="btn btn-primary"
@@ -5010,9 +4509,6 @@ const PurchaseOrder = () => {
                     </div>
                   </div>
                 </div>
-                {/* <button type="button" className="btn btn-primary">
-              LRP Report
-            </button> */}
               </div>
             </div>
           }
@@ -5131,10 +4627,10 @@ const PurchaseOrder = () => {
                         <td>
                           <input
                             type="number"
-                            value={paidAmounts1[item.POD_ID] || ""}
+                            value={paidAmounts1[item.pod_id] || ""}
                             onChange={(e) =>
                               handlePaidAmountChange1(
-                                item.POD_ID,
+                                item.pod_id,
                                 e.target.value
                               )
                             }
@@ -5144,9 +4640,9 @@ const PurchaseOrder = () => {
                           <div className="selectInvoiceView parentFormPayment autoComplete">
                             <select
                               name="unit_id"
-                              value={units[item.POD_ID] || ""} // Ensure it uses `units` state
+                              value={units[item.pod_id] || ""} // Ensure it uses `units` state
                               onChange={(e) =>
-                                handleUnitChange(item.POD_ID, e.target.value)
+                                handleUnitChange(item.pod_id, e.target.value)
                               }
                             >
                               <option value="" disabled>
@@ -5164,9 +4660,9 @@ const PurchaseOrder = () => {
                         <td>
                           <input
                             type="number"
-                            value={amounts[item.POD_ID] || ""}
+                            value={amounts[item.pod_id] || ""}
                             onChange={(e) =>
-                              handleAmountChange1(item.POD_ID, e.target.value)
+                              handleAmountChange1(item.pod_id, e.target.value)
                             }
                           />
                         </td>
@@ -5374,383 +4870,6 @@ const PurchaseOrder = () => {
                                 </td>
                               </tr>
                             </tbody>
-                            {/* <tbody>
-                              {details?.map((v, i) => (
-                                <tr key={`b_${i}`} className="rowCursorPointer">
-                                  <td className="borderUnsetPod">
-                                    {v.pod_status == "1" ? (
-                                      <input
-                                        className="border-0"
-                                        value={v.pod_code}
-                                      />
-                                    ) : (
-                                      <>{v.pod_code}</>
-                                    )}
-                                  </td>
-
-                                  <td className="autoFull">
-                                    {v.pod_status == "1" ? (
-                                      <Autocomplete
-                                        className="unsetPurchaseWidth"
-                                        value={
-                                          dropdownItems?.find(
-                                            (item) => item.ID === v.dropDown_id
-                                          ) || null
-                                        }
-                                        options={dropdownItems}
-                                        getOptionLabel={(option) =>
-                                          option.produce_name_en || ""
-                                        }
-                                        onChange={(event, newValue) => {
-                                          if (+v.pod_status !== 1) return;
-                                          const newEditPackaging = [...details];
-                                          newEditPackaging[i].dropDown_id =
-                                            newValue?.ID || null;
-                                          setDetails(newEditPackaging);
-                                        }}
-                                        renderInput={(params) => (
-                                          <TextField
-                                            {...params}
-                                            variant="outlined"
-                                            placeholder="Select Item"
-                                            // label="Select Produce"
-                                          />
-                                        )}
-                                      />
-                                    ) : (
-                                      <> {v.produce_name_en} </>
-                                    )}
-                                  </td>
-
-                                  <td clas>
-                                    {v.pod_status == "1" ? (
-                                      <input
-                                        className="border-0"
-                                        type="text"
-                                        name="pod_quantity"
-                                        disabled={+v.pod_status != 1}
-                                        value={v.pod_quantity}
-                                        onChange={(e) => handleEditDatils(i, e)}
-                                      />
-                                    ) : (
-                                      <> {v.pod_quantity}</>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {v.pod_status == "1" ? (
-                                      <Autocomplete
-                                        options={unitType}
-                                        value={
-                                          unitType?.find(
-                                            (item) =>
-                                              item.unit_id === v.unit_count_id
-                                          ) || null
-                                        }
-                                        getOptionLabel={(option) =>
-                                          option.unit_name_en || ""
-                                        }
-                                        onChange={(event, newValue) => {
-                                          if (+v.pod_status !== 1) return;
-                                          const newEditPackaging = [...details];
-                                          newEditPackaging[i].unit_count_id =
-                                            newValue?.unit_id || null;
-                                          setDetails(newEditPackaging);
-                                        }}
-                                        renderInput={(params) => (
-                                          <TextField
-                                            {...params}
-                                            variant="outlined"
-                                            placeholder="Select Unit"
-                                            // label="Select Unit"
-                                          />
-                                        )}
-                                      />
-                                    ) : (
-                                      // <ComboBox
-                                      //   options={unitType?.map((v) => ({
-                                      //     id: v.unit_id,
-                                      //     name: v.unit_name_en,
-                                      //   }))}
-                                      //   value={v.unit_count_id}
-                                      //   onChange={(e) => {
-                                      //     if (+v.pod_status != 1) return;
-                                      //     const newEditPackaging = [...details];
-                                      //     newEditPackaging[i].unit_count_id = e;
-                                      //     setDetails(newEditPackaging);
-                                      //   }}
-                                      // />
-                                      <> {v.unit_count_id}</>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {v.pod_status == "1" ? (
-                                      <input
-                                        type="number"
-                                        name="pod_price"
-                                        className="border-0"
-                                        defaultValue={v.pod_price}
-                                        disabled={+v.pod_status != 1}
-                                        onChange={(e) => handleEditDatils(i, e)}
-                                      />
-                                    ) : (
-                                      <> {v.pod_price}</>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {v.pod_status == "1" ? (
-                                      <input
-                                        type="number"
-                                        name="pod_vat"
-                                        className="border-0"
-                                        defaultValue={v.pod_vat}
-                                        disabled={+v.pod_status != 1}
-                                        onChange={(e) => handleEditDatils(i, e)}
-                                        style={{ width: "50px" }}
-                                      />
-                                    ) : (
-                                      <> {v.pod_vat}</>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {v.pod_status == "1" ? (
-                                      <input
-                                        type="text"
-                                        readOnly
-                                        className="border-0"
-                                        disabled={+v.pod_status != 1}
-                                        value={(
-                                          +(
-                                            +v.pod_price *
-                                            +v.pod_quantity *
-                                            (v.pod_vat / 100)
-                                          ) +
-                                          +v.pod_price * +v.pod_quantity
-                                        ).toLocaleString("en-us")}
-                                      />
-                                    ) : (
-                                      <>
-                                        {" "}
-                                        {(
-                                          +(
-                                            +v.pod_price *
-                                            +v.pod_quantity *
-                                            (v.pod_vat / 100)
-                                          ) +
-                                          +v.pod_price * +v.pod_quantity
-                                        ).toLocaleString("en-us")}
-                                      </>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {v.pod_status == "1" ? (
-                                      <input
-                                        type="text"
-                                        name="pod_wht_id"
-                                        className="border-0"
-                                        disabled={+v.pod_status != 1}
-                                        style={{ width: "50px" }}
-                                        value={v.pod_wht_id}
-                                        onChange={(e) => handleEditDatils(i, e)}
-                                      />
-                                    ) : (
-                                      <> {v.pod_wht_id}</>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {v.pod_status == "1" ? (
-                                      <input
-                                        type="text"
-                                        name="pod_crate"
-                                        className="border-0"
-                                        style={{ width: "70px" }}
-                                        disabled={+v.pod_status != 1}
-                                        value={v.pod_crate}
-                                        onChange={(e) => handleEditDatils(i, e)}
-                                      />
-                                    ) : (
-                                      <> {v.pod_crate}</>
-                                    )}
-                                  </td>
-                                  <td className="editIcon">
-                                    {+v.pod_status == 1 ? (
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const i = window.confirm(
-                                            "Do you want to delete this Order details?"
-                                          );
-                                          if (i) {
-                                            deleteDetails(v.pod_id);
-                                          }
-                                        }}
-                                      >
-                                        <i className="mdi mdi-trash-can-outline" />
-                                      </button>
-                                    ) : (
-                                      <> </>
-                                    )}
-                                  </td>
-                                </tr>
-                              ))}
-                              {formsValue?.map((element, index) => (
-                                <tr
-                                  key={`a_${index}`}
-                                  className="rowCursorPointer"
-                                >
-                                  <td> </td>
-                                  <td>
-                                    <Autocomplete
-                                      value={
-                                        dropdownItems?.find(
-                                          (item) =>
-                                            item.ID === element.POD_Selection
-                                        ) || null
-                                      }
-                                      options={dropdownItems}
-                                      getOptionLabel={(option) =>
-                                        option.Name_EN || ""
-                                      }
-                                      onChange={(event, newValue) =>
-                                        addFieldHandleChangeWname(
-                                          index,
-                                          "POD_Selection",
-                                          newValue?.ID || null
-                                        )
-                                      }
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          placeholder="Select Item"
-                                          variant="outlined"
-                                          // label="Select POD"
-                                        />
-                                      )}
-                                    />
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      name="pod_quantity"
-                                      className="border-0"
-                                      onChange={(e) =>
-                                        addFieldHandleChange(index, e)
-                                      }
-                                      defaultValue={element.pod_quantity}
-                                    />
-                                  </td>
-                                  <td>
-                                    <Autocomplete
-                                      value={
-                                        unitType?.find(
-                                          (item) =>
-                                            item.ID === element.unit_count_id
-                                        ) || null
-                                      }
-                                      options={unitType}
-                                      getOptionLabel={(option) =>
-                                        option.Name_EN || ""
-                                      }
-                                      onChange={(event, newValue) =>
-                                        addFieldHandleChangeWname(
-                                          index,
-                                          "unit_count_id",
-                                          newValue?.ID || null
-                                        )
-                                      }
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          variant="outlined"
-                                          placeholder="Select Unit"
-                                        />
-                                      )}
-                                    />
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="number"
-                                      name="pod_price"
-                                      className="border-0"
-                                      onChange={(e) =>
-                                        addFieldHandleChange(index, e)
-                                      }
-                                      defaultValue={element.pod_price}
-                                    />
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="number"
-                                      name="pod_vat"
-                                      className="border-0"
-                                      style={{ width: "50px" }}
-                                      onChange={(e) =>
-                                        addFieldHandleChange(index, e)
-                                      }
-                                      defaultValue={element.pod_vat}
-                                    />
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      readOnly
-                                      className="border-0"
-                                      value={(
-                                        +(
-                                          +element.pod_price *
-                                          +element.pod_quantity *
-                                          (element.pod_vat / 100)
-                                        ) +
-                                        +element.pod_price *
-                                          +element.pod_quantity
-                                      ).toLocaleString("en-us")}
-                                    />
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      name="pod_wht_id"
-                                      style={{ width: "50px" }}
-                                      className="border-0"
-                                      onChange={(e) =>
-                                        addFieldHandleChange(index, e)
-                                      }
-                                      defaultValue={element.pod_wht_id}
-                                    />
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      name="pod_crate"
-                                      className="border-0"
-                                      style={{ width: "70px" }}
-                                      onChange={(e) =>
-                                        addFieldHandleChange(index, e)
-                                      }
-                                      defaultValue={element.pod_crate}
-                                    />
-                                  </td>
-                                  <td>
-                                    {index == formsValue.length - 1 ? (
-                                      <button
-                                        type="button"
-                                        onClick={addFormFields}
-                                        className="cursor-pointer"
-                                      >
-                                        <i className="mdi mdi-plus text-xl" />
-                                      </button>
-                                    ) : (
-                                      <button
-                                        type="button"
-                                        className="cursor-pointer"
-                                        onClick={() => removeFormFields(index)}
-                                      >
-                                        <i className="mdi mdi-trash-can-outline text-xl" />
-                                      </button>
-                                    )}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody> */}
                           </table>
                         </div>
                       </form>
@@ -5977,371 +5096,7 @@ const PurchaseOrder = () => {
       )}
 
       {/* add modal end */}
-      {/* commission  modal */}
-      <div
-        className="modal fade "
-        id="exampleModalComm"
-        tabIndex={-1}
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modalShipTo  modal-xl">
-          <div className="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">
-                {t("recordCommission")}
-              </h1>
-              <button
-                type="button"
-                onClick={dataAllClear1}
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <i class="mdi mdi-close"></i>
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="row">
-                <div className="col-lg-4">
-                  <div className="parentFormPayment autoComplete">
-                    <p> {t("clients")} </p>
 
-                    <Autocomplete
-                      disablePortal
-                      options={clientsData || []} // Ensure options is always an array
-                      getOptionLabel={(option) => option.client_name || ""} // Display the client name
-                      onChange={(e, newValue) =>
-                        setClientId(newValue?.client_id || "")
-                      } // Set the selected client ID
-                      value={
-                        (clientsData || []).find(
-                          (client) => client.client_id === clientId
-                        ) || null
-                      } // Match the selected value
-                      sx={{ width: 300 }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder={t("clients")}
-                          InputLabelProps={{ shrink: false }} // Prevents floating label
-                        />
-                      )}
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-4">
-                  <div className="parentFormPayment autoComplete">
-                    <p> {t("consignee")} </p>
-
-                    <Autocomplete
-                      disablePortal
-                      options={consignees || []} // Use your consignees array as options
-                      getOptionLabel={(option) => option.consignee_name || ""} // Display the consignee name
-                      onChange={
-                        (e, newValue) =>
-                          setConsigneeId(newValue?.consignee_id || "") // Set the selected consignee ID
-                      }
-                      value={
-                        consignees?.find(
-                          (option) => option.consignee_id === consigneeId
-                        ) || null
-                      } // Ensure the correct value is shown in the dropdown
-                      sx={{ width: 300 }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder={t("selectConsignee")} // Adds a placeholder
-                          InputLabelProps={{ shrink: false }} // Prevents floating label
-                        />
-                      )}
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-4">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("paymentDate")}</p>
-                    </div>
-                    <div>
-                      <DatePicker
-                        selected={paymentDate}
-                        onChange={(date) => setPaymentDate(date)}
-                        dateFormat="dd/MM/yyyy"
-                        className="form-control"
-                        placeholderText="DD/MM/YYYY"
-                        customInput={<CustomInput />} // Ensure you have the `CustomInput` component defined or imported
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-4 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("clientPaymentRef")}</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        value={clientPaymentRef}
-                        onChange={(e) => setClientPaymentRef(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-4 mt-3">
-                  <div className="parentFormPayment autoComplete">
-                    <p>{t("paymentChannel")} </p>
-                    <Autocomplete
-                      options={paymentChannle || []}
-                      getOptionLabel={(option) => option.Bank_nick_name || ""}
-                      value={
-                        (paymentChannle || []).find(
-                          (item) => item.bank_id === paymentChannel
-                        ) || null
-                      }
-                      onChange={(event, newValue) => {
-                        if (newValue) {
-                          console.log("Selected value:", newValue.bank_id);
-                          setPaymentChannel(newValue.bank_id);
-                        } else {
-                          setPaymentChannel(""); // Reset if nothing is selected
-                        }
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          placeholder={t("paymentChannel")}
-                        />
-                      )}
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-4 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p>{t("bankRef")}</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        value={bankRef}
-                        onChange={(e) => setBankRef(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-4 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("fxPayment")}</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        value={fxPayment}
-                        onChange={(e) => setFxPayment(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="parentFormPayment col-lg-4 mt-3 autoComplete">
-                  <p> {t("fx")}</p>
-                  <div>
-                    <Autocomplete
-                      options={currency || []}
-                      getOptionLabel={(option) => option.currency || ""}
-                      value={
-                        (currency || []).find(
-                          (item) => item.currency_id === fxId
-                        ) || null
-                      }
-                      onChange={(event, newValue) => {
-                        if (newValue) {
-                          console.log("Selected value:", newValue.currency_id);
-                          handleCurrencyChange5({
-                            target: { value: newValue.currency_id },
-                          });
-                        } else {
-                          handleCurrencyChange5({ target: { value: "" } }); // Reset if nothing is selected
-                        }
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          placeholder={t("select_fx")}
-                        />
-                      )}
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-4 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("fxRate")}</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        value={fxRate}
-                        onChange={(e) => setFxRate(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-lg-6 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("interBankCharges")}</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        value={intermittentBankCharges}
-                        onChange={(e) =>
-                          setIntermittentBankCharges(e.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-6 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("localBankCharges")}</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        value={localBankCharges}
-                        onChange={(e) => setLocalBankCharges(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-6 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("thbReceived")}</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        value={thbReceived}
-                        onChange={(e) => setThbReceived(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-6 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("lossGain")}</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        value={lossGainOnExchangeRate1}
-                        onChange={(e) =>
-                          setLossGainOnExchangeRate1(e.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-12 mt-3">
-                  <div className="parentFormPayment">
-                    <div>
-                      <p> {t("notes")}</p>
-                    </div>
-                    <div>
-                      <textarea
-                        value={notes1}
-                        onChange={(e) => setNotes1(e.target.value)}
-                      ></textarea>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="row mt-4">
-                <div className="tableCreateClient tablepayment">
-                  <table>
-                    <tr>
-                      <th> {t("check")}</th>
-                      <th> {t("documentNumber")}</th>
-                      <th> {t("shipDate")}</th>
-                      <th>{t("ttref")}</th>
-                      <th>{t("fx")}</th>
-                      <th> {t("invoiceAmount")}</th>
-                      <th> {t("commissionThb")}</th>
-                      <th> {t("commissionFx")}</th>
-                      <th> {t("paidAmount")}</th>
-                    </tr>
-                    {paymentTable2?.map((item) => {
-                      return (
-                        <>
-                          <tr>
-                            <td>
-                              <input
-                                type="checkbox"
-                                checked={
-                                  !!checkedItems[item["Transaction Ref"]]
-                                }
-                                onChange={(e) =>
-                                  handleCheckboxChange5(
-                                    item["Transaction Ref"], // Use bracket notation here
-                                    e.target.checked
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>{item["Transaction Ref"]}</td>
-                            <td>{formatDate5(item.Date) || "N/A"}</td>
-                            <td>{item["TT REF"]}</td>
-                            <td>{item.FX}</td>
-                            <td>{item["Invoice Amount"]}</td>
-                            <td>{item["Commission Amount"]}</td>
-                            <td>{item.Currnecy}</td>
-                            <td>
-                              <input
-                                type="number"
-                                value={
-                                  paidAmounts[item["Transaction Ref"]] || ""
-                                }
-                                onChange={(e) =>
-                                  handlePaidAmountChange5(
-                                    item["Transaction Ref"],
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </td>
-                          </tr>
-                        </>
-                      );
-                    })}
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                onClick={handleSubmit5}
-                className="btn btn-primary"
-              >
-                {t("submit")}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* commision modal */}
       <Modal
         className="modalError receiveModal"
         show={show1}
@@ -6503,4 +5258,4 @@ const PurchaseOrder = () => {
   );
 };
 
-export default PurchaseOrder;
+export default Receipt;

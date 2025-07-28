@@ -74,6 +74,8 @@ const Test = () => {
   });
   const [selectedLinerId, setSelectedLinerId] = useState(null);
   const [totalDetails, setTotalDetails] = useState("");
+  const [newDate, setNewDate] = useState("");
+
   const [orderId, setOrderId] = useState("");
   const [deleteOrderId, setDeleteOrderId] = useState("");
   const [startDate, setStartDate] = useState(null);
@@ -136,7 +138,7 @@ const Test = () => {
       .then((response) => {
         console.log(response);
         setTotalDetails(response.data.data);
-        setStartDate(new Date(response.data.data.Load_Date));
+        setStartDate(new Date(response.data.data.load_date));
         setStartDate1(new Date(response.data.data.Ship_date));
         setStartDate2(new Date(response.data.data.Arrival_date));
       })
@@ -254,9 +256,12 @@ const Test = () => {
     setChargeVolume(e.target.checked);
   };
   const handleJourneySelection = async (selectedJourneyId) => {
+    console.log(selectedJourneyId);
     const journey_id = selectedJourneyId; // assuming selectedJourneyId comes directly as the ID
     const order_id = id; // Assuming 'id' is already storing the order_id you need
-
+    const load_date = newDate
+      ? moment(newDate).format("YYYY-MM-DD")
+      : moment(startDate, "YYYY-MM-DD").format("YYYY-MM-DD");
     console.log(journey_id);
     console.log(order_id);
 
@@ -268,6 +273,7 @@ const Test = () => {
         {
           journey_id,
           order_id,
+          load_date,
         }
       );
       // Logging the entire response object to see all details
@@ -308,10 +314,11 @@ const Test = () => {
     const journey_id = journeyId || totalDetails?.Freight_journey_number; // assuming selectedJourneyId comes directly as the ID
     const order_id = id; // Assuming 'id' is already storing the order_id you need
     const load_date = loadDate;
+    setNewDate(load_date);
     try {
       // Sending a POST request to the server with journey_id and order_id
       const response = await axios.post(
-        `${API_BASE_URL}/getOrderFreightDetails`,
+        `${API_BASE_URL}/NewgetorderFreightDetails`,
         {
           journey_id,
           order_id,
@@ -1088,24 +1095,23 @@ const Test = () => {
       const maxWidthLeft = 72; // Maximum width in pixels
       let yLeft = 33;
       const yIncrementLeft = 1; // Adjust this value based on your spacing requirements
+
       const textDataLeft = [
         {
-          label: invoiceResponse?.data?.orderMetaLabels["Order : "],
-          value: `${invoiceResponse?.data?.invoiceHeader.Order_Number || ""}`,
+          label: invoiceResponse?.data?.orderMetaLabels?.Row1,
+          value: `${invoiceResponse?.data?.invoiceHeader.Row1 || ""}`,
         },
         {
-          label: invoiceResponse?.data?.dateLabels["Loading Date : "],
-          value:
-            invoiceResponse?.data?.dateValues[
-              'DATE_FORMAT(Orders.load_date, "%d-%m-%Y")'
-            ] || "",
+          label: invoiceResponse?.data?.dateLabels?.Row2,
+          value: invoiceResponse?.data?.invoiceHeader.Row2 || "",
         },
         {
-          label: invoiceResponse?.data?.orderMetaLabels["Shipment Ref "],
-          value: `${invoiceResponse?.data?.invoiceHeader.Shipment_ref || ""}`,
+          label: invoiceResponse?.data?.orderMetaLabels?.Row3,
+          value: `${invoiceResponse?.data?.invoiceHeader.Row3 || ""}`,
         },
       ];
-
+      doc.text(`${invoiceResponse?.data?.transportTypeLabel?.Row1}`, 7, 48);
+      doc.text(`${invoiceResponse?.data?.transportInfo?.Row1}`, 40, 48);
       textDataLeft.forEach((item) => {
         const labelXLeft = 7;
         const valueXLeft = 40;
@@ -1127,23 +1133,20 @@ const Test = () => {
       const yIncrementRight = 1; // Adjust this value based on your spacing requirements
 
       const textDataRight = [
-        // { label: "AWB/BL:", value: `${a?.bl}` },
-        // { label: "Ship Date: ", value: `${formatDate1(a?.Ship_date)}` },
-        // { label: "Delivery By:", value: `` },
-
         {
-          label: `${invoiceResponse?.data?.transportTypeLabel.AWB}`,
-          value: `${invoiceResponse?.data?.transportInfo.AWB}`,
+          label: `${invoiceResponse?.data?.dateLabels.Row1}`,
+          value: `${invoiceResponse?.data?.dateValues.Row1}`,
         },
         {
-          label: `${invoiceResponse?.data?.dateLabels["Shipment Date : "]}`,
-          value:
-            invoiceResponse?.data?.dateValues[
-              'DATE_FORMAT(Orders.Ship_date, "%d-%m-%Y")'
-            ] || "",
+          label: `${invoiceResponse?.data?.dateLabels.Row2}`,
+          value: `${invoiceResponse?.data?.dateValues?.Row2 || ""}`,
+        },
+        {
+          label: `${invoiceResponse?.data?.dateLabels.Row3}`,
+          value: `${invoiceResponse?.data?.dateValues?.Row3 || ""}`,
         },
       ];
-
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
       textDataRight.forEach((item) => {
         const labelXRight = 100;
         const valueXRight = 127;
@@ -1161,11 +1164,19 @@ const Test = () => {
 
       // invoice to
       doc.setFontSize(12);
-      doc.text("Invoice to", 7, 48.5);
-      doc.text("Consignee Details", 100, 48.5);
+      doc.text(
+        `${invoiceResponse?.data?.clientLabel["Client Details"]}`,
+        7,
+        54
+      );
+      doc.text(
+        `${invoiceResponse?.data?.consigneeLabel["Consignee Details"]}`,
+        100,
+        54
+      );
     };
     doc.setFillColor(32, 55, 100);
-    doc.rect(7, 50.5, doc.internal.pageSize.width - 15, 0.5, "FD");
+    doc.rect(7, 55.5, doc.internal.pageSize.width - 15, 0.5, "FD");
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     function renderWrappedText(
@@ -1182,7 +1193,8 @@ const Test = () => {
       });
       return startY + lines.length * lineHeight;
     }
-    const commonStartY = 56;
+
+    const commonStartY = 60;
     const lineHeight = 4.2;
     const maxWidth1 = 72;
     const startX1 = 7;
@@ -1193,8 +1205,7 @@ const Test = () => {
       invoiceResponse.data?.client_address.Address2,
       invoiceResponse.data?.client_address.Address3,
       invoiceResponse.data?.client_address.Address4,
-      invoiceResponse.data?.client_address.client_address3,
-      a.client_email,
+      invoiceResponse.data?.client_address.client_phone,
     ].filter((text) => text && text.toString().trim() !== "");
 
     let currentY1 = commonStartY;
@@ -1293,55 +1304,22 @@ const Test = () => {
           invoiceResponse?.data?.summaryValues?.Box
             ? invoiceResponse?.data?.summaryValues?.Box
             : ""
-        } Boxes / ${
-          invoiceResponse?.data?.summaryValues?.Items
-            ? invoiceResponse?.data?.summaryValues?.Items
-            : ""
-        } Item`,
+        }`,
       },
       {
-        label: invoiceResponse?.data?.weightLabels["Total Net Weight : "]
-          ? invoiceResponse?.data?.weightLabels?.["Total Net Weight : "]
+        label: invoiceResponse?.data?.summaryLabels["Total Packages : "]
+          ? invoiceResponse?.data?.summaryLabels?.["Total Packages : "]
           : "",
-        value: invoiceResponse?.data?.weightValues?.total_nw
-          ? `${newFormatter1.format(
-              parseFloat(
-                invoiceResponse.data.weightValues.total_nw.replace(
-                  /[^\d.]/g,
-                  ""
-                )
-              )
-            )} `
+        value: invoiceResponse?.data?.summaryValues?.Packages
+          ? invoiceResponse?.data?.summaryValues?.Packages
           : "",
       },
       {
-        label: invoiceResponse?.data?.weightLabels["Total Gross Weight : "]
-          ? invoiceResponse?.data?.weightLabels["Total Gross Weight : "]
+        label: invoiceResponse?.data?.summaryLabels["Total Items : "]
+          ? invoiceResponse?.data?.summaryLabels["Total Items : "]
           : "",
-        value: invoiceResponse?.data?.weightValues?.total_gw
-          ? `${newFormatter1.format(
-              parseFloat(
-                invoiceResponse.data.weightValues.total_gw.replace(
-                  /[^\d.]/g,
-                  ""
-                )
-              )
-            )} `
-          : "",
-      },
-      {
-        label: invoiceResponse?.data?.weightLabels["Total CBM : "]
-          ? invoiceResponse?.data?.weightLabels["Total CBM : "]
-          : "",
-        value: invoiceResponse?.data?.weightValues?.total_cbm
-          ? `${newFormatter1.format(
-              parseFloat(
-                invoiceResponse.data.weightValues.total_cbm.replace(
-                  /[^\d.]/g,
-                  ""
-                )
-              )
-            )} `
+        value: invoiceResponse?.data?.summaryValues?.Items
+          ? invoiceResponse?.data?.summaryValues?.Items
           : "",
       },
     ];
@@ -1362,60 +1340,35 @@ const Test = () => {
     const maxWidthRight = 40; // Maximum width in pixels
     let yRight = endY + 4; // Start below the table
     const yIncrementRight = 1; // Adjust this value based on your spacing requirements
-
     const textDataRight = [
       {
         label:
-          invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
-          "Total Packages : ",
-        value: invoiceResponse?.data?.summaryValues?.Packages
-          ? `${noFormatter.format(
-              invoiceResponse.data.summaryValues.Packages
-            )} `
+          invoiceResponse?.data?.weightLabels?.["Total Net Weight : "] ||
+          "Total Net Weight : ",
+        value: invoiceResponse?.data?.weightValues?.total_nw
+          ? invoiceResponse.data.weightValues.total_nw
           : "",
       },
       {
         label:
-          invoiceResponse?.data?.dummyTotalLabels?.["FOB (THB) : "] ||
-          "FOB (THB) : ",
-        value: invoiceResponse?.data?.dummyTotalCalc?.FOB
-          ? `${fourFormatter2.format(
-              parseFloat(
-                invoiceResponse.data.dummyTotalCalc.FOB.replace(/[^\d.]/g, "")
-              )
-            )} `
+          invoiceResponse?.data?.weightLabels?.["Total Gross Weight : "] ||
+          "Total Gross Weight : ",
+        value: invoiceResponse?.data?.weightValues?.total_gw
+          ? invoiceResponse?.data?.weightValues?.total_gw
           : "",
       },
       {
         label:
-          invoiceResponse?.data?.summaryLabels?.["Freight : "] || "Freight : ",
-        value: invoiceResponse?.data?.dummyTotalCalc?.Freight
-          ? `${fourFormatter2.format(
-              parseFloat(
-                invoiceResponse.data.dummyTotalCalc.Freight.replace(
-                  /[^\d.]/g,
-                  ""
-                )
-              )
-            )} `
-          : "",
-      },
-      {
-        label:
-          invoiceResponse?.data?.summaryLabels?.["Exchange Rate "] ||
-          "Exchange Rate ",
-        value: invoiceResponse?.data?.dummyTotalCalc?.Daily_FX_Rate
-          ? `${fourFormatter4.format(
-              parseFloat(
-                invoiceResponse.data.dummyTotalCalc.Daily_FX_Rate.replace(
-                  /[^\d.]/g,
-                  ""
-                )
-              )
-            )} `
+          invoiceResponse?.data?.weightLabels?.["Total CBM : "] ||
+          "Total CBM : ",
+        value: invoiceResponse?.data?.weightValues?.total_cbm
+          ? invoiceResponse?.data?.weightValues?.total_cbm
           : "",
       },
     ];
+    // Draw the text for the order part (right side)
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
 
     textDataRight.forEach((item) => {
       const labelXRight = 85;
@@ -1431,6 +1384,48 @@ const Test = () => {
       });
 
       yRight += valueLinesRight.length * 4 + yIncrementRight;
+    });
+    const textDataRightThree = [
+      {
+        label:
+          invoiceResponse?.data?.dummyTotalLabels?.["FOB (THB) : "] ||
+          "FOB (THB) : ",
+        value: invoiceResponse?.data?.dummyTotalCalc?.FOB
+          ? invoiceResponse.data.dummyTotalCalc.FOB
+          : "",
+      },
+      {
+        label:
+          invoiceResponse?.data?.dummyTotalLabels?.["Freight : "] ||
+          "Freight : ",
+        value: invoiceResponse?.data?.dummyTotalCalc?.Freight
+          ? invoiceResponse?.data?.dummyTotalCalc?.Freight
+          : "",
+      },
+      {
+        label:
+          invoiceResponse?.data?.dummyTotalLabels?.["Exchange Rate "] ||
+          "Exchange Rate ",
+        value: invoiceResponse?.data?.dummyTotalCalc?.Daily_FX_Rate
+          ? invoiceResponse?.data?.dummyTotalCalc?.Daily_FX_Rate
+          : "",
+      },
+    ];
+    let yRightNew = endY + 20;
+    textDataRightThree.forEach((item) => {
+      const labelXRight = 7;
+      const valueXRight = 40;
+
+      // Split the value text if it exceeds maxWidth
+      const valueLinesRight = doc.splitTextToSize(item.value, maxWidthRight);
+
+      // Print the label
+      doc.text(item.label, labelXRight, yRightNew);
+      valueLinesRight.forEach((line, index) => {
+        doc.text(line, valueXRight, yRightNew + index * 4);
+      });
+
+      yRightNew += valueLinesRight.length * 4 + yIncrementRight;
     });
 
     const cnfText = invoiceResponse?.data?.paymentValues?.CNF;
@@ -1459,12 +1454,23 @@ const Test = () => {
     doc.text(cnfFXText, rightAlignX - textWidthCNFFX, endY + 11);
     doc.setFillColor(32, 55, 100);
     doc.rect(147, endY + 12, 55.5, 0.5, "FD");
-    //*****************************************************************************************
+    doc.text(
+      invoiceResponse?.data?.paymentLabels?.["Exchange Rate "] ||
+        "Exchange Rate ",
+      147,
+      endY + 17
+    );
+    const cnfFXTextNew = invoiceResponse?.data?.paymentValues?.Daily_FX_Rate;
+    doc.text(cnfFXTextNew, rightAlignX - textWidthCNFFX, endY + 17);
+    doc.rect(147, endY + 18, 55.5, 0.5, "FD");
+
+    //*****************************************************************************************//
 
     // Custom page number function
     const addPageNumbers = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
+        4, 154.51;
         doc.setPage(i);
         doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
       }
@@ -2673,28 +2679,30 @@ const Test = () => {
                   <div className="flex gap-2">
                     <div className="form-group w-full">
                       <label>{t("loadDate")}</label>
-                      <form.Field
-                        name="Load_date"
-                        children={(field) => (
-                          // <input
-                          //   type="date"
-                          //   name={field.name}
-                          //   value={field.state.value}
-                          //   onBlur={field.handleBlur}
-                          //   onChange={(e) => {
-                          //     field.handleChange(e.target.value);
-                          //     handleLoadDateSelection(e.target.value);
-                          //   }}
-                          // />
-                          <DatePicker
-                            selected={startDate}
-                            onChange={handleStartDateChange}
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText= {t("selectDate")}
-                            customInput={<CustomInput />}
-                          />
-                        )}
-                      />
+                      <form.Field name="Load_date">
+                        {(field) => {
+                          const value = field.state.value;
+                          const isValidDate =
+                            value && !isNaN(Date.parse(value));
+
+                          return (
+                            <DatePicker
+                              selected={isValidDate ? new Date(value) : null}
+                              onChange={(date) => {
+                                const formattedDate = date
+                                  ?.toISOString()
+                                  .split("T")[0]; // yyyy-MM-dd
+                                field.handleChange(formattedDate); // Update form state
+                                handleLoadDateSelection(formattedDate); // Trigger API logic
+                              }}
+                              onBlur={field.handleBlur}
+                              dateFormat="dd/MM/yyyy"
+                              placeholderText={t("selectDate")}
+                              customInput={<CustomInput />}
+                            />
+                          );
+                        }}
+                      </form.Field>
                     </div>
                     <div className="form-group loadTimeS">
                       <label>{t("loadTime")}</label>
@@ -2715,25 +2723,29 @@ const Test = () => {
                   <div className="flex gap-2">
                     <div className="form-group w-full">
                       <label>{t("shipDate")}</label>
-                      <form.Field
-                        name="Ship_date"
-                        children={(field) => (
-                          // <input
-                          //   type="date"
-                          //   name={field.name}
-                          //   value={field.state.value}
-                          //   onBlur={field.handleBlur}
-                          //   onChange={(e) => field.handleChange(e.target.value)}
-                          // />
-                          <DatePicker
-                            selected={startDate1}
-                            onChange={handleStartDateChange1}
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText= {t("selectDate")}
-                            customInput={<CustomInput />}
-                          />
-                        )}
-                      />
+                      <form.Field name="Ship_date">
+                        {(field) => {
+                          const value = field.state.value;
+                          const isValidDate =
+                            value && !isNaN(Date.parse(value));
+
+                          return (
+                            <DatePicker
+                              selected={isValidDate ? new Date(value) : null}
+                              onChange={(date) => {
+                                const formattedDate = date
+                                  ?.toISOString()
+                                  .split("T")[0];
+                                field.handleChange(formattedDate);
+                              }}
+                              onBlur={field.handleBlur}
+                              dateFormat="dd/MM/yyyy"
+                              placeholderText={t("selectDate")}
+                              customInput={<CustomInput />}
+                            />
+                          );
+                        }}
+                      </form.Field>
                     </div>
                     <div className="form-group">
                       <label>{t("etd")}</label>
@@ -2754,26 +2766,29 @@ const Test = () => {
                   <div className="flex gap-2">
                     <div className="form-group w-full">
                       <label>{t("arrivalDate")}</label>
-                      <form.Field
-                        name="Arrival_date"
-                        children={(field) => (
-                          // <input
-                          //   type="date"
-                          //   name={field.name}
-                          //   value={field.state.value}
-                          //   onBlur={field.handleBlur}
-                          //   onChange={(e) => field.handleChange(e.target.value)}
-                          // />
-                          <DatePicker
-                            selected={startDate2}
-                            onChange={handleStartDateChange2}
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText= {t("selectDate")}
-                           
-                            customInput={<CustomInput />}
-                          />
-                        )}
-                      />
+                      <form.Field name="Arrival_date">
+                        {(field) => {
+                          const value = field.state.value;
+                          const isValidDate =
+                            value && !isNaN(Date.parse(value));
+
+                          return (
+                            <DatePicker
+                              selected={isValidDate ? new Date(value) : null}
+                              onChange={(date) => {
+                                const formattedDate = date
+                                  ?.toISOString()
+                                  .split("T")[0];
+                                field.handleChange(formattedDate);
+                              }}
+                              onBlur={field.handleBlur}
+                              dateFormat="dd/MM/yyyy"
+                              placeholderText={t("selectDate")}
+                              customInput={<CustomInput />}
+                            />
+                          );
+                        }}
+                      </form.Field>
                     </div>
                     <div className="form-group">
                       <label>{t("eta")}</label>
@@ -2872,12 +2887,12 @@ const Test = () => {
             </div>
             <div className="modal-body">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                {t("note")}
+                {t("notes")}
               </h1>
               <textarea
                 value={notes1}
                 onChange={handleChange3}
-                placeholder= {t("typeNotes")}
+                placeholder={t("typeNotes")}
               />
             </div>
             <div className="modal-footer">

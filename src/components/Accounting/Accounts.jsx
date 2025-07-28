@@ -472,10 +472,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_Invoices),
             105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+              valueWidth -
+              doc.getTextWidth(
+                formatter.format(response.data.data?.statement_Invoices)
+              ),
             finalY + 1
           );
 
@@ -484,10 +484,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_claims),
             105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+              valueWidth -
+              doc.getTextWidth(
+                formatter.format(response.data.data?.statement_claims)
+              ),
             finalY + 5
           );
 
@@ -496,10 +496,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_payments),
             105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+              valueWidth -
+              doc.getTextWidth(
+                formatter.format(response.data.data?.statement_payments)
+              ),
             finalY + 9
           );
 
@@ -511,10 +511,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_Totals),
             105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
+              valueWidth -
+              doc.getTextWidth(
+                formatter.format(response.data.data?.statement_Totals)
+              ),
             finalY + 16
           );
 
@@ -905,10 +905,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Invoices)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Invoices)
+            ),
           finalY + 1
         );
 
@@ -917,10 +917,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_claims)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_claims)
+            ),
           finalY + 5
         );
 
@@ -929,10 +929,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_payments)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_payments)
+            ),
           finalY + 9
         );
 
@@ -944,10 +944,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Totals)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Totals)
+            ),
           finalY + 16
         );
 
@@ -1037,7 +1037,7 @@ const Accounts = () => {
       // Automatically set Paid Amount to the corresponding amount_to_pay if checked
       const amountToPay = isChecked
         ? paymentTable2.find((item) => item.po_id === invoiceNumber)
-          ?.amount_to_pay || 0
+            ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -1141,7 +1141,6 @@ const Accounts = () => {
       }
       toast.success("Amount Transfer Successful");
       // toast.success(t("returnToSupplierSuccess"));
-
     } catch (error) {
       console.error("Error during account transfer:", error);
       toast.error("Something went wrong during the transfer");
@@ -2251,10 +2250,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Invoices)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Invoices)
+            ),
           finalY + 1
         );
 
@@ -2263,10 +2262,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_claims)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_claims)
+            ),
           finalY + 5
         );
 
@@ -2275,10 +2274,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_payments)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_payments)
+            ),
           finalY + 9
         );
 
@@ -2290,10 +2289,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Totals)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Totals)
+            ),
           finalY + 16
         );
 
@@ -2456,19 +2455,24 @@ const Accounts = () => {
         const startX1 = 7;
         const lineHeight1 = 4.2;
 
-        const longText1_1 = `${response.data.vendorData?.name ? response.data.vendorData?.name : ""
-          }(${response.data.vendorData?.id_card
+        const longText1_1 = `${
+          response.data.vendorData?.name ? response.data.vendorData?.name : ""
+        }(${
+          response.data.vendorData?.id_card
             ? response.data.vendorData?.id_card
             : ""
-          })`;
+        })`;
         doc.setFont("helvetica", "normal");
-        const longText1_2 = `${response.data.vendorData?.address
-          ? response.data.vendorData?.address
-          : ""
-          }`;
-        const longText1_3 = `${response.data.vendorData?.email ? response.data.vendorData?.email : ""
-          } / ${response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
-          }`;
+        const longText1_2 = `${
+          response.data.vendorData?.address
+            ? response.data.vendorData?.address
+            : ""
+        }`;
+        const longText1_3 = `${
+          response.data.vendorData?.email ? response.data.vendorData?.email : ""
+        } / ${
+          response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
+        }`;
 
         // Render client details
         doc.setFont("NotoSansThai"); // Set the font to use
@@ -2626,10 +2630,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Invoices)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Invoices)
+            ),
           finalY + 1
         );
 
@@ -2638,10 +2642,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_claims)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_claims)
+            ),
           finalY + 5
         );
 
@@ -2650,10 +2654,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_payments)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_payments)
+            ),
           finalY + 9
         );
 
@@ -2665,10 +2669,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Totals)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Totals)
+            ),
           finalY + 16
         );
 
@@ -2720,7 +2724,6 @@ const Accounts = () => {
       setFromDate("");
       setToDate("");
       toast.success(t("statementSuccess"));
-
     } catch (error) {
       console.error("Error fetching statement:", error);
       toast.error(t("genericError"));
@@ -2939,11 +2942,11 @@ const Accounts = () => {
             response.data.statement_details?.Starting_Balance
           ),
           alignmentX -
-          doc.getTextWidth(
-            formatterTwo.format(
-              response.data.statement_details?.Starting_Balance
-            )
-          ),
+            doc.getTextWidth(
+              formatterTwo.format(
+                response.data.statement_details?.Starting_Balance
+              )
+            ),
           finalY + 1
         );
         doc.text("Credit :", labelX, finalY + 5);
@@ -2952,11 +2955,11 @@ const Accounts = () => {
             response.data.statement_details?.Statement_Credits
           ),
           alignmentX -
-          doc.getTextWidth(
-            formatterTwo.format(
-              response.data.statement_details?.Statement_Credits
-            )
-          ),
+            doc.getTextWidth(
+              formatterTwo.format(
+                response.data.statement_details?.Statement_Credits
+              )
+            ),
           finalY + 5
         );
 
@@ -2966,11 +2969,11 @@ const Accounts = () => {
             response.data.statement_details?.Statement_Debits
           ),
           alignmentX -
-          doc.getTextWidth(
-            formatterTwo.format(
-              response.data.statement_details?.Statement_Debits
-            )
-          ),
+            doc.getTextWidth(
+              formatterTwo.format(
+                response.data.statement_details?.Statement_Debits
+              )
+            ),
           finalY + 9
         );
 
@@ -2981,11 +2984,11 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.statement_details?.Statement_Balance),
           alignmentX -
-          doc.getTextWidth(
-            formatter.format(
-              response.data.statement_details?.Statement_Balance
-            )
-          ),
+            doc.getTextWidth(
+              formatter.format(
+                response.data.statement_details?.Statement_Balance
+              )
+            ),
           finalY + 16
         );
 
@@ -3011,7 +3014,6 @@ const Accounts = () => {
       setClientIdSet("");
       setToDate("");
       toast.success(t("statementSuccess"));
-
     } catch (error) {
       toast.error(t("statementError"));
     }
@@ -3043,7 +3045,7 @@ const Accounts = () => {
       const updatedCheckedItems = { ...prev, [invoiceNumber]: isChecked };
       const amountToPay = isChecked
         ? paymentTable1.find((item) => item.transaction_ref === invoiceNumber)
-          ?.amount_to_pay || 0
+            ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -3386,7 +3388,6 @@ const Accounts = () => {
       // Handle error case
       console.error("Error submitting payment data", error);
       toast.error(t("genericError"));
-
     }
   };
 
@@ -3545,9 +3546,10 @@ const Accounts = () => {
       currentYRight = renderLabelAndValue(
         doc,
         "Bank Name:",
-        `${response?.data?.vendorBankDetails?.bank_name
-          ? response?.data?.vendorBankDetails?.bank_name
-          : ""
+        `${
+          response?.data?.vendorBankDetails?.bank_name
+            ? response?.data?.vendorBankDetails?.bank_name
+            : ""
         }`,
         130,
         200,
@@ -3705,9 +3707,9 @@ const Accounts = () => {
       const totalAmount = parseFloat(
         response?.data?.Toataldata?.total_commision_THB
           ? String(response.data.Toataldata.total_commision_THB).replace(
-            /,/g,
-            ""
-          )
+              /,/g,
+              ""
+            )
           : 0
       );
 
@@ -4375,12 +4377,12 @@ const Accounts = () => {
                 </div>
                 <div className="col-lg-3 mb-4">
                   <div className="parantEmpView">
-                    <div>
+                    {/* <div>
                       <h6>
                         <strong>{t("bankRef")}</strong>
                       </h6>
                       <p>{accountDataShow.Bank_Ref}</p>
-                    </div>
+                    </div> */}
 
                     <div className="parantEmpView">
                       <h6>
@@ -4680,15 +4682,15 @@ const Accounts = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder= /* {t("client")} */ "Select Client" // Set placeholder text
+                            placeholder={t("select_client")} // Set placeholder text
                             variant="outlined"
                           />
                         )}
                         value={
                           Array.isArray(clients)
                             ? clients.find(
-                              (client) => client.client_id === clientIdSet
-                            ) || null
+                                (client) => client.client_id === clientIdSet
+                              ) || null
                             : null
                         }
                         isOptionEqualToValue={(option, value) =>
@@ -4723,7 +4725,7 @@ const Accounts = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder={t("selectConsignee")}  // Set placeholder text
+                            placeholder={t("selectConsignee")} // Set placeholder text
                             variant="outlined"
                           />
                         )}
@@ -4731,9 +4733,9 @@ const Accounts = () => {
                           // Find the consignee object corresponding to the selected ID
                           Array.isArray(consignees)
                             ? consignees.find(
-                              (consignee) =>
-                                consignee.consignee_id === consigneeIdSet
-                            ) || null
+                                (consignee) =>
+                                  consignee.consignee_id === consigneeIdSet
+                              ) || null
                             : null
                         }
                         isOptionEqualToValue={(option, value) =>
@@ -4989,12 +4991,12 @@ const Accounts = () => {
                           <tr>
                             <th>{t("check")}</th>
                             <th> {t("poNumber")} </th>
-                            <th> {t("poDate")}  </th>
+                            <th> {t("poDate")} </th>
                             <th> {t("invoiceNumber")} </th>
                             <th> {t("invoiceDate")} </th>
                             <th>{t("poAmount")} </th>
                             <th>{t("debitAmount")} </th>
-                            <th>{t("netAmount")}  </th>
+                            <th>{t("netAmount")} </th>
                             <th>{t("pastPayment")} </th>
                             <th>{t("amountPaid")} </th>
                           </tr>
@@ -5196,7 +5198,7 @@ const Accounts = () => {
                   </div>
                   <div className="modal-body">
                     <div className="client_filter autoComplete">
-                      <h6> Account/Bank/Wallet {t("accountInfo")}</h6>
+                      <h6>{t("accountInfo")}</h6>
                       <Autocomplete
                         value={
                           bankList.find(
@@ -5221,7 +5223,6 @@ const Accounts = () => {
                         disableClearable // Prevent clearing the selected value
                       />
                     </div>
-
 
                     <label htmlFor="fromDate">{t("fromDate")}</label>
                     <input
@@ -5319,8 +5320,8 @@ const Accounts = () => {
                                 // Find the client object corresponding to the selected ID
                                 Array.isArray(clients)
                                   ? clients.find(
-                                    (client) => client.client_id === clientId
-                                  ) || null
+                                      (client) => client.client_id === clientId
+                                    ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5358,9 +5359,9 @@ const Accounts = () => {
                                 // Find the consignee object corresponding to the selected ID
                                 Array.isArray(consignees)
                                   ? consignees.find(
-                                    (consignee) =>
-                                      consignee.consignee_id === consigneeId
-                                  ) || null
+                                      (consignee) =>
+                                        consignee.consignee_id === consigneeId
+                                    ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5442,9 +5443,9 @@ const Accounts = () => {
                                 // Find the payment channel object corresponding to the selected ID
                                 Array.isArray(paymentChannle)
                                   ? paymentChannle.find(
-                                    (channel) =>
-                                      channel.bank_id === paymentChannel
-                                  ) || null
+                                      (channel) =>
+                                        channel.bank_id === paymentChannel
+                                    ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5529,8 +5530,8 @@ const Accounts = () => {
                                   // Find the currency object corresponding to the selected fxId
                                   Array.isArray(currency)
                                     ? currency.find(
-                                      (item) => item.currency_id === fxId
-                                    ) || null
+                                        (item) => item.currency_id === fxId
+                                      ) || null
                                     : null
                                 }
                                 isOptionEqualToValue={(option, value) =>
@@ -5630,11 +5631,11 @@ const Accounts = () => {
                               <th>{t("fx")}</th>
                               <th> {t("invoiceAmount")}</th>
 
-                              <th>  {t("creditNote")}</th>
-                              <th>  {t("netAmount")}</th>
+                              <th> {t("creditNote")}</th>
+                              <th> {t("netAmount")}</th>
                               <th> {t("pastPayment")} </th>
-                              <th>   {t("amountToPay")}</th>
-                              <th>  {t("paidAmount")}</th>
+                              <th> {t("amountToPay")}</th>
+                              <th> {t("paidAmount")}</th>
                             </tr>
                             {paymentTable1?.map((item) => {
                               return (
@@ -5711,7 +5712,6 @@ const Accounts = () => {
               data-bs-target="#modalClaim"
             >
               {t("transfer")}
-
             </button>
             {/* Modal */}
             <div
@@ -5739,7 +5739,6 @@ const Accounts = () => {
                   </div>
                   <div className="modal-body">
                     <div className="client_filter autoComplete mb-3">
-
                       <h6> {t("from")}</h6>
                       {/* <ComboBox
                         options={bankList?.map((v) => ({
@@ -5827,10 +5826,9 @@ const Accounts = () => {
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       placeholder={t("amount")}
-
                     />
                     <label className="mt-2" htmlFor="ref">
-                       {t("ref")}
+                      {t("ref")}
                     </label>
                     <input
                       type="text"
@@ -5838,9 +5836,8 @@ const Accounts = () => {
                       id="ref"
                       value={ref}
                       onChange={(e) => setRef(e.target.value)}
-                      placeholder= {t("ref")}
-                    // placeholder={t("amount")}
-
+                      placeholder={t("ref")}
+                      // placeholder={t("amount")}
                     />
                   </div>
                   <div className="modal-footer">
@@ -5876,9 +5873,9 @@ const Accounts = () => {
                       dangerouslySetInnerHTML={{
                         __html: item.Name_exp_2
                           ? item.Name_exp_2.replace(/\r\n/g, "<br/>").replace(
-                            /\n/g,
-                            "<br/>"
-                          )
+                              /\n/g,
+                              "<br/>"
+                            )
                           : "",
                       }}
                     />

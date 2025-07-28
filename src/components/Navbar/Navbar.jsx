@@ -124,7 +124,7 @@ const Navbar = () => {
                 <ul className={`dropdown-menu ${isActive ? "show" : ""}`}>
                   <li>
                     <a className="dropdown-item">
-                      <h3>{t("header.notificationHead")}</h3>
+                      <h3>{t("notification")}</h3>
                       <div className="noti">
                         {data && data.length > 0 ? (
                           <>
@@ -143,18 +143,17 @@ const Navbar = () => {
                               </div>
                             ))}
                             <div className="notifcationButton">
-                              <button>{t("header.viewBtn")}</button>
+                              <button>{t("view")}</button>
                             </div>
                           </>
                         ) : (
-                          <h5>{t("header.noNotification")}</h5>
+                          <h5>{t("noNotification")}</h5>
                         )}
                       </div>
                     </a>
                   </li>
                 </ul>
               </div>
-            
             </div>
           )}
         </ul>

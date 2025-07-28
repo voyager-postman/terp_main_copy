@@ -1,4 +1,4 @@
- import axios from "axios";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -49,6 +49,8 @@ const CombinePaymentEdit = () => {
   const [podId, setPodId] = useState("");
   const [paymentTableVender, setPaymentTableVender] = useState([] || "");
   const [totalDataDetails1, setTotalDataDetails1] = React.useState("");
+  const [totalDataDetails2, setTotalDataDetails2] = React.useState("");
+
   const [totalDataDetails, setTotalDataDetails] = React.useState("");
 
   const getDetils = (podId) => {
@@ -231,6 +233,7 @@ const CombinePaymentEdit = () => {
   };
 
   const { data: vendorList } = useQuery("getAllVendor");
+  const { data: recieptDroupDown } = useQuery("RecieptsDropdown");
   const { data: dropdownType } = useQuery("getDropdownType");
   const { data: produceList } = useQuery("getAllProduceItem");
   const { data: packagingList } = useQuery("getAllPackaging");
@@ -270,8 +273,8 @@ const CombinePaymentEdit = () => {
     // setModalOne(false);  <-- Removed
     console.log(editDataShow);
     const selectedRows = editDataShow
-      .map((child, index) => ({
-        CPN: from?.ID,
+      ?.map((child, index) => ({
+        CPN: from?.ID || totalDataDetails2,
         PO_ID: child.PO_ID,
         Payment: Number.isNaN(parseFloat(amountToPay[index]))
           ? 0
@@ -337,20 +340,22 @@ const CombinePaymentEdit = () => {
   //   }
   // };
   useEffect(() => {
-    if (state.vendor_id) {
+    if (state.vendor_id || totalDataDetails2) {
       paymentTable10();
     }
-  }, [state.vendor_id]);
+  }, [state.vendor_id, totalDataDetails2]);
   const paymentTable10 = () => {
-    console.log(state.vendor_id);
+    console.log("vendor_id:", state.vendor_id);
 
-    if (from?.ID) {
+    const cpnId = from?.ID || totalDataDetails2;
+
+    if (cpnId) {
       axios
         .get(`${API_BASE_URL}/GetCombinedPaymentByID`, {
-          params: { cpn_id: from.ID }, // ✅ Correct way to send query params
+          params: { cpn_id: cpnId },
         })
         .then((response) => {
-          console.log(response);
+          console.log("GetCombinedPaymentByID response:", response);
           setPaymentTableVender(response.data.cpn_details);
           setTotalDataDetails(response.data.totaldata);
           setTotalDataDetails1(response.data.cpn_data);
@@ -358,20 +363,11 @@ const CombinePaymentEdit = () => {
         .catch((error) => {
           console.error("Error fetching details:", error);
         });
+    } else {
+      console.warn("cpn_id not available for GetCombinedPaymentByID request.");
     }
-    // axios
-    //   .post(`${API_BASE_URL}/VendorCombinedPaymentDetails`, {
-    //     vendor_id: state.vendor_id,
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //     setPaymentTableVender(res.data.data);
-    //     // setTableSummary(res.data.totaldata);
-    //   })
-    //   .catch((error) => {
-    //     console.log("There was an error fetching the data!", error);
-    //   });
   };
+
   const deleteOrder = async (id) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/DeletePurchase`, {
@@ -387,66 +383,160 @@ const CombinePaymentEdit = () => {
       console.log(e);
     }
   };
-  const update = async (e) => {
-    console.log(totalDataDetails1);
-    setButtonClicked(false);
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/${"VendorFilteredPaymentDetails"}`,
-        { vendor_id: totalDataDetails1?.Vendor, cpn_id: totalDataDetails1?.ID }
-      );
-      console.log(response);
-      setEditDataShow(response?.data?.data);
-      setStock(response?.data);
+  // const update = async (e) => {
+  //   console.log(totalDataDetails1);
+  //   setButtonClicked(false);
+  //   try {
+  //     const response = await axios.post(
+  //       `${API_BASE_URL}/${"VendorFilteredPaymentDetails"}`,
+  //       {
+  //         vendor_id: totalDataDetails1?.Vendor || state.vendor_id,
+  //         cpn_id: totalDataDetails1?.ID,
+  //       }
+  //     );
+  //     console.log(response);
+  //     setEditDataShow(response?.data?.data);
+  //     setStock(response?.data);
 
-      // 🔥 Clear the item form fields for new entry
-      setFormDataAdd({
-        pod_type_id: 0,
-        unit_count_id: 0,
-        POD_Selection: 0,
-        pod_quantity: 0,
-        pod_price: 0,
-        pod_vat: 0,
-        pod_wht_id: 0,
-        pod_crate: 0,
-        Unit_Name_EN: 0,
-        Unit_Name_TH: 0,
-        item_Name_EN: 0,
-        item_Name_TH: 0,
+  //     // 🔥 Clear the item form fields for new entry
+  //     setFormDataAdd({
+  //       pod_type_id: 0,
+  //       unit_count_id: 0,
+  //       POD_Selection: 0,
+  //       pod_quantity: 0,
+  //       pod_price: 0,
+  //       pod_vat: 0,
+  //       pod_wht_id: 0,
+  //       pod_crate: 0,
+  //       Unit_Name_EN: 0,
+  //       Unit_Name_TH: 0,
+  //       item_Name_EN: 0,
+  //       item_Name_TH: 0,
+  //     });
+
+  //     // ✅ Keep the purchase order ID and vendor details
+  //     setState((prevState) => ({
+  //       ...prevState,
+  //       ID: response.data?.ID || from?.ID || prevState.ID,
+  //       vendor_id: prevState.vendor_id,
+  //       created: prevState.created,
+  //       supplier_invoice_number: prevState.supplier_invoice_number,
+  //       supplier_invoice_date: prevState.supplier_invoice_date,
+  //       supplier_dua_date: prevState.supplier_dua_date,
+
+  //       rounding: prevState.rounding,
+  //     }));
+  //     setModalOne(true); // Show the modal
+  //     if (response.status === 200) {
+  //       if (response.data.success) {
+  //         const id = response.data?.ID || from?.ID;
+  //         console.log(id);
+
+  //         setPodId(id); //  Clear podId to avoid fetching last item data
+  //         setModalOne(true);
+  //         // toast.success("Create Purchase Orders", {
+  //         //   autoClose: 5000,
+  //         //   theme: "colored",
+  //         // });
+  //       }
+
+  //       // else {
+  //       //   setShow(true);
+  //       // }
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //     toast.error(t("errorOccurred"), {
+  //       autoClose: 5000,
+  //       theme: "colored",
+  //     });
+  //   }
+  // };
+  const update = async (e) => {
+    console.log("totalDataDetails1:", totalDataDetails1);
+    setButtonClicked(false);
+
+    try {
+      // Step 1: Call "AddCPN" API first
+      const addCpnResponse = await axios.post(`${API_BASE_URL}/AddCPN`, {
+        vendor_id: totalDataDetails1?.Vendor || state.vendor_id,
+        Payment_Date: state?.supplier_dua_date,
+        due_date: state?.supplier_invoice_date,
+        user_id: localStorage.getItem("id"),
+        cpn_id: totalDataDetails1?.ID || totalDataDetails2,
       });
 
-      // ✅ Keep the purchase order ID and vendor details
-      setState((prevState) => ({
-        ...prevState,
-        ID: response.data?.ID || from?.ID || prevState.ID,
-        vendor_id: prevState.vendor_id,
-        created: prevState.created,
-        supplier_invoice_number: prevState.supplier_invoice_number,
-        supplier_invoice_date: prevState.supplier_invoice_date,
-        supplier_dua_date: prevState.supplier_dua_date,
+      console.log("AddCPN response:", addCpnResponse);
 
-        rounding: prevState.rounding,
-      }));
-      setModalOne(true); // Show the modal
-      if (response.status === 200) {
-        if (response.data.success) {
-          const id = response.data?.ID || from?.ID;
-          console.log(id);
+      if (addCpnResponse.status === 200 && addCpnResponse?.data?.success) {
+        const newCpnId = addCpnResponse?.data?.data || totalDataDetails1?.ID;
+        setTotalDataDetails2(newCpnId);
 
-          setPodId(id); //  Clear podId to avoid fetching last item data
-          setModalOne(true);
-          // toast.success("Create Purchase Orders", {
-          //   autoClose: 5000,
-          //   theme: "colored",
-          // });
+        // Step 2: Now call "VendorFilteredPaymentDetails" using updated cpn_id
+        const response = await axios.post(
+          `${API_BASE_URL}/VendorFilteredPaymentDetails`,
+          {
+            vendor_id: totalDataDetails1?.Vendor || state.vendor_id,
+            cpn_id: newCpnId,
+          }
+        );
+
+        console.log("VendorFilteredPaymentDetails response:", response);
+
+        setEditDataShow(response?.data?.data);
+        setStock(response?.data);
+
+        // Step 3: Clear item form fields
+        setFormDataAdd({
+          pod_type_id: 0,
+          unit_count_id: 0,
+          POD_Selection: 0,
+          pod_quantity: 0,
+          pod_price: 0,
+          pod_vat: 0,
+          pod_wht_id: 0,
+          pod_crate: 0,
+          Unit_Name_EN: 0,
+          Unit_Name_TH: 0,
+          item_Name_EN: 0,
+          item_Name_TH: 0,
+        });
+
+        // Step 4: Update state and safely get ID
+        if (response?.data) {
+          const newId = response.data?.data ?? from?.ID ?? state?.ID;
+
+          setState((prevState) => ({
+            ...prevState,
+            ID: newId,
+            vendor_id: prevState.vendor_id,
+            created: prevState.created,
+            supplier_invoice_number: prevState.supplier_invoice_number,
+            supplier_invoice_date: prevState.supplier_invoice_date,
+            supplier_dua_date: prevState.supplier_dua_date,
+            rounding: prevState.rounding,
+          }));
+
+          // Step 5: Show modal and update pod ID
+          if (response?.data?.success && newId) {
+            setPodId(newId);
+            setModalOne(true);
+          }
+        } else {
+          console.warn("response.data is undefined");
+          toast.error(t("errorOccurred"), {
+            autoClose: 5000,
+            theme: "colored",
+          });
         }
-
-        // else {
-        //   setShow(true);
-        // }
+      } else {
+        toast.error(t("errorOccurred"), {
+          autoClose: 5000,
+          theme: "colored",
+        });
       }
     } catch (e) {
-      console.log(e);
+      console.error("Update error:", e);
       toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
@@ -792,7 +882,7 @@ const CombinePaymentEdit = () => {
 
     // Update all child checkboxes
     const updatedChildren = {};
-    editDataShow.forEach((_, index) => {
+    editDataShow?.forEach((_, index) => {
       updatedChildren[index] = newChecked;
     });
 
@@ -1060,40 +1150,40 @@ const CombinePaymentEdit = () => {
                     <div className="row cratePurchase">
                       <div className="col-lg-3 form-group autoComplete">
                         <div className="d-flex">
-                          <h6 className="me-2">{t("vendor")}</h6>
+                          <h6 className="me-2">{t("client")}</h6>
                         </div>
 
                         <Autocomplete
                           options={
-                            vendorList?.map((vendor) => ({
-                              id: vendor.ID,
-                              name: vendor.name,
+                            recieptDroupDown?.map((item) => ({
+                              id: item.VendorID,
+                              name: item.Payor,
                             })) || []
-                          } // Map the vendor list to create options with `id` and `name`
-                          getOptionLabel={(option) => option.name || ""} // Display the vendor name
+                          }
+                          getOptionLabel={(option) => option.name || ""}
                           value={
-                            vendorList
-                              ?.map((vendor) => ({
-                                id: vendor.ID,
-                                name: vendor.name,
+                            recieptDroupDown
+                              ?.map((item) => ({
+                                id: item.VendorID,
+                                name: item.Payor,
                               }))
                               .find(
                                 (option) => option.id === state.vendor_id
                               ) || null
-                          } // Find the selected vendor by `vendor_id`
+                          }
                           onChange={(e, newValue) => {
                             setState({
                               ...state,
                               vendor_id: newValue?.id || "",
                               vendor_name: newValue?.name || "",
-                            }); // Update `state.vendor_id` with the selected option's `id`
+                            });
                           }}
                           sx={{ width: 300 }}
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder={t("selectVendor")}
-                              InputLabelProps={{ shrink: false }} // Prevents floating label
+                              placeholder={t("selectClient")}
+                              InputLabelProps={{ shrink: false }}
                             />
                           )}
                         />

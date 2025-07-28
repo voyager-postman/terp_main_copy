@@ -179,7 +179,9 @@ const Sorting = () => {
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>{t("vendorName")}</div>,
+        Header: () => (
+          <div style={{ textAlign: "center" }}>{t("vendorName")}</div>
+        ),
         accessor: "Vendor_Name",
         Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
         // if your table supports it
@@ -213,7 +215,9 @@ const Sorting = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}>{t("quantity")}</div>,
+        Header: () => (
+          <div style={{ textAlign: "center" }}>{t("quantity")}</div>
+        ),
         accessor: "Quantity",
         Cell: ({ value }) => (
           <div style={{ textAlign: "right" }}>{formatTwoDecimals(value)}</div>
@@ -234,7 +238,9 @@ const Sorting = () => {
         ),
       },
       {
-        Header: () => <div style={{ textAlign: "center" }}> {t("qtyPerCrate")}</div>,
+        Header: () => (
+          <div style={{ textAlign: "center" }}> {t("qtyPerCrate")}</div>
+        ),
 
         accessor: "Qty/Crate",
         Cell: ({ value }) => (
@@ -338,7 +344,7 @@ const Sorting = () => {
       }
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error(t("fileAccessError"))
+      toast.error(t("fileAccessError"));
     }
   };
   const closeIcon = () => {
@@ -530,7 +536,6 @@ const Sorting = () => {
     } catch (error) {
       console.error("Error updating access file in closeButton:", error);
       toast.error(t("closingError"));
-
     }
   };
 
@@ -629,7 +634,8 @@ const Sorting = () => {
                   <div className="parentPurchaseView mb-3">
                     <div className="me-3">
                       <strong>
-                        {t("user_name")}<span>:</span>
+                        {t("user_name")}
+                        <span>:</span>
                       </strong>
                     </div>
                     <div>
@@ -716,15 +722,6 @@ const Sorting = () => {
                 <h1 className="modal-title fs-5" id="exampleModalLabel">
                   {t("operationSorting")}
                 </h1>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                  onClick={dataClear}
-                >
-                  <i class="mdi mdi-close"></i>
-                </button>
               </div>
               <div className="modal-body">
                 <main className="main-content">
@@ -916,7 +913,7 @@ const Sorting = () => {
                           {stock.Message_TH ? stock.Message_TH : "NULL"}
                         </p> */}
                           <div className="closeBtnRece">
-                            <button onClick={closeIcon}>  {t("close")}</button>
+                            <button onClick={closeIcon}> {t("close")}</button>
                           </div>
                         </div>
                       </div>

@@ -1046,7 +1046,6 @@
   "Available_Boxes_Management": "การจัดการกล่องที่พร้อมใช้งาน",
   "edit": "แก้ไข",
   "Inventory_Id": "รหัสสินค้าคงคลัง",
-  
   "fetchFreight": "เกิดข้อผิดพลาดในการดึงรายละเอียดค่าขนส่ง",
   "copyOrderProcedureSuccessfully": "คัดลอกขั้นตอนการสั่งซื้อเรียบร้อยแล้ว",
   "noFileSelected": "ยังไม่ได้เลือกไฟล์",
@@ -1054,13 +1053,11 @@
   "orderNumber": "หมายเลขคำสั่งซื้อ",
   "invoiceManagement": "การจัดการใบแจ้งหนี้",
   "selectedFile": "ไฟล์ที่เลือก",
-  
   "customBarcode": "บาร์โค้ดที่กำหนดเอง",
   "upload": "อัปโหลด",
   "shipTo": "จัดส่งไปยัง",
   "invoicePriceUpdated": "อัปเดตราคาบิลเรียบร้อยแล้ว",
   "agreedPriceUpdated": "อัปเดตราคาที่ตกลงไว้เรียบร้อยแล้ว",
-  
   "totalVolume": "ปริมาตรรวม",
   "profit": "กำไร",
   "row3": "แถวที่ 3",
@@ -1069,5 +1066,24 @@
   "password": "รหัสผ่าน",
   "reset": "รีเซ็ต",
   "orderPipeline": "ขั้นตอนการสั่งซื้อ",
- "notificationNotFound": "ไม่พบการแจ้งเตือน"
+  "notificationNotFound": "ไม่พบการแจ้งเตือน",
+  "delete": "ลบ",
+  "select_Date": "เลือกวันที่",
+  "creates": "สร้าง",
+  "profile": "โปรไฟล์",
+  "settings": "การตั้งค่า",
+  "signOut": "ออกจากระบบ",
+  "thai": "ไทย",
+  "selectAccount": "เลือกบัญชี",
+  "selectCountry": "เลือกประเทศ",
+  "maxPrice": "ราคาสูงสุด",
+  "customMargin": "กำไรขั้นต้นที่กำหนดเอง",
+  "billingNote": "ใบแจ้งหนี้",
+  "value": "มูลค่า",
+  "receiptDate": "วันที่รับ",
+  "billingNoteManagement": "การจัดการใบวางบิล",
+  "bnNumber": "เลขที่บิล",
+  "Payor": "ผู้ชำระเงิน",
+  "rePacking": "การบรรจุอีกครั้ง",
+  "vendorsAndClients": "ผู้ขายและลูกค้า"
 }

@@ -79,7 +79,7 @@ const InventoryBoxes = () => {
       {
         Header: () => <div style={{ textAlign: "center" }}>{t("produce")}</div>,
         accessor: "Item",
-        Cell: ({ value }) => <div style={{ textAlign: "left" }}>{t("view")}{value}</div>,
+        Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
       },
       {
         Header: () => <div style={{ textAlign: "center" }}>{t("unit")}</div>,
