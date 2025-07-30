@@ -184,6 +184,8 @@ import AccountLedger from "./components/Accounting/AccountLedger";
 import Wastage from "./components/operation/Wastage";
 import Receipt from "./components/Orders/Receipt";
 import ReceiptCreate from "./components/Orders/ReceiptCreate";
+import BillingNoteCreate from "./components/Orders/BillingNoteCreate";
+import BillingNoteView from "./components/Orders/BillingNoteView";
 
 function App() {
   const location = useLocation(); // Hook to get the current URL location
@@ -343,14 +345,12 @@ function App() {
                   path="/proforma_invoice_test"
                   element={<ProformaInvoiceTest />}
                 />
-
                 <Route path="/openjourney" element={<CreateJourney />} />
                 <Route path="/openEditjourney" element={<EditJourney />} />
                 <Route path="/claim" element={<Claim />} />
                 <Route path="/reciept" element={<Receipt />} />
                 <Route path="/receipt_create" element={<ReceiptCreate />} />
                 <Route path="/claimPdf" element={<ClaimPdf />} />
-
                 <Route path="/claim_details" element={<ClaimDetails />} />
                 <Route path="/invoice" element={<Invoice />} />
                 <Route path="/invoice_details" element={<InvoiceDetails />} />
@@ -483,9 +483,17 @@ function App() {
                   path="/combinePaymentView"
                   element={<CombinePaymentView />}
                 />
+                     <Route
+                  path="/billingNoteView"
+                  element={<BillingNoteView />}
+                />
                 <Route
                   path="/combinePaymenEdit"
                   element={<CombinePaymentEdit />}
+                />
+                  <Route
+                  path="/billingNoteCreate"
+                  element={<BillingNoteCreate />}
                 />
                 <Route path="/incomeState" element={<IncomeState />} />
                 <Route

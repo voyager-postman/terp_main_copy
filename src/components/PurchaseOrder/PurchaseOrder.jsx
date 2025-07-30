@@ -1573,7 +1573,10 @@ const PurchaseOrder = () => {
         doc.setFontSize(12);
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
         doc.text("Invoice to", 7, 32);
+        doc.setFont("helvetica", "normal");
+
         // doc.text("Consignee Details", 216.5, 32);
         doc.setFillColor(32, 55, 100);
         doc.setFontSize(11);

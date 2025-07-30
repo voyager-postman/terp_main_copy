@@ -13,7 +13,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { FaCalendarAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-
+import moment from "moment";
 import MySwal from "../../swal";
 const BillingNote = () => {
   const [t, i18n] = useTranslation("global");
@@ -29,6 +29,8 @@ const BillingNote = () => {
   const [procesureResult, setProcesureResult] = useState("");
   const [amountToPayNew, setAmountToPayNew] = useState("");
   const [depositAvailableNew, setDepositAvailableNew] = useState("");
+    const [columns, setColumns] = useState([]);
+  
   const [depositUsedNew, newDepositUsedNew] = useState("");
   const [vatNew, setVatNew] = useState("");
   const [whtNew, setWhtNew] = useState("");
@@ -149,7 +151,7 @@ const BillingNote = () => {
       .get(`${API_BASE_URL}/getCombinedPayment`)
       .then((response) => {
         console.log(response);
-        setData(response.data.data || []);
+        // setData(response.data.data || []);
       })
       .catch((error) => {
         console.log(error);
@@ -159,7 +161,86 @@ const BillingNote = () => {
   useEffect(() => {
     getCombinedPayment();
   }, []);
+  const billingNote = () => {
+    const lang = localStorage.getItem("language");
+    const langValue = lang === "en" ? 0 : 1;
 
+    axios
+      .post(`${API_BASE_URL}/BillingNoteView`, {
+        LANG: langValue,
+      })
+      .then((response) => {
+        const { data: rows = [], head = {} } = response.data;
+
+        // Step 1: Create dynamic columns from head
+        const generatedColumns = Object.entries(head).map(([key, label]) => ({
+          Header: t(label || key), // fallback to key if label is empty
+          accessor: key,
+        }));
+
+        // Step 2: Add actions column
+        generatedColumns.push({
+          Header: t("actions"),
+          accessor: "actions",
+          Cell: ({ row }) => {
+            const a = row.original;
+            return (
+              <>
+                <div className="editIcon">
+                  <button
+                    onClick={() =>
+                      navigate("/billingNoteView", { state: { from: a } })
+                    }
+                  >
+                    <i className="mdi mdi-eye" />
+                  </button>
+                  {!(a.Payment_Status === 3 || a.Payment_Status === 4) && (
+                    <>
+                      <Link to="/billingNoteCreate" state={{ from: a }}>
+                        <i className="mdi mdi-pencil pl-2" />
+                      </Link>
+
+                      <button type="button" onClick={() => deleteOrder(a.ID)}>
+                        <i className="mdi mdi-delete " />
+                      </button>
+                    </>
+                  )}
+
+                  {!(a.Payment_Status === 4) && (
+                    <button
+                      type="button"
+                      className="SvgAnchor"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalCombine"
+                      onClick={() => everyDataSet(a)}
+                    >
+                      <svg
+                        className="SvgQuo"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                      >
+                        <title>cash-check</title>
+                        <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z"></path>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </>
+            );
+          },
+        });
+
+        setColumns(generatedColumns);
+        setData(rows);
+      })
+      .catch((error) => {
+        console.error("Error fetching Debit Note:", error);
+        toast.error(t("genericError"));
+      });
+  };
+  useEffect(() => {
+    billingNote();
+  },[]);
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
@@ -194,116 +275,6 @@ const BillingNote = () => {
     const finalPayment = basePayment - deposit;
     setPaymentAmmountNew(finalPayment >= 0 ? finalPayment.toFixed(2) : 0);
   }, [depositAvailableNew, basePayment]);
-  const columns = useMemo(
-    () => [
-      {
-        Header: t("bnNumber"),
-        accessor: "CPNCODE",
-      },
-      {
-        Header: t("client"),
-        accessor: "vendor_name",
-      },
-      {
-        Header: t("consignee"),
-        // accessor: "vendor_name",
-        Cell: () => t("fresh4u Produce Ltd"), // Add this key to your i18n JSON files
-      },
-      {
-        Header: t("date"),
-        accessor: (a) => {
-          const formattedDate = new Date(a.CPN_Date).toLocaleDateString(
-            "en-GB",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }
-          );
-          return <div>{formattedDate}</div>;
-        },
-      },
-      {
-        Header: t("dueDate"),
-        accessor: (a) => {
-          const formattedDate = new Date(a.Due_Date).toLocaleDateString(
-            "en-GB",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }
-          );
-          return <div>{formattedDate}</div>;
-        },
-      },
-      {
-        Header: t("items"),
-        accessor: (a) => <div>{a.POCount}</div>,
-      },
-      {
-        Header: t("amount"),
-        accessor: (a) => (
-          <div style={{ textAlign: "right" }}>
-            {formatterTwo.format(a.Total_After_Tax)}
-          </div>
-        ),
-      },
-      {
-        Header: t("payable"),
-        accessor: (a) => (
-          <div style={{ textAlign: "right" }}>
-            {formatterTwo.format(a.Payable)}
-          </div>
-        ),
-      },
-      {
-        Header: t("actions"),
-        accessor: (a) => (
-          <div className="editIcon">
-            <button
-              onClick={() =>
-                navigate("/combinePaymentView", { state: { from: a } })
-              }
-            >
-              <i className="mdi mdi-eye" />
-            </button>
-            {!(a.Payment_Status === 3 || a.Payment_Status === 4) && (
-              <>
-                <Link to="/combinePaymenEdit" state={{ from: a }}>
-                  <i className="mdi mdi-pencil pl-2" />
-                </Link>
-
-                <button type="button" onClick={() => deleteOrder(a.ID)}>
-                  <i className="mdi mdi-delete " />
-                </button>
-              </>
-            )}
-
-            {!(a.Payment_Status === 4) && (
-              <button
-                type="button"
-                className="SvgAnchor"
-                data-bs-toggle="modal"
-                data-bs-target="#modalCombine"
-                onClick={() => everyDataSet(a)}
-              >
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>cash-check</title>
-                  <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z"></path>
-                </svg>
-              </button>
-            )}
-          </div>
-        ),
-      },
-    ],
-    [t]
-  );
 
   useEffect(() => {
     console.log("payableDATA:", payableDATA);
@@ -430,7 +401,7 @@ const BillingNote = () => {
         endElement={
           <button
             type="button"
-            onClick={() => navigate("/combinePaymenEdit")}
+            onClick={() => navigate("/billingNoteCreate")}
             className="btn button btn-info"
           >
             {t("create")}

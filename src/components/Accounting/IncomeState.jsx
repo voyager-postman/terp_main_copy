@@ -1,7 +1,28 @@
 import React, { useState, useEffect } from "react";
-
+import axios from "axios";
+import { API_BASE_URL } from "../../Url/Url";
 export default function AccountTable() {
   const [periods, setPeriods] = useState([]);
+
+  const listClaim = () => {
+    const lang = localStorage.getItem("language");
+    const langValue = lang === "en" ? 0 : 1;
+
+    axios
+      .post(`${API_BASE_URL}/BillingNoteView`, {
+        LANG: langValue,
+      })
+      .then((response) => {
+        console.log(response.data); 
+      })
+      .catch((error) => {
+        console.error("Error fetching Debit Note:", error);
+        toast.error(t("genericError"));
+      });
+  };
+  useEffect(() => {
+    listClaim();
+  });
   const [data, setData] = useState([
     { "Account Number": "1001", "Account Name": "Cash" },
     { "Account Number": "1002", "Account Name": "Bank" },

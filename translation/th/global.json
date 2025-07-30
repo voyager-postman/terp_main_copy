@@ -1085,5 +1085,12 @@
   "bnNumber": "เลขที่บิล",
   "Payor": "ผู้ชำระเงิน",
   "rePacking": "การบรรจุอีกครั้ง",
-  "vendorsAndClients": "ผู้ขายและลูกค้า"
+  "vendorsAndClients": "ผู้ขายและลูกค้า",
+  "billingNoteNumber": "เลขที่ใบแจ้งหนี้",
+  "billingNoteDate": "วันที่ใบแจ้งหนี้",
+  "billingNoteDateRequired": "กรุณาระบุวันที่ใบแจ้งหนี้",
+  "billing_note_view_form": "ใบแจ้งหนี้ / แบบฟอร์มแสดงผล",
+  "clientAutoGenerate": "สร้างลูกค้าอัตโนมัติ",
+  "consigneeAutoGenerate": "สร้างผู้รับอัตโนมัติ",
+  "shippingDocumentsAutoGenerate": "สร้างเอกสารการจัดส่งอัตโนมัติ"
 }
