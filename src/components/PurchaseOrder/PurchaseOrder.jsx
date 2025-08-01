@@ -1793,21 +1793,24 @@ const PurchaseOrder = () => {
             right: 7,
           },
           tableWidth: "auto", // Adjust to ensure the table fits within the page
-          columnStyles: {
+            columnStyles: {
             0: { halign: "left", cellWidth: 22 },
-            1: { halign: "left", cellWidth: 78, overflow: "linebreak" },
-            2: { halign: "left", cellWidth: 23, overflow: "linebreak" },
-            3: { halign: "center", cellWidth: 30 },
-            4: { halign: "right", cellWidth: 30 },
-            5: { halign: "right", cellWidth: 35 },
-            6: { halign: "right", cellWidth: 36, overflow: "linebreak" },
+            1: { halign: "left", cellWidth: 35, overflow: "linebreak" },
+            2: { halign: "right", cellWidth: 27, overflow: "linebreak" },
+            3: { halign: "right", cellWidth: 26 },
+            4: { halign: "right", cellWidth: 26 },
+            5: { halign: "right", cellWidth: 26},
+            6: { halign: "right", cellWidth: 33, overflow: "linebreak" },
             7: {
               halign: "right",
               cellWidth: 30,
               overflow: "linebreak",
               font: "NotoSansThai",
             },
+            8: { halign: "right", cellWidth:58, overflow: "linebreak" },
+ 
           },
+ 
         });
 
         yTop = doc.autoTable.previous.finalY + 1;

@@ -623,14 +623,14 @@ const Accounts = () => {
     setFromDate("");
     setToDate("");
   };
+
   const handleSubmit7 = async () => {
     const payload = {
-      client_id: clientIdSet, // Use selected client_id
+      client_id: clientIdSet,
       consignee_id: consigneeIdSet,
       from_date: fromDate,
       to_date: toDate,
     };
-
     try {
       const response = await axios.post(
         `${API_BASE_URL}/getConsigneeStatement`,
@@ -639,20 +639,57 @@ const Accounts = () => {
       console.log(response.data.data);
       getInventoryList();
 
+      const labels = response?.data?.section5_Labels || {};
+      const tableData = response?.data?.TableData || [];
+      const headers = Object.values(labels);
+      const keys = Object.keys(labels);
+      // Format date helper
+      const isDate = (val) =>
+        typeof val === "string" && /^\d{4}-\d{2}-\d{2}T/.test(val);
+      const formatDate = (val) => {
+        const date = new Date(val);
+        return `${date.getDate().toString().padStart(2, "0")}-${(
+          date.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, "0")}-${date.getFullYear().toString().slice(2)}`;
+      };
+      function formatDate1(val) {
+        const date = new Date(val);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+        const year = date.getFullYear(); // 4-digit year
+        return `${day}-${month}-${year}`;
+      }
+
+      // Prepare rows
+      const rows = tableData.map((rowItem) =>
+        keys.map((key) => {
+          const val = rowItem[key];
+          if (isDate(val)) {
+            return formatDate1(val);
+          }
+          return val !== null && val !== undefined ? val : "";
+        })
+      );
+      setClientId("");
+
       let modalElement = document.getElementById("modalConsignee");
       let modalInstance = bootstrap.Modal.getInstance(modalElement);
       if (modalInstance) {
         modalInstance.hide();
         const doc = new jsPDF("landscape");
+
+        doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular); // Load the font
+        doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal"); // Register the font
         const addLogoWithDetails = async () => {
           const imgData = logo;
           doc.addImage(imgData, "JPEG", 7, 5.7, 20, 20);
           doc.setFontSize(10);
           doc.setTextColor(0, 0, 0);
-          doc.text("Siam Eats Co.,Ltd. (0395561000010) ", 30, 10);
-          doc.text("16/8 Mu 11 ", 30, 14);
-          const longTextOne =
-            "Khlong Nueng, Khlong Luang, Pathum Thani 12120 THAILAND";
+          doc.text(`${response?.data?.Company_Address?.Line_1}`, 30, 10);
+          doc.text(`${response?.data?.Company_Address?.Line_2}`, 30, 14);
+          const longTextOne = `${response?.data?.Company_Address?.Line_3}`;
           const maxWidthOne = 59;
           const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
           let startXOne = 30;
@@ -660,31 +697,41 @@ const Accounts = () => {
           linesOne.forEach((lineOne, index) => {
             doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
           });
-          // adddress
           doc.setFontSize(17);
           doc.setTextColor(0, 0, 0);
           doc.text(`Statement`, 140, 11.5);
           doc.setFontSize(10);
           doc.setFont("helvetica", "normal");
           doc.setTextColor(0, 0, 0);
-          doc.text("Start Date:", 252, 9);
-          doc.text("End date:", 252, 13);
-          doc.text("Printed On:", 252, 17);
+          const sectionLabels = response?.data?.Section1_Labels || {};
+          const sectionValues = response?.data?.section1_Values || {};
+          doc.text(`${sectionLabels.Row1}`, 252, 9);
+          doc.text(`${sectionLabels.Row2}`, 252, 13);
+          doc.text(`${sectionLabels.Row3}`, 252, 17);
+          doc.text(`${sectionLabels.Row4}`, 252, 21);
 
-          doc.text(`${formatDate(fromDate)}`, 272.5, 9);
-          doc.text(`${formatDate(toDate)}`, 272, 13);
-          doc.text(`${formatDate(new Date())}`, 272, 17);
+          doc.text(`${sectionValues.Row1}`, 272.5, 9);
+          doc.text(`${sectionValues.Row2}`, 272, 13);
+          doc.text(`${formatDate(sectionValues.Row3)}`, 272, 17);
+          doc.text(`${sectionValues.Row4}`, 272, 21);
         };
+
         doc.setFillColor(32, 55, 100);
         doc.rect(7, 27, doc.internal.pageSize.width - 15, 0.5, "FD");
         doc.setFontSize(12);
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(12);
-        doc.text("Invoice to", 7, 32);
-        doc.text("Consignee Details", 216.5, 32);
+        // doc.setFont("helvetica", "bold");
+        // doc.text("Invoice to", 7, 32);
+        doc.setFont("helvetica", "normal");
+
+        doc.text("Invoice to", 7, 31.5);
+        doc.text("Consignee Details", 195, 31.5);
+
         doc.setFillColor(32, 55, 100);
         doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
+
         function renderWrappedText(
           doc,
           text,
@@ -697,91 +744,157 @@ const Accounts = () => {
           lines.forEach((line, index) => {
             doc.text(line, startX, startY + index * lineHeight);
           });
-          return startY + lines.length * lineHeight; // Return the new Y position after rendering the text
+          return startY + lines.length * lineHeight;
         }
 
-        // Common starting Y position
-        let startY = 36.5;
+        // Common Y start
+        const commonStartY = 36.3;
 
-        // First set of texts (Client details)
+        // === LEFT BLOCK ===
         const maxWidth1 = 72;
         const startX1 = 7;
         const lineHeight1 = 4.2;
 
-        const longText1_1 = `${response.data.clientAdress?.client_name}(${response.data.clientAdress?.client_tax_number})`;
-        const longText1_2 = `${response.data.clientAdress?.client_address}`;
-        const longText1_3 = `${response.data.clientAdress?.client_email} / ${response.data.clientAdress?.client_phone}`;
+        // Static values for sender
+        const longText1_1 = response?.data.section2_Values?.Row1;
+        const longText1_2 = response?.data.section2_Values?.Row2;
+        const longText1_3 = response?.data.section2_Values?.Row3;
+        const longText1_4 = response?.data.section2_Values?.Row4;
+        const longText1_5 = response?.data.section2_Values?.Row5;
+        const longText1_6 = response?.data.section2_Values?.Row6;
+        const longText1_7 = response?.data.section2_Values?.Row7;
 
-        // Render client details
-        startY = renderWrappedText(
+        let currentY1 = commonStartY;
+        currentY1 = renderWrappedText(
           doc,
           longText1_1,
           startX1,
-          startY,
+          currentY1,
           maxWidth1,
           lineHeight1
         );
         doc.setFontSize(10);
-        startY = renderWrappedText(
+        currentY1 = renderWrappedText(
           doc,
           longText1_2,
           startX1,
-          startY,
+          currentY1,
           maxWidth1,
           lineHeight1
         );
-        startY = renderWrappedText(
+        currentY1 = renderWrappedText(
           doc,
           longText1_3,
           startX1,
-          startY,
+          currentY1,
+          maxWidth1,
+          lineHeight1
+        );
+        currentY1 = renderWrappedText(
+          doc,
+          longText1_4,
+          startX1,
+          currentY1,
+          maxWidth1,
+          lineHeight1
+        );
+        currentY1 = renderWrappedText(
+          doc,
+          longText1_5,
+          startX1,
+          currentY1,
+          maxWidth1,
+          lineHeight1
+        );
+        currentY1 = renderWrappedText(
+          doc,
+          longText1_6,
+          startX1,
+          currentY1,
+          maxWidth1,
+          lineHeight1
+        );
+        currentY1 = renderWrappedText(
+          doc,
+          longText1_7,
+          startX1,
+          currentY1,
           maxWidth1,
           lineHeight1
         );
 
-        // Consignee details
+        // === RIGHT BLOCK ===
         const maxWidth2 = 72;
-        const startX2 = 216.5; // Start X position for the consignee details
-        const lineHeight2 = 4.2;
+        const startX2 = 195;
+
         doc.setFontSize(11);
+        const longText2_1 = response?.data.section3_Values?.Row1;
+        const longText2_2 = response?.data.section3_Values?.Row2;
+        const longText2_3 = response?.data.section3_Values?.Row3;
+        const longText2_4 = response?.data.section3_Values?.Row4;
+        const longText2_5 = response?.data.section3_Values?.Row5;
+        const longText2_6 = response?.data.section3_Values?.Row6;
+        const longText2_7 = response?.data.section3_Values?.Row7;
 
-        const longText2_1 = `${response.data.consigneeAddress?.consignee_name}(${response.data.consigneeAddress?.consignee_tax_number})`;
-        const longText2_2 = `${response.data.consigneeAddress?.consignee_address}`;
-        const longText2_3 = `${response.data.consigneeAddress?.consignee_email}/${response.data.consigneeAddress?.consignee_phone}`;
-
-        // Reset the startY position for consignee details to align with client details
-        let startY2 = 36.5;
-
-        // Render consignee details using the same startY for alignment
-        startY2 = renderWrappedText(
+        let currentY2 = commonStartY;
+        currentY2 = renderWrappedText(
           doc,
           longText2_1,
           startX2,
-          startY2,
+          currentY2,
           maxWidth2,
-          lineHeight2
+          lineHeight1
         );
         doc.setFontSize(10);
-        startY2 = renderWrappedText(
+        currentY2 = renderWrappedText(
           doc,
           longText2_2,
           startX2,
-          startY2,
+          currentY2,
           maxWidth2,
-          lineHeight2
+          lineHeight1
         );
-        startY2 = renderWrappedText(
+        currentY2 = renderWrappedText(
           doc,
           longText2_3,
           startX2,
-          startY2,
+          currentY2,
           maxWidth2,
-          lineHeight2
+          lineHeight1
         );
-
-        // Determine the maximum Y position to avoid overlap
-        startY = Math.max(startY, startY2);
-
+        currentY2 = renderWrappedText(
+          doc,
+          longText2_4,
+          startX2,
+          currentY2,
+          maxWidth2,
+          lineHeight1
+        );
+        currentY2 = renderWrappedText(
+          doc,
+          longText2_5,
+          startX2,
+          currentY2,
+          maxWidth2,
+          lineHeight1
+        );
+        currentY2 = renderWrappedText(
+          doc,
+          longText2_6,
+          startX2,
+          currentY2,
+          maxWidth2,
+          lineHeight1
+        );
+        currentY2 = renderWrappedText(
+          doc,
+          longText2_7,
+          startX2,
+          currentY2,
+          maxWidth2,
+          lineHeight1
+        );
+        const startY = Math.max(currentY1, currentY2);
         const formatterNg = new Intl.NumberFormat("en-US", {
           style: "decimal",
           minimumFractionDigits: 3,
@@ -793,70 +906,81 @@ const Accounts = () => {
         });
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text("Pre Statement", 7, startY + 0.5);
+        doc.text(
+          `${response?.data.section4_heading["Pre Statement"]}`,
+          7,
+          startY + 0.5
+        );
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.text("Invoices : ", 7, startY + 5);
+
         doc.text(
-          formatter.format(response.data.data?.pre_statement_Invoices),
-          24,
+          `${response?.data.section4_Labels?.Col1 || ""}`,
+          7,
           startY + 5
         );
-        doc.text("Claim : ", 58, startY + 5);
         doc.text(
-          formatter.format(response.data.data?.pre_statement_claims),
-          71,
+          `${response?.data.section4_Values?.Col1 || ""}`,
+          22,
           startY + 5
         );
-        doc.text("Payment : ", 100, startY + 5);
         doc.text(
-          formatter.format(response.data.data?.pre_statement_payments),
-          119,
+          `${response?.data.section4_Labels?.Col2 || ""}`,
+          54,
           startY + 5
         );
-        doc.text("Total : ", 150, startY + 5);
         doc.text(
-          formatter.format(response.data.data?.pre_statement_Totals),
-          162,
+          `${response?.data.section4_Values?.Col2 || ""}`,
+          67,
           startY + 5
         );
+        doc.text(
+          `${response?.data.section4_Labels?.Col3 || ""}`,
+          96,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col3 || ""}`,
+          115,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Labels?.Col4 || ""}`,
+          146,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col4 || ""}`,
+          158,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Labels?.Col5 || ""}`,
+          188,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col5 || ""}`,
+          206,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Labels?.Col6 || ""}`,
+          238,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col6 || ""}`,
+          258,
+          startY + 5
+        );
+
         await addLogoWithDetails();
-        let yTop = startY + 7.5;
-        const rows = response?.data?.result.map((item, index) => ({
-          index: formatDate(item.Date),
-          AWB: item.AWB,
-          Transaction_Ref: item.Transaction_Ref,
-          Currnecy: item.Currnecy,
-          Invocied_Amount: item.Invocied_Amount
-            ? newFormatter.format(item.Invocied_Amount)
-            : "",
-          Paid_Amount: item.Paid_Amount,
-          Client_Reference: item.Client_Reference,
-          TT_Reference: item.TT_Reference,
-        }));
+        let yTop = startY + 13;
+
         doc.autoTable({
-          head: [
-            [
-              "Date",
-              "AWB / BL",
-              "Transaction Ref",
-              "Currency",
-              "Invoiced Amount",
-              "Payment",
-              "Client Reference",
-              "TT Reference",
-            ],
-          ],
-          body: rows.map((row) => [
-            row.index,
-            row.AWB,
-            row.Transaction_Ref,
-            row.Currnecy,
-            row.Invocied_Amount,
-            row.Paid_Amount,
-            row.Client_Reference,
-            row.TT_Reference,
-          ]),
+          head: [headers],
+          body: rows,
           startY: yTop,
           headStyles: {
             fillColor: "#203764",
@@ -880,14 +1004,20 @@ const Accounts = () => {
           },
           tableWidth: "auto", // Adjust to ensure the table fits within the page
           columnStyles: {
-            0: { halign: "left", cellWidth: 25 },
-            1: { halign: "left", cellWidth: 42, overflow: "linebreak" },
-            2: { halign: "left", cellWidth: 50, overflow: "linebreak" },
-            3: { halign: "center", cellWidth: 25 },
-            4: { halign: "right" },
-            5: { halign: "right", cellWidth: 30 },
-            6: { halign: "right", cellWidth: 40, overflow: "linebreak" },
-            7: { halign: "right", cellWidth: 35, overflow: "linebreak" },
+            0: { halign: "left", cellWidth: 22 },
+            1: { halign: "left", cellWidth: 35, overflow: "linebreak" },
+            2: { halign: "right", cellWidth: 27, overflow: "linebreak" },
+            3: { halign: "right", cellWidth: 26 },
+            4: { halign: "right", cellWidth: 26 },
+            5: { halign: "right", cellWidth: 26 },
+            6: { halign: "right", cellWidth: 33, overflow: "linebreak" },
+            7: {
+              halign: "right",
+              cellWidth: 30,
+              overflow: "linebreak",
+              font: "NotoSansThai",
+            },
+            8: { halign: "right", cellWidth: 58, overflow: "linebreak" },
           },
         });
 
@@ -901,54 +1031,73 @@ const Accounts = () => {
         doc.setTextColor(0, 0, 0);
 
         // Invoices
-        doc.text(`Invoices :  `, 75, finalY + 1);
+        doc.text(`${response?.data.section6_Labels.Row1}`, 75, finalY + 1);
         doc.text(
-          formatter.format(response.data.data?.statement_Invoices),
+          `${response?.data.section6_Values.Row1 || ""}`,
           105 +
             valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+            doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
           finalY + 1
         );
 
         // Claims
-        doc.text(`Claims :`, 75, finalY + 5);
+        doc.text(`${response?.data.section6_Labels.Row2}`, 75, finalY + 5);
         doc.text(
-          formatter.format(response.data.data?.statement_claims),
+          `${response?.data.section6_Values.Row2 || ""}`,
           105 +
             valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+            doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
           finalY + 5
         );
 
         // Payments
-        doc.text(`Payments :`, 75, finalY + 9);
+        doc.text(`${response?.data.section6_Labels.Row3}`, 75, finalY + 9);
         doc.text(
-          formatter.format(response.data.data?.statement_payments),
+          `${response?.data.section6_Values.Row3 || ""}`,
           105 +
             valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+            doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
           finalY + 9
+        );
+        // new
+        doc.text(`${response?.data.section6_Labels.Row4}`, 75, finalY + 13);
+        doc.text(
+          `${response?.data.section6_Values.Row4 || ""}`,
+          105 +
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
+          finalY + 13
+        );
+
+        doc.text(`${response?.data.section6_Labels.Row5}`, 75, finalY + 17);
+        doc.text(
+          `${response?.data.section6_Values.Row5 || ""}`,
+          105 +
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
+          finalY + 17
+        );
+
+        doc.text(`${response?.data.section6_Labels.Row6}`, 75, finalY + 21);
+        doc.text(
+          `${response?.data.section6_Values.Row6 || ""}`,
+          105 +
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
+          finalY + 21
         );
 
         // Line
-        doc.rect(75, finalY + 11, 50, 0.5, "FD");
+        doc.rect(75, finalY + 25, 50, 0.5, "FD");
 
         // Total
-        doc.text("Total :", 75, finalY + 16);
+        doc.text(`${response?.data.section6_Labels.Row4}`, 75, finalY + 29);
         doc.text(
-          formatter.format(response.data.data?.statement_Totals),
+          `${response?.data.section6_Values.Row4 || ""}`,
           105 +
             valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
-          finalY + 16
+            doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
+          finalY + 29
         );
 
         // bottom part
@@ -956,29 +1105,88 @@ const Accounts = () => {
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text("Total History", 7, finalY + 20);
+
+        doc.text(
+          `${response?.data.section7_heading["Full History"]}`,
+          7,
+          finalY + 31
+        );
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.text("Invoices : ", 7, finalY + 24);
         doc.text(
-          formatter.format(response.data.data?.Total_Invoices),
+          `${response?.data.section7_Labels.Col1 || ""}`,
+          7,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section7_Values.Col1 || ""}`,
           24,
-          finalY + 24
+          finalY + 36
         );
-        doc.text("Claim : ", 58, finalY + 24);
         doc.text(
-          formatter.format(response.data.data?.Total_Claims),
+          `${response?.data.section7_Labels.Col2 || ""}`,
+          58,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section7_Values.Col2 || ""}`,
           71,
-          finalY + 24
+          finalY + 36
         );
-        doc.text("Payment : ", 100, finalY + 24);
         doc.text(
-          formatter.format(response.data.data?.Total_Payment),
-          119,
-          finalY + 24
+          `${response?.data.section7_Labels.Col3 || ""}`,
+          100,
+          finalY + 36
         );
-        doc.text("Total : ", 150, finalY + 24);
-        doc.text(formatter.format(response.data.data?.Total), 162, finalY + 24);
+
+        doc.text(
+          `${response?.data.section7_Values.Col3 || ""}`,
+          119,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section7_Labels.Col4 || ""}`,
+          150,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section7_Values.Col4 || ""}`,
+          162,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section7_Labels.Col5 || ""}`,
+          7,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section7_Values.Col5 || ""}`,
+          24,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section7_Labels.Col6 || ""}`,
+          58,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section7_Values.Col6 || ""}`,
+          75,
+          finalY + 41
+        );
+
+        // Row7 key is mismatched with value Col7, but weâ€™ll assume Col7 is correct
+        // doc.text(
+        //   `${response?.data.section7_Labels.Row7 || ""}`,
+        //   100,
+        //   finalY + 41
+        // );
+        // doc.text(
+        //   `${response?.data.section7_Values.Col7 || ""}`,
+        //   119,
+        //   finalY + 41
+        // );
+
         // page number
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
@@ -995,7 +1203,6 @@ const Accounts = () => {
         // Upload the PDF to the server
         await uploadPDF7(pdfBlob);
       }
-      // Handle the response data as needed
       setFromDate("");
       setConsigneeIdSet("");
       setClientIdSet("");
@@ -1003,7 +1210,7 @@ const Accounts = () => {
       toast.success(t("statementSuccess"));
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error(t("genericError"));
+      toast.error("Something went Wrong ");
       // Handle the error as needed
     }
   };

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../Url/Api";
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -25,6 +25,8 @@ const BillingNoteCreate = () => {
   const location = useLocation();
   const [dropdownItems, setDropdownItems] = useState([]);
   const [editDataShow, setEditDataShow] = useState([]);
+  const [editId, setEditId] = useState("");
+
   const [roundingData, setRoundingData] = useState("");
   const [VATTotal, setVATTotal] = useState(0);
   const [WHTTotal, setWHTTotal] = useState(0);
@@ -265,7 +267,7 @@ const BillingNoteCreate = () => {
   const handleSubmitVenderData = async () => {
     console.log("Edit Data:", editDataShow);
 
-    // 🔍 Build selected rows only where checkbox is ticked
+    // ðŸ” Build selected rows only where checkbox is ticked
     const selectedRows = editDataShow
       ?.map((child, index) => {
         if (!childChecked?.[index]) return null; // Only include checked rows
@@ -310,7 +312,10 @@ const BillingNoteCreate = () => {
           t("cpnDetailsSuccess") || "Details submitted successfully"
         );
         paymentTable10();
-        setModalOne(false); // ✅ Close modal only on success
+        setModalOne(false); // âœ… Close modal only on success
+        setChildChecked({});
+        setAmountToPay({});
+        setParentChecked(false);
       } else {
         toast.error(
           result.message || t("submissionFailed") || "Submission failed"
@@ -327,6 +332,10 @@ const BillingNoteCreate = () => {
       paymentTable10();
     }
   }, [from?.ID, totalDataDetails2]);
+  const filteredHeaders = Object.fromEntries(
+    Object.entries(dynamicHeaders || {}).filter(([key]) => key !== "ID")
+  );
+
   const paymentTable10 = () => {
     console.log("vendor_id:", state.vendor_id);
 
@@ -340,6 +349,7 @@ const BillingNoteCreate = () => {
           console.log("GetCombinedPaymentByID response:", res);
           setTableHead(res.tableHead || {});
           setTableData(res.tableData || []);
+          setEditId(res.data);
           setTotalDataDetails(res);
           setDataShow(res);
         })
@@ -362,9 +372,8 @@ const BillingNoteCreate = () => {
 
   const deleteOrder = async (id) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/DeletePurchase`, {
-        ID: id,
-        user_id: localStorage.getItem("id"),
+      const response = await axios.post(`${API_BASE_URL}/DeleteBN`, {
+        bn_id: id,
       });
       console.log(response);
       // toast.success(response.data.Message_EN);
@@ -390,7 +399,7 @@ const BillingNoteCreate = () => {
   //     setEditDataShow(response?.data?.data);
   //     setStock(response?.data);
 
-  //     // 🔥 Clear the item form fields for new entry
+  //     // ðŸ”¥ Clear the item form fields for new entry
   //     setFormDataAdd({
   //       pod_type_id: 0,
   //       unit_count_id: 0,
@@ -406,7 +415,7 @@ const BillingNoteCreate = () => {
   //       item_Name_TH: 0,
   //     });
 
-  //     // ✅ Keep the purchase order ID and vendor details
+  //     // âœ… Keep the purchase order ID and vendor details
   //     setState((prevState) => ({
   //       ...prevState,
   //       ID: response.data?.ID || from?.ID || prevState.ID,
@@ -479,8 +488,8 @@ const BillingNoteCreate = () => {
         const response = await axios.post(
           `${API_BASE_URL}/getInvoicesByClientConsignee`,
           {
-            client_id: state.ClientID,
-            consignee_id: state.ConsigneeID,
+            client_id: state.ClientID || editId?.client_id,
+            consignee_id: state.ConsigneeID || editId?.consignee_id,
             vendor_id: state.vendor_id,
           }
         );
@@ -557,7 +566,7 @@ const BillingNoteCreate = () => {
       console.log(response);
       setStock(response?.data);
 
-      // 🔥 Clear the item form fields for new entry
+      // ðŸ”¥ Clear the item form fields for new entry
       setFormDataAdd({
         pod_type_id: 0,
         unit_count_id: 0,
@@ -573,7 +582,7 @@ const BillingNoteCreate = () => {
         item_Name_TH: 0,
       });
 
-      // ✅ Keep the purchase order ID and vendor details
+      // âœ… Keep the purchase order ID and vendor details
       setState((prevState) => ({
         ...prevState,
         ID: response.data?.ID || from?.ID || prevState.ID,
@@ -638,7 +647,7 @@ const BillingNoteCreate = () => {
         [name]: value,
       };
 
-      // ✅ Ensure VAT updates dynamically when price, quantity, or VAT_Rate changes
+      // âœ… Ensure VAT updates dynamically when price, quantity, or VAT_Rate changes
       const price = parseFloat(updatedData.pod_price || 0);
       const quantity = parseFloat(updatedData.pod_quantity || 0);
       const vatRate = parseFloat(prev.VAT_Rate || 0);
@@ -681,7 +690,7 @@ const BillingNoteCreate = () => {
   };
 
   const handleEditClick = (item) => {
-    setFormDataAdd(item); // Set the selected item’s data
+    setFormDataAdd(item); // Set the selected itemâ€™s data
     setModalOne(true); // Fill the form with item data
     // Open the modal
   };
@@ -736,6 +745,11 @@ const BillingNoteCreate = () => {
   };
   const handleCloseModalOne = () => {
     setModalOne(false); // Hide the modal
+
+    setModalOne(false);
+    setChildChecked({});
+    setAmountToPay({});
+    setParentChecked(false);
   };
 
   // const openModalOne = () => {
@@ -862,30 +876,48 @@ const BillingNoteCreate = () => {
     const newChecked = !parentChecked;
     setParentChecked(newChecked);
 
-    // Update all child checkboxes
     const updatedChildren = {};
-    editDataShow?.forEach((_, index) => {
+    const updatedAmounts = {};
+
+    editDataShow?.forEach((row, index) => {
       updatedChildren[index] = newChecked;
+
+      if (newChecked) {
+        // âœ… Clean commas and parse correctly
+        const rawValue = row?.COL8 || "0";
+        const cleanValue = parseFloat(rawValue.toString().replace(/,/g, ""));
+        updatedAmounts[index] = cleanValue;
+      }
     });
 
     setChildChecked(updatedChildren);
-
-    // Calculate sum when selecting all
+    setAmountToPay(newChecked ? updatedAmounts : {});
   };
+
   const handleChildChange = (index) => {
-    const updatedChildren = {
-      ...childChecked,
-      [index]: !childChecked[index], // Toggle individual checkbox
-    };
+    const isChecked = !childChecked[index];
 
-    setChildChecked(updatedChildren);
+    setChildChecked((prev) => ({
+      ...prev,
+      [index]: isChecked,
+    }));
 
-    // Check if all children are selected
-    const allChecked = Object.values(updatedChildren).every(Boolean);
-    setParentChecked(allChecked);
+    setAmountToPay((prev) => {
+      const updated = { ...prev };
 
-    // Update sum based on selection
+      if (isChecked) {
+        // âœ… Clean commas and parse correctly
+        const rawValue = editDataShow[index]?.COL8 || "0";
+        const cleanValue = parseFloat(rawValue.toString().replace(/,/g, ""));
+        updated[index] = cleanValue;
+      } else {
+        delete updated[index];
+      }
+
+      return updated;
+    });
   };
+
   useEffect(() => {
     // Initialize state with Payable values
     const initialAmounts = editDataShow.reduce((acc, child, index) => {
@@ -895,17 +927,16 @@ const BillingNoteCreate = () => {
     setAmountToPay(initialAmounts);
   }, [editDataShow]);
   const handleAmountChange2 = (index, value) => {
-    setAmountToPay((prev) => {
-      const updatedAmounts = {
-        ...prev,
-        [index]: value, // Update specific index
-      };
-
-      // Recalculate VAT & WHT dynamically after updating amountToPay
-
-      return updatedAmounts;
-    });
+    setAmountToPay((prev) => ({
+      ...prev,
+      [index]: value,
+    }));
   };
+
+  const totalAmountToPay = Object.values(amountToPay).reduce(
+    (sum, val) => sum + (parseFloat(val) || 0),
+    0
+  );
 
   useEffect(() => {
     let sumAmountToPay = 0;
@@ -989,52 +1020,74 @@ const BillingNoteCreate = () => {
 
   console.log(totalDataDetails);
   const handleSubmitVenderData1 = async () => {
-    if (!state.supplier_dua_date) {
-      toast.error(t("missingRequiredFields"));
-      return;
-    }
-
-    const selectedRows = paymentTableVender.map((child, index) => ({
-      ID: child?.ID ?? null, // Ensure ID exists
-      CPN: totalDataDetails1?.ID ?? "", // Ensure valid CPN
-      PO_ID: child?.PO_ID ?? "", // Ensure PO_ID exists
-      Payment: parseFloat(amountToPay[index] || 0), // Ensure it's a valid number
-    }));
-
-    const userId = localStorage.getItem("id");
-
-    const payload = {
-      vendor_id: totalDataDetails1.Vendor,
-      Payment_Date: state.supplier_dua_date,
-      due_date: state.supplier_invoice_date,
-      user_id: userId,
-      cpn_id: totalDataDetails1?.ID ?? "",
-      datas: selectedRows,
-    };
-
+    console.log(state.ID);
+    const cpnId = from?.ID || totalDataDetails2;
     try {
-      const response = await fetch(`${API_BASE_URL}/AddCombinedPayment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+      const accessResponse = await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
+        id: cpnId,
+        accesstype: 5, // 5 = Cancel action
       });
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      console.log("API Response:", result);
-      toast.success(t("paymentUpdateSuccess"));
-      paymentTable10();
-      navigate("/billing_note");
+      // âœ… Success: Show toast, refresh table, navigate
+      toast.success(t("success"));
+      paymentTable10(); // Refresh table or data
+      navigate("/billing_note"); // Redirect
     } catch (error) {
-      console.error("API Error:", error);
-      toast.error(t("genericError"));
+      console.error(
+        "Error updating access file in handleSubmitVenderData1:",
+        error
+      );
+      toast.error(t("closingError"));
     }
   };
+
+  // const handleSubmitVenderData1 = async () => {
+  //   if (!state.supplier_dua_date) {
+  //     toast.error(t("missingRequiredFields"));
+  //     return;
+  //   }
+
+  //   const selectedRows = paymentTableVender.map((child, index) => ({
+  //     ID: child?.ID ?? null, // Ensure ID exists
+  //     CPN: totalDataDetails1?.ID ?? "", // Ensure valid CPN
+  //     PO_ID: child?.PO_ID ?? "", // Ensure PO_ID exists
+  //     Payment: parseFloat(amountToPay[index] || 0), // Ensure it's a valid number
+  //   }));
+
+  //   const userId = localStorage.getItem("id");
+
+  //   const payload = {
+  //     vendor_id: totalDataDetails1.Vendor,
+  //     Payment_Date: state.supplier_dua_date,
+  //     due_date: state.supplier_invoice_date,
+  //     user_id: userId,
+  //     cpn_id: totalDataDetails1?.ID ?? "",
+  //     datas: selectedRows,
+  //   };
+
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/AddCombinedPayment`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(payload),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error(`API Error: ${response.status} ${response.statusText}`);
+  //     }
+
+  //     const result = await response.json();
+  //     console.log("API Response:", result);
+  //     toast.success(t("paymentUpdateSuccess"));
+  //     paymentTable10();
+  //     navigate("/billing_note");
+  //   } catch (error) {
+  //     console.error("API Error:", error);
+  //     toast.error(t("genericError"));
+  //   }
+  // };
 
   return (
     <>
@@ -1238,30 +1291,24 @@ const BillingNoteCreate = () => {
                     </button>
                     {modalOne && (
                       <div
-                        className="fixed inset-0 flex items-center justify-center"
+                        className="fixed inset-0 flex items-center justify-center "
                         style={{ zIndex: "999" }}
                       >
                         <div
-                          className="fixed w-screen h-screen bg-black/20"
+                          className="fixed w-screen h-screen bg-black/20 "
                           onClick={handleCloseModalOne}
                         />
                         <div
-                          className="bg-white rounded-lg shadow-lg max-w-md w-full"
+                          className="bg-white rounded-lg shadow-lg max-w-md w-full modalBillingTable"
                           style={{ maxWidth: "1530px" }}
                         >
-                          <div className="crossArea">
-                            <h3>{t("editDetails")}</h3>
-                            <p onClick={handleCloseModalOne}>
-                              <CloseIcon />
-                            </p>
-                          </div>
-                          <div className="formEan formCreate">
+                          <div className="formEan">
                             <div className="modal-body modalShipTo p-0 ">
                               {/* {/ <h1>hello</h1> /} */}
 
-                              <div className="addMOdalContent formCreate mt-0 px-2">
-                                <div className="row mt-4 tableCombinePayment">
-                                  <div className="tableCreateClient tableLr tablepayment">
+                              <div className="addMOdalContent">
+                                <div className="row tableCombinePayment">
+                                  <div className="tableCreateClient tableLr tablepayment ">
                                     {/* <table>
                                       <tr>
                                         <th style={{ width: "80px" }}>
@@ -1392,23 +1439,30 @@ const BillingNoteCreate = () => {
                                             />
                                           </th>
 
-                                          {/* 🔽 Render headers dynamically */}
-                                          {Object.entries(
-                                            dynamicHeaders || {}
-                                          ).map(([key, label]) => (
-                                            <th
-                                              key={key}
-                                              className="text-center"
-                                              style={{ minWidth: "130px" }}
-                                            >
-                                              {label}
-                                            </th>
-                                          ))}
+                                          {/* ðŸ”½ Render headers dynamically */}
+                                          {/* ðŸ”½ Render headers dynamically */}
+                                          {Object.entries(filteredHeaders).map(
+                                            ([key, label]) => (
+                                              <th
+                                                key={key}
+                                                className="text-center"
+                                                style={{ minWidth: "130px" }}
+                                              >
+                                                {label}
+                                              </th>
+                                            )
+                                          )}
+
                                           <th
                                             className="text-center"
                                             style={{ width: "150px" }}
                                           >
                                             {t("amountToPay")}
+                                          </th>
+                                          <th>
+                                            <CloseIcon
+                                              onClick={handleCloseModalOne}
+                                            />
                                           </th>
                                         </tr>
                                       </thead>
@@ -1426,28 +1480,54 @@ const BillingNoteCreate = () => {
                                               />
                                             </td>
 
-                                            {/* 🔽 Render row data dynamically */}
-                                            {Object.keys(
-                                              dynamicHeaders || {}
-                                            ).map((colKey) => (
-                                              <td
-                                                key={colKey}
-                                                className="text-center"
-                                              >
-                                                {row[colKey]}
-                                              </td>
-                                            ))}
+                                            {/* ðŸ”½ Render row data dynamically */}
+                                            {/* ðŸ”½ Render row data dynamically */}
+                                            {Object.keys(filteredHeaders).map(
+                                              (colKey) => (
+                                                <td
+                                                  key={colKey}
+                                                  className="text-center"
+                                                >
+                                                  {row[colKey]}
+                                                </td>
+                                              )
+                                            )}
 
-                                            <td className="pe-3">
+                                            <td className="pe-3" colspan="2">
                                               <input
-                                                type="number"
-                                                value={amountToPay[index] ?? ""}
-                                                onChange={(e) =>
+                                                type="text"
+                                                inputMode="decimal"
+                                                className="form-control text-end"
+                                                defaultValue={
+                                                  amountToPay[index] !==
+                                                    undefined &&
+                                                  amountToPay[index] !== ""
+                                                    ? Number(
+                                                        amountToPay[index]
+                                                      ).toLocaleString(
+                                                        "en-US",
+                                                        {
+                                                          minimumFractionDigits: 2,
+                                                          maximumFractionDigits: 2,
+                                                        }
+                                                      )
+                                                    : ""
+                                                }
+                                                onChange={(e) => {
+                                                  const rawValue =
+                                                    e.target.value.replace(
+                                                      /,/g,
+                                                      ""
+                                                    );
+                                                  const numericValue =
+                                                    parseFloat(rawValue);
                                                   handleAmountChange2(
                                                     index,
-                                                    e.target.value
-                                                  )
-                                                }
+                                                    isNaN(numericValue)
+                                                      ? ""
+                                                      : numericValue
+                                                  );
+                                                }}
                                               />
                                             </td>
                                           </tr>
@@ -1459,14 +1539,33 @@ const BillingNoteCreate = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="modal-footer justify-center">
-                            <button
-                              type="button"
-                              className="UpdatePopupBtn btn btn-primary mb-4"
-                              onClick={() => handleSubmitVenderData()}
-                            >
-                              {t("submit")}
-                            </button>
+                          <div className="modal-footer ">
+                            {/* Submit button aligned center (automatically left-aligned here) */}
+                            <div className="mx-auto">
+                              <button
+                                type="button"
+                                className="UpdatePopupBtn btn btn-primary"
+                                onClick={handleSubmitVenderData}
+                              >
+                                {t("submit")}
+                              </button>
+                            </div>
+
+                            <div>
+                              <input
+                                type="text"
+                                readOnly
+                                className="form-control text-end"
+                                value={Number(totalAmountToPay).toLocaleString(
+                                  "en-US",
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }
+                                )}
+                                style={{ maxWidth: "200px" }}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1571,20 +1670,24 @@ const BillingNoteCreate = () => {
               onClick={handleSubmitVenderData1}
               disabled={buttonClicked}
             >
-              {from?.ID ? t("update") : t("create")}
+              {from?.ID ? t("Close") : t("create")}
             </button>
-            <Link
-              className="btn btn-danger"
-              to={from?.ID ? "/billing_note" : "/billing_note"} // Redirect if ID
-              exists
-              onClick={(e) => {
-                if (!podId) return; // Do nothing if podId is missing
-                e.preventDefault(); // Prevent navigation if deleting
-                deleteOrder(podId); // Call delete function
-              }}
-            >
-              {t("cancel")}
-            </Link>
+            {!from?.ID ? (
+              <Link
+                className="btn btn-danger"
+                to={from?.ID ? "/billing_note" : "/billing_note"} // Redirect if ID
+                exists
+                onClick={(e) => {
+                  if (!totalDataDetails2) return; // Do nothing if podId is missing
+                  e.preventDefault(); // Prevent navigation if deleting
+                  deleteOrder(totalDataDetails2); // Call delete function
+                }}
+              >
+                {t("cancel")}
+              </Link>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </Card>

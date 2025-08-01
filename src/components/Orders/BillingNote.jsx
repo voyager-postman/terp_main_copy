@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../Url/Api";
 import { useEffect, useMemo, useState, useRef } from "react";
 import Barcode from "react-barcode";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,6 +17,8 @@ import moment from "moment";
 import MySwal from "../../swal";
 const BillingNote = () => {
   const [t, i18n] = useTranslation("global");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [roundingData, setRoundingData] = useState("");
   const [VATTotal, setVATTotal] = useState(0);
   const [WHTTotal, setWHTTotal] = useState(0);
@@ -29,8 +31,8 @@ const BillingNote = () => {
   const [procesureResult, setProcesureResult] = useState("");
   const [amountToPayNew, setAmountToPayNew] = useState("");
   const [depositAvailableNew, setDepositAvailableNew] = useState("");
-    const [columns, setColumns] = useState([]);
-  
+  const [columns, setColumns] = useState([]);
+
   const [depositUsedNew, newDepositUsedNew] = useState("");
   const [vatNew, setVatNew] = useState("");
   const [whtNew, setWhtNew] = useState("");
@@ -39,6 +41,12 @@ const BillingNote = () => {
   const [roundingNew1, setRoundingNew1] = useState("0");
   const [totalBeforText, setTotalBeforText] = useState("0");
   const [leftRoundingNew, setLeftRoundingNew] = useState("");
+  const [show1, setShow1] = useState("");
+
+  const handleClose1 = () => setShow1(false);
+  const closeIcon1 = () => {
+    setShow1(false);
+  };
   const handleRoundingChange = (e) => {
     let value = e.target.value;
 
@@ -173,10 +181,12 @@ const BillingNote = () => {
         const { data: rows = [], head = {} } = response.data;
 
         // Step 1: Create dynamic columns from head
-        const generatedColumns = Object.entries(head).map(([key, label]) => ({
-          Header: t(label || key), // fallback to key if label is empty
-          accessor: key,
-        }));
+        const generatedColumns = Object.entries(head)
+          .filter(([key]) => key !== "ID")
+          .map(([key, label]) => ({
+            Header: t(label || key),
+            accessor: key,
+          }));
 
         // Step 2: Add actions column
         generatedColumns.push({
@@ -196,9 +206,41 @@ const BillingNote = () => {
                   </button>
                   {!(a.Payment_Status === 3 || a.Payment_Status === 4) && (
                     <>
-                      <Link to="/billingNoteCreate" state={{ from: a }}>
+                      {/* <Link to="/billingNoteCreate" state={{ from: a }}>
                         <i className="mdi mdi-pencil pl-2" />
-                      </Link>
+                      </Link> */}
+
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await axios.post(
+                              `${API_BASE_URL}/Checkeaccessfile`,
+                              {
+                                id: a.ID,
+                                accesstype: 5, // Mark as in use
+                              }
+                            );
+
+                            if (res?.data?.success) {
+                              navigate("/billingNoteCreate", {
+                                state: { from: a },
+                              });
+                            } else {
+                              toast.warning(res?.data?.message);
+                            }
+                          } catch (error) {
+                            console.error("Access API error:", error);
+                            toast.error(t("genericError"));
+                          }
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <i className="mdi mdi-pencil pl-2" />
+                      </button>
 
                       <button type="button" onClick={() => deleteOrder(a.ID)}>
                         <i className="mdi mdi-delete " />
@@ -224,6 +266,23 @@ const BillingNote = () => {
                       </svg>
                     </button>
                   )}
+                  <button
+                    type="button"
+                    className="SvgAnchor"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalCombine"
+                    onClick={() => everyDataSet(a)}
+                  >
+                    <svg
+                      className="SvgPdf"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="#203764"
+                    >
+                      <title>pdf-generate</title>
+                      <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2M14 9V3.5L19.5 9H14M7 12H8.5C9.3 12 10 12.67 10 13.5S9.3 15 8.5 15H7V12M8.5 13.2H8V14.3H8.5C8.8 14.3 9 14.05 9 13.8C9 13.45 8.8 13.2 8.5 13.2M11 12H12V13H13V12H14V15H13V14H12V15H11V12M15 12H16.5C17.33 12 18 12.67 18 13.5S17.33 15 16.5 15H15V12M16.5 13.2H16V14.3H16.5C16.8 14.3 17 14.05 17 13.8C17 13.45 16.8 13.2 16.5 13.2Z" />
+                    </svg>
+                  </button>
                 </div>
               </>
             );
@@ -240,7 +299,7 @@ const BillingNote = () => {
   };
   useEffect(() => {
     billingNote();
-  },[]);
+  }, []);
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
@@ -250,26 +309,32 @@ const BillingNote = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "delete",
+      confirmButtonText: t("delete"),
     }).then(async (result) => {
       console.log(result);
       if (result.isConfirmed) {
         try {
-          const response = await axios.post(
-            `${API_BASE_URL}/DeleteCpnPayment`,
-            {
-              id: id,
-            }
-          );
-          console.log(response);
-          getCombinedPayment();
-          toast.success(t("combinedPaymentDeleteSuccess"));
+          const response = await axios.post(`${API_BASE_URL}/DeleteBN`, {
+            bn_id: id,
+          });
+
+          // Handle response
+          if (response.data.success === false) {
+            // Set modal message and show modal
+            setErrorMessage(response.data);
+            setShow1(true); // open modal
+          } else {
+            getCombinedPayment();
+            billingNote();
+            toast.success(t("combinedPaymentDeleteSuccess"));
+          }
         } catch (e) {
           toast.error(t("genericError"));
         }
       }
     });
   };
+
   useEffect(() => {
     const deposit = parseFloat(depositAvailableNew) || 0;
     const finalPayment = basePayment - deposit;
@@ -782,6 +847,66 @@ const BillingNote = () => {
           <div
             className="modal-footer"
             style={{ backgroundColor: color ? "#2f423c" : "" }}
+          ></div>
+        </div>
+      </Modal>
+      <Modal
+        className="modalError receiveModal"
+        show={show1}
+        onHide={handleClose1}
+      >
+        <div className="modal-content">
+          <div
+            className="modal-header border-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <h1 className="modal-title fs-5" id="exampleModalLabel">
+              {t("billingNote")}
+            </h1>
+            <button
+              style={{ color: "#fff", fontSize: "30px" }}
+              type="button"
+              onClick={closeIcon1}
+            >
+              <i class="mdi mdi-close"></i>
+            </button>
+          </div>
+          <div
+            className="modal-body pt-0"
+            style={{
+              backgroundColor: color,
+            }}
+          >
+            <div className="eanCheck errorMessage recheckReceive">
+              <p
+                style={{
+                  backgroundColor: color ? "" : "#631f37",
+                }}
+                className="mt-0 pt-0"
+              >
+                {errorMessage?.Message_EN}
+              </p>
+              <p
+                style={{
+                  backgroundColor: color ? "" : "#631f37",
+                }}
+                className="mt-0 pt-0"
+              >
+                {errorMessage?.Message_TH}
+              </p>
+
+              <div className="closeBtnRece">
+                <button onClick={closeIcon1}>{t("close")}</button>
+              </div>
+            </div>
+          </div>
+          <div
+            className="modal-footer"
+            style={{
+              backgroundColor: color,
+            }}
           ></div>
         </div>
       </Modal>
