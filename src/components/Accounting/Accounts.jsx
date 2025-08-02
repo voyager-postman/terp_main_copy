@@ -740,160 +740,79 @@ const Accounts = () => {
           maxWidth,
           lineHeight
         ) {
-          const lines = doc.splitTextToSize(text, maxWidth);
+          if (!text || !text.trim()) return startY; // Skip null, undefined, or empty strings
+          const lines = doc.splitTextToSize(text.trim(), maxWidth);
           lines.forEach((line, index) => {
             doc.text(line, startX, startY + index * lineHeight);
           });
           return startY + lines.length * lineHeight;
         }
 
-        // Common Y start
         const commonStartY = 36.3;
-
-        // === LEFT BLOCK ===
         const maxWidth1 = 72;
         const startX1 = 7;
         const lineHeight1 = 4.2;
 
-        // Static values for sender
-        const longText1_1 = response?.data.section2_Values?.Row1;
-        const longText1_2 = response?.data.section2_Values?.Row2;
-        const longText1_3 = response?.data.section2_Values?.Row3;
-        const longText1_4 = response?.data.section2_Values?.Row4;
-        const longText1_5 = response?.data.section2_Values?.Row5;
-        const longText1_6 = response?.data.section2_Values?.Row6;
-        const longText1_7 = response?.data.section2_Values?.Row7;
+        // Collect all rows and clean them
+        const sectionValues = [
+          response?.data.section2_Values?.Row1,
+          response?.data.section2_Values?.Row2,
+          response?.data.section2_Values?.Row3,
+          response?.data.section2_Values?.Row4,
+          response?.data.section2_Values?.Row5,
+          response?.data.section2_Values?.Row6,
+          response?.data.section2_Values?.Row7,
+        ].filter((row) => row && row.trim()); // Remove null, undefined, and empty strings
 
         let currentY1 = commonStartY;
-        currentY1 = renderWrappedText(
-          doc,
-          longText1_1,
-          startX1,
-          currentY1,
-          maxWidth1,
-          lineHeight1
-        );
         doc.setFontSize(10);
-        currentY1 = renderWrappedText(
-          doc,
-          longText1_2,
-          startX1,
-          currentY1,
-          maxWidth1,
-          lineHeight1
-        );
-        currentY1 = renderWrappedText(
-          doc,
-          longText1_3,
-          startX1,
-          currentY1,
-          maxWidth1,
-          lineHeight1
-        );
-        currentY1 = renderWrappedText(
-          doc,
-          longText1_4,
-          startX1,
-          currentY1,
-          maxWidth1,
-          lineHeight1
-        );
-        currentY1 = renderWrappedText(
-          doc,
-          longText1_5,
-          startX1,
-          currentY1,
-          maxWidth1,
-          lineHeight1
-        );
-        currentY1 = renderWrappedText(
-          doc,
-          longText1_6,
-          startX1,
-          currentY1,
-          maxWidth1,
-          lineHeight1
-        );
-        currentY1 = renderWrappedText(
-          doc,
-          longText1_7,
-          startX1,
-          currentY1,
-          maxWidth1,
-          lineHeight1
-        );
 
-        // === RIGHT BLOCK ===
+        sectionValues.forEach((text) => {
+          currentY1 = renderWrappedText(
+            doc,
+            text,
+            startX1,
+            currentY1,
+            maxWidth1,
+            lineHeight1
+          );
+        });
+
         const maxWidth2 = 72;
         const startX2 = 195;
 
-        doc.setFontSize(11);
-        const longText2_1 = response?.data.section3_Values?.Row1;
-        const longText2_2 = response?.data.section3_Values?.Row2;
-        const longText2_3 = response?.data.section3_Values?.Row3;
-        const longText2_4 = response?.data.section3_Values?.Row4;
-        const longText2_5 = response?.data.section3_Values?.Row5;
-        const longText2_6 = response?.data.section3_Values?.Row6;
-        const longText2_7 = response?.data.section3_Values?.Row7;
-
         let currentY2 = commonStartY;
-        currentY2 = renderWrappedText(
-          doc,
-          longText2_1,
-          startX2,
-          currentY2,
-          maxWidth2,
-          lineHeight1
-        );
-        doc.setFontSize(10);
-        currentY2 = renderWrappedText(
-          doc,
-          longText2_2,
-          startX2,
-          currentY2,
-          maxWidth2,
-          lineHeight1
-        );
-        currentY2 = renderWrappedText(
-          doc,
-          longText2_3,
-          startX2,
-          currentY2,
-          maxWidth2,
-          lineHeight1
-        );
-        currentY2 = renderWrappedText(
-          doc,
-          longText2_4,
-          startX2,
-          currentY2,
-          maxWidth2,
-          lineHeight1
-        );
-        currentY2 = renderWrappedText(
-          doc,
-          longText2_5,
-          startX2,
-          currentY2,
-          maxWidth2,
-          lineHeight1
-        );
-        currentY2 = renderWrappedText(
-          doc,
-          longText2_6,
-          startX2,
-          currentY2,
-          maxWidth2,
-          lineHeight1
-        );
-        currentY2 = renderWrappedText(
-          doc,
-          longText2_7,
-          startX2,
-          currentY2,
-          maxWidth2,
-          lineHeight1
-        );
+
+        // Collect and clean all rows
+        const section3Values = [
+          response?.data.section3_Values?.Row1,
+          response?.data.section3_Values?.Row2,
+          response?.data.section3_Values?.Row3,
+          response?.data.section3_Values?.Row4,
+          response?.data.section3_Values?.Row5,
+          response?.data.section3_Values?.Row6,
+          response?.data.section3_Values?.Row7,
+        ].filter((row) => row && row.trim()); // remove null/empty
+
+        // Loop through and render text
+        section3Values.forEach((text, index) => {
+          // Example: first row bigger font, rest smaller
+          if (index === 0) {
+            doc.setFontSize(11);
+          } else {
+            doc.setFontSize(10);
+          }
+
+          currentY2 = renderWrappedText(
+            doc,
+            text,
+            startX2,
+            currentY2,
+            maxWidth2,
+            lineHeight1
+          );
+        });
+
         const startY = Math.max(currentY1, currentY2);
         const formatterNg = new Intl.NumberFormat("en-US", {
           style: "decimal",
@@ -976,7 +895,7 @@ const Accounts = () => {
         );
 
         await addLogoWithDetails();
-        let yTop = startY + 13;
+        let yTop = startY + 10;
 
         doc.autoTable({
           head: [headers],
@@ -1004,20 +923,19 @@ const Accounts = () => {
           },
           tableWidth: "auto", // Adjust to ensure the table fits within the page
           columnStyles: {
-            0: { halign: "left", cellWidth: 22 },
-            1: { halign: "left", cellWidth: 35, overflow: "linebreak" },
-            2: { halign: "right", cellWidth: 27, overflow: "linebreak" },
-            3: { halign: "right", cellWidth: 26 },
-            4: { halign: "right", cellWidth: 26 },
-            5: { halign: "right", cellWidth: 26 },
+            0: { halign: "center", cellWidth: 15 },
+            1: { halign: "left", cellWidth: 30, overflow: "linebreak" },
+            2: { halign: "center", cellWidth: 35, overflow: "linebreak" },
+            3: { halign: "center", cellWidth: 35 },
+            4: { halign: "right", cellWidth: 29 },
+            5: { halign: "right", cellWidth: 29 },
             6: { halign: "right", cellWidth: 33, overflow: "linebreak" },
             7: {
               halign: "right",
-              cellWidth: 30,
+              cellWidth: 77,
               overflow: "linebreak",
               font: "NotoSansThai",
             },
-            8: { halign: "right", cellWidth: 58, overflow: "linebreak" },
           },
         });
 

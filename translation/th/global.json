@@ -1092,5 +1092,10 @@
   "billing_note_view_form": "ใบแจ้งหนี้ / แบบฟอร์มแสดงผล",
   "clientAutoGenerate": "สร้างลูกค้าอัตโนมัติ",
   "consigneeAutoGenerate": "สร้างผู้รับอัตโนมัติ",
-  "shippingDocumentsAutoGenerate": "สร้างเอกสารการจัดส่งอัตโนมัติ"
+  "shippingDocumentsAutoGenerate": "สร้างเอกสารการจัดส่งอัตโนมัติ",
+  "fxRateReceived": "ได้รับอัตราแลกเปลี่ยน",
+  "prepayment": "ชำระเงินล่วงหน้า",
+  "averageRate": "อัตราเฉลี่ย",
+  "lossGainFx": "กำไร/ขาดทุน จากอัตราแลกเปลี่ยน",
+  "receiptManagement": "การจัดการใบเสร็จรับเงิน"
 }

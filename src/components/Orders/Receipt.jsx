@@ -69,6 +69,7 @@ const Receipt = () => {
   };
   const [hasUserChangedValues, setHasUserChangedValues] = useState(false);
   const [basePayment, setBasePayment] = useState(0);
+  const [columns, setColumns] = useState([]);
   const [consigneeId, setConsigneeId] = useState("");
   const [data, setData] = useState([]);
   const [notes2, setNotes2] = useState("");
@@ -128,6 +129,11 @@ const Receipt = () => {
 
   const { data: paymentChannle } = useQuery("PaymentChannela");
   const { data: currency } = useQuery("getCurrency");
+  useEffect(() => {
+    if (currency) {
+      console.log("Currency API Data:", currency);
+    }
+  }, [currency]);
   const [purchaseStatistic, setPurchaseStatistic] = useState([]);
   const [claimTable, setClaimTable] = useState([]);
   const [claimPageData, setClaimPageData] = useState("");
@@ -221,21 +227,43 @@ const Receipt = () => {
       alert(t("invalidFile"));
     }
   };
+  const [paymentForm, setPaymentForm] = useState({
+    paymentDate: null,
+    fx: "",
+    paymentChannel: "",
+    fxRateReceived: "",
+    clientPaymentRef: "",
+    interBankCharges: "",
+    paymentAmount: "",
+    prepayment: "",
+    bankRef: "",
+    localBankCharges: "",
+    thbReceived: "",
+    rounding: "",
+    notes: "",
+  });
 
-  const orderData1 = () => {
-    axios
-      .get(`${API_BASE_URL}/getPurchaseOrder`, {
-        params: {
-          status,
-        },
-      })
-      .then((res) => {
-        setData(res.data.data || []);
-      })
-      .catch((error) => {
-        console.error("Error fetching orders:", error);
-      });
+  const handleChange5 = (field, value) => {
+    setPaymentForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
+
+  // const orderData1 = () => {
+  //   axios
+  //     .get(`${API_BASE_URL}/getPurchaseOrder`, {
+  //       params: {
+  //         status,
+  //       },
+  //     })
+  //     .then((res) => {
+  //       setData(res.data.data || []);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching orders:", error);
+  //     });
+  // };
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
   };
@@ -636,15 +664,6 @@ const Receipt = () => {
     getOrdersDetails();
     getAllPackaging();
   }, []);
-  const getPurchaseOrder = () => {
-    axios.get(`${API_BASE_URL}/getPurchaseOrder`).then((res) => {
-      console.log(res);
-      setData(res.data.data || []);
-    });
-  };
-  useEffect(() => {
-    getPurchaseOrder();
-  }, []);
 
   const handleLossGainChange1 = (e) => {
     const value = e.target.value; // Parse input or fallback to 0
@@ -675,45 +694,9 @@ const Receipt = () => {
   }, [responceId]);
 
   const everyDataSet = async (a) => {
-    console.log(a);
-    setHasUserChangedValues(false); // reset change flag
+  
     setSinglePodId(a);
 
-    let deposit = 0;
-
-    if (a?.PO_ID) {
-      try {
-        const accessResponse = await axios.post(
-          `${API_BASE_URL}/Checkeaccessfile`,
-          {
-            id: a.PO_ID,
-            accesstype: 1, // Mark as in use
-          }
-        );
-        console.log(accessResponse);
-        if (accessResponse?.data?.success) {
-          const res1 = await axios.get(
-            `${API_BASE_URL}/getPurchaseOrderDetails?po_id=${a?.PO_ID}`
-          );
-          console.log(res1);
-          deposit = res1?.data?.data1?.Available_deposit || 0;
-          setDepositAvailableNew(deposit);
-          setBasePayment(res1?.data?.data1?.left_pay || 0); // set it once
-          setVatNew(res1?.data?.data1?.Vat_payment || 0);
-          setWhtNew(res1?.data?.data1?.wht_payment || 0);
-          setRoundingNew1(res1?.data?.data1?.Rounding || 0);
-          setTotalBeforText(res1?.data?.data1?.Total_Before_Tax || 0);
-          const modal = new bootstrap.Modal(
-            document.getElementById("modalCombine")
-          );
-          modal.show();
-        } else {
-          toast.warning(accessResponse?.data?.message);
-        }
-      } catch (error) {
-        console.log("Error fetching deposit:", error);
-      }
-    }
   };
 
   useEffect(() => {
@@ -2249,103 +2232,60 @@ const Receipt = () => {
   };
 
   const submitPaymentData = async () => {
-    if (!selectedPaymentDate) {
-      setShow2(true);
-      return;
-    }
-    if (!selectedPaymentChannel) {
-      setShow2(true);
-      return;
-    }
-
     const paymentData = {
-      vendor_id: singlePodId.Vendor || venderId.Vendor,
-      Payment_Date: selectedPaymentDate,
-      Payment_Channel: selectedPaymentChannel,
-      Bank_Fees: bankChargeAmount,
-      Rounding: roundingAmount,
-      available_Deposit: depositAvailable,
-      // Payment_Amount: totalPaymentAmount,
-      Payment_Amount: paymentAmmountNew,
-      Notes: paymentNotes,
-      Bank_Ref: bankReference,
-      PO_id: singlePodId.PO_ID,
-      CPN_id: venderId.ID,
-      User_id: localStorage.getItem("id"),
-      amount_to_pay: (
-        Number(paymentAmmountNew) +
-        (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-          Number(vatNew) -
-        (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-          Number(whtNew) +
-        (Number(roundingNew1) + Number(roundingNew))
-      ).toFixed(2),
-      Deposit_Used: Number(depositAvailableNew),
-      VAT: (
-        (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
-        Number(vatNew)
-      ).toFixed(2),
-      WHT: (
-        (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
-        Number(whtNew)
-      ).toFixed(2),
-      left_Rounding: Number(roundingNew1) + Number(roundingNew),
-      Total_Before_Tax: Number(depositAvailableNew) + Number(paymentAmmountNew),
+      bn_id: singlePodId.ID || venderId.bn_id, // or however you get bn_id
+      IID: singlePodId.IID || venderId.IID, // same for IID
+      USER_ID: localStorage.getItem("id"),
+      Receipt_Date: paymentForm.paymentDate, // from DatePicker
+      Prepayment: paymentForm.prepayment,
+      FX_Received: paymentForm.thbReceived, // THB Received → FX Received (if that's correct mapping)
+      FX: paymentForm.fx, // selected FX
+      R_FX_Rate: paymentForm.fxRateReceived, // Rate Received
+      BankFees_FX: paymentForm.interBankCharges, // Inter-bank charges (FX)
+      BankFees_THB: paymentForm.localBankCharges, // Local bank charges (THB)
+      Notes: paymentForm.notes,
     };
 
-    console.log(paymentData);
+    console.log("BNPayment payload:", paymentData);
 
     try {
-      // Send POST request to insertClientPayment endpoint (first API)
       const response = await axios.post(
-        `${API_BASE_URL}/POPayments`,
+        `${API_BASE_URL}/BNPayment`,
         paymentData
       );
-      console.log("Payment data submitted successfully", response);
-      getPurchaseOrder();
+
       if (response?.data?.success === true) {
-        // If success = true, show success toast
         toast.success(response.data?.message);
-        const updatedCollectPaymentId = response?.data.data;
-        setCollectPaymentId(updatedCollectPaymentId);
-        setProcesureResult("");
-        setRoundingNew("");
-        setPaymentAmmountNew("");
-        setDepositAvailableNew("");
-        setSelectedPaymentDate(null);
-        setSelectedPaymentChannel("");
-        setBankReference("");
-        setBankChargeAmount("0");
-        setDepositAvailable("");
-        setRoundingAmount("");
-        setTotalPaymentAmount("");
-        setPaymentNotes("");
-        // Hide modal after successful submission
 
-        const accessResponse = await axios.post(
-          `${API_BASE_URL}/ReleaseAccess`,
-          {
-            id: singlePodId.PO_ID,
+        // Reset the form
+        setPaymentForm({
+          paymentDate: null,
+          fx: "",
+          paymentChannel: "",
+          fxRateReceived: "",
+          clientPaymentRef: "",
+          interBankCharges: "",
+          paymentAmount: "",
+          prepayment: "",
+          bankRef: "",
+          localBankCharges: "",
+          thbReceived: "",
+          rounding: "",
+          notes: "",
+        });
 
-            accesstype: 1, // Mark as in use
-          }
-        );
-        console.log(accessResponse);
+        // Close modal
         let modalElement = document.getElementById("modalCombine");
         let modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-      } else {
-        toast.warning(response.data.message);
-        //           setShow1(true);
-        // setStock1(response.data || "Procedure returned an error");
-      }
+        if (modalInstance) modalInstance.hide();
 
-      // Update client details and summary table with collectPaymentId from the response
+        // Refresh list
+        receipt();
+      } else {
+        toast.warning(response.data?.message);
+      }
     } catch (error) {
-      // Handle error case for first API
-      console.error("Error submitting payment data", error);
+      console.error("Error submitting BNPayment data", error);
       toast.error(t("tryAgain"));
     }
   };
@@ -2792,175 +2732,183 @@ const Receipt = () => {
     setNotes1("");
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        Header: t("receipts"),
-        accessor: "POCODE",
-      },
-      {
-        Header: t("Payor"),
-        accessor: () => "Fresh4U Produce Ltd",
-      },
-      {
-        Header: t("date"),
-        accessor: (a) =>
-          `${new Date(a.PO_date).getDate().toString().padStart(2, "0")}-${(
-            new Date(a.PO_date).getMonth() + 1
-          )
-            .toString()
-            .padStart(2, "0")}-${new Date(a.PO_date).getFullYear()}`,
-      },
-      {
-        Header: t("value"),
-        accessor: (a) =>
-          `${(+(a.Total_Before_Tax + a.VAT || "0")).toLocaleString()} THB`,
-      },
-      {
-        Header: t("account"),
-        accessor: () => "55466345435",
-      },
+  const receipt = () => {
+    const lang = localStorage.getItem("language");
+    const langValue = lang === "en" ? 0 : 1;
 
-      {
-        Header: t("actions"),
-        accessor: (a) => (
-          <div className="editIcon">
-            <>
-              <button
-                onClick={() =>
-                  navigate("/purchaseview", { state: { from: a } })
-                }
-              >
-                <i className="mdi mdi-eye" />
-              </button>
+    axios
+      .post(`${API_BASE_URL}/ReceiptView`, {
+        LANG: langValue,
+      })
+      .then((response) => {
+        const { data: rows = [], head = {} } = response.data;
 
-              {a.Payment_Status === 1 &&
-                (a.Receiving_Status === 1 || a.Receiving_Status === 2) && (
-                  <button
-                    onClick={async () => {
-                      try {
-                        const res = await axios.post(
-                          `${API_BASE_URL}/Checkeaccessfile`,
-                          {
-                            id: a.PO_ID,
-                            accesstype: 1, // Mark as in use
-                            edit: 1,
-                          }
-                        );
+        // Step 1: Create dynamic columns from head
+        const generatedColumns = Object.entries(head)
+          .filter(([key]) => key !== "ID")
+          .map(([key, label]) => ({
+            Header: t(label || key),
+            accessor: key,
+          }));
 
-                        if (res?.data?.success) {
-                          navigate("/updatePurchaseOrder", {
-                            state: { from: a },
-                          });
-                        } else {
-                          toast.warning(res?.data?.message);
-                        }
-                      } catch (error) {
-                        console.error("Access API error:", error);
-                        toast.error(
-                          "Something went wrong while checking file access."
-                        );
+        // Step 2: Add actions column
+        generatedColumns.push({
+          Header: t("actions"),
+          accessor: "actions",
+          Cell: ({ row }) => {
+            const a = row.original;
+            return (
+              <>
+                <div className="editIcon">
+                  <>
+                    <button
+                      onClick={() =>
+                        navigate("/purchaseview", { state: { from: a } })
                       }
-                    }}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <i className="mdi mdi-pencil pl-2" />
-                  </button>
-                )}
+                    >
+                      <i className="mdi mdi-eye" />
+                    </button>
 
-              {a.Payment_Status === 1 && a.Receiving_Status === 2 && (
-                <button
-                  type="button"
-                  onClick={() => deleteOrder(a.PO_ID)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "red",
-                  }}
-                >
-                  <i className="ps-2 mdi mdi-delete" />
-                </button>
-              )}
+                    {/* {a.Payment_Status === 1 &&
+                      (a.Receiving_Status === 1 ||
+                        a.Receiving_Status === 2) && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await axios.post(
+                                `${API_BASE_URL}/Checkeaccessfile`,
+                                {
+                                  id: a.PO_ID,
+                                  accesstype: 1, // Mark as in use
+                                  edit: 1,
+                                }
+                              );
 
-              <button
-                type="button"
-                className="svgIconPurchase"
-                onClick={() => handleDownloadPDF(a.PO_ID, a)}
-              >
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 500 500"
-                    style={{ cursor: "pointer" }}
-                  >
-                    <g>
-                      <path d="M388,428.4H114.2V72.6h183.6l90.1,90.1V428.4z M141.6,401.1h219V174l-74.1-74.1H141.6V401.1z" />
-                      <polygon points="374.3,182.1 278.5,182.1 278.5,86.2 305.9,86.2 305.9,154.7 374.3,154.7" />
-                      <path d="M240.5,248.2c0,8.4-2.6,14.9-7.9,19.3c-5.3,4.5-12.7,6.7-22.4,6.7h-7.1V302h-16.6v-78.2h25c9.5,0,16.7,2,21.6,6.1 C238.1,234,240.5,240.1,240.5,248.2z M203.1,260.6h5.5c5.1,0,8.9-1,11.4-3s3.8-4.9,3.8-8.8c0-3.9-1.1-6.8-3.2-8.6s-5.4-2.8-10-2.8 h-7.5V260.6z" />
-                      <path d="M318,262.8c0,12.9-3.2,22.9-9.6,29.8c-6.4,7-15.6,10.4-27.6,10.4s-21.2-3.5-27.6-10.4c-6.4-7-9.6-16.9-9.6-29.9 c0-13,3.2-23,9.7-29.8c6.4-6.9,15.7-10.3,27.7-10.3c12,0,21.2,3.5,27.6,10.4C314.9,239.9,318,249.8,318,262.8z M261,262.8 c0,8.7,1.7,15.3,5,19.7c3.3,4.4,8.3,6.6,14.9,6.6c13.2,0,19.8-8.8,19.8-26.4c0-17.6-6.6-26.4-19.7-26.4c-6.6,0-11.6,2.2-14.9,6.7 C262.7,247.5,261,254.1,261,262.8z" />
-                    </g>
-                  </svg>
+                              if (res?.data?.success) {
+                                navigate("/updatePurchaseOrder", {
+                                  state: { from: a },
+                                });
+                              } else {
+                                toast.warning(res?.data?.message);
+                              }
+                            } catch (error) {
+                              console.error("Access API error:", error);
+                              toast.error(
+                                "Something went wrong while checking file access."
+                              );
+                            }
+                          }}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <i className="mdi mdi-pencil pl-2" />
+                        </button>
+                      )} */}
+
+                    {/* {a.Payment_Status === 1 && a.Receiving_Status === 2 && ( */}
+                      <button
+                        type="button"
+                        onClick={() => deleteOrder(a.PO_ID)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "red",
+                        }}
+                      >
+                        <i className="ps-2 mdi mdi-delete" />
+                      </button>
+                    {/* )} */}
+
+                    <button
+                      type="button"
+                      className="svgIconPurchase"
+                      onClick={() => handleDownloadPDF(a.PO_ID, a)}
+                    >
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 500 500"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <g>
+                            <path d="M388,428.4H114.2V72.6h183.6l90.1,90.1V428.4z M141.6,401.1h219V174l-74.1-74.1H141.6V401.1z" />
+                            <polygon points="374.3,182.1 278.5,182.1 278.5,86.2 305.9,86.2 305.9,154.7 374.3,154.7" />
+                            <path d="M240.5,248.2c0,8.4-2.6,14.9-7.9,19.3c-5.3,4.5-12.7,6.7-22.4,6.7h-7.1V302h-16.6v-78.2h25c9.5,0,16.7,2,21.6,6.1 C238.1,234,240.5,240.1,240.5,248.2z M203.1,260.6h5.5c5.1,0,8.9-1,11.4-3s3.8-4.9,3.8-8.8c0-3.9-1.1-6.8-3.2-8.6s-5.4-2.8-10-2.8 h-7.5V260.6z" />
+                            <path d="M318,262.8c0,12.9-3.2,22.9-9.6,29.8c-6.4,7-15.6,10.4-27.6,10.4s-21.2-3.5-27.6-10.4c-6.4-7-9.6-16.9-9.6-29.9 c0-13,3.2-23,9.7-29.8c6.4-6.9,15.7-10.3,27.7-10.3c12,0,21.2,3.5,27.6,10.4C314.9,239.9,318,249.8,318,262.8z M261,262.8 c0,8.7,1.7,15.3,5,19.7c3.3,4.4,8.3,6.6,14.9,6.6c13.2,0,19.8-8.8,19.8-26.4c0-17.6-6.6-26.4-19.7-26.4c-6.6,0-11.6,2.2-14.9,6.7 C262.7,247.5,261,254.1,261,262.8z" />
+                          </g>
+                        </svg>
+                      </div>
+                    </button>
+
+                    {/* <button
+                      type="button"
+                      // data-bs-toggle="modal"
+                      // data-bs-target="#modalClaim"
+                      onClick={() => claimDetails(a.PO_ID, a)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <svg
+                        className="SvgQuo"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                      >
+                        <title>text-box-minus</title>
+                        <path d="M22,17V19H14V17H22M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z" />
+                      </svg>
+                    </button> */}
+
+                    {/* {a.Payment_Status !== 2 && a.Payment_Status !== 4 && (
+                      <button
+                        type="button"
+                        className="SvgAnchor"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalCombine"
+                        onClick={() => {
+                          everyDataSet(a);
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <svg
+                          className="SvgQuo"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                        >
+                          <title>cash-check</title>
+                          <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z" />
+                        </svg>
+                      </button>
+                    )} */}
+                  </>
                 </div>
-              </button>
+              </>
+            );
+          },
+        });
 
-              <button
-                type="button"
-                // data-bs-toggle="modal"
-                // data-bs-target="#modalClaim"
-                onClick={() => claimDetails(a.PO_ID, a)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>text-box-minus</title>
-                  <path d="M22,17V19H14V17H22M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z" />
-                </svg>
-              </button>
+        setColumns(generatedColumns);
+        setData(rows);
+      })
+      .catch((error) => {
+        console.error("Error fetching Debit Note:", error);
+        toast.error(t("genericError"));
+      });
+  };
+  useEffect(() => {
+    receipt();
+  }, []);
 
-              {a.Payment_Status !== 2 && a.Payment_Status !== 4 && (
-                <button
-                  type="button"
-                  className="SvgAnchor"
-                  // data-bs-toggle="modal"
-                  // data-bs-target="#modalCombine"
-                  onClick={() => {
-                    everyDataSet(a);
-                  }}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  <svg
-                    className="SvgQuo"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <title>cash-check</title>
-                    <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z" />
-                  </svg>
-                </button>
-              )}
-            </>
-          </div>
-        ),
-      },
-    ],
-    [i18n.language]
-  );
   const closeButton = async () => {
     try {
       // First: update access file
@@ -3186,7 +3134,7 @@ const Receipt = () => {
 
   return (
     <>
-      <Card>
+      <Card title={t("receiptManagement")}>
         <div className="d-flex justify-content-center domesticPayment">
           <button
             type="button"
@@ -3497,7 +3445,7 @@ const Receipt = () => {
               <div className="modal-content">
                 <div className="modal-header">
                   <h1 className="modal-title fs-5" id="exampleModalLabel">
-                    {t("payments")}
+                    {t("receipts")}
                   </h1>
                   <button
                     type="button"
@@ -3511,22 +3459,46 @@ const Receipt = () => {
                 </div>
                 <div className="modal-body">
                   <div className="row">
-                    <div className="col-lg-9">
-                      <div className="row">
-                        <div className="col-lg-6">
+                    <div className="col-lg-7">
+                      <div className="row g-3">
+                        <div className="col-xl-3 col-lg-4 col-md-6">
                           <div className="parentFormPayment">
                             <p> {t("paymentDate")}</p>
                             <DatePicker
-                              selected={selectedPaymentDate}
-                              onChange={(date) => setSelectedPaymentDate(date)}
+                              selected={paymentForm.paymentDate}
+                              onChange={(date) =>
+                                handleChange5("paymentDate", date)
+                              }
                               dateFormat="dd/MM/yyyy"
                               placeholderText="Click to select a date"
                               customInput={<CustomInput />}
                             />
                           </div>
                         </div>
+                        <div className="col-xl-3 col-lg-4 col-md-6 autoComplete">
+                          <div className="parentFormPayment">
+                            <p> {t("fx")}</p>
+                            <Autocomplete
+                              disablePortal
+                              options={currency}
+                              getOptionLabel={(option) => option.FX}
+                              sx={{ width: 300 }}
+                              onChange={(event, newValue) =>
+                                handleChange5("fx", newValue?.FX || "")
+                              }
+                              value={
+                                (currency || []).find(
+                                  (c) => c.FX === paymentForm.fx
+                                ) || null
+                              }
+                              renderInput={(params) => (
+                                <TextField {...params} placeholder="Fx" />
+                              )}
+                            />
+                          </div>
+                        </div>
 
-                        <div className="col-lg-6">
+                        <div className="col-xl-3 col-lg-4 col-md-4">
                           <div className="parentFormPayment autoComplete">
                             <p> {t("paymentChannel")}</p>
                             <Autocomplete
@@ -3535,14 +3507,16 @@ const Receipt = () => {
                               value={
                                 (paymentChannle || []).find(
                                   (channel) =>
-                                    channel.bank_id === selectedPaymentChannel
+                                    channel.bank_id ===
+                                    paymentForm.paymentChannel
                                 ) || null
                               }
                               getOptionLabel={(option) =>
                                 option.Bank_nick_name || ""
                               }
                               onChange={(e, newValue) =>
-                                setSelectedPaymentChannel(
+                                handleChange5(
+                                  "paymentChannel",
                                   newValue?.bank_id || ""
                                 )
                               }
@@ -3550,90 +3524,147 @@ const Receipt = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Search Payment Channel"
-                                  InputLabelProps={{ shrink: false }}
+                                  placeholder={t("paymentChannel")}
                                 />
                               )}
                             />
                           </div>
                         </div>
-
-                        <div className="col-lg-6 mt-3">
+                        <div className="col-xl-3 col-lg-4 col-md-4">
+                          <div className="parentFormPayment">
+                            <p> {t("fxRateReceived")}</p>
+                            <input
+                              type="text"
+                              value={paymentForm.fxRateReceived}
+                              onChange={(e) =>
+                                handleChange5("fxRateReceived", e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="col-xl-3 col-lg-4 col-md-4">
+                          <div className="parentFormPayment">
+                            <p> {t("clientPaymentRef")}</p>
+                            <input
+                              type="text"
+                              value={paymentForm.clientPaymentRef}
+                              onChange={(e) =>
+                                handleChange5(
+                                  "clientPaymentRef",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="col-xl-3 col-lg-4 col-md-4">
+                          <div className="parentFormPayment">
+                            <p> {t("interBankCharges")}</p>
+                            <input
+                              type="text"
+                              value={paymentForm.interBankCharges}
+                              onChange={(e) =>
+                                handleChange5(
+                                  "interBankCharges",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="col-xl-3 col-lg-4 col-md-4">
+                          <div className="parentFormPayment">
+                            <p> {t("paymentAmount")}</p>
+                            <input
+                              type="text"
+                              value={paymentForm.paymentAmount}
+                              onChange={(e) =>
+                                handleChange5("paymentAmount", e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="col-xl-3 col-lg-4 col-md-4">
+                          <div className="parentFormPayment">
+                            <p> {t("prepayment")}</p>
+                            <input
+                              type="text"
+                              value={paymentForm.prepayment}
+                              onChange={(e) =>
+                                handleChange5("prepayment", e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="col-xl-3 col-lg-4 col-md-4">
                           <div className="parentFormPayment">
                             <p> {t("bankRef")}</p>
                             <input
                               type="text"
-                              value={bankReference}
-                              onChange={(e) => setBankReference(e.target.value)}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="col-lg-6 mt-3">
-                          <div className="parentFormPayment">
-                            <p> {t("bankCharges")}</p>
-                            <input
-                              type="text"
-                              value={bankChargeAmount}
+                              value={paymentForm.bankRef}
                               onChange={(e) =>
-                                setBankChargeAmount(e.target.value)
+                                handleChange5("bankRef", e.target.value)
                               }
                             />
                           </div>
                         </div>
 
-                        <div className="col-lg-6 mt-3">
+                        <div className="col-xl-3 col-lg-4 col-md-4">
                           <div className="parentFormPayment">
-                            <p> {t("availableDeposit")}</p>
+                            <p> {t("localBankCharges")}</p>
                             <input
-                              type="number"
-                              value={depositAvailableNew}
-                              name="availabledeposite"
-                              onChange={handleDepositeAvailable}
+                              type="text"
+                              value={paymentForm.localBankCharges}
+                              onChange={(e) =>
+                                handleChange5(
+                                  "localBankCharges",
+                                  e.target.value
+                                )
+                              }
                             />
                           </div>
                         </div>
-                        <div className="col-lg-6 mt-3">
+
+                        <div className="col-xl-3 col-lg-4 col-md-4">
+                          <div className="parentFormPayment">
+                            <p> {t("thbReceived")}</p>
+                            <input
+                              type="number"
+                              value={paymentForm.thbReceived}
+                              onChange={(e) =>
+                                handleChange5("thbReceived", e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="col-xl-3 col-lg-4 col-md-4">
                           <div className="parentFormPayment">
                             <p> {t("rounding")}</p>
                             <input
                               type="text"
-                              value={roundingNew}
-                              onChange={(e) => {
-                                setHasUserChangedValues(true);
-                                setRoundingNew(e.target.value);
-                              }}
+                              value={paymentForm.rounding}
+                              onChange={(e) =>
+                                handleChange5("rounding", e.target.value)
+                              }
                             />
-                          </div>
-                        </div>
-
-                        <div className="parentFormPayment col-lg-6 mt-3">
-                          <p> {t("paymentAmount")}</p>
-                          <input
-                            type="text"
-                            value={paymentAmmountNew}
-                            onChange={(e) => {
-                              setHasUserChangedValues(true);
-                              setPaymentAmmountNew(e.target.value); // Optional override
-                            }}
-                          />
-                        </div>
-
-                        <div className="col-lg-6 mt-3">
-                          <div className="parentFormPayment">
-                            <p> {t("notes")}</p>
-                            <textarea
-                              type="text"
-                              value={paymentNotes}
-                              onChange={(e) => setPaymentNotes(e.target.value)}
-                            ></textarea>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className="col-lg-3">
-                      <div className="flex ps-3 pt-5 mt-4 totalBefore">
+                      <div className="flex totalBefore">
                         <div className="pe-3" style={{ width: "85%" }}>
+                          <div className="flexBefore">
+                            <div>
+                              <strong> {t("averageRate")} </strong>
+                            </div>
+                            <div>
+                              <span>
+                                {Number(depositAvailableNew) +
+                                  Number(paymentAmmountNew)}
+                              </span>
+                            </div>
+                          </div>
                           <div className="flexBefore">
                             <div>
                               <strong> {t("totalBeforeTax")} </strong>
@@ -3647,7 +3678,7 @@ const Receipt = () => {
                           </div>
                           <div className="flexBefore">
                             <div>
-                              <strong> {t("vat")}: </strong>
+                              <strong> {t("vat")} : </strong>
                             </div>
                             <div>
                               <span>
@@ -3732,8 +3763,36 @@ const Receipt = () => {
                                 </span>
                               </div>
                             </div>
+                            <div className="flexBefore">
+                              <div>
+                                <strong>{t("lossGainFx")} : </strong>{" "}
+                              </div>
+
+                              <div>
+                                <span>
+                                  {(
+                                    (Number(totalBeforText) -
+                                      (Number(depositAvailableNew) +
+                                        Number(paymentAmmountNew))) *
+                                    (1 + Number(vatNew))
+                                  ).toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    <div className="col-lg-2 mt-3">
+                      <div className="parentFormPayment">
+                        <p> {t("notes")}</p>
+                        <textarea
+                          value={paymentForm.notes}
+                          onChange={(e) =>
+                            handleChange5("notes", e.target.value)
+                          }
+                        ></textarea>
                       </div>
                     </div>
                   </div>

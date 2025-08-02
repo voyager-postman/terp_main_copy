@@ -15,7 +15,40 @@ import { TableView } from "../table";
 import { API_IMAGE_URL } from "../../Url/Url";
 import { Button, Modal } from "react-bootstrap";
 import RobotoRegular from "../../assets/fonts/Roboto_Regular";
+import DatePicker from "react-datepicker";
+import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslation } from "react-i18next";
+import TextField from "@mui/material/TextField";
+import { FaCalendarAlt } from "react-icons/fa";
+
+const CustomInput = ({ value, onClick }) => (
+  <div
+    className="custom-input"
+    onClick={onClick}
+    style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+  >
+    <input
+      type="text"
+      value={value}
+      readOnly
+      style={{
+        padding: "10px",
+        paddingLeft: "35px",
+        width: "250px",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+      }}
+    />
+    <FaCalendarAlt
+      style={{
+        position: "absolute",
+        right: "10px",
+        fontSize: "18px",
+        color: "#888",
+      }}
+    />
+  </div>
+);
 const Invoice = () => {
   const [t, i18n] = useTranslation("global");
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +61,14 @@ const Invoice = () => {
     showConfirmButton: false,
     allowOutsideClick: false,
   });
+  const { data: currency } = useQuery("getCurrency");
+  useEffect(() => {
+    if (currency) {
+      console.log("Currency API Data:", currency);
+    }
+  }, [currency]);
+  const { data: paymentChannle } = useQuery("PaymentChannela");
+
   const [unitPrices, setUnitPrices] = useState({});
   const [itemDetails2, setItemDetails2] = useState(false);
   const [claimReasons, setClaimReasons] = useState({});
@@ -40,7 +81,89 @@ const Invoice = () => {
   const [itemDetails1, setItemDetails1] = useState(""); // Default state
   const [useAgreedPricing, setUseAgreedPricing] = useState(false);
   const [selectedInvoice1, setSelectedInvoice1] = useState("Client");
+  const [paymentForm, setPaymentForm] = useState({
+    paymentDate: null,
+    fx: "",
+    paymentChannel: "",
+    fxRateReceived: "",
+    clientPaymentRef: "",
+    interBankCharges: "",
+    paymentAmount: "",
+    prepayment: "",
+    bankRef: "",
+    localBankCharges: "",
+    thbReceived: "",
+    rounding: "",
+    notes: "",
+  });
+  const [singlePodId, setSinglePodId] = useState("");
 
+  const handleChange5 = (field, value) => {
+    setPaymentForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const submitPaymentData = async () => {
+    const paymentData = {
+      bn_id: singlePodId.ID, // or however you get bn_id
+      IID: singlePodId.Order_ID, // same for IID
+      USER_ID: localStorage.getItem("id"),
+      Receipt_Date: paymentForm.paymentDate, // from DatePicker
+      Prepayment: paymentForm.prepayment,
+      Payment_Channel: paymentForm.paymentChannel,
+      FX_Received: paymentForm.thbReceived, // THB Received → FX Received (if that's correct mapping)
+      FX: paymentForm.fx, // selected FX
+      R_FX_Rate: paymentForm.fxRateReceived, // Rate Received
+      BankFees_FX: paymentForm.interBankCharges, // Inter-bank charges (FX)
+      BankFees_THB: paymentForm.localBankCharges, // Local bank charges (THB)
+      Notes: paymentForm.notes,
+    };
+
+    console.log("BNPayment payload:", paymentData);
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/BNPayment`,
+        paymentData
+      );
+
+      if (response?.data?.success === true) {
+        toast.success(response.data?.message);
+
+        // Reset the form
+        setPaymentForm({
+          paymentDate: null,
+          fx: "",
+          paymentChannel: "",
+          fxRateReceived: "",
+          clientPaymentRef: "",
+          interBankCharges: "",
+          paymentAmount: "",
+          prepayment: "",
+          bankRef: "",
+          localBankCharges: "",
+          thbReceived: "",
+          rounding: "",
+          notes: "",
+        });
+
+        // Close modal
+        let modalElement = document.getElementById("modalCombine");
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) modalInstance.hide();
+
+        // Refresh list
+        allInvoiceData();
+      } else {
+        toast.warning(response.data?.message);
+      }
+    } catch (error) {
+      console.error("Error submitting BNPayment data", error);
+      toast.error(t("tryAgain"));
+    }
+  };
   const [companyAddress, setCompanyAddress] = useState("");
   const [data3, setData3] = useState("");
   const [tableData, setTableData] = useState([]);
@@ -1846,7 +1969,7 @@ const Invoice = () => {
           doc.autoTable({
             head,
             body: rowsToAdd,
-            startY: tableStartYNew, 
+            startY: tableStartYNew,
             margin: {
               left: 7,
               right: 7,
@@ -2472,7 +2595,23 @@ const Invoice = () => {
     }
   };
   // two pdf end
-
+  const paymentDataClear = () => {
+    setPaymentForm({
+      paymentDate: null,
+      fx: "",
+      paymentChannel: "",
+      fxRateReceived: "",
+      clientPaymentRef: "",
+      interBankCharges: "",
+      paymentAmount: "",
+      prepayment: "",
+      bankRef: "",
+      localBankCharges: "",
+      thbReceived: "",
+      rounding: "",
+      notes: "",
+    });
+  };
   const uploadPDF11 = async (pdfBlob, a) => {
     // Generate a unique date-time string
     const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
@@ -3263,6 +3402,29 @@ const Invoice = () => {
                 </button>
               )}
             </div>
+            <button
+              type="button"
+              className="SvgAnchor"
+              data-bs-toggle="modal"
+              data-bs-target="#modalCombine"
+              onClick={() => {
+                everyDataSet(a);
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <title>cash-check</title>
+                <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z" />
+              </svg>
+            </button>
           </>
         ),
       },
@@ -3279,7 +3441,11 @@ const Invoice = () => {
     setExchangeRate(false);
     setSelectedInvoice("Client");
   };
+  const everyDataSet = async (a) => {
+    console.log(a);
 
+    setSinglePodId(a);
+  };
   const clearData1 = () => {
     setItemDetails2(false);
     setCbm1(true);
@@ -5779,6 +5945,327 @@ const Invoice = () => {
                 type="button"
                 onClick={generatePdf5}
                 className="btn btn-primary mb-4"
+              >
+                {t("submit")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="modal fade "
+        id="modalCombine"
+        tabIndex={-1}
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+      >
+        <div className="modal-dialog modalShipTo modal-xl">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">
+                {t("receipts")}
+              </h1>
+              <button
+                type="button"
+                onClick={paymentDataClear}
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <i className="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-lg-7">
+                  <div className="row g-3">
+                    <div className="col-xl-3 col-lg-4 col-md-6">
+                      <div className="parentFormPayment">
+                        <p> {t("paymentDate")}</p>
+                        <DatePicker
+                          selected={paymentForm.paymentDate}
+                          onChange={(date) =>
+                            handleChange5("paymentDate", date)
+                          }
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="Click to select a date"
+                          customInput={<CustomInput />}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-6 autoComplete">
+                      <div className="parentFormPayment">
+                        <p> {t("fx")}</p>
+                        <Autocomplete
+                          disablePortal
+                          options={currency || []}
+                          getOptionLabel={(option) => option.FX || ""}
+                          sx={{ width: 300 }}
+                          onChange={(event, newValue) =>
+                            handleChange5("fx", newValue?.ID || "")
+                          }
+                          value={
+                            (currency || []).find(
+                              (c) => c.ID === paymentForm.fx
+                            ) || null
+                          }
+                          renderInput={(params) => (
+                            <TextField {...params} placeholder={t("fx")} />
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment autoComplete">
+                        <p> {t("paymentChannel")}</p>
+                        <Autocomplete
+                          disablePortal
+                          options={paymentChannle || []}
+                          value={
+                            (paymentChannle || []).find(
+                              (channel) =>
+                                channel.bank_id === paymentForm.paymentChannel
+                            ) || null
+                          }
+                          getOptionLabel={(option) =>
+                            option.Bank_nick_name || ""
+                          }
+                          onChange={(e, newValue) =>
+                            handleChange5(
+                              "paymentChannel",
+                              newValue?.bank_id || ""
+                            )
+                          }
+                          sx={{ width: 300 }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("paymentChannel")}
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("fxRateReceived")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.fxRateReceived}
+                          onChange={(e) =>
+                            handleChange5("fxRateReceived", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("clientPaymentRef")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.clientPaymentRef}
+                          onChange={(e) =>
+                            handleChange5("clientPaymentRef", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("interBankCharges")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.interBankCharges}
+                          onChange={(e) =>
+                            handleChange5("interBankCharges", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("paymentAmount")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.paymentAmount}
+                          onChange={(e) =>
+                            handleChange5("paymentAmount", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("prepayment")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.prepayment}
+                          onChange={(e) =>
+                            handleChange5("prepayment", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("bankRef")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.bankRef}
+                          onChange={(e) =>
+                            handleChange5("bankRef", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("localBankCharges")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.localBankCharges}
+                          onChange={(e) =>
+                            handleChange5("localBankCharges", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("thbReceived")}</p>
+                        <input
+                          type="number"
+                          value={paymentForm.thbReceived}
+                          onChange={(e) =>
+                            handleChange5("thbReceived", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("rounding")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.rounding}
+                          onChange={(e) =>
+                            handleChange5("rounding", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-3">
+                  <div className="flex totalBefore">
+                    <div className="pe-3" style={{ width: "85%" }}>
+                      <div className="flexBefore">
+                        <div>
+                          <strong> {t("averageRate")} </strong>
+                        </div>
+                        <div>
+                          <span>0</span>
+                        </div>
+                      </div>
+                      <div className="flexBefore">
+                        <div>
+                          <strong> {t("totalBeforeTax")} </strong>
+                        </div>
+                        <div>
+                          <span>0</span>
+                        </div>
+                      </div>
+                      <div className="flexBefore">
+                        <div>
+                          <strong> {t("vat")} : </strong>
+                        </div>
+                        <div>
+                          <span>0</span>
+                        </div>
+                      </div>
+
+                      <div className="flexBefore">
+                        <div>
+                          <strong> {t("wht")} : </strong>
+                        </div>
+                        <div>
+                          <span>0</span>
+                        </div>
+                      </div>
+
+                      <div className=" form-group">
+                        <div className="flexBefore">
+                          <div>
+                            <strong> {t("rounding")} : </strong>
+                          </div>
+                          <div>
+                            <span>0</span>
+                          </div>
+                        </div>
+                        <div className="flexBefore">
+                          <div>
+                            <strong> {t("deposit")} : </strong>
+                          </div>
+                          <div>
+                            <span>0</span>
+                          </div>
+                        </div>
+
+                        <div className="flexBefore">
+                          <div>
+                            <strong> {t("amountToPay")} : </strong>{" "}
+                          </div>
+
+                          <div>
+                            <span>0</span>
+                          </div>
+                        </div>
+                        <div className="flexBefore">
+                          <div>
+                            <strong>{t("remainder")} : </strong>{" "}
+                          </div>
+
+                          <div>
+                            <span>0</span>
+                          </div>
+                        </div>
+                        <div className="flexBefore">
+                          <div>
+                            <strong>{t("lossGainFx")} : </strong>{" "}
+                          </div>
+
+                          <div>
+                            <span>0</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-lg-2 mt-3">
+                  <div className="parentFormPayment">
+                    <p> {t("notes")}</p>
+                    <textarea
+                      value={paymentForm.notes}
+                      onChange={(e) => handleChange5("notes", e.target.value)}
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                type="button"
+                onClick={submitPaymentData}
+                className="btn btn-primary"
               >
                 {t("submit")}
               </button>

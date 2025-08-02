@@ -1094,5 +1094,10 @@
   "billing_note_view_form": "Billing Note / View Form",
   "clientAutoGenerate": "Client Auto Generate",
   "consigneeAutoGenerate": "Consignee Auto Generate",
-  "shippingDocumentsAutoGenerate": "Shipping Documents Auto Generate"
+  "shippingDocumentsAutoGenerate": "Shipping Documents Auto Generate",
+  "fxRateReceived": "Fx Rate Received",
+  "prepayment": "Prepayment",
+  "averageRate": "Average Rate",
+  "lossGainFx": "Loss/Gain FX",
+  "receiptManagement": "Receipt Management"
 }

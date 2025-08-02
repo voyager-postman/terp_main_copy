@@ -18,7 +18,35 @@ import MySwal from "../../swal";
 const BillingNote = () => {
   const [t, i18n] = useTranslation("global");
   const [errorMessage, setErrorMessage] = useState("");
+  const { data: currency } = useQuery("getCurrency");
+  useEffect(() => {
+    if (currency) {
+      console.log("Currency API Data:", currency);
+    }
+  }, [currency]);
+  const [paymentForm, setPaymentForm] = useState({
+    paymentDate: null,
+    fx: "",
+    paymentChannel: "",
+    fxRateReceived: "",
+    clientPaymentRef: "",
+    interBankCharges: "",
+    paymentAmount: "",
+    prepayment: "",
+    bankRef: "",
+    localBankCharges: "",
+    thbReceived: "",
+    rounding: "",
+    notes: "",
+  });
+  const [singlePodId, setSinglePodId] = useState("");
 
+  const handleChange5 = (field, value) => {
+    setPaymentForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
   const [roundingData, setRoundingData] = useState("");
   const [VATTotal, setVATTotal] = useState(0);
   const [WHTTotal, setWHTTotal] = useState(0);
@@ -36,7 +64,6 @@ const BillingNote = () => {
   const [depositUsedNew, newDepositUsedNew] = useState("");
   const [vatNew, setVatNew] = useState("");
   const [whtNew, setWhtNew] = useState("");
-  const [singlePodId, setSinglePodId] = useState("");
   const [basePayment, setBasePayment] = useState(0); // from left_pay
   const [roundingNew1, setRoundingNew1] = useState("0");
   const [totalBeforText, setTotalBeforText] = useState("0");
@@ -148,6 +175,65 @@ const BillingNote = () => {
     setShow2(false);
     // navigate("/purchase_orders");
   };
+  const submitPaymentData2 = async () => {
+    const paymentData = {
+      bn_id: singlePodId.ID, // or however you get bn_id
+      IID: singlePodId.IID, // same for IID
+      USER_ID: localStorage.getItem("id"),
+      Receipt_Date: paymentForm.paymentDate, // from DatePicker
+      Prepayment: paymentForm.prepayment,
+      Payment_Channel: paymentForm.paymentChannel,
+      FX_Received: paymentForm.thbReceived, // THB Received → FX Received (if that's correct mapping)
+      FX: paymentForm.fx, // selected FX
+      R_FX_Rate: paymentForm.fxRateReceived, // Rate Received
+      BankFees_FX: paymentForm.interBankCharges, // Inter-bank charges (FX)
+      BankFees_THB: paymentForm.localBankCharges, // Local bank charges (THB)
+      Notes: paymentForm.notes,
+    };
+
+    console.log("BNPayment payload:", paymentData);
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/BNPayment`,
+        paymentData
+      );
+
+      if (response?.data?.success === true) {
+        toast.success(response.data?.message);
+
+        // Reset the form
+        setPaymentForm({
+          paymentDate: null,
+          fx: "",
+          paymentChannel: "",
+          fxRateReceived: "",
+          clientPaymentRef: "",
+          interBankCharges: "",
+          paymentAmount: "",
+          prepayment: "",
+          bankRef: "",
+          localBankCharges: "",
+          thbReceived: "",
+          rounding: "",
+          notes: "",
+        });
+
+        // Close modal
+        let modalElement = document.getElementById("modalCombine");
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) modalInstance.hide();
+
+        // Refresh list
+        billingNote();
+      } else {
+        toast.warning(response.data?.message);
+      }
+    } catch (error) {
+      console.error("Error submitting BNPayment data", error);
+      toast.error(t("tryAgain"));
+    }
+  };
   const newFormatter5 = new Intl.NumberFormat("en-US", {
     style: "decimal",
     minimumFractionDigits: 0,
@@ -250,11 +336,12 @@ const BillingNote = () => {
 
                   {!(a.Payment_Status === 4) && (
                     <button
-                      type="button"
                       className="SvgAnchor"
                       data-bs-toggle="modal"
                       data-bs-target="#modalCombine"
-                      onClick={() => everyDataSet(a)}
+                      onClick={() => {
+                        everyDataSet(a);
+                      }}
                     >
                       <svg
                         className="SvgQuo"
@@ -364,18 +451,21 @@ const BillingNote = () => {
   };
 
   const paymentDataClear = () => {
-    // Fix these lines:
-    setDepositAvailableNew("");
-    setRoundingNew("");
-    setPaymentAmmountNew("");
-    setSelectedPaymentDate(null);
-    setSelectedPaymentChannel("");
-    setBankReference("");
-    setBankChargeAmount("0");
-    setDepositAvailable("");
-    setRoundingAmount("");
-    setTotalPaymentAmount("");
-    setPaymentNotes("");
+    setPaymentForm({
+      paymentDate: null,
+      fx: "",
+      paymentChannel: "",
+      fxRateReceived: "",
+      clientPaymentRef: "",
+      interBankCharges: "",
+      paymentAmount: "",
+      prepayment: "",
+      bankRef: "",
+      localBankCharges: "",
+      thbReceived: "",
+      rounding: "",
+      notes: "",
+    });
   };
   const submitPaymentData = async () => {
     if (!selectedPaymentDate) {
@@ -477,18 +567,22 @@ const BillingNote = () => {
       </Card>
 
       {/* paymentIcon */}
+
       <div
         className="modal fade "
         id="modalCombine"
         tabIndex={-1}
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
       >
         <div className="modal-dialog modalShipTo modal-xl">
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                {t("payment")}
+                {t("receipts")}
               </h1>
               <button
                 type="button"
@@ -502,281 +596,282 @@ const BillingNote = () => {
             </div>
             <div className="modal-body">
               <div className="row">
-                <div className="col-lg-9">
-                  <div className="row">
-                    {/* Payment Date */}
-                    <div className="col-lg-6">
+                <div className="col-lg-7">
+                  <div className="row g-3">
+                    <div className="col-xl-3 col-lg-4 col-md-6">
                       <div className="parentFormPayment">
-                        <p>{t("paymentDate")}</p>
+                        <p> {t("paymentDate")}</p>
                         <DatePicker
-                          selected={selectedPaymentDate}
-                          onChange={(date) => setSelectedPaymentDate(date)}
+                          selected={paymentForm.paymentDate}
+                          onChange={(date) =>
+                            handleChange5("paymentDate", date)
+                          }
                           dateFormat="dd/MM/yyyy"
-                          placeholderText={t("clickToSelectDate")}
+                          placeholderText="Click to select a date"
                           customInput={<CustomInput />}
                         />
                       </div>
                     </div>
+                    <div className="col-xl-3 col-lg-4 col-md-6 autoComplete">
+                      <div className="parentFormPayment">
+                        <p> {t("fx")}</p>
+                        <Autocomplete
+                          disablePortal
+                          options={currency || []}
+                          getOptionLabel={(option) => option.FX || ""}
+                          sx={{ width: 300 }}
+                          onChange={(event, newValue) =>
+                            handleChange5("fx", newValue?.ID || "")
+                          }
+                          value={
+                            (currency || []).find(
+                              (c) => c.ID === paymentForm.fx
+                            ) || null
+                          }
+                          renderInput={(params) => (
+                            <TextField {...params} placeholder="Fx" />
+                          )}
+                        />
+                      </div>
+                    </div>
 
-                    {/* Payment Channel */}
-                    <div className="col-lg-6">
+                    <div className="col-xl-3 col-lg-4 col-md-4">
                       <div className="parentFormPayment autoComplete">
-                        <p>{t("paymentChannel")}</p>
+                        <p> {t("paymentChannel")}</p>
                         <Autocomplete
                           disablePortal
                           options={paymentChannle || []}
                           value={
                             (paymentChannle || []).find(
                               (channel) =>
-                                channel.bank_id === selectedPaymentChannel
+                                channel.bank_id === paymentForm.paymentChannel
                             ) || null
                           }
                           getOptionLabel={(option) =>
                             option.Bank_nick_name || ""
                           }
                           onChange={(e, newValue) =>
-                            setSelectedPaymentChannel(newValue?.bank_id || "")
+                            handleChange5(
+                              "paymentChannel",
+                              newValue?.bank_id || ""
+                            )
                           }
                           sx={{ width: 300 }}
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder={t("searchChannel")}
-                              InputLabelProps={{ shrink: false }}
+                              placeholder={t("paymentChannel")}
                             />
                           )}
                         />
                       </div>
                     </div>
-
-                    {/* Bank Ref */}
-                    <div className="col-lg-6 mt-3">
+                    <div className="col-xl-3 col-lg-4 col-md-4">
                       <div className="parentFormPayment">
-                        <p>{t("bankRef")}</p>
+                        <p> {t("fxRateReceived")}</p>
                         <input
                           type="text"
-                          value={bankReference}
-                          onChange={(e) => setBankReference(e.target.value)}
+                          value={paymentForm.fxRateReceived}
+                          onChange={(e) =>
+                            handleChange5("fxRateReceived", e.target.value)
+                          }
                         />
                       </div>
                     </div>
-
-                    {/* Bank Charges */}
-                    <div className="col-lg-6 mt-3">
+                    <div className="col-xl-3 col-lg-4 col-md-4">
                       <div className="parentFormPayment">
-                        <p>{t("bankCharges")}</p>
+                        <p> {t("clientPaymentRef")}</p>
                         <input
                           type="text"
-                          value={bankChargeAmount}
-                          onChange={(e) => setBankChargeAmount(e.target.value)}
+                          value={paymentForm.clientPaymentRef}
+                          onChange={(e) =>
+                            handleChange5("clientPaymentRef", e.target.value)
+                          }
                         />
                       </div>
                     </div>
-
-                    {/* Available Deposit */}
-                    <div className="col-lg-6 mt-3">
+                    <div className="col-xl-3 col-lg-4 col-md-4">
                       <div className="parentFormPayment">
-                        <p>{t("availableDeposit")}</p>
+                        <p> {t("interBankCharges")}</p>
                         <input
                           type="text"
-                          value={depositAvailableNew}
-                          onChange={(e) => {
-                            setHasUserChangedValues(true);
-                            setDepositAvailableNew(e.target.value);
-                          }}
+                          value={paymentForm.interBankCharges}
+                          onChange={(e) =>
+                            handleChange5("interBankCharges", e.target.value)
+                          }
                         />
                       </div>
                     </div>
-                    <div className="col-lg-6">
-                      <div className="parentFormPayment mt-3">
-                        <p>{t("rounding")}</p>
-                        <input
-                          type="text"
-                          value={roundingNew}
-                          onChange={(e) => {
-                            setHasUserChangedValues(true);
-                            setRoundingNew(e.target.value);
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-lg-6">
-                      <div className="parentFormPayment mt-3">
-                        <p>{t("paymentAmount")}</p>
-                        <input
-                          type="text"
-                          value={paymentAmmountNew}
-                          onChange={(e) => {
-                            setHasUserChangedValues(true);
-                            setPaymentAmmountNew(e.target.value); // Optional override
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="col-lg-6 mt-3">
+                    <div className="col-xl-3 col-lg-4 col-md-4">
                       <div className="parentFormPayment">
-                        <p>{t("notes")}</p>
-                        <textarea
+                        <p> {t("paymentAmount")}</p>
+                        <input
                           type="text"
-                          value={paymentNotes}
-                          onChange={(e) => setPaymentNotes(e.target.value)}
-                        ></textarea>
+                          value={paymentForm.paymentAmount}
+                          onChange={(e) =>
+                            handleChange5("paymentAmount", e.target.value)
+                          }
+                        />
                       </div>
                     </div>
-                    {/* Rounding */}
-                    {/* <div className="col-lg-6 mt-3">
-                       <div className="parentFormPayment">
-                         <p>Rounding</p>
-                         <input
-                           type="text"
-                           value={roundingAmount}
-                           onChange={(e) => setRoundingAmount(e.target.value)}
-                         />
-                       </div>
-                     </div> */}
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("prepayment")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.prepayment}
+                          onChange={(e) =>
+                            handleChange5("prepayment", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("bankRef")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.bankRef}
+                          onChange={(e) =>
+                            handleChange5("bankRef", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
 
-                    {/* Payment Amount */}
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("localBankCharges")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.localBankCharges}
+                          onChange={(e) =>
+                            handleChange5("localBankCharges", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("thbReceived")}</p>
+                        <input
+                          type="number"
+                          value={paymentForm.thbReceived}
+                          onChange={(e) =>
+                            handleChange5("thbReceived", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-3 col-lg-4 col-md-4">
+                      <div className="parentFormPayment">
+                        <p> {t("rounding")}</p>
+                        <input
+                          type="text"
+                          value={paymentForm.rounding}
+                          onChange={(e) =>
+                            handleChange5("rounding", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="col-lg-3">
-                  <div className="flex mt-5 pt-5 ps-3 totalBefore">
-                    <div style={{ width: "85%" }}>
-                      {/* Total Before Tax */}
+                  <div className="flex totalBefore">
+                    <div className="pe-3" style={{ width: "85%" }}>
                       <div className="flexBefore">
                         <div>
-                          <strong>{t("totalBeforeTax")} </strong>
+                          <strong> {t("averageRate")} </strong>
                         </div>
                         <div>
-                          <span>
-                            {Number(depositAvailableNew) +
-                              Number(paymentAmmountNew)}
-                          </span>
+                          <span>0</span>
+                        </div>
+                      </div>
+                      <div className="flexBefore">
+                        <div>
+                          <strong> {t("totalBeforeTax")} </strong>
+                        </div>
+                        <div>
+                          <span>0</span>
+                        </div>
+                      </div>
+                      <div className="flexBefore">
+                        <div>
+                          <strong> {t("vat")} : </strong>
+                        </div>
+                        <div>
+                          <span>0</span>
                         </div>
                       </div>
 
-                      {/* VAT */}
                       <div className="flexBefore">
                         <div>
-                          <strong>{t("vat")} : </strong>
+                          <strong> {t("wht")} : </strong>
                         </div>
                         <div>
-                          <span>
-                            {" "}
-                            {(
-                              (Number(depositAvailableNew) +
-                                Number(paymentAmmountNew)) *
-                              Number(vatNew)
-                            ).toFixed(2)}
-                          </span>
+                          <span>0</span>
                         </div>
                       </div>
 
-                      {/* WHT */}
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("wht")} :</strong>
+                      <div className=" form-group">
+                        <div className="flexBefore">
+                          <div>
+                            <strong> {t("rounding")} : </strong>
+                          </div>
+                          <div>
+                            <span>0</span>
+                          </div>
                         </div>
-                        <div>
-                          <span>
-                            {(
-                              (Number(depositAvailableNew) +
-                                Number(paymentAmmountNew)) *
-                              Number(whtNew)
-                            ).toFixed(2)}
-                          </span>
+                        <div className="flexBefore">
+                          <div>
+                            <strong> {t("deposit")} : </strong>
+                          </div>
+                          <div>
+                            <span>0</span>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Rounding Input */}
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("rounding")} :</strong>
-                        </div>
-                        <div>
-                          <span>
-                            {Number(roundingNew1) + Number(roundingNew)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("deposit")} : </strong>
-                        </div>
-                        <div>
-                          <span>{Number(depositAvailableNew)}</span>
-                        </div>
-                      </div>
-                      {/* <div className="d-flex flexBefore">
-                         <div className="me-3">
-                           <strong>Rounding</strong>
-                         </div>
-                         {/* <input
-                           type="number"
-                           name="rounding"
-                           value={roundingData}
-                           onChange={handleRoundingChange}
-                           onBlur={handleRoundingBlur}
-                         /> */}
-                      {/* <input
-                           type="text"
-                           value={roundingAmount}
-                           onChange={(e) => setRoundingAmount(e.target.value)}
-                         />
-                       </div> */}
+                        <div className="flexBefore">
+                          <div>
+                            <strong> {t("amountToPay")} : </strong>{" "}
+                          </div>
 
-                      {/* Amount to Pay */}
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("amountToPay")} : </strong>
+                          <div>
+                            <span>0</span>
+                          </div>
                         </div>
-                        <div>
-                          {/* <span>
-                             {formatterTwo.format(
-                               (Number(totalPaymentAmount) || 0) +
-                                 (Number(totalPaymentAmount) || 0) *
-                                   ((Number(singleFilterData?.VAT) || 0) /
-                                     (Number(
-                                       singleFilterData?.Total_Before_Tax
-                                     ) || 1)) -
-                                 (Number(totalPaymentAmount) || 0) *
-                                   ((Number(singleFilterData?.WHT) || 0) /
-                                     (Number(
-                                       singleFilterData?.Total_Before_Tax
-                                     ) || 1)) -
-                                 roundingAmount
-                             )}
-                           </span> */}
-                          <span>
-                            {(
-                              Number(paymentAmmountNew) +
-                              (Number(paymentAmmountNew) +
-                                Number(depositAvailableNew)) *
-                                Number(vatNew) -
-                              (Number(paymentAmmountNew) +
-                                Number(depositAvailableNew)) *
-                                Number(whtNew) +
-                              (Number(roundingNew1) + Number(roundingNew))
-                            ).toFixed(2)}
-                          </span>
+                        <div className="flexBefore">
+                          <div>
+                            <strong>{t("remainder")} : </strong>{" "}
+                          </div>
+
+                          <div>
+                            <span>0</span>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("remainder")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {(
-                              (Number(totalBeforText) -
-                                (Number(depositAvailableNew) +
-                                  Number(paymentAmmountNew))) *
-                              (1 + Number(vatNew))
-                            ).toFixed(2)}
-                          </span>
+                        <div className="flexBefore">
+                          <div>
+                            <strong>{t("lossGainFx")} : </strong>{" "}
+                          </div>
+
+                          <div>
+                            <span>0</span>
+                          </div>
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                <div className="col-lg-2 mt-3">
+                  <div className="parentFormPayment">
+                    <p> {t("notes")}</p>
+                    <textarea
+                      value={paymentForm.notes}
+                      onChange={(e) => handleChange5("notes", e.target.value)}
+                    ></textarea>
                   </div>
                 </div>
               </div>
@@ -785,7 +880,7 @@ const BillingNote = () => {
             <div className="modal-footer">
               <button
                 type="button"
-                onClick={submitPaymentData}
+                onClick={submitPaymentData2}
                 className="btn btn-primary"
               >
                 {t("submit")}
