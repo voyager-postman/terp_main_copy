@@ -694,7 +694,7 @@ const Receipt = () => {
   }, [responceId]);
 
   const everyDataSet = async (a) => {
-  
+
     setSinglePodId(a);
 
   };
@@ -1058,10 +1058,9 @@ const Receipt = () => {
       renderLabelAndValue(
         doc,
         "Bank Name :",
-        `${
-          response?.data?.vendor_details?.vendor_bank_name
-            ? response?.data?.vendor_details?.vendor_bank_name
-            : ""
+        `${response?.data?.vendor_details?.vendor_bank_name
+          ? response?.data?.vendor_details?.vendor_bank_name
+          : ""
         }`,
         7,
         40,
@@ -1070,10 +1069,9 @@ const Receipt = () => {
       renderLabelAndValue(
         doc,
         "Account Name :",
-        `${
-          response?.data?.vendor_details?.vendor_bank_account
-            ? response?.data?.vendor_details?.vendor_bank_account
-            : ""
+        `${response?.data?.vendor_details?.vendor_bank_account
+          ? response?.data?.vendor_details?.vendor_bank_account
+          : ""
         }`,
         7,
         40,
@@ -1082,10 +1080,9 @@ const Receipt = () => {
       renderLabelAndValue(
         doc,
         "Account Number :",
-        `${
-          response?.data?.vendor_details?.vendor_bank_number
-            ? response?.data?.vendor_details?.vendor_bank_number
-            : ""
+        `${response?.data?.vendor_details?.vendor_bank_number
+          ? response?.data?.vendor_details?.vendor_bank_number
+          : ""
         }`,
         7,
         40,
@@ -1276,32 +1273,27 @@ const Receipt = () => {
         const startX1 = 7;
         const lineHeight1 = 4.2;
 
-        const longText1_1 = `${
-          response.data.section2_Values?.Row1
-            ? response.data.section2_Values?.Row1
-            : ""
-        }`;
+        const longText1_1 = `${response.data.section2_Values?.Row1
+          ? response.data.section2_Values?.Row1
+          : ""
+          }`;
         doc.setFont("helvetica", "normal");
-        const longText1_2 = `${
-          response.data.section2_Values?.Row2
-            ? response.data.section2_Values?.Row2
-            : ""
-        }`;
-        const longText1_3 = `${
-          response.data.section2_Values?.Row3
-            ? response.data.section2_Values?.Row3
-            : ""
-        }`;
-        const longText1_4 = `${
-          response.data.section2_Values?.Row4
-            ? response.data.section2_Values?.Row4
-            : ""
-        }`;
-        const longText1_5 = `${
-          response.data.section2_Values?.Row5
-            ? response.data.section2_Values?.Row5
-            : ""
-        }`;
+        const longText1_2 = `${response.data.section2_Values?.Row2
+          ? response.data.section2_Values?.Row2
+          : ""
+          }`;
+        const longText1_3 = `${response.data.section2_Values?.Row3
+          ? response.data.section2_Values?.Row3
+          : ""
+          }`;
+        const longText1_4 = `${response.data.section2_Values?.Row4
+          ? response.data.section2_Values?.Row4
+          : ""
+          }`;
+        const longText1_5 = `${response.data.section2_Values?.Row5
+          ? response.data.section2_Values?.Row5
+          : ""
+          }`;
 
         // Render client details
         doc.setFont("NotoSansThai"); // Set the font to use
@@ -1496,8 +1488,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row1 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
           finalY + 1
         );
 
@@ -1506,8 +1498,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row2 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
           finalY + 5
         );
 
@@ -1516,8 +1508,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row3 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
           finalY + 9
         );
         // new
@@ -1525,8 +1517,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row7 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
           finalY + 13
         );
 
@@ -1534,8 +1526,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row5 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
           finalY + 17
         );
 
@@ -1543,8 +1535,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row6 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
           finalY + 21
         );
 
@@ -1556,8 +1548,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row4 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
           finalY + 29
         );
 
@@ -2405,8 +2397,8 @@ const Receipt = () => {
       const updatedCheckedItems = { ...prev, [invoiceNumber]: isChecked };
       const amountToPay = isChecked
         ? paymentTable2.find(
-            (item) => item["Transaction Ref"] === invoiceNumber
-          )?.["Amount to Pay"] || 0
+          (item) => item["Transaction Ref"] === invoiceNumber
+        )?.["Amount to Pay"] || 0
         : "";
 
       // Update Paid Amounts
@@ -2441,7 +2433,7 @@ const Receipt = () => {
       // Automatically set Paid Amount to the corresponding amount_to_pay if checked
       const amountToPay = isChecked
         ? paymentTable1.find((item) => item.po_id === invoiceNumber)
-            ?.amount_to_pay || 0
+          ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -2490,70 +2482,70 @@ const Receipt = () => {
       return updatedPaidAmounts;
     });
   };
-  const deleteOrder = async (id) => {
-    try {
-      // Step 1: Check file access before proceeding
-      const accessResponse = await axios.post(
-        `${API_BASE_URL}/Checkeaccessfile`,
-        {
-          id: id,
-          accesstype: 1,
-        }
-      );
+  // const deleteOrder = async (id) => {
+  //   try {
+  //     // Step 1: Check file access before proceeding
+  //     const accessResponse = await axios.post(
+  //       `${API_BASE_URL}/Checkeaccessfile`,
+  //       {
+  //         id: id,
+  //         accesstype: 1,
+  //       }
+  //     );
 
-      // Step 2: If access allowed, show confirmation
-      if (accessResponse?.data?.success) {
-        getPurchaseOrder(); // You can keep or move this as needed
+  //     // Step 2: If access allowed, show confirmation
+  //     if (accessResponse?.data?.success) {
+  //       getPurchaseOrder(); // You can keep or move this as needed
 
-        const result = await MySwal.fire({
-          title: "Are you sure?",
-          text: "You won't be able to revert this!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Delete",
-          cancelButtonText: "Cancel",
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-        });
+  //       const result = await MySwal.fire({
+  //         title: "Are you sure?",
+  //         text: "You won't be able to revert this!",
+  //         icon: "warning",
+  //         showCancelButton: true,
+  //         confirmButtonColor: "#3085d6",
+  //         cancelButtonColor: "#d33",
+  //         confirmButtonText: "Delete",
+  //         cancelButtonText: "Cancel",
+  //         allowOutsideClick: false,
+  //         allowEscapeKey: false,
+  //       });
 
-        if (result.isConfirmed) {
-          try {
-            const response = await axios.post(
-              `${API_BASE_URL}/DeletePurchase`,
-              {
-                po_id: id,
-                user_id: localStorage.getItem("id"),
-              }
-            );
+  //       if (result.isConfirmed) {
+  //         try {
+  //           const response = await axios.post(
+  //             `${API_BASE_URL}/DeletePurchase`,
+  //             {
+  //               po_id: id,
+  //               user_id: localStorage.getItem("id"),
+  //             }
+  //           );
 
-            getPurchaseOrder();
-            toast.success(response.data.Message_EN);
-            toast.success(response.data.Message_TH);
-          } catch (e) {
-            toast.error(t("deleteError"));
-          }
-        } else {
-          // If cancelled, release access
-          try {
-            await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
-              id: id,
+  //           getPurchaseOrder();
+  //           toast.success(response.data.Message_EN);
+  //           toast.success(response.data.Message_TH);
+  //         } catch (e) {
+  //           toast.error(t("deleteError"));
+  //         }
+  //       } else {
+  //         // If cancelled, release access
+  //         try {
+  //           await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
+  //             id: id,
 
-              accesstype: 1,
-            });
-            getPurchaseOrder();
-          } catch (e) {
-            toast.error(t("accessUpdateError"));
-          }
-        }
-      } else {
-        toast.warning(t("fileInUse"));
-      }
-    } catch (e) {
-      toast.error(t("fileAccessCheckFailed"));
-    }
-  };
+  //             accesstype: 1,
+  //           });
+  //           getPurchaseOrder();
+  //         } catch (e) {
+  //           toast.error(t("accessUpdateError"));
+  //         }
+  //       }
+  //     } else {
+  //       toast.warning(t("fileInUse"));
+  //     }
+  //   } catch (e) {
+  //     toast.error(t("fileAccessCheckFailed"));
+  //   }
+  // };
 
   // const deleteOrder = async (id) => {
   //   try {
@@ -2641,6 +2633,46 @@ const Receipt = () => {
   //     }
   //   });
   // };
+
+  const deleteReceipt = async (id) => {
+    try {
+      const result = await MySwal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(
+            `${API_BASE_URL}/receiptDelete`,
+            {
+              RID: id,
+              user_id: localStorage.getItem("id"),
+            }
+          );
+
+          receipt();
+          toast.success(response.data.Message_EN);
+          toast.success(response.data.Message_TH);
+        } catch (e) {
+          toast.error(t("deleteError"));
+          console.log(e)
+        }
+      }
+    } catch (e) {
+      toast.error(t("genericError"));
+    }
+  };
+
+
   const options = useMemo(
     () => ({
       chart: {
@@ -2808,10 +2840,10 @@ const Receipt = () => {
                         </button>
                       )} */}
 
-                    {/* {a.Payment_Status === 1 && a.Receiving_Status === 2 && ( */}
+                    {a.is_latest === 1 && (
                       <button
                         type="button"
-                        onClick={() => deleteOrder(a.PO_ID)}
+                        onClick={() => deleteReceipt(a.ID)}
                         style={{
                           background: "none",
                           border: "none",
@@ -2821,7 +2853,7 @@ const Receipt = () => {
                       >
                         <i className="ps-2 mdi mdi-delete" />
                       </button>
-                    {/* )} */}
+                    )}
 
                     <button
                       type="button"
@@ -3139,19 +3171,20 @@ const Receipt = () => {
           <button
             type="button"
             className="btn btn-danger"
-            data-bs-toggle="modal"
-            data-bs-target="#modalCombine1"
+            // data-bs-toggle="modal"
+            // data-bs-target="#modalCombine1"
+            onClick={() => navigate("/reciept/billing_receipt")}
           >
             {t("billingNote")}
           </button>
-          <button
+          {/* <button
             type="button"
             className="btn btn-primary"
             data-bs-toggle="modal"
             data-bs-target="#exampleModal2"
           >
             {t("statement")}
-          </button>
+          </button> */}
 
           <button
             type="button"
@@ -3738,10 +3771,10 @@ const Receipt = () => {
                                     Number(paymentAmmountNew) +
                                     (Number(paymentAmmountNew) +
                                       Number(depositAvailableNew)) *
-                                      Number(vatNew) -
+                                    Number(vatNew) -
                                     (Number(paymentAmmountNew) +
                                       Number(depositAvailableNew)) *
-                                      Number(whtNew) +
+                                    Number(whtNew) +
                                     (Number(roundingNew1) + Number(roundingNew))
                                   ).toFixed(2)}
                                 </span>
@@ -4421,9 +4454,9 @@ const Receipt = () => {
                             <span>
                               {formatNumber(
                                 (TotalBeforeTaxTotal ?? 0) + // Summed checked Total_Before_Tax
-                                  (VATTotal ?? 0) - // Summed checked VAT
-                                  (WHTTotal ?? 0) + // Summed checked WHT
-                                  (Number(roundingData) || 0) // Summed checked Rounding, ensuring it's a number
+                                (VATTotal ?? 0) - // Summed checked VAT
+                                (WHTTotal ?? 0) + // Summed checked WHT
+                                (Number(roundingData) || 0) // Summed checked Rounding, ensuring it's a number
                               )}
                             </span>
                           </div>

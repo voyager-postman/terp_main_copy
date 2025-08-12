@@ -61,8 +61,8 @@ const EanRepack = () => {
       id: item.ID,
       name:
         (email === "Plaew" && role === "Operation") ||
-        (email === "Gam" && role === "Operation") ||
-        (email === "Look Sorn" && role === "Operation")
+          (email === "Gam" && role === "Operation") ||
+          (email === "Look Sorn" && role === "Operation")
           ? item.EAN_Internal_TH
           : item.EAN_Internal_EN,
     })) || [];
@@ -228,6 +228,7 @@ const EanRepack = () => {
             return toast.error(t("genericError")); // or a specific message
           }
         }
+        console.log(localStorage); // View all keys
 
         // Proceed with repack API call
         const repackRes = await axios.post(`${API_BASE_URL}/doRepackEan`, {
@@ -247,9 +248,8 @@ const EanRepack = () => {
         openModal();
       } else {
         closeModal();
-        const message = `${responseData.message.en?.trim() || ""} ${
-          responseData.message.th?.trim() || ""
-        }`;
+        const message = `${responseData.message.en?.trim() || ""} ${responseData.message.th?.trim() || ""
+          }`;
         toast.error(message.trim(), {
           className: "toast-error",
         });
@@ -818,9 +818,9 @@ const EanRepack = () => {
                     options={
                       unitType
                         ? unitType?.slice(0, 3).map((item) => ({
-                            id: item.ID,
-                            name: item.Name_EN,
-                          }))
+                          id: item.ID,
+                          name: item.Name_EN,
+                        }))
                         : []
                     }
                     getOptionLabel={(option) => option.name || ""}
@@ -832,11 +832,11 @@ const EanRepack = () => {
                     value={
                       unitType
                         ? unitType
-                            .map((item) => ({
-                              id: item.ID,
-                              name: item.Name_EN,
-                            }))
-                            .find((item) => item.id === data?.unit_id) || null
+                          .map((item) => ({
+                            id: item.ID,
+                            name: item.Name_EN,
+                          }))
+                          .find((item) => item.id === data?.unit_id) || null
                         : null
                     }
                     isOptionEqualToValue={(option, value) =>
@@ -863,21 +863,21 @@ const EanRepack = () => {
                     options={
                       brands
                         ? brands.map((item) => ({
-                            id: item.ID,
-                            name: item.Name_EN,
-                          }))
+                          id: item.ID,
+                          name: item.Name_EN,
+                        }))
                         : []
                     }
                     getOptionLabel={(option) => option.name || ""}
                     value={
                       brands
                         ? brands
-                            .map((item) => ({
-                              id: item.ID,
-                              name: item.Name_EN,
-                            }))
-                            .find((brand) => brand.id === data?.brand_id) ||
-                          null
+                          .map((item) => ({
+                            id: item.ID,
+                            name: item.Name_EN,
+                          }))
+                          .find((brand) => brand.id === data?.brand_id) ||
+                        null
                         : null
                     }
                     isOptionEqualToValue={(option, value) =>

@@ -1265,7 +1265,7 @@ const ReceiptCreate = () => {
                     >
                       <thead>
                         <tr>
-                          <th style={{ width: "170px" }}> {t("pod_Code")}</th>
+                          
                           <th style={{ width: "350px" }}> {t("item")}</th>
                           <th style={{ width: "150px" }}> {t("quantity")}</th>
                           <th style={{ width: "100px" }}> {t("unit")}</th>
@@ -1273,7 +1273,7 @@ const ReceiptCreate = () => {
                           <th style={{ width: "70px" }}> {t("price")}</th>
                           <th style={{ width: "150px" }}> {t("total")}</th>
                           <th style={{ width: "100px" }}> {t("vat")}</th>
-                          <th style={{ width: "100px" }}> {t("crate")}</th>
+                          
                           <th style={{ width: "100px" }}> {t("action")}</th>
                         </tr>
                       </thead>

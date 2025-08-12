@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -16,6 +16,8 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslation } from "react-i18next";
 const AddShipTo = () => {
   const [t, i18n] = useTranslation("global");
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
+
   const [unitDropdown, setUnitDropDown] = useState([]);
   const getUnitDropdown = () => {
     axios
@@ -36,7 +38,7 @@ const AddShipTo = () => {
   //
   const location = useLocation();
   const { from } = location.state || {};
-
+  console.log(from);
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const [consigeeDetails, setconsigeeDetails] = useState("");
@@ -87,6 +89,286 @@ const AddShipTo = () => {
     from?.barcode !== undefined ? from.barcode : false
   );
   // new statistic end
+  const [state7, setState7] = useState({
+    User_ID: localStorage.getItem("id"),
+    Consignee: from?.Consignee ?? 1,
+    vendor_id: from?.ID ?? undefined,
+    name: from?.Name ?? "",
+    taxId: from?.TAX ?? "",
+    Entity: from?.Legal_Entity ?? "",
+    phone: from?.Phone_Main ?? "",
+    email: from?.Email_Main ?? "",
+    Messenger_Type: from?.Messenger_Type ?? "",
+    messangerId: from?.Messenger_Main_ID ?? "",
+    address1: from?.Address1 ?? "",
+    address2: from?.Address2 ?? "",
+    Bank_Name: from?.Bank_Name ?? "",
+    Bank_Branch: from?.Bank_Branch ?? "",
+    Bank_Account: from?.Bank_Account ?? "",
+    Bank_IBAN: from?.Bank_IBAN ?? "",
+    Bank_Swift: from?.Bank_Swift ?? "",
+    Bank_Country: from?.Bank_Country ?? "",
+    Bank_Address: from?.Bank_Address ?? "",
+  });
+  const { data: dropdownVendor } = useQuery("getDropdownVendor");
+  const { data: dropdownDistrict } = useQuery("getDropdownAddressDistrict");
+  const { data: dropdownSubDistrict } = useQuery(
+    "getDropdownAddressSub-district"
+  );
+  const availableDistrict = useMemo(() => {
+    return dropdownDistrict?.filter((item) => item._id == state7.provinces);
+  }, [state7.provinces, dropdownDistrict]);
+
+  const availableSubDistrict = useMemo(() => {
+    return dropdownSubDistrict?.filter((item) => item._id == state7.district);
+  }, [
+    state7.provinces,
+    dropdownDistrict,
+    state7.district,
+    dropdownSubDistrict,
+  ]);
+  console.log(availableSubDistrict);
+  useEffect(() => {
+    const p = dropdownSubDistrict?.find(
+      (item) => item.code == state7.id
+    )?.zipcode;
+    if (p)
+      setState7((prevState) => {
+        return {
+          ...prevState,
+          postcode: p,
+        };
+      });
+  }, [state7.subdistrict, dropdownSubDistrict]);
+
+  const handleChange9 = (event) => {
+    const { name, value } = event.target;
+    setState7((prevState) => {
+      return {
+        ...prevState,
+        [name]: value,
+      };
+    });
+  };
+
+  const updateVendor = async () => {
+    try {
+      setIsButtonClicked(true); // Set button clicked state to true
+      await axios.post(
+        `${API_BASE_URL}/${
+          typeof state7.vendor_id == "undefined" ? "addVC" : "updateVC"
+        }`,
+        {
+          id: state7.vendor_id,
+          User_ID: state7.User_ID,
+          name: state7.name,
+          taxId: state7.taxId,
+          Phone_Main: state7.phone,
+          Email_Main: state7.email,
+          Messenger_Type: state7.Messenger_Type,
+          Messenger_Main_ID: state7.messangerId,
+          Country: selectedCountry?.name || "",
+          Province: selectedProvince?.name || "",
+          District: selectedDistrict?.name || "",
+          Subdistrict: selectedSubdistrict?.name || "",
+          Postcode: postalCode,
+          Address1: state7.address1,
+          Address2: state7.address2,
+          Bank_Name: state7.Bank_Name,
+          Legal_Entity: state7.Entity,
+          Bank_Branch: state7.Bank_Branch,
+          Bank_Account: state7.Bank_Account,
+          Bank_IBAN: state7.Bank_IBAN,
+          Bank_Swift: state7.Bank_Swift,
+          Bank_Country: state7.Bank_Country,
+          Bank_Address: state7.Bank_Address,
+          Consignee: state7.Consignee || 1,
+        }
+      );
+      toast.success(t("success"));
+
+      navigate("/shipToNew");
+    } catch (error) {
+      toast.error(t("errorWhileSaving"));
+    }
+  };
+
+  const countries = ["WhatsApp", "Telegram"];
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
+  const [countryList, setCountryList] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/countries`)
+      .then((res) => {
+        if (Array.isArray(res.data?.countries)) {
+          setCountryList(res.data.countries);
+        } else {
+          console.error("Expected countries array not found", res.data);
+        }
+      })
+      .catch((err) => console.error("Axios error:", err));
+  }, []);
+  const [provinceList, setProvinceList] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      if (!selectedCountry?.id) {
+        setProvinceList([]);
+        setSelectedProvince(null);
+        return;
+      }
+
+      try {
+        const { data } = await axios.get(
+          `https://r3.siameats.net/api/provinces/${selectedCountry.id}`
+        );
+        if (Array.isArray(data?.provinces)) {
+          setProvinceList(data.provinces);
+        } else {
+          console.error("Expected 'provinces' to be an array", data);
+          setProvinceList([]);
+        }
+      } catch (error) {
+        console.error("Error fetching provinces:", error);
+        setProvinceList([]);
+      }
+    };
+
+    fetchProvinces();
+  }, [selectedCountry]);
+  // district
+  const [districtList, setDistrictList] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  useEffect(() => {
+    if (!selectedProvince?.id) {
+      setDistrictList([]);
+      setSelectedDistrict(null);
+      return;
+    }
+
+    axios
+      .get(`${API_BASE_URL}/districts/${selectedProvince.id}`)
+      .then(({ data }) => {
+        console.log("", data);
+        if (Array.isArray(data?.districts)) {
+          setDistrictList(data.districts);
+        } else {
+          console.error("Expected districts array", data);
+          setDistrictList([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching districts:", err);
+        setDistrictList([]);
+      });
+  }, [selectedProvince]);
+  // sub district
+  const [subdistrictList, setSubdistrictList] = useState([]);
+  const [selectedSubdistrict, setSelectedSubdistrict] = useState(null);
+  useEffect(() => {
+    if (!selectedDistrict?.id) {
+      setSubdistrictList([]);
+      setSelectedSubdistrict(null);
+      return;
+    }
+
+    axios
+      .get(`${API_BASE_URL}/subdistricts/${selectedDistrict.id}`)
+      .then(({ data }) => {
+        console.log("pratimaDis", data);
+        if (Array.isArray(data?.Subdistricts)) {
+          setSubdistrictList(data.Subdistricts);
+        } else {
+          console.error("pratima", data);
+          setSubdistrictList([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching subdistricts:", err);
+        setSubdistrictList([]);
+      });
+  }, [selectedDistrict]);
+
+  const [postalCode, setPostalCode] = useState(null);
+
+  useEffect(() => {
+    if (!selectedSubdistrict?.lat || !selectedSubdistrict?.lng) {
+      setPostalCode("");
+      return;
+    }
+
+    axios
+      .get(
+        `${API_BASE_URL}/postal-code?lat=${selectedSubdistrict.lat}&lng=${selectedSubdistrict.lng}`
+      )
+      .then(({ data }) => {
+        if (data?.date?.postal_code) {
+          setPostalCode(data.date.postal_code);
+        } else {
+          setPostalCode("");
+        }
+      })
+      .catch(() => {
+        setPostalCode("");
+      });
+  }, [selectedSubdistrict]);
+  // Pre-fill form for update mode
+  useEffect(() => {
+    if (!from || countryList.length === 0) return;
+
+    // 1️⃣ Find Country
+    const countryObj = countryList.find((c) => c.name === from.Country);
+    if (countryObj) {
+      setSelectedCountry(countryObj);
+
+      // Fetch provinces and set province
+      axios
+        .get(`https://r3.siameats.net/api/provinces/${countryObj.id}`)
+        .then(({ data }) => {
+          if (Array.isArray(data?.provinces)) {
+            setProvinceList(data.provinces);
+            const provinceObj = data.provinces.find(
+              (p) => p.name === from.Province
+            );
+            if (provinceObj) {
+              setSelectedProvince(provinceObj);
+
+              // Fetch districts and set district
+              axios
+                .get(`${API_BASE_URL}/districts/${provinceObj.id}`)
+                .then(({ data }) => {
+                  if (Array.isArray(data?.districts)) {
+                    setDistrictList(data.districts);
+                    const districtObj = data.districts.find(
+                      (d) => d.name === from.District
+                    );
+                    if (districtObj) {
+                      setSelectedDistrict(districtObj);
+
+                      // Fetch subdistricts and set subdistrict
+                      axios
+                        .get(`${API_BASE_URL}/subdistricts/${districtObj.id}`)
+                        .then(({ data }) => {
+                          if (Array.isArray(data?.Subdistricts)) {
+                            setSubdistrictList(data.Subdistricts);
+                            const subdistrictObj = data.Subdistricts.find(
+                              (s) => s.name === from.Subdistrict
+                            );
+                            if (subdistrictObj) {
+                              setSelectedSubdistrict(subdistrictObj);
+                              setPostalCode(from.Postcode || "");
+                            }
+                          }
+                        });
+                    }
+                  }
+                });
+            }
+          }
+        });
+    }
+  }, [from, countryList]);
   const getAllTimePeriod = () => {
     axios.get(`${API_BASE_URL}/statisticsDateSelection1`).then((res) => {
       console.log(res);
@@ -3186,7 +3468,7 @@ const AddShipTo = () => {
                 aria-labelledby="first-tab"
                 tabindex="0"
               >
-                <div
+                {/* <div
                   id="datatable_wrapper"
                   className="information_dataTables dataTables_wrapper dt-bootstrap4 "
                 >
@@ -3547,6 +3829,396 @@ const AddShipTo = () => {
                       {from?.consignee_id ? t("update") : t("create")}
                     </button>
                     <Link className="btn btn-danger" to="/shipToNew">
+                      {t("cancel")}
+                    </Link>
+                  </div>
+                </div> */}
+                <div className="tab-content px-2 md:!px-4">
+                  <div className="vc_form formCreate ">
+                    <div className="row">
+                      <div className="row justify-content-between">
+                        <div className="col-lg-8">
+                          <div className="row">
+                            <div className="col-lg-4 form-group">
+                              <h6>{t("name")}</h6>
+                              <input
+                                type="text"
+                                id="name"
+                                onChange={handleChange9}
+                                name="name"
+                                className="form-control"
+                                placeholder="Name"
+                                defaultValue={state7.name}
+                              />
+                            </div>
+
+                            <div className="col-lg-4 form-group">
+                              <h6>{t("taxId")}</h6>
+                              <input
+                                type="text"
+                                id="taxId"
+                                value={state7.taxId || ""}
+                                onChange={handleChange9}
+                                name="taxId"
+                                className="form-control"
+                                placeholder="Tax"
+                              />
+                            </div>
+                            <div className="form-group col-lg-4 autoComplete">
+                              <h6>{t("Entity")}</h6>
+
+                              <Autocomplete
+                                options={dropdownVendor || []} // Populate with the list of vendors
+                                getOptionLabel={(option) =>
+                                  option.entity_name_en || ""
+                                } // Display the English name of the entity
+                                value={
+                                  dropdownVendor?.find(
+                                    (vendor) => vendor.id === state7.Entity
+                                  ) || null
+                                } // Match the current entity ID in state with the options
+                                onChange={(e, newValue) => {
+                                  handleChange9({
+                                    target: {
+                                      name: "Entity",
+                                      value: newValue?.id || "",
+                                    },
+                                  }); // Trigger handleChange with the selected entity's ID
+                                }}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    placeholder={t("SelectEntity")} // Adds a placeholder
+                                    InputLabelProps={{ shrink: false }} // Prevents floating label
+                                  />
+                                )}
+                                isOptionEqualToValue={(option, value) =>
+                                  option.id === value.id
+                                } // Ensure proper matching
+                                sx={{ width: 300 }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-lg-4">
+                          <div className="text-end">
+                            <button className="btn btn-danger">
+                              Add Contact
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("phone")}</h6>
+                        <input
+                          type="text"
+                          id="phone"
+                          value={state7.phone || ""}
+                          onChange={handleChange9}
+                          name="phone"
+                          className="form-control"
+                          placeholder="Phone"
+                        />
+                      </div>
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("email")}</h6>
+                        <input
+                          type="text"
+                          id="phone"
+                          value={state7.email || ""}
+                          onChange={handleChange9}
+                          name="email"
+                          className="form-control"
+                          placeholder="Email"
+                        />
+                      </div>
+                      <div className="col-lg-3 form-group autoComplete">
+                        <h6>{t("messengerType")}</h6>
+                        <div>
+                          <Autocomplete
+                            options={countries}
+                            value={state7.Messenger_Type || ""}
+                            onChange={(event, newValue) =>
+                              setState7({ ...state7, Messenger_Type: newValue })
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("messengerType")}
+                                variant="outlined"
+                              />
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("messangerId")}</h6>
+                        <div>
+                          <input
+                            type="text"
+                            id="messangerId"
+                            value={state7.messangerId || ""}
+                            onChange={handleChange9}
+                            name="messangerId"
+                            className="form-control"
+                            placeholder="Messanger ID"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-3 form-group autoComplete mb-3">
+                        <h6>{t("country")}</h6>
+                        <div>
+                          <Autocomplete
+                            options={countryList}
+                            getOptionLabel={(option) => option.name || ""}
+                            isOptionEqualToValue={(option, value) =>
+                              option.id === value?.id
+                            }
+                            value={selectedCountry}
+                            onChange={(event, newValue) =>
+                              setSelectedCountry(newValue)
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("country")}
+                                variant="outlined"
+                              />
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group col-lg-3 autoComplete mb-3">
+                        <h6>{t("province")}</h6>
+                        <Autocomplete
+                          options={provinceList}
+                          getOptionLabel={(opt) => opt.name ?? ""}
+                          isOptionEqualToValue={(opt, val) =>
+                            opt.id === val?.id
+                          }
+                          value={selectedProvince}
+                          onChange={(e, newProv) =>
+                            setSelectedProvince(newProv)
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("province")}
+                              variant="outlined"
+                            />
+                          )}
+                          style={{ marginTop: 16 }}
+                        />
+                      </div>
+                      <div className="form-group col-lg-3 autoComplete mb-3">
+                        <h6>{t("district")}</h6>
+                        <Autocomplete
+                          options={districtList}
+                          getOptionLabel={(opt) => opt.name ?? ""}
+                          isOptionEqualToValue={(opt, val) =>
+                            opt.id === val?.id
+                          }
+                          value={selectedDistrict}
+                          onChange={(e, dis) => setSelectedDistrict(dis)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("district")}
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+                      <div className="col-lg-3 form-group autoComplete">
+                        <h6>{t("subDistrict")}</h6>
+                        <Autocomplete
+                          options={subdistrictList || []}
+                          getOptionLabel={(opt) => opt?.name ?? ""}
+                          isOptionEqualToValue={(opt, val) =>
+                            opt?.id === val?.id
+                          }
+                          value={selectedSubdistrict || null}
+                          onChange={(e, sub) => setSelectedSubdistrict(sub)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Subdistrict"
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("postCode")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={postalCode || ""}
+                          onChange={(e) => setPostalCode(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("address")} 1</h6>
+                        <input
+                          type="text"
+                          id="address1"
+                          value={state7.address1 || ""}
+                          onChange={handleChange9}
+                          name="address1"
+                          className="form-control"
+                          placeholder="Address1"
+                        />
+                      </div>
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("address")} 2</h6>
+                        <input
+                          type="text"
+                          id="address2"
+                          value={state7.address2 || ""}
+                          onChange={handleChange9}
+                          name="address2"
+                          className="form-control"
+                          placeholder="Address2"
+                        />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-12 form-group autoComplete">
+                        <h6 style={{ fontWeight: "bold" }}>
+                          {" "}
+                          {t("BankDetails")}:
+                        </h6>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankName")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state7.Bank_Name || ""}
+                          onChange={(e) =>
+                            setState7({ ...state7, Bank_Name: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankBranch")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state7.Bank_Branch || ""}
+                          onChange={(e) =>
+                            setState7({
+                              ...state7,
+                              Bank_Branch: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankAccount")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state7.Bank_Account || ""}
+                          onChange={(e) =>
+                            setState7({
+                              ...state7,
+                              Bank_Account: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankIbon")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state7.Bank_IBAN || ""}
+                          onChange={(e) =>
+                            setState7({ ...state7, Bank_IBAN: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankSwift")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state7.Bank_Swift || ""}
+                          onChange={(e) =>
+                            setState7({ ...state7, Bank_Swift: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group autoComplete">
+                        <h6>{t("bankCountry")}</h6>
+                        <Autocomplete
+                          options={countryList}
+                          getOptionLabel={(option) => option.name || ""}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === value?.id
+                          }
+                          value={
+                            countryList.find(
+                              (c) =>
+                                String(c.id) === String(state7.Bank_Country)
+                            ) || null
+                          }
+                          onChange={(event, newValue) =>
+                            setState7({
+                              ...state7,
+                              Bank_Country: newValue ? newValue.id : "",
+                            })
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("bankCountry")}
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+
+                      <div className="col-lg-12 form-group">
+                        <h6>{t("bankAddress")}</h6>
+                        <textarea
+                          className="form-control p-2"
+                          placeholder={t("bankAddress")}
+                          value={state7.Bank_Address || ""}
+                          onChange={(e) =>
+                            setState7({
+                              ...state7,
+                              Bank_Address: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-footer">
+                    <button
+                      className="btn btn-primary"
+                      type="submit"
+                      name="signup"
+                      onClick={updateVendor}
+                      disabled={isButtonClicked}
+                    >
+                      {typeof state7.vendor_id !== "undefined"
+                        ? t("update")
+                        : t("create")}
+                    </button>
+                    <Link className="btn btn-danger" to={"/shipToNew"}>
                       {t("cancel")}
                     </Link>
                   </div>
@@ -4633,50 +5305,6 @@ const AddShipTo = () => {
                       <div className="col-lg-2 form-group autoComplete">
                         <h6>{t("invoiceUnit")}</h6>
 
-                        {/* <Autocomplete
-                          options={
-                            Array.isArray(unitDropdown)
-                              ? unitDropdown.map((item) => ({
-                                  unit_id: item.ID,
-                                  unit_name_en: item.Name_EN,
-                                }))
-                              : []
-                          }
-                          getOptionLabel={(option) =>
-                            option?.unit_name_en || "Select Invoice Unit"
-                          }
-                          onChange={(event, newValue) => {
-                            handleChange5({
-                              target: {
-                                name: "Invoice_Unit",
-                                value: newValue ? newValue.unit_id : "",
-                              },
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select Unit"
-                              variant="outlined"
-                            />
-                          )}
-                          value={
-                            Array.isArray(unitDropdown)
-                              ? unitDropdown
-                                  .map((item) => ({
-                                    unit_id: item.ID,
-                                    unit_name_en: item.Name_EN,
-                                  }))
-                                  .find(
-                                    (unit) =>
-                                      unit.unit_id === state.Invoice_Unit
-                                  ) || null
-                              : null
-                          }
-                          isOptionEqualToValue={(option, value) =>
-                            option.unit_id === value?.unit_id
-                          }
-                        /> */}
                         <Autocomplete
                           options={unitDropdown || []}
                           getOptionLabel={(option) => option.Name_EN || ""} // Use Name_EN from API

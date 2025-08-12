@@ -488,7 +488,7 @@ const ShipToNew = () => {
 
       {
         Header: t("nameCompany"),
-        accessor: "consignee_name",
+        accessor: "Name",
       },
       {
         Header: t("status"),
@@ -660,19 +660,15 @@ const ShipToNew = () => {
 
   const getAirportData = () => {
     axios
-      .get(`${API_BASE_URL}/getConsignee`)
-      .then((response) => {
-        setData(response.data.data || []);
+      .get(`${API_BASE_URL}/getVCList`, {
+        params: { type: 3 },
       })
-      .catch((error) => {
-        console.log(error);
-        if (error) {
-          toast.error(t("networkError"), {
-            autoClose: 1000,
-            theme: "colored",
-          });
-          return false;
-        }
+      .then((res) => {
+        console.log(res);
+        setData(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching VC List:", err);
       });
   };
 

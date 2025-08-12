@@ -1088,7 +1088,20 @@ const BillingNoteCreate = () => {
   //     toast.error(t("genericError"));
   //   }
   // };
-
+const options =
+    recieptDroupDown?.map((item) => ({
+      value: item.VendorID,
+      label: item.Payor,
+      clientId: item.ClientID,
+      consigneeId: item.ConsigneeID,
+    })) || [];
+ 
+  const selectedOption = options.find(
+    (option) =>
+      Number(option.value) === Number(state.vendor_id) &&
+      Number(option.clientId) === Number(state.ClientID) &&
+      Number(option.consigneeId) === Number(state.ConsigneeID)
+  );
   return (
     <>
       <Card
@@ -1156,7 +1169,7 @@ const BillingNoteCreate = () => {
                     </div>
                   ) : (
                     <div className="row cratePurchase">
-                      <div className="col-lg-4 form-group autoComplete">
+                      <div className="col-lg-4 form-group selectReact">
                         <div className="d-flex">
                           <h6 className="me-2">{t("client")}</h6>
                         </div>
@@ -1196,49 +1209,25 @@ const BillingNoteCreate = () => {
                             />
                           )}
                         /> */}
-                        <Autocomplete
-                          options={
-                            recieptDroupDown?.map((item) => ({
-                              id: item.VendorID,
-                              name: item.Payor,
-                              clientId: item.ClientID,
-                              consigneeId: item.ConsigneeID,
-                            })) || []
-                          }
-                          getOptionLabel={(option) => option.name || ""}
-                          value={
-                            recieptDroupDown
-                              ?.map((item) => ({
-                                id: Number(item.VendorID),
-                                name: item.Payor,
-                                clientId: Number(item.ClientID),
-                                consigneeId: Number(item.ConsigneeID),
-                              }))
-                              .find(
-                                (option) =>
-                                  option.id === Number(state.vendor_id) &&
-                                  option.clientId === Number(state.ClientID) &&
-                                  option.consigneeId ===
-                                    Number(state.ConsigneeID)
-                              ) || null
-                          }
-                          onChange={(e, newValue) => {
+                            <Select
+                          options={options}
+                          value={selectedOption || null}
+                          onChange={(selected) => {
                             setState((prev) => ({
                               ...prev,
-                              vendor_id: newValue?.id || "",
-                              vendor_name: newValue?.name || "",
-                              ClientID: newValue?.clientId || "",
-                              ConsigneeID: newValue?.consigneeId || "",
+                              vendor_id: selected?.value || "",
+                              vendor_name: selected?.label || "",
+                              ClientID: selected?.clientId || "",
+                              ConsigneeID: selected?.consigneeId || "",
                             }));
                           }}
-                          sx={{ width: 300 }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectClient")}
-                              InputLabelProps={{ shrink: false }}
-                            />
-                          )}
+                          isClearable
+                          placeholder={t("selectClient")}
+                          classNamePrefix="select"
+                          className="basic-single"
+                          styles={{
+                            container: (base) => ({ ...base}),
+                          }}
                         />
                       </div>
                       {/* <div className="col-lg-3">

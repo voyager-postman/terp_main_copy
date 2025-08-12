@@ -24,7 +24,7 @@ const CreateQuotationTest = () => {
   const [color, setColor] = useState(false);
   const { data: RoundingDataList } = useQuery("GetRoundingTable");
   const [copyData, setCopyData] = useState("");
-
+  const [selectedConsigneeData, setSelectedConsigneeData] = useState(null); // detailed data
   const [state5, setState5] = useState({
     Rounding: "", // Initial state
   });
@@ -65,7 +65,7 @@ const CreateQuotationTest = () => {
   );
   const handleSaveOrderPopulate = () => {
     const payload = {
-      order_id: state.order_id, // You must have this in your component
+      order_id: state.Order_ID || selectedConsigneeData.Order_ID, // You must have this in your component
       user_id: localStorage.getItem("id"), // You must also define this
       Order_NW: orderNetWeight,
       input: {
@@ -79,7 +79,6 @@ const CreateQuotationTest = () => {
         is_quotation: 1,
       },
     };
-
     axios
       .post(`${API_BASE_URL}/OrderPopulate`, payload)
       .then((res) => {
@@ -92,6 +91,7 @@ const CreateQuotationTest = () => {
           };
         });
         setOrderId(res?.data?.order_id);
+        setDeleteOrderId(res?.data?.order_id)
         getOrdersDetails();
         toast.success(t("quotationPopulatedSuccess"), {
           autoClose: 1000,
@@ -240,7 +240,7 @@ const CreateQuotationTest = () => {
     if (updatableFields.includes(name)) {
       try {
         await axios.post(`${API_BASE_URL}/updateOrdersValues`, {
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           [name]: value,
         });
         console.log(`${name} updated successfully`);
@@ -319,10 +319,10 @@ const CreateQuotationTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate1(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -348,10 +348,10 @@ const CreateQuotationTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate2(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -377,10 +377,10 @@ const CreateQuotationTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate5(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -406,10 +406,10 @@ const CreateQuotationTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate3(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -435,10 +435,10 @@ const CreateQuotationTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate4(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -515,7 +515,7 @@ const CreateQuotationTest = () => {
             toast.success(t("quotationDetailDeletedSuccess"));
           }
         });
-      } catch (e) {}
+      } catch (e) { }
     } else {
       setDetails((prevState) => {
         return prevState.filter((v, index) => index != i);
@@ -866,8 +866,8 @@ const CreateQuotationTest = () => {
   }, [selectedDetails, details]);
   console.log(defaultDetailsValue);
   const [toEditDetails, setToEditDetails] = useState({});
-  console.log(toEditDetails?.brand_id);
-  console.log(defaultDetailsValue?.brand_id);
+  console.log(toEditDetails?.Brand_id);
+  console.log(defaultDetailsValue?.Brand_id);
   console.log(defaultDetailsValue);
   const closeModal = () => {
     setIsOpenModal(false);
@@ -934,6 +934,7 @@ const CreateQuotationTest = () => {
       const { data } = await axios.post(`${API_BASE_URL}/NewaddOrderInput`, {
         input: {
           ...computedState,
+          order_id: selectedConsigneeData.Order_ID || null,
           user: localStorage.getItem("id"),
           palletized: exchangeRate2 ? 1 : 0,
           Chamber: exchangeRate3 ? 1 : 0,
@@ -1062,53 +1063,44 @@ const CreateQuotationTest = () => {
     }
   };
   const computedState = useMemo(() => {
-    console.log(state.quote_id);
-    console.log(state);
     const r = {
       ...state,
       consignee_id: state.consignee_id,
       client_id: state.client_id,
     };
-    console.log(r);
 
-    const consigneeFind = consigneesNew?.find(
-      (v) => v.consignee_id == state.consignee_id
-    );
-    console.log(consigneeFind);
-    setCopyData(consigneeFind);
+    const consigneeFind = selectedConsigneeData
+      ? selectedConsigneeData
+      : consigneesNew?.find(v => v.ID == state.consignee_id);
 
-    console.log(consigneeFind);
     const portDestinationFind = ports?.find(
       (v) =>
-        v.port_id == (r.destination_port_id || consigneeFind?.destination_port)
+        v.port_id == (r.destination_port_id || consigneeFind?.Destination_Port)
     );
     const portOriginFind = ports?.find(
-      (v) => v.port_id == (r.from_port_ || consigneeFind?.port_of_orign)
+      (v) => v.port_id == (r.from_port_ || consigneeFind?.Origin_Port)
     );
-    r.fx_id = r.fx_id || consigneeFind?.currency;
 
+    r.fx_id = r.fx_id || consigneeFind?.FX_ID;
     r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost;
-
     r.fx_rate =
       !state.fx_rate_manually_set && r.fx_id
         ? currency?.find((v) => +v.ID === +r.fx_id)?.fx_rate || 0
         : state.fx_rate;
-
-    r.rebate = r.rebate || consigneeFind?.O_Rebate;
+    r.rebate = r.rebate || consigneeFind?.Rebate;
     r.Clearance_provider =
       r.Clearance_provider ||
       portOriginFind?.preferred_clearance ||
       consigneeFind?.Clearance_provider;
-    r.loading_location = r.loading_location || consigneeFind?.Default_location;
-    r.brand_id = state.brand_id || consigneeFind?.brand;
+    r.loading_location = r.loading_location || consigneeFind?.loading_location;
+    r.brand_id = state.brand_id || consigneeFind?.Brand_id;
     r.mark_up = r.mark_up || consigneeFind?.O_Markup;
     r.consignee_name = r.consignee_name || consigneeFind?.consignee_name;
-
     r.Transportation_provider =
       r.Transportation_provider || portOriginFind?.preferred_transport;
-    r.from_port_ = r.from_port_ || consigneeFind?.port_of_orign;
+    r.from_port_ = r.from_port_ || consigneeFind?.Origin_Port;
     r.destination_port_id =
-      r.destination_port_id || consigneeFind?.destination_port;
+      r.destination_port_id || consigneeFind?.Destination_Port;
     r.liner_id = r.liner_id || portDestinationFind?.prefered_liner;
     r.Freight_provider_ =
       state.Freight_provider_ ||
@@ -1130,39 +1122,123 @@ const CreateQuotationTest = () => {
     freights,
     unit,
     itf,
+    selectedConsigneeData // added dependency
   ]);
-  useEffect(() => {
-    const consigneeFind = consigneesNew?.find(
-      (v) => v.consignee_id == state.consignee_id
-    );
 
-    if (consigneeFind) {
-      setExchangeRate1(consigneeFind?.Charge_Volume || 0);
-      setExchangeRate2(consigneeFind?.Palletized || 0);
-      setExchangeRate3(consigneeFind?.CO_Chamber_Required || 0);
-      setExchangeRate4(consigneeFind?.Precooling || 0);
-      setExchangeRate5(consigneeFind?.Include_claims || 0);
-    }
-  }, [state.consignee_id, consigneesNew]);
-  console.log(from);
-  console.log(computedState);
-  const fetchConsigneesNew = async () => {
-    console.log(computedState.client_id);
-    try {
-      const response = await axios.post(`${API_BASE_URL}/ConsigneeDropDown`, {
-        Client_id: computedState.client_id,
-      });
-      console.log(response);
-      setConsigneesNew(response.data.data);
-    } catch (error) {
-      console.error("Error fetching consignees:", error);
-    }
-  };
+  // Update copyData whenever computedState changes
   useEffect(() => {
-    if (state.client_id) {
-      fetchConsigneesNew();
+    const consigneeFind = selectedConsigneeData
+      ? selectedConsigneeData
+      : consigneesNew?.find(v => v.ID == state.consignee_id);
+
+    setCopyData(consigneeFind || null);
+  }, [computedState, selectedConsigneeData, consigneesNew, state.consignee_id]);
+
+
+  // useEffect(() => {
+  //   // Don't run if no client
+  //   if (!state.client_id) return;
+
+  //   // Build request body
+  //   const payload = {
+  //     Client_id: state.client_id
+  //   };
+
+  //   console.log(state);
+
+  //   // If we also have consignee_id, add extra params
+  //   if (state.consignee_id) {
+  //     payload.Consignee_ID = state.consignee_id;
+  //     payload.Is_Quotation = 1;
+  //     payload.User_ID = localStorage.getItem("id");
+  //   }
+
+  //   // Call same API
+  //   axios.post(`${API_BASE_URL}/ConsigneeDropDown`, payload)
+  //     .then(res => {
+  //       console.log(res.data.data);
+
+  //       setConsigneesNew(res.data.data);
+  //     })
+  //     .catch(err => {
+  //       console.error("Error fetching consignees:", err);
+  //     });
+
+  // }, [state.client_id, state.consignee_id]);
+
+  // useEffect(() => {
+  //   const consigneeFind = consigneesNew?.find(
+  //     (v) => v.consignee_id == state.consignee_id
+  //   );
+
+  //   if (consigneeFind) {
+  //     setExchangeRate1(consigneeFind?.Charge_Volume || 0);
+  //     setExchangeRate2(consigneeFind?.Palletized || 0);
+  //     setExchangeRate3(consigneeFind?.CO_Chamber_Required || 0);
+  //     setExchangeRate4(consigneeFind?.Precooling || 0);
+  //     setExchangeRate5(consigneeFind?.Include_claims || 0);
+  //   }
+  // }, [state.consignee_id, consigneesNew]);
+  // console.log(from);
+  // console.log(computedState);
+  // const fetchConsigneesNew = async () => {
+  //   console.log(computedState.client_id);
+  //   try {
+  //     const response = await axios.post(`${API_BASE_URL}/ConsigneeDropDown`, {
+  //       Client_id: computedState.client_id,
+  //     });
+  //     console.log(response);
+  //     setConsigneesNew(response.data.data);
+  //   } catch (error) {
+  //     console.error("Error fetching consignees:", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (state.client_id) {
+  //     fetchConsigneesNew();
+  //   }
+  // }, [state.client_id, state.consignee_id]);
+
+
+  // Fetch full consignee list for a client
+  useEffect(() => {
+    if (!state.client_id) return;
+
+    axios.post(`${API_BASE_URL}/ConsigneeDropDown`, { Client_id: state.client_id })
+      .then(res => {
+        setConsigneesNew(res.data.data || []);
+      })
+      .catch(console.error);
+  }, [state.client_id]);
+
+  // Fetch detailed info for selected consignee
+  useEffect(() => {
+    if (!state.client_id || !state.consignee_id) return;
+    console.log("run.............");
+
+    axios.post(`${API_BASE_URL}/ConsigneeDropDown`, {
+      Client_id: state.client_id,
+      Consignee_ID: state.consignee_id,
+      Is_Quotation: 1,
+      User_ID: localStorage.getItem("id")
+    })
+      .then(res => {
+        const detail = res.data.data?.[0] || null;
+        setSelectedConsigneeData(detail); // store detailed data
+      })
+      .catch(console.error);
+  }, [state.consignee_id]);
+  console.log(selectedConsigneeData);
+
+  // Clear when unselected
+  useEffect(() => {
+    if (!state.consignee_id) {
+      setSelectedConsigneeData(null);
+      setCopyData(null);
     }
-  }, [state.client_id, state.consignee_id]);
+  }, [state.consignee_id]);
+
+
   const customStyles = {
     control: (base) => ({
       ...base,
@@ -1202,14 +1278,14 @@ const CreateQuotationTest = () => {
 
   const options = itfNew
     ? itfNew.map((v) => ({
-        value: v.ID, // Standardized property name for value
-        label: v.itf_name,
-        Produce: v.Produce, // Standardized property name for value
-        Claim_Markup: v.Claim_Markup,
-        HSCODE: v.HSCODE,
-        Produce_Status: v.Produce_Status,
-        // Standardized property name for label
-      }))
+      value: v.ID, // Standardized property name for value
+      label: v.itf_name,
+      Produce: v.Produce, // Standardized property name for value
+      Claim_Markup: v.Claim_Markup,
+      HSCODE: v.HSCODE,
+      Produce_Status: v.Produce_Status,
+      // Standardized property name for label
+    }))
     : [];
   const selectedOption = options.find(
     (option) =>
@@ -1312,16 +1388,17 @@ const CreateQuotationTest = () => {
                         <Autocomplete
                           options={consigneesNew || []} // Ensure consignees is an array
                           getOptionLabel={(option) =>
-                            option.consignee_name || ""
+                            option.Name || ""
                           } // Display the consignee name
                           value={
                             consigneesNew?.find(
                               (v) =>
-                                v.consignee_id === computedState.consignee_id
+                                v.ID === computedState.consignee_id
                             ) || null
                           } // Find the selected consignee by consignee_id
                           onChange={(event, newValue) => {
                             // Handle the change and reset multiple fields in the state
+                            console.log("Updating state to:", newValue);
                             setState({
                               ...state,
                               rebate: "",
@@ -1338,10 +1415,10 @@ const CreateQuotationTest = () => {
                               Q_Markup: "",
                               loading_location: "",
                               consignee_id: newValue
-                                ? newValue.consignee_id
+                                ? newValue.ID
                                 : "", // Set consignee_id from the selected consignee
                               consignee_name: newValue
-                                ? newValue.consignee_name
+                                ? newValue.Name
                                 : "",
                             });
                           }}
@@ -1353,7 +1430,7 @@ const CreateQuotationTest = () => {
                             />
                           )}
                           isOptionEqualToValue={(option, value) =>
-                            option.consignee_id === value?.consignee_id
+                            option.ID === value?.consignee_id
                           } // Compare based on consignee_id
                         />
                       </div>
@@ -1496,14 +1573,14 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.destination_port_id
                               ? ports
-                                  ?.map((v) => ({
-                                    id: v.port_id,
-                                    name: v.port_name,
-                                  }))
-                                  .find(
-                                    (v) =>
-                                      v.id === computedState.destination_port_id
-                                  ) || null
+                                ?.map((v) => ({
+                                  id: v.port_id,
+                                  name: v.port_name,
+                                }))
+                                .find(
+                                  (v) =>
+                                    v.id === computedState.destination_port_id
+                                ) || null
                               : null
                           }
                           onChange={(e, newValue) =>
@@ -1537,13 +1614,13 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.liner_id
                               ? liners
-                                  ?.map((v) => ({
-                                    id: v.liner_id,
-                                    name: v.liner_name,
-                                  }))
-                                  .find(
-                                    (v) => v.id === computedState.liner_id
-                                  ) || null
+                                ?.map((v) => ({
+                                  id: v.liner_id,
+                                  name: v.liner_name,
+                                }))
+                                .find(
+                                  (v) => v.id === computedState.liner_id
+                                ) || null
                               : null
                           }
                           onChange={async (e, newValue) => {
@@ -1554,7 +1631,7 @@ const CreateQuotationTest = () => {
                               await axios.post(
                                 `${API_BASE_URL}/updateOrdersValues`,
                                 {
-                                  id: state.order_id,
+                                  id: state.order_id || selectedConsigneeData.Order_ID,
                                   liner_id: newId,
                                   Freight_provider_: state.Freight_provider_,
                                 }
@@ -1628,10 +1705,10 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.Transportation_provider
                               ? transport?.find(
-                                  (v) =>
-                                    v.Transportation_provider ===
-                                    computedState.Transportation_provider
-                                ) || null
+                                (v) =>
+                                  v.Transportation_provider ===
+                                  computedState.Transportation_provider
+                              ) || null
                               : null
                           } // Ensure value is mapped to the full object
                           onChange={(e, newValue) =>
@@ -1662,10 +1739,10 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.Clearance_provider
                               ? clearance?.find(
-                                  (v) =>
-                                    v.Clearance_provider ===
-                                    computedState.Clearance_provider
-                                ) || null
+                                (v) =>
+                                  v.Clearance_provider ===
+                                  computedState.Clearance_provider
+                              ) || null
                               : null
                           } // Map the id to the full object
                           onChange={(e, newValue) =>
@@ -1727,10 +1804,10 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.Freight_provider_
                               ? freights?.find(
-                                  (v) =>
-                                    v.Freight_provider ===
-                                    computedState.Freight_provider_
-                                ) || null
+                                (v) =>
+                                  v.Freight_provider ===
+                                  computedState.Freight_provider_
+                              ) || null
                               : null
                           }
                           onChange={async (e, newValue) => {
@@ -2172,9 +2249,9 @@ const CreateQuotationTest = () => {
                                     ((localStorage.getItem("level") ===
                                       "Level 1" &&
                                       localStorage.getItem("role") ===
-                                        "Admin") ||
+                                      "Admin") ||
                                       localStorage.getItem("level") ===
-                                        "Level 5")
+                                      "Level 5")
                                   ) {
                                     return null; // Hide "Profit"
                                   }
@@ -2210,9 +2287,9 @@ const CreateQuotationTest = () => {
                                     ((localStorage.getItem("level") ===
                                       "Level 1" &&
                                       localStorage.getItem("role") ===
-                                        "Admin") ||
+                                      "Admin") ||
                                       localStorage.getItem("level") ===
-                                        "Level 5")
+                                      "Level 5")
                                   ) {
                                     return null;
                                   }
@@ -2786,7 +2863,7 @@ const CreateQuotationTest = () => {
         >
           <div className="modal-dialog modal-xl modalShipTo">
             <div className="modal-content">
-              <div className="modal-header">
+              {/* <div className="modal-header">
                 <button
                   type="button"
                   className="btn-close"
@@ -2795,18 +2872,26 @@ const CreateQuotationTest = () => {
                 >
                   <i className="mdi mdi-close"></i>
                 </button>
-              </div>
+              </div> */}
               <div className="modal-body">
                 <div className="row tableCombinePayment">
                   <div className="tableCreateClient tablepayment">
                     <table>
-                      <thead>
+                    <thead>
                         <tr>
                           {Object.values(calculateListData?.header || {}).map(
                             (label, index) => (
                               <th key={index}>{label}</th>
                             )
                           )}
+                          <th>
+                            {" "}
+                            <i
+                              type="button"
+                              onClick={handleCloseModal}
+                              className="mdi mdi-close"
+                            ></i>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>

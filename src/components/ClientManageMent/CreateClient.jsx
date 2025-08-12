@@ -1,5 +1,5 @@
- import axios from "axios";
-import { useState, useEffect } from "react";
+import axios from "axios";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -8,6 +8,8 @@ import { API_IMAGE_URL } from "../../Url/Url";
 import MySwal from "../../swal";
 import { Card } from "../../card";
 import jsPDF from "jspdf";
+import dayjs from "dayjs";
+
 import "jspdf-autotable";
 import ChartConsi from "./ChartConsi";
 import TextField from "@mui/material/TextField";
@@ -16,8 +18,17 @@ import { useTranslation } from "react-i18next";
 const CreateClient = () => {
   const [t, i18n] = useTranslation("global");
   const location = useLocation();
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
+
   const { data: clients } = useQuery("getClientDataAsOptions");
   const { data: consignee } = useQuery("getConsignee");
+  const { data: DropdownDelivery } = useQuery("DropdownDelivery");
+  const [claimValue, setClaimvalue] = useState("");
+
+  const { data: FXCorrection } = useQuery("FXCorrection");
+  const { data: RoundingDataList } = useQuery("GetRoundingTable");
+  const [claimValue1, setClaimvalue1] = useState("");
+
   const [consignees, setConsignees] = useState([]);
   const [collectPaymentId, setCollectPaymentId] = useState("");
   const [selectedItemId, setSelectedItemId] = useState(null);
@@ -66,6 +77,331 @@ const CreateClient = () => {
   console.log(from);
   const navigate = useNavigate();
   // new
+  const [state5, setState5] = useState({
+    User_ID: localStorage.getItem("id"),
+    Client: from?.Client ?? 1,
+    vendor_id: from?.ID ?? undefined,
+    name: from?.Name ?? "",
+    taxId: from?.TAX ?? "",
+    Entity: from?.Legal_Entity ?? "",
+    phone: from?.Phone_Main ?? "",
+    email: from?.Email_Main ?? "",
+    Messenger_Type: from?.Messenger_Type ?? "",
+    messangerId: from?.Messenger_Main_ID ?? "",
+    address1: from?.Address1 ?? "",
+    address2: from?.Address2 ?? "",
+    Bank_Name: from?.Bank_Name ?? "",
+    Bank_Branch: from?.Bank_Branch ?? "",
+    Bank_Account: from?.Bank_Account ?? "",
+    Bank_IBAN: from?.Bank_IBAN ?? "",
+    Bank_Swift: from?.Bank_Swift ?? "",
+    Bank_Country: from?.Bank_Country ?? "",
+    Bank_Address: from?.Bank_Address ?? "",
+  });
+  const [state6, setState6] = useState({
+    invoiceCurrency: "",
+    clientId: from?.ID ?? undefined,
+    markup: "",
+    rebate: "",
+    commissionType: "",
+    consigneeType: "",
+    consigneeCode: "",
+    Invoice_Unit: "",
+    commissionValue: "",
+    commissionCurrency: "",
+    chargeVolume: "",
+    deliveryTerms: "",
+    paymentTerms: "",
+    statementDueDate: 1,
+    extraCost: "",
+    markupValue: "",
+    freightAdjust: "",
+    rebateValue: "",
+    quotation: "",
+    claim: "",
+    other: "",
+    final: "",
+    Rounding: "",
+  });
+  const { data: dropdownVendor } = useQuery("getDropdownVendor");
+  const { data: dropdownDistrict } = useQuery("getDropdownAddressDistrict");
+  const { data: dropdownSubDistrict } = useQuery(
+    "getDropdownAddressSub-district"
+  );
+  const availableDistrict = useMemo(() => {
+    return dropdownDistrict?.filter((item) => item._id == state5.provinces);
+  }, [state5.provinces, dropdownDistrict]);
+
+  const availableSubDistrict = useMemo(() => {
+    return dropdownSubDistrict?.filter((item) => item._id == state5.district);
+  }, [
+    state5.provinces,
+    dropdownDistrict,
+    state5.district,
+    dropdownSubDistrict,
+  ]);
+  console.log(availableSubDistrict);
+  useEffect(() => {
+    const p = dropdownSubDistrict?.find(
+      (item) => item.code == state5.id
+    )?.zipcode;
+    if (p)
+      setState5((prevState) => {
+        return {
+          ...prevState,
+          postcode: p,
+        };
+      });
+  }, [state5.subdistrict, dropdownSubDistrict]);
+
+  const handleChange5 = (event) => {
+    const { name, value } = event.target;
+    setState5((prevState) => {
+      return {
+        ...prevState,
+        [name]: value,
+      };
+    });
+  };
+  const handleChange6 = (e) => {
+    const { name, type, checked, value } = e.target;
+    if (name === "commissionCurrency") {
+      // Toggle between "THB" and "FX"
+      setState6((prevState) => ({
+        ...prevState,
+        commissionCurrency: checked ? "THB" : "FX",
+      }));
+    } else if (name === "chargeVolume") {
+      setState6((prevState) => ({
+        ...prevState,
+        chargeVolume: checked ? 1 : 0,
+      }));
+    } else {
+      setState6((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  };
+  const updateVendor = async () => {
+    try {
+      setIsButtonClicked(true); // Set button clicked state to true
+      await axios.post(
+        `${API_BASE_URL}/${
+          typeof state5.vendor_id == "undefined" ? "addVC" : "updateVC"
+        }`,
+        {
+          id: state5.vendor_id,
+          User_ID: state5.User_ID,
+          name: state5.name,
+          taxId: state5.taxId,
+          Phone_Main: state5.phone,
+          Email_Main: state5.email,
+          Messenger_Type: state5.Messenger_Type,
+          Messenger_Main_ID: state5.messangerId,
+          Country: selectedCountry?.name || "",
+          Province: selectedProvince?.name || "",
+          District: selectedDistrict?.name || "",
+          Subdistrict: selectedSubdistrict?.name || "",
+          Postcode: postalCode,
+          Address1: state5.address1,
+          Address2: state5.address2,
+          Bank_Name: state5.Bank_Name,
+          Legal_Entity: state5.Entity,
+          Bank_Branch: state5.Bank_Branch,
+          Bank_Account: state5.Bank_Account,
+          Bank_IBAN: state5.Bank_IBAN,
+          Bank_Swift: state5.Bank_Swift,
+          Bank_Country: state5.Bank_Country,
+          Bank_Address: state5.Bank_Address,
+          Client: state5.Client || 1,
+        }
+      );
+      toast.success(t("success"));
+
+      navigate("/clientNew");
+    } catch (error) {
+      toast.error(t("errorWhileSaving"));
+    }
+  };
+
+  const countries = ["WhatsApp", "Telegram"];
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
+  const [countryList, setCountryList] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/countries`)
+      .then((res) => {
+        if (Array.isArray(res.data?.countries)) {
+          setCountryList(res.data.countries);
+        } else {
+          console.error("Expected countries array not found", res.data);
+        }
+      })
+      .catch((err) => console.error("Axios error:", err));
+  }, []);
+  const [provinceList, setProvinceList] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      if (!selectedCountry?.id) {
+        setProvinceList([]);
+        setSelectedProvince(null);
+        return;
+      }
+
+      try {
+        const { data } = await axios.get(
+          `https://r3.siameats.net/api/provinces/${selectedCountry.id}`
+        );
+        if (Array.isArray(data?.provinces)) {
+          setProvinceList(data.provinces);
+        } else {
+          console.error("Expected 'provinces' to be an array", data);
+          setProvinceList([]);
+        }
+      } catch (error) {
+        console.error("Error fetching provinces:", error);
+        setProvinceList([]);
+      }
+    };
+
+    fetchProvinces();
+  }, [selectedCountry]);
+  // district
+  const [districtList, setDistrictList] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  useEffect(() => {
+    if (!selectedProvince?.id) {
+      setDistrictList([]);
+      setSelectedDistrict(null);
+      return;
+    }
+
+    axios
+      .get(`${API_BASE_URL}/districts/${selectedProvince.id}`)
+      .then(({ data }) => {
+        console.log("", data);
+        if (Array.isArray(data?.districts)) {
+          setDistrictList(data.districts);
+        } else {
+          console.error("Expected districts array", data);
+          setDistrictList([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching districts:", err);
+        setDistrictList([]);
+      });
+  }, [selectedProvince]);
+  // sub district
+  const [subdistrictList, setSubdistrictList] = useState([]);
+  const [selectedSubdistrict, setSelectedSubdistrict] = useState(null);
+  useEffect(() => {
+    if (!selectedDistrict?.id) {
+      setSubdistrictList([]);
+      setSelectedSubdistrict(null);
+      return;
+    }
+
+    axios
+      .get(`${API_BASE_URL}/subdistricts/${selectedDistrict.id}`)
+      .then(({ data }) => {
+        console.log("pratimaDis", data);
+        if (Array.isArray(data?.Subdistricts)) {
+          setSubdistrictList(data.Subdistricts);
+        } else {
+          console.error("pratima", data);
+          setSubdistrictList([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching subdistricts:", err);
+        setSubdistrictList([]);
+      });
+  }, [selectedDistrict]);
+
+  const [postalCode, setPostalCode] = useState(null);
+
+  useEffect(() => {
+    if (!selectedSubdistrict?.lat || !selectedSubdistrict?.lng) {
+      setPostalCode("");
+      return;
+    }
+
+    axios
+      .get(
+        `${API_BASE_URL}/postal-code?lat=${selectedSubdistrict.lat}&lng=${selectedSubdistrict.lng}`
+      )
+      .then(({ data }) => {
+        if (data?.date?.postal_code) {
+          setPostalCode(data.date.postal_code);
+        } else {
+          setPostalCode("");
+        }
+      })
+      .catch(() => {
+        setPostalCode("");
+      });
+  }, [selectedSubdistrict]);
+  // Pre-fill form for update mode
+  useEffect(() => {
+    if (!from || countryList.length === 0) return;
+
+    // 1️⃣ Find Country
+    const countryObj = countryList.find((c) => c.name === from.Country);
+    if (countryObj) {
+      setSelectedCountry(countryObj);
+
+      // Fetch provinces and set province
+      axios
+        .get(`https://r3.siameats.net/api/provinces/${countryObj.id}`)
+        .then(({ data }) => {
+          if (Array.isArray(data?.provinces)) {
+            setProvinceList(data.provinces);
+            const provinceObj = data.provinces.find(
+              (p) => p.name === from.Province
+            );
+            if (provinceObj) {
+              setSelectedProvince(provinceObj);
+
+              // Fetch districts and set district
+              axios
+                .get(`${API_BASE_URL}/districts/${provinceObj.id}`)
+                .then(({ data }) => {
+                  if (Array.isArray(data?.districts)) {
+                    setDistrictList(data.districts);
+                    const districtObj = data.districts.find(
+                      (d) => d.name === from.District
+                    );
+                    if (districtObj) {
+                      setSelectedDistrict(districtObj);
+
+                      // Fetch subdistricts and set subdistrict
+                      axios
+                        .get(`${API_BASE_URL}/subdistricts/${districtObj.id}`)
+                        .then(({ data }) => {
+                          if (Array.isArray(data?.Subdistricts)) {
+                            setSubdistrictList(data.Subdistricts);
+                            const subdistrictObj = data.Subdistricts.find(
+                              (s) => s.name === from.Subdistrict
+                            );
+                            if (subdistrictObj) {
+                              setSelectedSubdistrict(subdistrictObj);
+                              setPostalCode(from.Postcode || "");
+                            }
+                          }
+                        });
+                    }
+                  }
+                });
+            }
+          }
+        });
+    }
+  }, [from, countryList]);
+
   const [unitDropdown, setUnitDropDown] = useState([]);
   const getUnitDropdown = () => {
     axios
@@ -675,6 +1011,8 @@ const CreateClient = () => {
   const { data: port } = useQuery("getAllAirports");
   const { data: liner } = useQuery("getLiner");
   const { data: commission } = useQuery("getDropdownCommissionType");
+  const { data: getVcConsigneeList } = useQuery("getVcConsignee");
+
   const { data: locations } = useQuery("getLocation");
   const { data: contactType } = useQuery("DropdownContactType ");
   const [state1, setState1] = useState({
@@ -821,6 +1159,52 @@ const CreateClient = () => {
       toast.error(t("genericError"));
     }
   };
+  const updatePaymentValue = () => {
+    axios
+      .post(
+        `${API_BASE_URL}/${
+          typeof state6.clientId == "undefined"
+            ? "AddMarginPaymentClientConsignee"
+            : "updateMarginPaymentClientConsignee"
+        }`,
+        {
+          consignee_id: state6?.consigneeType,
+          profit: state6.markupValue,
+          Consignee_Code: state6.consigneeCode,
+          rebate: state6.rebateValue,
+          commission: state6.commissionType,
+          Invoice_Unit: state6.Invoice_Unit,
+          commission_value: state6.commissionValue,
+          Charge_Volume: state6.chargeVolume ? 1 : 0,
+          Commission_Currency: state6.commissionCurrency,
+          currency: parseInt(state6.invoiceCurrency),
+          Incoterms: state6.deliveryTerms,
+          Payment_Terms: state6.paymentTerms,
+          Extra_cost: state6.extraCost,
+          Quotation_Margin: state6.quotation,
+          Extra_Margin: state6.other,
+          Freight_Adjustment: state6.freightAdjust,
+          Rounding: state6.Rounding,
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        oneQoutationData();
+        getCongineeDetails1();
+        toast.success(t("updatedSuccess"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      })
+      .catch((error) => {
+        console.error(error); // Use console.error for better error tracking
+        toast.error(t("networkError"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+        return false;
+      });
+  };
   const clearAllFields = () => {
     setClientId("");
     setConsigneeId("");
@@ -874,16 +1258,19 @@ const CreateClient = () => {
   const { data: currency } = useQuery("getCurrency");
   const [data, setData] = useState([]);
   const [customization, setCustomization] = useState([]);
-
+  const [headers, setHeaders] = useState({});
   const getAllContact = () => {
     axios
-      .post(`${API_BASE_URL}/getContactList`, {
-        consignee_id: from?.consignee_id,
-        client_id: from?.client_id,
+      .post(`${API_BASE_URL}/clientConsigneeTableEN`, {
+        client_id: from?.ID,
       })
       .then((res) => {
-        console.log(res);
-        setData(res.data.data || []);
+        const { head, data } = res.data;
+        setHeaders(head || {}); // store headers object
+        setData(data || []); // store table rows
+      })
+      .catch((err) => {
+        console.error("Error fetching data", err);
       });
   };
   const getAllCustomization = () => {
@@ -1396,9 +1783,10 @@ const CreateClient = () => {
       Email: selectedUser?.Email || "",
       mobile: selectedUser?.mobile || "",
       landline: selectedUser?.landline || "",
-      birthday: selectedUser
-        ? new Date(selectedUser.birthday).toISOString().split("T")[0]
-        : "",
+      birthday:
+        selectedUser && selectedUser.birthday
+          ? dayjs(selectedUser.birthday).format("YYYY-MM-DD")
+          : "",
       Notes: selectedUser?.Notes || "",
       Nick_name: selectedUser?.Nick_name || "",
     }));
@@ -1483,6 +1871,20 @@ const CreateClient = () => {
               </li>
               <li class="nav-item" role="presentation">
                 <button
+                  class="nav-link"
+                  id="profile-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#consigneeTab"
+                  type="button"
+                  role="tab"
+                  aria-controls="consigneeTab"
+                  aria-selected="false"
+                >
+                  {t("consignee")}
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
                   class="nav-link "
                   id="notify-tab"
                   data-bs-toggle="tab"
@@ -1524,7 +1926,608 @@ const CreateClient = () => {
                 </li>
               )}
             </ul>
+
             <div class="tab-content" id="myTabContent">
+              {/* consignee tab detail */}
+              <div
+                class="tab-pane fade show"
+                id="consigneeTab"
+                role="tabpanel"
+                aria-labelledby="consigneeTab"
+                tabindex="0"
+              >
+                <div className="table-responsive">
+                  <table className="tableContact striped table borderTerpProduce">
+                    <thead>
+                      <tr>
+                        {/* Dynamic headers from API */}
+                        {Object.values(headers).map((headerTitle, index) => (
+                          <th key={index}>{headerTitle}</th>
+                        ))}
+
+                        {/* Fixed Action Header */}
+                        <th>{t("action")}</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {data.map((item, rowIndex) => (
+                        <tr key={rowIndex}>
+                          {/* Dynamic row data */}
+                          {Object.keys(headers).map((key, colIndex) => (
+                            <td key={colIndex}>{item[key]}</td>
+                          ))}
+
+                          {/* Action column */}
+                          <td>
+                            <div>
+                              {/* Edit button */}
+                              <button
+                                type="button"
+                                onClick={() => handleEditClick(item.contact_id)}
+                                data-bs-toggle="modal"
+                                data-bs-target="#exampleModalContact"
+                              >
+                                <i className="mdi mdi-pencil"></i>
+                              </button>
+
+                              {/* Edit modal */}
+
+                              {/* Delete button */}
+                              <button
+                                type="button"
+                                onClick={() => deleteOrder1(item.contact_id)}
+                              >
+                                <i className="mdi mdi-delete "></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="row">
+                  <Link
+                    style={{ width: "170px" }}
+                    className="btn btn-danger mb-4"
+                    to="/"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModalContact"
+                  >
+                    {t("add_consignee")}
+                  </Link>
+                  {/* modal */}
+                  <div
+                    class="modal fade"
+                    id="exampleModalContact"
+                    tabindex="-1"
+                    aria-labelledby="exampleModalLabel"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog modalShipTo modal-xl">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="exampleModalLabel">
+                            {t("contact")}
+                          </h1>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                            onClick={dataClear}
+                          >
+                            <i class="mdi mdi-close"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div className="formCreate createPackage">
+                            <form>
+                              <div className="row justify-content-center">
+                                <div className="col-lg-3 form-group autoComplete">
+                                  <h6>{t("invoiceCurrency")}</h6>
+                                  <Autocomplete
+                                    options={currency || []} // List of currencies
+                                    getOptionLabel={(option) => option.FX || ""} // Label to display (currency name for each item)
+                                    onChange={(event, newValue) => {
+                                      handleChange6({
+                                        target: {
+                                          name: "invoiceCurrency",
+                                          value: newValue ? newValue.ID : "",
+                                        },
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectCurrency")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      currency?.find(
+                                        (item) =>
+                                          item.ID === state6.invoiceCurrency
+                                      ) || null
+                                    } // Set selected value based on invoiceCurrency
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.ID === value.ID
+                                    }
+                                  />
+                                </div>
+                                <div className="col-lg-3 form-group autoComplete">
+                                  <h6>{t("invoiceUnit")}</h6>
+
+                                  <Autocomplete
+                                    options={unitDropdown || []}
+                                    getOptionLabel={(option) =>
+                                      option.Name_EN || ""
+                                    } // Use Name_EN from API
+                                    onChange={(event, newValue) => {
+                                      handleChange6({
+                                        target: {
+                                          name: "Invoice_Unit",
+                                          value: newValue ? newValue.ID : "",
+                                        },
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectUnit")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      unitDropdown?.find(
+                                        (item) =>
+                                          item.ID === state6.Invoice_Unit
+                                      ) || null
+                                    }
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.ID === value.ID
+                                    }
+                                  />
+                                </div>
+                                <div className="col-lg-3 form-group autoComplete">
+                                  <h6>{t("selectConsignee")}</h6>
+
+                                  <Autocomplete
+                                    options={getVcConsigneeList || []}
+                                    getOptionLabel={(option) =>
+                                      option.Name || ""
+                                    }
+                                    onChange={(event, newValue) => {
+                                      handleChange6({
+                                        target: {
+                                          name: "consigneeType",
+                                          value: newValue ? newValue.ID : "", // ✅ use capital ID
+                                        },
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectConsignee")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      (getVcConsigneeList || []).find(
+                                        (item) =>
+                                          item.ID === state6.consigneeType // ✅ use capital ID
+                                      ) || null
+                                    }
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.ID === value.ID
+                                    } // ✅ use capital ID
+                                  />
+                                </div>
+                                <div className="col-lg-3 form-group">
+                                  <h6>{t("Consignee Code")}</h6>
+                                  <div className="parentthb packParent">
+                                    <div className="childThb">
+                                      <input
+                                        type="text"
+                                        name="consigneeCode"
+                                        placeholder={t("Consignee Code")}
+                                        value={state6.consigneeCode}
+                                        onChange={handleChange6}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="col-lg-4 form-group autoComplete">
+                                  <h6>{t("commission")}</h6>
+
+                                  <Autocomplete
+                                    options={commission || []}
+                                    getOptionLabel={(option) =>
+                                      option.commission_name_en || ""
+                                    }
+                                    onChange={(event, newValue) => {
+                                      handleChange6({
+                                        target: {
+                                          name: "commissionType",
+                                          value: newValue ? newValue.id : "",
+                                        },
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectCommission")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      commission?.find(
+                                        (item) =>
+                                          item.id === state6.commissionType
+                                      ) || null
+                                    } // Set selected value based on commissionType
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.id === value.id
+                                    } // Option comparison by id
+                                  />
+                                </div>
+                                <div className="col-lg-4 form-group">
+                                  <h6>{t("commissionValue")}</h6>
+                                  <div className="parentthb packParent">
+                                    <div className="childThb">
+                                      <input
+                                        type="text"
+                                        name="commissionValue"
+                                        placeholder={t("commissionValue")}
+                                        value={state6.commissionValue}
+                                        onChange={handleChange6}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="col-lg-2 shipToToggle">
+                                  <h6>{t("commission")}</h6>
+                                  <label
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      padding: "10px",
+                                    }}
+                                    className="toggleSwitch large"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={
+                                        state6.commissionCurrency === "THB"
+                                      }
+                                      onChange={handleChange6}
+                                      name="commissionCurrency"
+                                    />
+                                    <span>
+                                      <span>{t("fx")}</span>
+                                      <span> {t("thb")}</span>
+                                    </span>
+                                    <a> </a>
+                                  </label>
+                                </div>
+                                <div className="col-lg-2 shipToToggle">
+                                  <h6>{t("chargeVolume")}</h6>
+                                  <label
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      padding: "10px",
+                                    }}
+                                    className="toggleSwitch large"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={state6.chargeVolume == 1}
+                                      onChange={handleChange6}
+                                      name="chargeVolume"
+                                    />
+                                    <span>
+                                      <span>{t("no")}</span>
+                                      <span>{t("yes")}</span>
+                                    </span>
+                                    <a> </a>
+                                  </label>
+                                </div>
+
+                                <div className="col-lg-2 form-group autoComplete">
+                                  <h6>{t("deliveryTermsIncoterms")}</h6>
+                                  <Autocomplete
+                                    options={DropdownDelivery || []} // List of delivery terms and incoterms
+                                    getOptionLabel={(option) =>
+                                      option.Incoterms || ""
+                                    } // Label to display (Incoterms)
+                                    onChange={(event, newValue) => {
+                                      handleChange6({
+                                        target: {
+                                          name: "deliveryTerms",
+                                          value: newValue ? newValue.id : "",
+                                        }, // Update deliveryTerms in state
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t(
+                                          "selectDeliveryTermsIncoterms"
+                                        )}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      DropdownDelivery?.find(
+                                        (item) =>
+                                          item.id === state6.deliveryTerms
+                                      ) || null
+                                    } // Set selected value based on deliveryTerms
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.id === value.id
+                                    } // Option comparison by id
+                                  />
+                                </div>
+
+                                <div className="col-lg-2 form-group autoComplete">
+                                  <h6>{t("paymentTerms")}</h6>
+                                  <Autocomplete
+                                    options={FXCorrection || []} // List of payment terms
+                                    getOptionLabel={(option) =>
+                                      `${option.DAYS} DAYS` || ""
+                                    } // Label to display (e.g., "30 DAYS")
+                                    onChange={(event, newValue) => {
+                                      handleChange6({
+                                        target: {
+                                          name: "paymentTerms",
+                                          value: newValue ? newValue.ID : "",
+                                        }, // Update paymentTerms in state
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectPaymentTerms")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      FXCorrection?.find(
+                                        (item) =>
+                                          item.ID === state6.paymentTerms
+                                      ) || null
+                                    } // Set selected value based on paymentTerms
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.ID === value.ID
+                                    } // Option comparison by ID
+                                  />
+                                </div>
+
+                                <div className="col-lg-2 form-group autoComplete">
+                                  <h6>{t("statementDueDate")}</h6>
+                                  <Autocomplete
+                                    disablePortal
+                                    options={[
+                                      { id: 1, label: "Pre Shipment" },
+                                      { id: 2, label: "Seaport" },
+                                    ]} // Define the options array
+                                    getOptionLabel={(option) => option.label} // Display the `label` for each option
+                                    onChange={handleChange6} // Use the handleChange function
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t(
+                                          "selectStatementDueDate"
+                                        )}
+                                        InputLabelProps={{ shrink: false }} // Prevents floating label
+                                      />
+                                    )}
+                                    sx={{ width: 300 }}
+                                  />
+                                </div>
+
+                                {/* <div className="col-lg-2 form-group">
+                        <h6>Rounding</h6>
+                        <input
+                          type="text"
+                          name="Rounding"
+                          className="form-control"
+                          placeholder="15.000"
+                          value={state5.extraCost}
+                          onChange={handleChange5}
+                        />
+                      </div> */}
+                                <div className="col-lg-2 form-group autoComplete">
+                                  <h6>{t("rounding")}</h6>
+                                  <Autocomplete
+                                    options={RoundingDataList || []} // List of delivery terms and incoterms
+                                    getOptionLabel={(option) =>
+                                      option.DropDown || ""
+                                    } // Label to display (Incoterms)
+                                    onChange={(event, newValue) => {
+                                      handleChange6({
+                                        target: {
+                                          name: "Rounding",
+                                          value: newValue ? newValue.ID : "",
+                                        }, // Update deliveryTerms in state
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectRounding")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      RoundingDataList?.find(
+                                        (item) => item.ID === state6.Rounding
+                                      ) || null
+                                    } // Set selected value based on deliveryTerms
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.ID === value.ID
+                                    } // Option comparison by id
+                                  />
+                                </div>
+                                <div className="col-lg-2 form-group">
+                                  <h6>{t("extraCost")}</h6>
+                                  <input
+                                    type="text"
+                                    name="extraCost"
+                                    className="form-control"
+                                    placeholder={t("extraCost")}
+                                    value={state6.extraCost}
+                                    onChange={handleChange6}
+                                  />
+                                </div>
+                                <div className="col-lg-2 form-group  ">
+                                  <h6>{t("freightAdjustment")}</h6>
+                                  <input
+                                    type="text"
+                                    name="freightAdjust"
+                                    className="form-control"
+                                    placeholder={t("freightAdjustment")}
+                                    value={state6.freightAdjust}
+                                    onChange={handleChange6}
+                                  />
+                                </div>
+                                <div className="col-lg-2 form-group">
+                                  <h6>{t("markupValue")}</h6>
+                                  <div className="parentShip">
+                                    <div className="markupShip">
+                                      <input
+                                        type="text"
+                                        name="markupValue"
+                                        className="form-control"
+                                        placeholder={t("markupValue")}
+                                        value={state6.markupValue}
+                                        onChange={handleChange6}
+                                      />
+                                    </div>
+                                    <div className="shipPercent">
+                                      <span>%</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="col-lg-2 form-group">
+                                  <h6>{t("rebateValue")}</h6>
+                                  <div className="parentShip">
+                                    <div className="markupShip">
+                                      <input
+                                        type="text"
+                                        name="rebateValue"
+                                        className="form-control"
+                                        placeholder={t("rebateValue")}
+                                        value={state6.rebateValue}
+                                        onChange={handleChange6}
+                                      />
+                                    </div>
+                                    <div className="shipPercent">
+                                      <span>%</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="col-lg-2 form-group">
+                                  <h6>{t("quotation")}</h6>
+                                  <div className="parentShip">
+                                    <div className="markupShip">
+                                      <input
+                                        type="text"
+                                        name="quotation"
+                                        className="form-control"
+                                        placeholder={t("quotation")}
+                                        value={state6.quotation}
+                                        onChange={handleChange6}
+                                      />
+                                    </div>
+                                    <div className="shipPercent">
+                                      <span>%</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="col-lg-2 form-group">
+                                  <h6>{t("claim")}</h6>
+                                  <div className="parentShip">
+                                    <div className="markupShip">
+                                      <input
+                                        type="text"
+                                        name="claim"
+                                        className="form-control"
+                                        placeholder={t("claim")}
+                                        value={claimValue1}
+                                        onChange={handleChange6}
+                                      />
+                                    </div>
+                                    <div className="shipPercent">
+                                      <span>%</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="col-lg-2 form-group">
+                                  <h6>{t("other")}</h6>
+                                  <div className="parentShip">
+                                    <div className="markupShip">
+                                      <input
+                                        type="text"
+                                        name="other"
+                                        className="form-control"
+                                        placeholder={t("other")}
+                                        value={state6.other}
+                                        onChange={handleChange6}
+                                      />
+                                    </div>
+                                    <div className="shipPercent">
+                                      <span>%</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="col-lg-2 form-group">
+                                  <h6>{t("final")}</h6>
+                                  <div className="parentShip">
+                                    <div className="markupShip">
+                                      <input
+                                        type="text"
+                                        name="final"
+                                        className="form-control"
+                                        placeholder={t("final")}
+                                        value={claimValue}
+                                        onChange={handleChange6}
+                                      />
+                                    </div>
+                                    <div className="shipPercent">
+                                      <span>%</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-primary mb-0"
+                            onClick={updatePaymentValue}
+                          >
+                            {t("submit")}{" "}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* modal end */}
+                </div>
+              </div>
               <div
                 class="tab-pane fade show active"
                 id="first-tab-pane"
@@ -1532,7 +2535,7 @@ const CreateClient = () => {
                 aria-labelledby="first-tab"
                 tabindex="0"
               >
-                <div
+                {/* <div
                   id="datatable_wrapper"
                   className="information_dataTables dataTables_wrapper dt-bootstrap4 "
                 >
@@ -1712,6 +2715,396 @@ const CreateClient = () => {
                       {t("cancel")}
                     </Link>
                   </div>
+                </div> */}
+                <div className="tab-content px-2 md:!px-4">
+                  <div className="vc_form formCreate ">
+                    <div className="row">
+                      <div className="row justify-content-between">
+                        <div className="col-lg-8">
+                          <div className="row">
+                            <div className="col-lg-4 form-group">
+                              <h6>{t("name")}</h6>
+                              <input
+                                type="text"
+                                id="name"
+                                onChange={handleChange5}
+                                name="name"
+                                className="form-control"
+                                placeholder="Name"
+                                defaultValue={state5.name}
+                              />
+                            </div>
+
+                            <div className="col-lg-4 form-group">
+                              <h6>{t("taxId")}</h6>
+                              <input
+                                type="text"
+                                id="taxId"
+                                value={state5.taxId || ""}
+                                onChange={handleChange5}
+                                name="taxId"
+                                className="form-control"
+                                placeholder="Tax"
+                              />
+                            </div>
+                            <div className="form-group col-lg-4 autoComplete">
+                              <h6>{t("Entity")}</h6>
+
+                              <Autocomplete
+                                options={dropdownVendor || []} // Populate with the list of vendors
+                                getOptionLabel={(option) =>
+                                  option.entity_name_en || ""
+                                } // Display the English name of the entity
+                                value={
+                                  dropdownVendor?.find(
+                                    (vendor) => vendor.id === state5.Entity
+                                  ) || null
+                                } // Match the current entity ID in state with the options
+                                onChange={(e, newValue) => {
+                                  handleChange5({
+                                    target: {
+                                      name: "Entity",
+                                      value: newValue?.id || "",
+                                    },
+                                  }); // Trigger handleChange with the selected entity's ID
+                                }}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    placeholder={t("SelectEntity")} // Adds a placeholder
+                                    InputLabelProps={{ shrink: false }} // Prevents floating label
+                                  />
+                                )}
+                                isOptionEqualToValue={(option, value) =>
+                                  option.id === value.id
+                                } // Ensure proper matching
+                                sx={{ width: 300 }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-lg-4">
+                          <div className="text-end">
+                            <button className="btn btn-danger">
+                              Add Contact
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("phone")}</h6>
+                        <input
+                          type="text"
+                          id="phone"
+                          value={state5.phone || ""}
+                          onChange={handleChange5}
+                          name="phone"
+                          className="form-control"
+                          placeholder="Phone"
+                        />
+                      </div>
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("email")}</h6>
+                        <input
+                          type="text"
+                          id="phone"
+                          value={state5.email || ""}
+                          onChange={handleChange5}
+                          name="email"
+                          className="form-control"
+                          placeholder="Email"
+                        />
+                      </div>
+                      <div className="col-lg-3 form-group autoComplete">
+                        <h6>{t("messengerType")}</h6>
+                        <div>
+                          <Autocomplete
+                            options={countries}
+                            value={state5.Messenger_Type || ""}
+                            onChange={(event, newValue) =>
+                              setState5({ ...state5, Messenger_Type: newValue })
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("messengerType")}
+                                variant="outlined"
+                              />
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("messangerId")}</h6>
+                        <div>
+                          <input
+                            type="text"
+                            id="messangerId"
+                            value={state5.messangerId || ""}
+                            onChange={handleChange5}
+                            name="messangerId"
+                            className="form-control"
+                            placeholder="Messanger ID"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-3 form-group autoComplete mb-3">
+                        <h6>{t("country")}</h6>
+                        <div>
+                          <Autocomplete
+                            options={countryList}
+                            getOptionLabel={(option) => option.name || ""}
+                            isOptionEqualToValue={(option, value) =>
+                              option.id === value?.id
+                            }
+                            value={selectedCountry}
+                            onChange={(event, newValue) =>
+                              setSelectedCountry(newValue)
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("country")}
+                                variant="outlined"
+                              />
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group col-lg-3 autoComplete mb-3">
+                        <h6>{t("province")}</h6>
+                        <Autocomplete
+                          options={provinceList}
+                          getOptionLabel={(opt) => opt.name ?? ""}
+                          isOptionEqualToValue={(opt, val) =>
+                            opt.id === val?.id
+                          }
+                          value={selectedProvince}
+                          onChange={(e, newProv) =>
+                            setSelectedProvince(newProv)
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("province")}
+                              variant="outlined"
+                            />
+                          )}
+                          style={{ marginTop: 16 }}
+                        />
+                      </div>
+                      <div className="form-group col-lg-3 autoComplete mb-3">
+                        <h6>{t("district")}</h6>
+                        <Autocomplete
+                          options={districtList}
+                          getOptionLabel={(opt) => opt.name ?? ""}
+                          isOptionEqualToValue={(opt, val) =>
+                            opt.id === val?.id
+                          }
+                          value={selectedDistrict}
+                          onChange={(e, dis) => setSelectedDistrict(dis)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("district")}
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+                      <div className="col-lg-3 form-group autoComplete">
+                        <h6>{t("subDistrict")}</h6>
+                        <Autocomplete
+                          options={subdistrictList || []}
+                          getOptionLabel={(opt) => opt?.name ?? ""}
+                          isOptionEqualToValue={(opt, val) =>
+                            opt?.id === val?.id
+                          }
+                          value={selectedSubdistrict || null}
+                          onChange={(e, sub) => setSelectedSubdistrict(sub)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Subdistrict"
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("postCode")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={postalCode || ""}
+                          onChange={(e) => setPostalCode(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("address")} 1</h6>
+                        <input
+                          type="text"
+                          id="address1"
+                          value={state5.address1 || ""}
+                          onChange={handleChange5}
+                          name="address1"
+                          className="form-control"
+                          placeholder="Address1"
+                        />
+                      </div>
+                      <div className="col-lg-3 form-group">
+                        <h6>{t("address")} 2</h6>
+                        <input
+                          type="text"
+                          id="address2"
+                          value={state5.address2 || ""}
+                          onChange={handleChange5}
+                          name="address2"
+                          className="form-control"
+                          placeholder="Address2"
+                        />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-12 form-group autoComplete">
+                        <h6 style={{ fontWeight: "bold" }}>
+                          {" "}
+                          {t("BankDetails")}:
+                        </h6>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankName")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state5.Bank_Name || ""}
+                          onChange={(e) =>
+                            setState5({ ...state5, Bank_Name: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankBranch")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state5.Bank_Branch || ""}
+                          onChange={(e) =>
+                            setState5({
+                              ...state5,
+                              Bank_Branch: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankAccount")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state5.Bank_Account || ""}
+                          onChange={(e) =>
+                            setState5({
+                              ...state5,
+                              Bank_Account: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankIbon")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state5.Bank_IBAN || ""}
+                          onChange={(e) =>
+                            setState5({ ...state5, Bank_IBAN: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group">
+                        <h6>{t("bankSwift")}</h6>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={state5.Bank_Swift || ""}
+                          onChange={(e) =>
+                            setState5({ ...state5, Bank_Swift: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="col-lg-4 form-group autoComplete">
+                        <h6>{t("bankCountry")}</h6>
+                        <Autocomplete
+                          options={countryList}
+                          getOptionLabel={(option) => option.name || ""}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === value?.id
+                          }
+                          value={
+                            countryList.find(
+                              (c) =>
+                                String(c.id) === String(state5.Bank_Country)
+                            ) || null
+                          }
+                          onChange={(event, newValue) =>
+                            setState5({
+                              ...state5,
+                              Bank_Country: newValue ? newValue.id : "",
+                            })
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("bankCountry")}
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+
+                      <div className="col-lg-12 form-group">
+                        <h6>{t("bankAddress")}</h6>
+                        <textarea
+                          className="form-control p-2"
+                          placeholder={t("bankAddress")}
+                          value={state5.Bank_Address || ""}
+                          onChange={(e) =>
+                            setState5({
+                              ...state5,
+                              Bank_Address: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-footer">
+                    <button
+                      className="btn btn-primary"
+                      type="submit"
+                      name="signup"
+                      onClick={updateVendor}
+                      disabled={isButtonClicked}
+                    >
+                      {typeof state.vendor_id !== "undefined"
+                        ? t("update")
+                        : t("create")}
+                    </button>
+                    <Link className="btn btn-danger" to={"/shipToNew"}>
+                      {t("cancel")}
+                    </Link>
+                  </div>
                 </div>
               </div>
 
@@ -1828,12 +3221,12 @@ const CreateClient = () => {
                                                     }))
                                                   }
                                                   value={
-                                                    contactType.find(
+                                                    (contactType || []).find(
                                                       (item) =>
                                                         item.contact_type_id ===
                                                         state1.contact_type_id
                                                     ) || null
-                                                  } // Match the selected value with the current state
+                                                  }
                                                   sx={{ width: 300 }} // Customize the width as needed
                                                   renderInput={(params) => (
                                                     <TextField
@@ -4068,25 +5461,27 @@ const CreateClient = () => {
                           <div className="modal-body">
                             <div className="claimParent">
                               <div>
-                                <strong>{t("invoiceNumber")} : </strong> 
-                                <span>INV-202407019</span> 
+                                <strong>{t("invoiceNumber")} : </strong>
+                                <span>INV-202407019</span>
                               </div>
                               <div>
-                                <strong>{t("client")} :</strong> 
-                                <span>Finley DWC-LLC</span> 
+                                <strong>{t("client")} :</strong>
+                                <span>Finley DWC-LLC</span>
                               </div>
                               <div>
-                                <strong>{t("shipTo")} :</strong> 
-                                <span> Cape Fresh Industries LLC</span> 
+                                <strong>{t("shipTo")} :</strong>
+                                <span> Cape Fresh Industries LLC</span>
                               </div>
                               <div>
-                                <strong>{t("currency")} : </strong> <span>USD</span> 
+                                <strong>{t("currency")} : </strong>{" "}
+                                <span>USD</span>
                               </div>
                               <div>
-                                <strong>{t("itemsInfo")} : </strong> <span>USD</span> 
+                                <strong>{t("itemsInfo")} : </strong>{" "}
+                                <span>USD</span>
                               </div>
                               <div>
-                                 <strong>{t("claimDate")}</strong>
+                                <strong>{t("claimDate")}</strong>
                                 <input type="date" />{" "}
                               </div>
                             </div>
@@ -4103,7 +5498,10 @@ const CreateClient = () => {
                                   <th>{t("amount")}</th>
                                 </tr>
                                 <tr>
-                                  <td className="text-start"> Papaya Holland - Kg x 3 (Frutulip)</td>
+                                  <td className="text-start">
+                                    {" "}
+                                    Papaya Holland - Kg x 3 (Frutulip)
+                                  </td>
                                   <td>None</td>
                                   <td>16.00</td>
                                   <td>KG</td>
@@ -4137,7 +5535,7 @@ const CreateClient = () => {
                                   </td>
                                 </tr>
                                 <tr>
-                                 <td className="text-start">
+                                  <td className="text-start">
                                     Lemongrass - 500g (38cm) x 20 (F) 1,600.00
                                   </td>
                                   <td>None</td>
@@ -4190,10 +5588,9 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                             {t("totalPayment")}
+                              {t("totalPayment")}
                             </p>
                             <h4 className="mb-0">
-                             
                               {formatter.format(
                                 consigneeData?.Total_invoiced_value
                               )}
@@ -4204,9 +5601,9 @@ const CreateClient = () => {
                         <div className="card-footer p-3">
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
-                              +55% 
+                              +55%
                             </span>{" "}
-                       {t("totalShipments")}
+                            {t("totalShipments")}
                           </p>
                         </div>
                       </div>
@@ -4241,9 +5638,9 @@ const CreateClient = () => {
                         <div className="card-footer p-3">
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
-                              +5% 
+                              +5%
                             </span>{" "}
-                           {t("thanYesterday")}
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4265,14 +5662,12 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                              
-                           {t("totalPayment")}
+                              {t("totalPayment")}
                             </p>
                             <h4 className="mb-0">
-                             
                               {formatter.format(
                                 consigneeData?.Total_payments_value
-                              )} 
+                              )}
                             </h4>
                           </div>
                         </div>
@@ -4281,8 +5676,8 @@ const CreateClient = () => {
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
                               -2%
-                            </span> {" "}
-                          {t("thanYesterday")}
+                            </span>{" "}
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4295,11 +5690,10 @@ const CreateClient = () => {
                           </div>
                           <div className="text-end pt-1">
                             <p className="text-sm mb-0 text-capitalize">
-                             {t("pendingPayment")}
+                              {t("pendingPayment")}
                             </p>
                             <h4 className="mb-0">
-                             
-                              {formatter.format(consigneeData?.Balance)} 
+                              {formatter.format(consigneeData?.Balance)}
                             </h4>
                           </div>
                         </div>
@@ -4307,9 +5701,8 @@ const CreateClient = () => {
                         <div className="card-footer p-3">
                           <p className="mb-0">
                             <span className="text-success text-sm font-weight-bolder">
-                              +5%  
-                            </span>
-{" "}
+                              +5%
+                            </span>{" "}
                             {t("thanYesterday")}
                           </p>
                         </div>
@@ -4366,7 +5759,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%{" "}
                             </span>
-                              {t("thanYesterday")}
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4392,7 +5785,7 @@ const CreateClient = () => {
                             <span className="text-success text-sm font-weight-bolder">
                               +5%{" "}
                             </span>
-                           {t("thanYesterday")}
+                            {t("thanYesterday")}
                           </p>
                         </div>
                       </div>
@@ -4401,7 +5794,7 @@ const CreateClient = () => {
                 </div>
                 <div className="card-footer text-center">
                   <Link className="btn btn-danger" to="/shipToNew">
-                    {t ("close")}
+                    {t("close")}
                   </Link>
                 </div>
               </div>

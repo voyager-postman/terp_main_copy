@@ -3458,98 +3458,60 @@ const UpdateTest = () => {
 
       {showModal && (
         <div
-          className="modal fade show"
-          style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-          tabIndex="-1"
+          className="fixed inset-0 flex items-center justify-center "
+          style={{ zIndex: "999" }}
         >
-          <div className="modal-dialog modal-xl modalShipTo">
-            <div className="modal-content">
-              <div className="modal-header">
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={handleCloseModal}
-                  aria-label="Close"
-                >
-                  <i className="mdi mdi-close"></i>
-                </button>
-              </div>
-              <div className="modal-body">
-                <div className="row tableCombinePayment">
-                  <div className="tableCreateClient tablepayment">
-                    <table>
-                      <thead>
-                        <tr>
-                          {Object.values(calculateListData?.header || {}).map(
-                            (label, index) => (
-                              <th key={index}>{label}</th>
-                            )
-                          )}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {calculateListData?.data?.map((row, rowIndex) => (
-                          <tr key={rowIndex}>
-                            {Object.keys(calculateListData?.header || {}).map(
-                              (_, colIndex) => {
-                                const colKey = `COL${colIndex + 1}`; // Dynamically build COL1, COL2, ...
-                                return (
-                                  <td key={colKey}>{row[colKey] ?? ""}</td>
-                                );
-                              }
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {/* <table>
-                      <thead>
-                        <tr>
-                          <th>ITF</th>
-                          <th>Last Update</th>
-                          <th>EXW</th>
-                          <th>TC</th>
-                          <th>Commission</th>
-                          <th>FOB</th>
-                          <th>GW</th>
-                          <th>Freight</th>
-                          <th>CNF</th>
-                          <th>Margin</th>
-                          <th>Fx Rate</th>
-                          <th>Fx Rebate</th>
-                          <th>Calculated Price</th>
-                          <th>Final Price</th>
-                          <th>Rebate</th>
-                          <th>Base</th>
-                          <th>Profit</th>
-                          <th>Profit %</th>
-                        </tr>
-                        {calculateListData?.map((item, index) => (
-                          <tr key={index}>
-                            <td>{item.ITF}</td>
-                            <td>
-                              {item["Last Update"] ? item["Last Update"] : ""}
-                            </td>
-                            <td>{item.EXW}</td>
-                            <td>{item.TCC}</td>
-                            <td>{item.Commission}</td>
-                            <td>{item.FOB_Cost}</td>
-                            <td>{item.GW}</td>
-                            <td>{item.freight}</td>
-                            <td>{item.CNF_COST}</td>
-                            <td>{item.Margin}</td>
-                            <td>{item.FX_Rate}</td>
-                            <td>{item.FX_Rebate}</td>
-                            <td>{item.Calculated_price}</td>
-                            <td>{item.FInal_Price}</td>
-                            <td>{item.Rebate}</td>
-                            <td>{item.base}</td>
-                            <td>{item.profit}</td>
-                            <td>{item.profit_Percentage}</td>
-                          </tr>
-                        ))}
-                      </thead>
-                      <tbody>{/* Add dynamic table data here */}
+          <div
+            className="fixed w-screen h-screen bg-black/20 "
+             onClick={handleCloseModal}
+          />
+          <div
+            className="bg-white rounded-lg shadow-lg max-w-md w-full modalBillingTable"
+            style={{ maxWidth: "1530px" }}
+          >
+            <div className="formEan">
+              <div className="modal-body modalShipTo p-0 ">
+                <div className="formEan">
+                  <div className="addMOdalContent">
+                    <div className="row tableCombinePayment">
+                      <div className="tableCreateClient tableLr tablepayment">
+                        <table>
+                          <thead>
+                            <tr>
+                              {Object.values(
+                                calculateListData?.header || {}
+                              ).map((label, index) => (
+                                <th key={index}>{label}</th>
+                              ))}
+                              <th>
+                                {" "}
+                                <i
+                                  type="button"
+                                  onClick={handleCloseModal}
+                                  className="mdi mdi-close"
+                                ></i>
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {calculateListData?.data?.map((row, rowIndex) => (
+                              <tr key={rowIndex}>
+                                {Object.keys(
+                                  calculateListData?.header || {}
+                                ).map((_, colIndex) => {
+                                  const colKey = `COL${colIndex + 1}`; // Dynamically build COL1, COL2, ...
+                                  return (
+                                    <td key={colKey}>{row[colKey] ?? ""}</td>
+                                  );
+                                })}
+                                <td></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                       
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

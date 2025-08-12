@@ -1,4 +1,4 @@
- import axios from "axios";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -760,12 +760,12 @@ const ClientNew = () => {
 
       {
         Header: t("nameCompany"),
-        accessor: "client_name",
+        accessor: "Name",
       },
 
       {
         Header: t("email"),
-        accessor: "client_email",
+        accessor: "Email_Main",
       },
 
       {
@@ -890,21 +890,15 @@ const ClientNew = () => {
   );
   const getAirportData = () => {
     axios
-      .get(`${API_BASE_URL}/getAllClients`)
-      .then((response) => {
-        if (response.data.success == true) {
-          setData(response.data.data);
-        }
+      .get(`${API_BASE_URL}/getVCList`, {
+        params: { type: 2 },
       })
-      .catch((error) => {
-        console.log(error);
-        if (error) {
-          toast.error(t("networkError"), {
-            autoClose: 1000,
-            theme: "colored",
-          });
-          return false;
-        }
+      .then((res) => {
+        console.log(res);
+        setData(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching VC List:", err);
       });
   };
 
@@ -1307,7 +1301,7 @@ const ClientNew = () => {
                 onClick={handleSubmit1}
                 className="btn btn-primary"
               >
-              {t("Submit")}
+                {t("Submit")}
               </button>
             </div>
           </div>

@@ -1408,7 +1408,7 @@ const UpdateQuotationTest = () => {
       })
       .catch((error) => {
         console.log(error);
-      toast.error(t("tryAgain"));
+        toast.error(t("tryAgain"));
       })
       .finally(() => {
         calculate();
@@ -1608,13 +1608,10 @@ const UpdateQuotationTest = () => {
                         <h6>{t("consignee")}</h6>
                         <Autocomplete
                           options={consigneesNew || []} // Ensure consignees is an array
-                          getOptionLabel={(option) =>
-                            option.consignee_name || ""
-                          } // Display the consignee name
+                          getOptionLabel={(option) => option.Name || ""} // Display the consignee name
                           value={
                             consigneesNew?.find(
-                              (v) =>
-                                v.consignee_id === computedState.consignee_id
+                              (v) => v.ID === computedState.consignee_id
                             ) || null
                           } // Find the selected consignee by consignee_id
                           onChange={(event, newValue) => {
@@ -3433,69 +3430,11 @@ const UpdateQuotationTest = () => {
           style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
           tabIndex="-1"
         >
-          <div className="modal-dialog modal-xl modalShipTo">
+          <div className="modal-dialog modal-xl modalShipTo p-0">
             <div className="modal-content">
-              <div className="modal-header">
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={handleCloseModal}
-                  aria-label="Close"
-                >
-                  <i className="mdi mdi-close"></i>
-                </button>
-              </div>
               <div className="modal-body">
                 <div className="row tableCombinePayment">
-                  <div className="tableCreateClient tablepayment">
-                    {/* <table>
-                      <thead>
-                        <tr>
-                          <th>ITF</th>
-                          <th>Last Update</th>
-                          <th>EXW</th>
-                          <th>TC</th>
-                          <th>Commission</th>
-                          <th>FOB</th>
-                          <th>GW</th>
-                          <th>Freight</th>
-                          <th>CNF</th>
-                          <th>Margin</th>
-                          <th>Fx Rate</th>
-                          <th>Fx Rebate</th>
-                          <th>Calculated Price</th>
-                          <th>Final Price</th>
-                          <th>Rebate</th>
-                          <th>Base</th>
-                          <th>Profit</th>
-                          <th>Profit %</th>
-                        </tr>
-                        {calculateListData?.data?.map((item, index) => (
-                          <tr key={index}>
-                            <td>{item.ITF}</td>
-                            <td>
-                              {item["Last Update"] ? item["Last Update"] : ""}
-                            </td>
-                            <td>{item.EXW}</td>
-                            <td>{item.TCC}</td>
-                            <td>{item.Commission}</td>
-                            <td>{item.FOB_Cost}</td>
-                            <td>{item.GW}</td>
-                            <td>{item.freight}</td>
-                            <td>{item.CNF_COST}</td>
-                            <td>{item.Margin}</td>
-                            <td>{item.FX_Rate}</td>
-                            <td>{item.FX_Rebate}</td>
-                            <td>{item.Calculated_price}</td>
-                            <td>{item.FInal_Price}</td>
-                            <td>{item.Rebate}</td>
-                            <td>{item.base}</td>
-                            <td>{item.profit}</td>
-                            <td>{item.profit_Percentage}</td>
-                          </tr>
-                        ))}
-                      </thead>
-                    </table> */}
+                  <div className="tableCreateClient tablepayment modalBillingTable">
                     <table>
                       <thead>
                         <tr>
@@ -3504,6 +3443,14 @@ const UpdateQuotationTest = () => {
                               <th key={index}>{label}</th>
                             )
                           )}
+                          <th>
+                            {" "}
+                            <i
+                              type="button"
+                              onClick={handleCloseModal}
+                              className="mdi mdi-close"
+                            ></i>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -3517,6 +3464,7 @@ const UpdateQuotationTest = () => {
                                 );
                               }
                             )}
+                            <td></td>
                           </tr>
                         ))}
                       </tbody>
@@ -3537,7 +3485,6 @@ const UpdateQuotationTest = () => {
           </div>
         </div>
       )}
-
       <Modal
         className="modalError receiveModal"
         show={show1}

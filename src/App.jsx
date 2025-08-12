@@ -186,6 +186,7 @@ import Receipt from "./components/Orders/Receipt";
 import ReceiptCreate from "./components/Orders/ReceiptCreate";
 import BillingNoteCreate from "./components/Orders/BillingNoteCreate";
 import BillingNoteView from "./components/Orders/BillingNoteView";
+import BillingNoteReciept from "./components/Orders/BillingNoteReciept";
 
 function App() {
   const location = useLocation(); // Hook to get the current URL location
@@ -480,10 +481,14 @@ function App() {
                 <Route path="/newEanPacking" element={<NewEanPacking />} />
                 <Route path="/combinePayment" element={<CombinePayment />} />
                 <Route
+                  path="/reciept/billing_receipt"
+                  element={<BillingNoteReciept />}
+                />
+                <Route
                   path="/combinePaymentView"
                   element={<CombinePaymentView />}
                 />
-                     <Route
+                <Route
                   path="/billingNoteView"
                   element={<BillingNoteView />}
                 />
@@ -491,7 +496,7 @@ function App() {
                   path="/combinePaymenEdit"
                   element={<CombinePaymentEdit />}
                 />
-                  <Route
+                <Route
                   path="/billingNoteCreate"
                   element={<BillingNoteCreate />}
                 />

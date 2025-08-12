@@ -1097,5 +1097,18 @@
   "prepayment": "ชำระเงินล่วงหน้า",
   "averageRate": "อัตราเฉลี่ย",
   "lossGainFx": "กำไร/ขาดทุน จากอัตราแลกเปลี่ยน",
-  "receiptManagement": "การจัดการใบเสร็จรับเงิน"
+  "receiptManagement": "การจัดการใบเสร็จรับเงิน",
+  "postCode": "รหัสไปรษณีย์",
+  "messengerType": "ประเภทผู้จัดส่ง",
+  "bankBranch": "สาขาธนาคาร",
+  "bankAccount": "บัญชีธนาคาร",
+  "bankIbon": "รหัส IBON",
+  "bankSwift": "รหัส SWIFT",
+  "bankCountry": "ประเทศของธนาคาร",
+  "taxId": "รหัสภาษี/รหัสการจดทะเบียน",
+  "messangerId": "รหัสผู้ส่งสาร",
+  "BankDetails": "รายละเอียดธนาคาร",
+  "Entity": "นิติบุคคล",
+  "SelectEntity": "เลือกนิติบุคคล",
+  "add_consignee": "เพิ่มผู้รับสินค้า"
 }

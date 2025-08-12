@@ -18,6 +18,8 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MySwal from "../../../swal";
 import { useTranslation } from "react-i18next";
+import CloseIcon from "@mui/icons-material/Close";
+import { Button, Modal } from "react-bootstrap";
 
 const QuotationTest = () => {
   const { t, i18n } = useTranslation("global");
@@ -27,6 +29,11 @@ const QuotationTest = () => {
   const [useAgreedPricing, setUseAgreedPricing] = useState(false);
   const [itemDetails, setItemDetails] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState("Client");
+  const [notes1, setNotes1] = useState("");
+  const [deleteOrderId, setDeleteOrderId] = useState("");
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
   const loadingModal = MySwal.mixin({
     title: "Loading...",
     didOpen: () => {
@@ -44,6 +51,9 @@ const QuotationTest = () => {
   const [isRecalculateChecked, setIsRecalculateChecked] = useState(false);
   const handleChange = (event) => {
     setStatus(event.target.value);
+  };
+  const handleChange3 = (e) => {
+    setNotes1(e.target.value);
   };
   const handleAgreedPricingChange = (e) => {
     setIsRecalculateChecked(e.target.checked);
@@ -125,6 +135,8 @@ const QuotationTest = () => {
         try {
           const response = await axios.post(`${API_BASE_URL}/deleteQuotation`, {
             quotation_id: id,
+            USER_ID: localStorage.getItem("id"),
+            NOTES: "",
           });
           if (response.data.success === true) {
             console.log("API response:", response);
@@ -1273,15 +1285,24 @@ const QuotationTest = () => {
               </button>
             )}
             {(+a.Status === 1 || +a.Status === 2) && (
+              // <button
+              //   type="button"
+              //   style={{
+              //     width: "20px",
+              //     color: "#203764",
+              //     fontSize: "22px",
+              //     marginTop: "10px",
+              //   }}
+              //   onClick={() => deleteOrder(a.Order_ID)}
+              // >
+              //   <i className="mdi mdi-delete" />
+              // </button>
+
               <button
                 type="button"
-                style={{
-                  width: "20px",
-                  color: "#203764",
-                  fontSize: "22px",
-                  marginTop: "10px",
-                }}
-                onClick={() => deleteOrder(a.Order_ID)}
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal1"
+                onClick={() => setDeleteOrderId(a.Order_ID)}
               >
                 <i className="mdi mdi-delete" />
               </button>
@@ -1323,6 +1344,38 @@ const QuotationTest = () => {
     ],
     [i18n.language]
   );
+  const dataSubmit1 = () => {
+    axios
+      .post(`${API_BASE_URL}/deleteQuotation`, {
+        quotation_id: deleteOrderId,
+        USER_ID: localStorage.getItem("id"),
+        NOTES: notes1,
+      })
+      .then((response) => {
+        if (response.data.success) {
+          // Close modal
+          let modalElement = document.getElementById("exampleModal1");
+          let modalInstance =
+            bootstrap.Modal.getInstance(modalElement) ||
+            new bootstrap.Modal(modalElement);
+          modalInstance.hide();
+          getAllQuotation();
+          toast.success(t("orderDeleted"), {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        } else {
+          setShow(true);
+        }
+
+        setNotes1("");
+        orderData();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const clearData = () => {
     setExchangeRate(false);
     setUseAgreedPricing(false);
@@ -1549,6 +1602,7 @@ const QuotationTest = () => {
                 </div>
               </div>
             </div>
+
             <div className="modal-footer">
               <button
                 type="button"
@@ -1556,6 +1610,54 @@ const QuotationTest = () => {
                 className="btn btn-primary mb-4"
               >
                 {t("submit")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="modal fade"
+        id="exampleModal1"
+        tabIndex={-1}
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog   orderDelPop">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <div className="modal-body">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">
+                {t("notes")}
+              </h1>
+              <textarea
+                value={notes1}
+                onChange={handleChange3}
+                placeholder={t("typeNotes")}
+              />
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary "
+                data-bs-dismiss="modal"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={dataSubmit1}
+                className="btn btn-primary"
+              >
+                {t("ok")}
               </button>
             </div>
           </div>

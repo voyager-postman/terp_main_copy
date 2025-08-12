@@ -15,6 +15,11 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import MySwal from "../../swal";
+import jsPDF from "jspdf";
+import logo from "../../assets/logoNew.png";
+import NotoSansThaiRegular from "../../assets/fonts/NotoSansThai-Regular-normal";
+import { API_IMAGE_URL } from "../../Url/Url";
+
 const BillingNote = () => {
   const [t, i18n] = useTranslation("global");
   const [errorMessage, setErrorMessage] = useState("");
@@ -41,12 +46,15 @@ const BillingNote = () => {
   });
   const [singlePodId, setSinglePodId] = useState("");
 
-  const handleChange5 = (field, value) => {
-    setPaymentForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  // const handleChange5 = (field, value) => {
+  //   setPaymentForm((prev) => ({
+  //     ...prev,
+  //     [field]: value,
+  //   }));
+  // };
+
+
+
   const [roundingData, setRoundingData] = useState("");
   const [VATTotal, setVATTotal] = useState(0);
   const [WHTTotal, setWHTTotal] = useState(0);
@@ -112,7 +120,7 @@ const BillingNote = () => {
     });
 
     return () => {
-      modal?.removeEventListener("hidden.bs.modal", () => {});
+      modal?.removeEventListener("hidden.bs.modal", () => { });
     };
   }, []);
 
@@ -156,7 +164,7 @@ const BillingNote = () => {
 
   const [selectedPaymentDate, setSelectedPaymentDate] = useState(null);
   const { data: paymentChannle } = useQuery("PaymentChannela");
-  const [paymentChannel, setPaymentChannel] = useState("");
+  const [receiptID, setReceiptID] = useState("");
   const [bankRef, setBankRef] = useState("");
   const [bankChargeAmount, setBankChargeAmount] = useState("0");
   const [depositAvailable, setDepositAvailable] = useState("");
@@ -169,40 +177,95 @@ const BillingNote = () => {
   const [payableDATA, setPayableData] = useState("");
   const [show2, setShow2] = useState(false);
   const [color, setColor] = useState(false);
+  const [modalHead, setModalHead] = useState(null);   // Stores API head data
+  const [modalData, setModalData] = useState(null);   // Stores API row data
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const closeIcon2 = () => {
     setShow2(false);
     // navigate("/purchase_orders");
   };
-  const submitPaymentData2 = async () => {
-    const paymentData = {
-      bn_id: singlePodId.ID, // or however you get bn_id
-      IID: singlePodId.IID, // same for IID
-      USER_ID: localStorage.getItem("id"),
-      Receipt_Date: paymentForm.paymentDate, // from DatePicker
-      Prepayment: paymentForm.prepayment,
-      Payment_Channel: paymentForm.paymentChannel,
-      FX_Received: paymentForm.thbReceived, // THB Received → FX Received (if that's correct mapping)
-      FX: paymentForm.fx, // selected FX
-      R_FX_Rate: paymentForm.fxRateReceived, // Rate Received
-      BankFees_FX: paymentForm.interBankCharges, // Inter-bank charges (FX)
-      BankFees_THB: paymentForm.localBankCharges, // Local bank charges (THB)
-      Notes: paymentForm.notes,
-    };
+  // const submitPaymentData2 = async () => {
+  //   const paymentData = {
+  //     bn_id: singlePodId.ID, // or however you get bn_id
+  //     IID: singlePodId.IID, // same for IID
+  //     USER_ID: localStorage.getItem("id"),
+  //     Receipt_Date: paymentForm.paymentDate, // from DatePicker
+  //     Prepayment: paymentForm.prepayment,
+  //     Payment_Channel: paymentForm.paymentChannel,
+  //     FX_Received: paymentForm.thbReceived, // THB Received → FX Received (if that's correct mapping)
+  //     FX: paymentForm.fx, // selected FX
+  //     R_FX_Rate: paymentForm.fxRateReceived, // Rate Received
+  //     BankFees_FX: paymentForm.interBankCharges, // Inter-bank charges (FX)
+  //     BankFees_THB: paymentForm.localBankCharges, // Local bank charges (THB)
+  //     Notes: paymentForm.notes,
+  //   };
 
-    console.log("BNPayment payload:", paymentData);
+  //   console.log("BNPayment payload:", paymentData);
+
+  //   try {
+  //     const response = await axios.post(
+  //       `${API_BASE_URL}/BNPayment`,
+  //       paymentData
+  //     );
+
+  //     if (response?.data?.success === true) {
+  //       toast.success(response.data?.message);
+
+  //       // Reset the form
+  //       setPaymentForm({
+  //         paymentDate: null,
+  //         fx: "",
+  //         paymentChannel: "",
+  //         fxRateReceived: "",
+  //         clientPaymentRef: "",
+  //         interBankCharges: "",
+  //         paymentAmount: "",
+  //         prepayment: "",
+  //         bankRef: "",
+  //         localBankCharges: "",
+  //         thbReceived: "",
+  //         rounding: "",
+  //         notes: "",
+  //       });
+
+  //       // Close modal
+  //       let modalElement = document.getElementById("modalCombine");
+  //       let modalInstance = bootstrap.Modal.getInstance(modalElement);
+  //       if (modalInstance) modalInstance.hide();
+
+  //       // Refresh list
+  //       billingNote();
+  //     } else {
+  //       toast.warning(response.data?.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting BNPayment data", error);
+  //     toast.error(t("tryAgain"));
+  //   }
+  // };
+
+
+  const submitPaymentData2 = async () => {
+    if (!receiptID) {
+      console.error("No RID found for final submission.");
+      toast.error("Receipt ID missing. Please retry.");
+      return;
+    }
+
+    console.log("Submitting BNPaymentSubmit for RID:", receiptID);
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/BNPayment`,
-        paymentData
+        `${API_BASE_URL}/BNPaymentSubmit`,
+        { RID: receiptID } // Only send RID now
       );
 
       if (response?.data?.success === true) {
-        toast.success(response.data?.message);
+        toast.success("Payment submitted successfully!");
 
-        // Reset the form
+        // Reset form
         setPaymentForm({
           paymentDate: null,
           fx: "",
@@ -224,16 +287,17 @@ const BillingNote = () => {
         let modalInstance = bootstrap.Modal.getInstance(modalElement);
         if (modalInstance) modalInstance.hide();
 
-        // Refresh list
+        // Refresh parent list
         billingNote();
       } else {
-        toast.warning(response.data?.message);
+        toast.warning(response.data?.message || "Submission failed.");
       }
     } catch (error) {
-      console.error("Error submitting BNPayment data", error);
+      console.error("Error submitting BNPaymentSubmit:", error);
       toast.error(t("tryAgain"));
     }
   };
+
   const newFormatter5 = new Intl.NumberFormat("en-US", {
     style: "decimal",
     minimumFractionDigits: 0,
@@ -268,7 +332,7 @@ const BillingNote = () => {
 
         // Step 1: Create dynamic columns from head
         const generatedColumns = Object.entries(head)
-          .filter(([key]) => key !== "ID")
+          .filter(([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID")
           .map(([key, label]) => ({
             Header: t(label || key),
             accessor: key,
@@ -290,7 +354,7 @@ const BillingNote = () => {
                   >
                     <i className="mdi mdi-eye" />
                   </button>
-                  {!(a.Payment_Status === 3 || a.Payment_Status === 4) && (
+                  {a.Payment_Status === 1 && (
                     <>
                       {/* <Link to="/billingNoteCreate" state={{ from: a }}>
                         <i className="mdi mdi-pencil pl-2" />
@@ -334,14 +398,12 @@ const BillingNote = () => {
                     </>
                   )}
 
-                  {!(a.Payment_Status === 4) && (
+                  {(a.Payment_Status === 1 || a.Payment_Status === 3) && (
                     <button
                       className="SvgAnchor"
                       data-bs-toggle="modal"
                       data-bs-target="#modalCombine"
-                      onClick={() => {
-                        everyDataSet(a);
-                      }}
+                      onClick={() => handleModalOpen(a)}
                     >
                       <svg
                         className="SvgQuo"
@@ -356,9 +418,7 @@ const BillingNote = () => {
                   <button
                     type="button"
                     className="SvgAnchor"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalCombine"
-                    onClick={() => everyDataSet(a)}
+                    onClick={() => handleSubmit7(a)}
                   >
                     <svg
                       className="SvgPdf"
@@ -451,6 +511,9 @@ const BillingNote = () => {
   };
 
   const paymentDataClear = () => {
+    setModalHead(null);
+    setModalData(null);
+    setLoading(false);
     setPaymentForm({
       paymentDate: null,
       fx: "",
@@ -491,9 +554,9 @@ const BillingNote = () => {
       amount_to_pay: (
         Number(paymentAmmountNew) +
         (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-          Number(vatNew) -
+        Number(vatNew) -
         (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-          Number(whtNew) +
+        Number(whtNew) +
         (Number(roundingNew1) + Number(roundingNew))
       ).toFixed(2),
       Deposit_Used: Number(depositAvailableNew),
@@ -549,6 +612,672 @@ const BillingNote = () => {
   };
   const inputRef = useRef(null); // Ref for input field
 
+  const fetchReceiptData = async (bn_id) => {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/receiptBNIDView`, { bn_id });
+      if (res.data.success) {
+        setModalHead(res.data.head);
+        setModalData(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching receipt data", error);
+    }
+  };
+
+  const handleChange5 = async (field, value) => {
+
+    // 1. Update UI immediately
+    setPaymentForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // 2. Ensure receiptID is present
+    if (!receiptID) {
+      console.error("❌ No RID found. API won't run.");
+      return;
+    }
+
+    // 3. Map fields to API params
+    const fieldMapping = {
+      paymentDate: "Receipt_Date",
+      prepayment: "Prepayment",
+      fx: "FX",
+      fxRateReceived: "R_FX_Rate",
+      interBankCharges: "BankFees_FX",
+      localBankCharges: "BankFees_THB",
+      notes: "Notes",
+      paymentChannel: "Payment_Channel",
+      clientPaymentRef: "Client_Ref",
+      bankRef: "Bank_Ref",
+      paymentAmount: "payment_amount",
+      rounding: "Rounding",
+    };
+
+    const apiField = fieldMapping[field];
+    if (!apiField) return;
+
+    // 4. Prepare value (e.g., format date)
+    const payloadValue =
+      field === "paymentDate" && value instanceof Date
+        ? value.toISOString().split("T")[0] // format date
+        : value;
+
+    try {
+      // 5. Call BNPayment API
+      const res = await fetch(`${API_BASE_URL}/BNPayment`, {
+        method: "POST", //  Use PUT for updates
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          RID: receiptID,
+          [apiField]: payloadValue,
+        }),
+      });
+
+      const result = await res.json();
+      console.log(`Updated "${apiField}" for RID ${receiptID}`, result);
+
+      // 6. Refresh data using correct bn_id
+      fetchReceiptData(singlePodId?.ID); // ensure singlePodId is correct
+
+    } catch (error) {
+      console.error("❌ Error updating field:", error);
+    }
+  };
+
+  /*  const handleModalOpen = (a) => {
+     everyDataSet(a);            // Your existing function
+     fetchReceiptData(a.ID);  // Fetch and set modal API data
+   }; */
+
+  const handleModalOpen = async (a) => {
+    try {
+      // 1Set existing modal data
+      everyDataSet(a);
+      fetchReceiptData(a.ID);
+
+      //  Call BNPaymentStep API to get LastInsertedReceiptID
+      const res = await fetch(`${API_BASE_URL}/BNPaymentStep`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bn_id: a.ID,       // Pass BN ID from selected record
+          IID: "",              // Keep empty if not applicable
+          USER_ID: 7            // Replace with logged-in user ID
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const latestId = data.latestId?.LastInsertedReceiptID || null;
+        if (latestId) {
+          console.log("Stored Receipt ID:", latestId);
+          setReceiptID(latestId); // <-- Store in state for modal use
+        }
+      } else {
+        console.error("BNPaymentStep Error:", data.message);
+      }
+    } catch (error) {
+      console.error("handleModalOpen Error:", error);
+    }
+  };
+
+
+  // billing pdf
+
+
+  /*   const handleSubmit7 = async () => {
+      try {
+        // Fetch data from API
+        const res = await fetch(`${API_BASE_URL}/PDFBillingNote`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ BN: "119", External: "0", RID: "36" }),
+        });
+        const response = await res.json();
+  
+        const {
+          Company_Address,
+          section1,
+          section2_label,
+          section2_Values,
+          section3_label,
+          section3_Values,
+          section4_label,
+          section4_Values,
+          section5_label,
+          section5_Values,
+          section6_label,
+          section6_Values,
+        } = response;
+  
+        const doc = new jsPDF("p", "mm", "a4");
+        doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular);
+        doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
+        doc.setFont("NotoSansThai");
+  
+        // Add Static Logo & Company Address
+        const addLogoWithDetails = () => {
+          // Static Logo
+          doc.addImage(logo, "JPEG", 7, 5.7, 20, 20);
+  
+          doc.setFontSize(10);
+          doc.setTextColor(0, 0, 0);
+  
+          let startY = 10;
+          const textX = 30;
+          const lineSpacing = 4.2;
+  
+          if (Company_Address?.Line_1) {
+            doc.text(Company_Address.Line_1, textX, startY);
+            startY += lineSpacing;
+          }
+          if (Company_Address?.Line_2) {
+            doc.text(Company_Address.Line_2, textX, startY);
+            startY += lineSpacing;
+          }
+          if (Company_Address?.Line_3) {
+            const lines3 = doc.splitTextToSize(Company_Address.Line_3, 150);
+            lines3.forEach((line) => {
+              doc.text(line, textX, startY);
+              startY += lineSpacing;
+            });
+          }
+          if (Company_Address?.Line_4) {
+            const lines4 = doc.splitTextToSize(Company_Address.Line_4, 150);
+            lines4.forEach((line) => {
+              doc.text(line, textX, startY);
+              startY += lineSpacing;
+            });
+          }
+  
+          return startY;
+        };
+  
+        const addressEndY = addLogoWithDetails();
+        doc.setFillColor(32, 55, 100);
+        const pageWidth = doc.internal.pageSize.width;
+        const margin = 7;
+        const usableWidth = pageWidth - margin * 2;
+        const startYd = 27;
+        const lineHeightd = 7;
+        const maxWidthLabel = 42;
+        const maxWidthValue = 60;
+  
+        // Section 1: Heading with background lines
+        doc.rect(margin, startYd, usableWidth, 0.5, "FD");
+        doc.rect(margin, startYd + lineHeightd, usableWidth, 0.5, "FD");
+  
+        const centerXd = pageWidth / 2;
+        const centerYd = startYd + lineHeightd / 2;
+        doc.setFontSize(14);
+        doc.text(section1.Row1, centerXd, centerYd + 1.5, { align: "center" });
+  
+        // Section 2 & 3: Two-column layout
+        doc.setFontSize(10);
+        const halfWidth = usableWidth / 2;
+  
+        const leftLabelX = margin;
+        const leftValueX = leftLabelX + maxWidthLabel + 2;
+  
+        const rightLabelX = margin + halfWidth;
+        const rightValueX = rightLabelX + maxWidthLabel + 2;
+  
+        const lineHeight = 5;
+        let currentY = startYd + 15;
+  
+        const maxRows = Math.max(
+          Object.keys(section2_label).length,
+          Object.keys(section3_label).length
+        );
+  
+        for (let i = 1; i <= maxRows; i++) {
+          const leftLabel = section2_label[`Row${i}`] || "";
+          const leftValue = section2_Values[`Row${i}`] || "";
+          const rightLabel = section3_label[`Row${i}`] || "";
+          const rightValue = section3_Values[`Row${i}`] || "";
+  
+          const leftLabelLines = doc.splitTextToSize(leftLabel, maxWidthLabel);
+          const leftValueLines = doc.splitTextToSize(leftValue, maxWidthValue);
+          const rightLabelLines = doc.splitTextToSize(rightLabel, maxWidthLabel);
+          const rightValueLines = doc.splitTextToSize(rightValue, maxWidthValue);
+  
+          const maxLines = Math.max(
+            leftLabelLines.length,
+            leftValueLines.length,
+            rightLabelLines.length,
+            rightValueLines.length
+          );
+  
+          for (let j = 0; j < maxLines; j++) {
+            if (leftLabelLines[j])
+              doc.text(leftLabelLines[j], leftLabelX, currentY + j * lineHeight);
+            if (leftValueLines[j])
+              doc.text(leftValueLines[j], leftValueX, currentY + j * lineHeight);
+            if (rightLabelLines[j])
+              doc.text(
+                rightLabelLines[j],
+                rightLabelX,
+                currentY + j * lineHeight
+              );
+            if (rightValueLines[j])
+              doc.text(
+                rightValueLines[j],
+                rightValueX,
+                currentY + j * lineHeight
+              );
+          }
+  
+          currentY += maxLines * lineHeight;
+        }
+  
+        const tableHeaders = Object.values(section4_label);
+        const tableRows = section4_Values.map((row) => Object.values(row));
+  
+        doc.autoTable({
+          head: [tableHeaders],
+          body: tableRows,
+          startY: currentY,
+          headStyles: {
+            fillColor: "#203764",
+            textColor: "#FFFFFF",
+            halign: "center",
+          },
+          bodyStyles: { valign: "top" },
+          styles: {
+            overflow: "linebreak",
+            textColor: "#000000",
+            lineColor: "#203764",
+            lineWidth: 0.1,
+          },
+          margin: { left: 7, right: 7 },
+          tableWidth: "auto",
+          columnStyles: {
+            0: { halign: "center" },
+            1: { halign: "left" },
+            2: { halign: "left" },
+            3: { halign: "right" },
+            4: { halign: "right" },
+            5: { halign: "right" },
+            6: { halign: "right" },
+            7: { halign: "right" },
+          },
+        });
+  
+        const finalY = doc.autoTable.previous.finalY;
+        // Render Notes
+        doc.setFont("helvetica", "bold");
+        doc.text("Notes", 7, finalY + 5);
+  
+        doc.setFont("helvetica", "normal");
+        const text = `Lorem Ipsum is simply dummy text of the printing and typesetting industry... Lorem Ipsum is simply dummy text of the printing and typesetting industry... Lorem Ipsum is simply dummy text of the printing and typesetting industry...Lorem Ipsum is simply dummy text of the printing and typesetting industry...Lorem Ipsum is simply dummy text of the printing and typesetting industry...Lorem Ipsum is simply dummy text of the printing and typesetting industry...Lorem Ipsum is simply dummy text of the printing and typesetting industry...Lorem Ipsum is simply dummy text of the printing and typesetting industry...Lorem Ipsum is simply dummy text of the printing and typesetting industry...Lorem Ipsum is simply dummy text of the printing and typesetting industry...`;
+        const splitText = doc.splitTextToSize(text, usableWidth);
+        const textStartY = finalY + 10;
+        doc.text(splitText, 7, textStartY);
+  
+        // Calculate last Y after notes
+        const lastY = textStartY + (splitText.length - 1) * lineHeight;
+        doc.rect(7, lastY, pageWidth - 15, 0.5, "FD");
+  
+        // //  Section 5 starts AFTER Notes
+        // const labelsAndValues = Object.keys(section5_label).map((key, index) => ({
+        //   label: section5_label[key],
+        //   value: section5_Values[`Row${index + 1}`],
+        // }));
+  
+        // const startX = 7;
+        // const colSpacing = 35;
+        // const labelY = lastY + 5;   //  Start after notes
+        // const valueY = labelY + 5;
+  
+        // labelsAndValues.forEach((item, idx) => {
+        //   const x = startX + idx * colSpacing;
+        //   doc.text(item.label, x, labelY);
+        //   doc.text(item.value || "-", x, valueY);
+        // });
+  
+        // Handle Notes or Section 6 dynamically
+        // Handle Notes or Section 6 dynamically
+        // Handle Notes (Dynamic) or Section 6
+        let nextStartY = finalY + 5; // Start after table
+  
+        if (typeof section5_label === "string" && typeof section5_Values === "string") {
+          // ✅ Case 1: Dynamic Notes present
+          doc.setFont("helvetica", "bold");
+          doc.text(section5_label, 7, nextStartY); // Example: "Notes"
+          doc.setFont("helvetica", "normal");
+  
+          const notesY = nextStartY + 5;
+          doc.text(section5_Values || "-", 7, notesY); // Notes from API (single line)
+  
+          // Draw separator line after notes
+          const notesEndY = notesY + 5;
+          doc.rect(7, notesEndY, pageWidth - 15, 0.5, "FD");
+  
+          // Move Y position for Section 6 after notes
+          nextStartY = notesEndY + 8;
+  
+          // ✅ Render Section 6 (only if exists)
+          if (section6_label && section6_Values) {
+            const section6Data = Object.keys(section6_label).map((key, index) => ({
+              label: section6_label[key],
+              value: section6_Values[`Row${index + 1}`],
+            }));
+  
+            const startX = 7;
+            const colSpacing = 35;
+            const labelY = nextStartY;
+            const valueY = labelY + 5;
+  
+            section6Data.forEach((item, idx) => {
+              const x = startX + idx * colSpacing;
+              doc.text(item.label, x, labelY);
+              doc.text(item.value || "-", x, valueY);
+            });
+          }
+  
+        } else if (typeof section5_label === "object" && typeof section5_Values === "object") {
+          // ✅ Case 2: No Notes → Treat section5 as Section 6
+          const section6Data = Object.keys(section5_label).map((key, index) => ({
+            label: section5_label[key],
+            value: section5_Values[`Row${index + 1}`],
+          }));
+  
+          const startX = 7;
+          const colSpacing = 35;
+          const labelY = nextStartY;
+          const valueY = labelY + 5;
+  
+          section6Data.forEach((item, idx) => {
+            const x = startX + idx * colSpacing;
+            doc.text(item.label, x, labelY);
+            doc.text(item.value || "-", x, valueY);
+          });
+        }
+  
+  
+        //  Page Numbers
+        const addPageNumbers = () => {
+          const pageCount = doc.internal.getNumberOfPages();
+          for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.text(`${i} out of ${pageCount}`, 185.2, 3.1);
+          }
+        };
+        addPageNumbers();
+        const pdfBlob = doc.output("blob");
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        // Open the PDF in a new tab
+        window.open(pdfUrl);
+        // Save the PDF
+  
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      }
+    };
+   */
+
+  const handleSubmit7 = async (a) => {
+    try {
+      // Fetch data from API
+      const res = await fetch(`${API_BASE_URL}/PDFBillingNote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ BN: a.ID, External: "0", RID: a.Reciept_ID }),
+      });
+      const response = await res.json();
+
+      const {
+        Company_Address,
+        section1,
+        section2_label,
+        section2_Values,
+        section3_label,
+        section3_Values,
+        section4_label,
+        section4_Values,
+        section5_label,
+        section5_Values,
+        section6_label,
+        section6_Values,
+      } = response;
+
+      const doc = new jsPDF("p", "mm", "a4");
+      doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular);
+      doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
+      doc.setFont("NotoSansThai");
+
+      // Add Static Logo & Company Address
+      const addLogoWithDetails = () => {
+        doc.addImage(logo, "JPEG", 7, 5.7, 20, 20);
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+
+        let startY = 10;
+        const textX = 30;
+        const lineSpacing = 4.2;
+
+        if (Company_Address?.Line_1) {
+          doc.text(Company_Address.Line_1, textX, startY);
+          startY += lineSpacing;
+        }
+        if (Company_Address?.Line_2) {
+          doc.text(Company_Address.Line_2, textX, startY);
+          startY += lineSpacing;
+        }
+        if (Company_Address?.Line_3) {
+          const lines3 = doc.splitTextToSize(Company_Address.Line_3, 150);
+          lines3.forEach((line) => {
+            doc.text(line, textX, startY);
+            startY += lineSpacing;
+          });
+        }
+        if (Company_Address?.Line_4) {
+          const lines4 = doc.splitTextToSize(Company_Address.Line_4, 150);
+          lines4.forEach((line) => {
+            doc.text(line, textX, startY);
+            startY += lineSpacing;
+          });
+        }
+        return startY;
+      };
+
+      const addressEndY = addLogoWithDetails();
+      doc.setFillColor(32, 55, 100);
+      const pageWidth = doc.internal.pageSize.width;
+      const margin = 7;
+      const usableWidth = pageWidth - margin * 2;
+      const startYd = 27;
+      const lineHeightd = 7;
+      const maxWidthLabel = 42;
+      const maxWidthValue = 60;
+
+      // Section 1: Heading
+      doc.rect(margin, startYd, usableWidth, 0.5, "FD");
+      doc.rect(margin, startYd + lineHeightd, usableWidth, 0.5, "FD");
+      const centerXd = pageWidth / 2;
+      const centerYd = startYd + lineHeightd / 2;
+      doc.setFontSize(14);
+      doc.text(section1.Row1, centerXd, centerYd + 1.5, { align: "center" });
+
+      // Section 2 & 3: Two-column layout
+      doc.setFontSize(10);
+      const halfWidth = usableWidth / 2;
+      const leftLabelX = margin;
+      const leftValueX = leftLabelX + maxWidthLabel + 2;
+      const rightLabelX = margin + halfWidth;
+      const rightValueX = rightLabelX + maxWidthLabel + 2;
+      const lineHeight = 5;
+      let currentY = startYd + 15;
+
+      const maxRows = Math.max(
+        Object.keys(section2_label).length,
+        Object.keys(section3_label).length
+      );
+
+      for (let i = 1; i <= maxRows; i++) {
+        const leftLabel = section2_label[`Row${i}`] || "";
+        const leftValue = section2_Values[`Row${i}`] || "";
+        const rightLabel = section3_label[`Row${i}`] || "";
+        const rightValue = section3_Values[`Row${i}`] || "";
+
+        const leftLabelLines = doc.splitTextToSize(leftLabel, maxWidthLabel);
+        const leftValueLines = doc.splitTextToSize(leftValue, maxWidthValue);
+        const rightLabelLines = doc.splitTextToSize(rightLabel, maxWidthLabel);
+        const rightValueLines = doc.splitTextToSize(rightValue, maxWidthValue);
+
+        const maxLines = Math.max(
+          leftLabelLines.length,
+          leftValueLines.length,
+          rightLabelLines.length,
+          rightValueLines.length
+        );
+
+        for (let j = 0; j < maxLines; j++) {
+          if (leftLabelLines[j])
+            doc.text(leftLabelLines[j], leftLabelX, currentY + j * lineHeight);
+          if (leftValueLines[j])
+            doc.text(leftValueLines[j], leftValueX, currentY + j * lineHeight);
+          if (rightLabelLines[j])
+            doc.text(rightLabelLines[j], rightLabelX, currentY + j * lineHeight);
+          if (rightValueLines[j])
+            doc.text(rightValueLines[j], rightValueX, currentY + j * lineHeight);
+        }
+        currentY += maxLines * lineHeight;
+      }
+
+      // Section 4: Table
+      const tableHeaders = Object.values(section4_label);
+      const tableRows = section4_Values.map((row) => Object.values(row));
+      doc.autoTable({
+        head: [tableHeaders],
+        body: tableRows,
+        startY: currentY,
+        headStyles: { fillColor: "#203764", textColor: "#FFFFFF", halign: "center" },
+        bodyStyles: { valign: "top" },
+        styles: { overflow: "linebreak", textColor: "#000000", lineColor: "#203764", lineWidth: 0.1 },
+        margin: { left: 7, right: 7 },
+        tableWidth: "auto",
+        columnStyles: {
+          0: { halign: "center" },
+          1: { halign: "left" },
+          2: { halign: "left" },
+          3: { halign: "right" },
+          4: { halign: "right" },
+          5: { halign: "right" },
+          6: { halign: "right" },
+          7: { halign: "right" },
+        },
+      });
+
+      const finalY = doc.autoTable.previous.finalY;
+      let nextStartY = finalY + 5;
+
+      // ✅ Dynamic Notes or Section 6
+      // Case 1: Notes exist in object format (Col1)
+      if (
+        typeof section5_label === "object" &&
+        typeof section5_Values === "object" &&
+        section5_label.Col1?.toLowerCase().includes("notes")
+      ) {
+        // Render Notes
+        doc.setFont("helvetica", "bold");
+        doc.text(section5_label.Col1, 7, nextStartY);
+        doc.setFont("helvetica", "normal");
+        const notesY = nextStartY + 5;
+        doc.text(section5_Values.Col1 || "-", 7, notesY);
+        const notesEndY = notesY + 5;
+        doc.rect(7, notesEndY, pageWidth - 15, 0.5, "FD");
+        nextStartY = notesEndY + 8;
+
+        // Continue to Section 6
+        if (section6_label && section6_Values) {
+          const section6Data = Object.keys(section6_label).map((key, index) => ({
+            label: section6_label[key],
+            value: section6_Values[`Row${index + 1}`],
+          }));
+          const startX = 7;
+          const colSpacing = 35;
+          const labelY = nextStartY;
+          const valueY = labelY + 5;
+          section6Data.forEach((item, idx) => {
+            const x = startX + idx * colSpacing;
+            doc.text(item.label, x, labelY);
+            doc.text(item.value || "-", x, valueY);
+          });
+        }
+      }
+      // Case 2: No Notes → Treat section5 as section6
+      else if (typeof section5_label === "object" && typeof section5_Values === "object") {
+        const section6Data = Object.keys(section5_label).map((key, index) => ({
+          label: section5_label[key],
+          value: section5_Values[`Row${index + 1}`],
+        }));
+        const startX = 7;
+        const colSpacing = 35;
+        const labelY = nextStartY;
+        const valueY = labelY + 5;
+        section6Data.forEach((item, idx) => {
+          const x = startX + idx * colSpacing;
+          doc.text(item.label, x, labelY);
+          doc.text(item.value || "-", x, valueY);
+        });
+      }
+
+
+      // Page Numbers
+      const addPageNumbers = () => {
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.text(`${i} out of ${pageCount}`, 185.2, 3.1);
+        }
+      };
+      addPageNumbers();
+
+      const pdfBlob = doc.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      // window.open(pdfUrl);
+      await uploadPDF5(pdfBlob, a);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
+  };
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+  };
+  const uploadPDF5 = async (pdfBlob, a) => {
+    // Generate a unique date-time string
+    const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
+
+    const formData = new FormData();
+    formData.append(
+      "document",
+      pdfBlob,
+      `${a?.COL1 || "default"}_Billing_Note_${dateTime}.pdf`
+    );
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
+      console.log(response);
+      if (response.data.success) {
+        console.log("PDF uploaded successfully");
+        window.open(
+          `${API_IMAGE_URL}${a?.COL1 || "default"
+          }_Billing_Note_${dateTime}.pdf`
+        );
+      } else {
+        console.log("Failed to upload PDF");
+      }
+    } catch (error) {
+      console.error("Error uploading PDF:", error);
+    }
+  };
+
   return (
     <>
       <Card
@@ -596,9 +1325,9 @@ const BillingNote = () => {
             </div>
             <div className="modal-body">
               <div className="row">
-                <div className="col-lg-7">
+                <div className="col-lg-9">
                   <div className="row g-3">
-                    <div className="col-xl-3 col-lg-4 col-md-6">
+                    <div className=" col-xl-3 col-lg-3 col-md-6">
                       <div className="parentFormPayment">
                         <p> {t("paymentDate")}</p>
                         <DatePicker
@@ -612,7 +1341,7 @@ const BillingNote = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-xl-3 col-lg-4 col-md-6 autoComplete">
+                    <div className=" col-xl-3 col-lg-3 col-md-6 autoComplete">
                       <div className="parentFormPayment">
                         <p> {t("fx")}</p>
                         <Autocomplete
@@ -635,7 +1364,7 @@ const BillingNote = () => {
                       </div>
                     </div>
 
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment autoComplete">
                         <p> {t("paymentChannel")}</p>
                         <Autocomplete
@@ -666,7 +1395,7 @@ const BillingNote = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("fxRateReceived")}</p>
                         <input
@@ -678,7 +1407,7 @@ const BillingNote = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("clientPaymentRef")}</p>
                         <input
@@ -690,7 +1419,7 @@ const BillingNote = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("interBankCharges")}</p>
                         <input
@@ -702,7 +1431,7 @@ const BillingNote = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("paymentAmount")}</p>
                         <input
@@ -714,7 +1443,7 @@ const BillingNote = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("prepayment")}</p>
                         <input
@@ -726,7 +1455,7 @@ const BillingNote = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("bankRef")}</p>
                         <input
@@ -739,7 +1468,7 @@ const BillingNote = () => {
                       </div>
                     </div>
 
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("localBankCharges")}</p>
                         <input
@@ -752,7 +1481,7 @@ const BillingNote = () => {
                       </div>
                     </div>
 
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    {/* <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("thbReceived")}</p>
                         <input
@@ -763,8 +1492,8 @@ const BillingNote = () => {
                           }
                         />
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-lg-4 col-md-4">
+                    </div> */}
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
                       <div className="parentFormPayment">
                         <p> {t("rounding")}</p>
                         <input
@@ -778,7 +1507,7 @@ const BillingNote = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-3">
+                {/* <div className="col-lg-3">
                   <div className="flex totalBefore">
                     <div className="pe-3" style={{ width: "85%" }}>
                       <div className="flexBefore">
@@ -863,9 +1592,29 @@ const BillingNote = () => {
                       </div>
                     </div>
                   </div>
+                </div> */}
+                <div className="col-lg-3">
+                  <div className="flex totalBefore">
+                    <div className="pe-3" style={{ width: "85%" }}>
+                      {loading ? (
+                        <p>Loading...</p>
+                      ) : modalHead ? (
+                        <>
+                          {Object.keys(modalHead).map((key) => (
+                            <div className="flexBefore" key={key}>
+                              <div><strong>{modalHead[key]}</strong></div>
+                              <div><span>{modalData ? modalData[key] || 0 : 0}</span></div>
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                        <p>{""}</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="col-lg-2 mt-3">
+                <div className="col-lg-4 mt-3">
                   <div className="parentFormPayment">
                     <p> {t("notes")}</p>
                     <textarea

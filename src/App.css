@@ -4084,3 +4084,16 @@ td {
 .invOptionSetup p {
   margin-bottom: 10px;
 }
+.selectReact .select__placeholder{
+  margin-left: 10px !important;
+}
+.selectReact .select__control{
+border: 2px solid #203764 !important;
+}
+.selectReact .select__input{
+  border: unset !important;
+  width: 100%;
+}
+.selectReact .select__control:focus{
+ border: 2px solid #203764 !important;
+}

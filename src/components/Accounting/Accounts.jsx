@@ -472,10 +472,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_Invoices),
             105 +
-              valueWidth -
-              doc.getTextWidth(
-                formatter.format(response.data.data?.statement_Invoices)
-              ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Invoices)
+            ),
             finalY + 1
           );
 
@@ -484,10 +484,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_claims),
             105 +
-              valueWidth -
-              doc.getTextWidth(
-                formatter.format(response.data.data?.statement_claims)
-              ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_claims)
+            ),
             finalY + 5
           );
 
@@ -496,10 +496,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_payments),
             105 +
-              valueWidth -
-              doc.getTextWidth(
-                formatter.format(response.data.data?.statement_payments)
-              ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_payments)
+            ),
             finalY + 9
           );
 
@@ -511,10 +511,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_Totals),
             105 +
-              valueWidth -
-              doc.getTextWidth(
-                formatter.format(response.data.data?.statement_Totals)
-              ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Totals)
+            ),
             finalY + 16
           );
 
@@ -833,6 +833,7 @@ const Accounts = () => {
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
 
+        // First column stays at 7
         doc.text(
           `${response?.data.section4_Labels?.Col1 || ""}`,
           7,
@@ -840,62 +841,68 @@ const Accounts = () => {
         );
         doc.text(
           `${response?.data.section4_Values?.Col1 || ""}`,
-          22,
-          startY + 5
+          7,
+          startY + 10
         );
+
+        // All others X +3
         doc.text(
           `${response?.data.section4_Labels?.Col2 || ""}`,
-          54,
+          72,
           startY + 5
-        );
+        ); // 65 + 7
         doc.text(
           `${response?.data.section4_Values?.Col2 || ""}`,
-          67,
-          startY + 5
+          72,
+          startY + 10
         );
+
         doc.text(
           `${response?.data.section4_Labels?.Col3 || ""}`,
-          96,
+          105,
           startY + 5
-        );
+        ); // 98 + 7
         doc.text(
           `${response?.data.section4_Values?.Col3 || ""}`,
-          115,
-          startY + 5
+          105,
+          startY + 9
         );
+
         doc.text(
           `${response?.data.section4_Labels?.Col4 || ""}`,
-          146,
+          158,
           startY + 5
-        );
+        ); // 151 + 7
         doc.text(
           `${response?.data.section4_Values?.Col4 || ""}`,
           158,
-          startY + 5
+          startY + 10
         );
+
         doc.text(
           `${response?.data.section4_Labels?.Col5 || ""}`,
-          188,
+          201,
           startY + 5
-        );
+        ); // 194 + 7
         doc.text(
           `${response?.data.section4_Values?.Col5 || ""}`,
-          206,
-          startY + 5
+          201,
+          startY + 10
         );
+
         doc.text(
           `${response?.data.section4_Labels?.Col6 || ""}`,
-          238,
+          244,
           startY + 5
-        );
+        ); // 237 + 7
         doc.text(
           `${response?.data.section4_Values?.Col6 || ""}`,
-          258,
-          startY + 5
+          244,
+          startY + 10
         );
 
         await addLogoWithDetails();
-        let yTop = startY + 10;
+        let yTop = startY + 13;
 
         doc.autoTable({
           head: [headers],
@@ -953,8 +960,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row1 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
           finalY + 1
         );
 
@@ -963,8 +970,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row2 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
           finalY + 5
         );
 
@@ -973,8 +980,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row3 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
           finalY + 9
         );
         // new
@@ -982,8 +989,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row4 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
           finalY + 13
         );
 
@@ -991,8 +998,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row5 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
           finalY + 17
         );
 
@@ -1000,8 +1007,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row6 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
           finalY + 21
         );
 
@@ -1013,8 +1020,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row4 || ""}`,
           105 +
-            valueWidth -
-            doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
+          valueWidth -
+          doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
           finalY + 29
         );
 
@@ -1132,6 +1139,7 @@ const Accounts = () => {
       // Handle the error as needed
     }
   };
+
   const uploadPDF7 = async (pdfBlob) => {
     const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
     const formData = new FormData();
@@ -1162,7 +1170,7 @@ const Accounts = () => {
       // Automatically set Paid Amount to the corresponding amount_to_pay if checked
       const amountToPay = isChecked
         ? paymentTable2.find((item) => item.po_id === invoiceNumber)
-            ?.amount_to_pay || 0
+          ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -2375,10 +2383,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Invoices)
+          ),
           finalY + 1
         );
 
@@ -2387,10 +2395,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_claims)
+          ),
           finalY + 5
         );
 
@@ -2399,10 +2407,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_payments)
+          ),
           finalY + 9
         );
 
@@ -2414,10 +2422,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Totals)
+          ),
           finalY + 16
         );
 
@@ -2580,24 +2588,19 @@ const Accounts = () => {
         const startX1 = 7;
         const lineHeight1 = 4.2;
 
-        const longText1_1 = `${
-          response.data.vendorData?.name ? response.data.vendorData?.name : ""
-        }(${
-          response.data.vendorData?.id_card
+        const longText1_1 = `${response.data.vendorData?.name ? response.data.vendorData?.name : ""
+          }(${response.data.vendorData?.id_card
             ? response.data.vendorData?.id_card
             : ""
-        })`;
+          })`;
         doc.setFont("helvetica", "normal");
-        const longText1_2 = `${
-          response.data.vendorData?.address
-            ? response.data.vendorData?.address
-            : ""
-        }`;
-        const longText1_3 = `${
-          response.data.vendorData?.email ? response.data.vendorData?.email : ""
-        } / ${
-          response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
-        }`;
+        const longText1_2 = `${response.data.vendorData?.address
+          ? response.data.vendorData?.address
+          : ""
+          }`;
+        const longText1_3 = `${response.data.vendorData?.email ? response.data.vendorData?.email : ""
+          } / ${response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
+          }`;
 
         // Render client details
         doc.setFont("NotoSansThai"); // Set the font to use
@@ -2755,10 +2758,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Invoices)
+          ),
           finalY + 1
         );
 
@@ -2767,10 +2770,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_claims)
+          ),
           finalY + 5
         );
 
@@ -2779,10 +2782,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_payments)
+          ),
           finalY + 9
         );
 
@@ -2794,10 +2797,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
+          valueWidth -
+          doc.getTextWidth(
+            formatter.format(response.data.data?.statement_Totals)
+          ),
           finalY + 16
         );
 
@@ -3067,11 +3070,11 @@ const Accounts = () => {
             response.data.statement_details?.Starting_Balance
           ),
           alignmentX -
-            doc.getTextWidth(
-              formatterTwo.format(
-                response.data.statement_details?.Starting_Balance
-              )
-            ),
+          doc.getTextWidth(
+            formatterTwo.format(
+              response.data.statement_details?.Starting_Balance
+            )
+          ),
           finalY + 1
         );
         doc.text("Credit :", labelX, finalY + 5);
@@ -3080,11 +3083,11 @@ const Accounts = () => {
             response.data.statement_details?.Statement_Credits
           ),
           alignmentX -
-            doc.getTextWidth(
-              formatterTwo.format(
-                response.data.statement_details?.Statement_Credits
-              )
-            ),
+          doc.getTextWidth(
+            formatterTwo.format(
+              response.data.statement_details?.Statement_Credits
+            )
+          ),
           finalY + 5
         );
 
@@ -3094,11 +3097,11 @@ const Accounts = () => {
             response.data.statement_details?.Statement_Debits
           ),
           alignmentX -
-            doc.getTextWidth(
-              formatterTwo.format(
-                response.data.statement_details?.Statement_Debits
-              )
-            ),
+          doc.getTextWidth(
+            formatterTwo.format(
+              response.data.statement_details?.Statement_Debits
+            )
+          ),
           finalY + 9
         );
 
@@ -3109,11 +3112,11 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.statement_details?.Statement_Balance),
           alignmentX -
-            doc.getTextWidth(
-              formatter.format(
-                response.data.statement_details?.Statement_Balance
-              )
-            ),
+          doc.getTextWidth(
+            formatter.format(
+              response.data.statement_details?.Statement_Balance
+            )
+          ),
           finalY + 16
         );
 
@@ -3170,7 +3173,7 @@ const Accounts = () => {
       const updatedCheckedItems = { ...prev, [invoiceNumber]: isChecked };
       const amountToPay = isChecked
         ? paymentTable1.find((item) => item.transaction_ref === invoiceNumber)
-            ?.amount_to_pay || 0
+          ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -3671,10 +3674,9 @@ const Accounts = () => {
       currentYRight = renderLabelAndValue(
         doc,
         "Bank Name:",
-        `${
-          response?.data?.vendorBankDetails?.bank_name
-            ? response?.data?.vendorBankDetails?.bank_name
-            : ""
+        `${response?.data?.vendorBankDetails?.bank_name
+          ? response?.data?.vendorBankDetails?.bank_name
+          : ""
         }`,
         130,
         200,
@@ -3832,9 +3834,9 @@ const Accounts = () => {
       const totalAmount = parseFloat(
         response?.data?.Toataldata?.total_commision_THB
           ? String(response.data.Toataldata.total_commision_THB).replace(
-              /,/g,
-              ""
-            )
+            /,/g,
+            ""
+          )
           : 0
       );
 
@@ -4814,8 +4816,8 @@ const Accounts = () => {
                         value={
                           Array.isArray(clients)
                             ? clients.find(
-                                (client) => client.client_id === clientIdSet
-                              ) || null
+                              (client) => client.client_id === clientIdSet
+                            ) || null
                             : null
                         }
                         isOptionEqualToValue={(option, value) =>
@@ -4858,9 +4860,9 @@ const Accounts = () => {
                           // Find the consignee object corresponding to the selected ID
                           Array.isArray(consignees)
                             ? consignees.find(
-                                (consignee) =>
-                                  consignee.consignee_id === consigneeIdSet
-                              ) || null
+                              (consignee) =>
+                                consignee.consignee_id === consigneeIdSet
+                            ) || null
                             : null
                         }
                         isOptionEqualToValue={(option, value) =>
@@ -5445,8 +5447,8 @@ const Accounts = () => {
                                 // Find the client object corresponding to the selected ID
                                 Array.isArray(clients)
                                   ? clients.find(
-                                      (client) => client.client_id === clientId
-                                    ) || null
+                                    (client) => client.client_id === clientId
+                                  ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5484,9 +5486,9 @@ const Accounts = () => {
                                 // Find the consignee object corresponding to the selected ID
                                 Array.isArray(consignees)
                                   ? consignees.find(
-                                      (consignee) =>
-                                        consignee.consignee_id === consigneeId
-                                    ) || null
+                                    (consignee) =>
+                                      consignee.consignee_id === consigneeId
+                                  ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5568,9 +5570,9 @@ const Accounts = () => {
                                 // Find the payment channel object corresponding to the selected ID
                                 Array.isArray(paymentChannle)
                                   ? paymentChannle.find(
-                                      (channel) =>
-                                        channel.bank_id === paymentChannel
-                                    ) || null
+                                    (channel) =>
+                                      channel.bank_id === paymentChannel
+                                  ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5655,8 +5657,8 @@ const Accounts = () => {
                                   // Find the currency object corresponding to the selected fxId
                                   Array.isArray(currency)
                                     ? currency.find(
-                                        (item) => item.currency_id === fxId
-                                      ) || null
+                                      (item) => item.currency_id === fxId
+                                    ) || null
                                     : null
                                 }
                                 isOptionEqualToValue={(option, value) =>
@@ -5962,7 +5964,7 @@ const Accounts = () => {
                       value={ref}
                       onChange={(e) => setRef(e.target.value)}
                       placeholder={t("ref")}
-                      // placeholder={t("amount")}
+                    // placeholder={t("amount")}
                     />
                   </div>
                   <div className="modal-footer">
@@ -5998,9 +6000,9 @@ const Accounts = () => {
                       dangerouslySetInnerHTML={{
                         __html: item.Name_exp_2
                           ? item.Name_exp_2.replace(/\r\n/g, "<br/>").replace(
-                              /\n/g,
-                              "<br/>"
-                            )
+                            /\n/g,
+                            "<br/>"
+                          )
                           : "",
                       }}
                     />

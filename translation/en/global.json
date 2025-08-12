@@ -88,7 +88,6 @@
   "totalHistory": "Total History",
   "statementSuccess": "Statement Added successful",
   "statementError": "Error fetching statement",
-
   "genericError": "Something went Wrong",
   "paymentSuccess": "Payment data submitted successfully",
   "paymentMismatch": "Total Paid Amount does not match FX Payment value",
@@ -1047,7 +1046,6 @@
   "Available_Boxes_Management": "Available Boxes Management",
   "edit": "Edit",
   "Inventory_Id": "Inventory Id",
-
   "fetchFreight": "Error fetching freight details",
   "copyOrderProcedureSuccessfully": "Copy Order Procedure successfully",
   "noFileSelected": "No file selected",
@@ -1099,5 +1097,18 @@
   "prepayment": "Prepayment",
   "averageRate": "Average Rate",
   "lossGainFx": "Loss/Gain FX",
-  "receiptManagement": "Receipt Management"
+  "receiptManagement": "Receipt Management",
+  "postCode": "Post Code",
+  "messengerType": "Messenger Type",
+  "bankBranch": "Bank Branch",
+  "bankAccount": "Bank Account",
+  "bankIbon": "Bank IBON",
+  "bankSwift": "Bank SWIFT",
+  "bankCountry": "Bank Country",
+  "taxId": "Tax/Registration ID",
+  "messangerId": "Messenger ID",
+  "BankDetails": "Bank Details",
+  "Entity": "Entity",
+  "SelectEntity": "Select Entity",
+  "add_consignee": "Add Consignee"
 }
