@@ -44,6 +44,8 @@ const QuotationTest = () => {
     allowOutsideClick: false,
   });
   const [data, setData] = useState([]);
+  const [columns, setColumns] = useState([]);
+
   const [chargeVolume, setChargeVolume] = useState(false);
   const [idData, setIdData] = useState("");
   const [status, setStatus] = useState("");
@@ -58,19 +60,203 @@ const QuotationTest = () => {
   const handleAgreedPricingChange = (e) => {
     setIsRecalculateChecked(e.target.checked);
   };
+  // const getAllQuotation = () => {
+  //   axios
+  //     .get(`${API_BASE_URL}/NewgetOrders`, {
+  //       params: { is_quotation: 1 },
+  //     })
+  //     .then((res) => {
+  //       console.log(res);
+  //       setData(res.data.data || []);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching quotations:", err);
+  //     });
+  // };
   const getAllQuotation = () => {
     axios
-      .get(`${API_BASE_URL}/NewgetOrders`, {
-        params: { is_quotation: 1 },
-      })
+      .get(`${API_BASE_URL}/QuotationEN`)
       .then((res) => {
         console.log(res);
-        setData(res.data.data || []);
+
+        const { head, data } = res.data;
+
+        // Remove unwanted columns from table (Order_ID, Status_value)
+        const columnsToHide = ["Order_ID", "Status_value"];
+
+        // Create dynamic columns excluding hidden ones
+        const dynamicColumns = Object.keys(head)
+          .filter((key) => !columnsToHide.includes(key))
+          .map((key) => ({
+            Header: t(head[key]), // Translate header if needed
+            accessor: key,
+          }));
+
+        // Add the "actions" column at the end
+        dynamicColumns.push({
+          Header: t("actions"),
+          // accessor: (a) => (
+          //   <div className="editIcon">
+          //     <Link to="/quotation_view" state={{ from: { ...a } }}>
+          //       <i className="mdi mdi-eye" />
+          //     </Link>
+
+          //     {(+a.Status_value === 1 || +a.Status_value === 2) && (
+          //       <Link to="/update_Quotation" state={{ from: { ...a } }}>
+          //         <i className="mdi mdi-pencil" />
+          //       </Link>
+          //     )}
+
+          //     {[1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(
+          //       a.Status_value
+          //     ) && (
+          //       <button
+          //         type="button"
+          //         onClick={() => quotationConfirmationForOrder(a.Order_ID)}
+          //       >
+          //         <i
+          //           className="mdi mdi-check"
+          //           style={{
+          //             width: "20px",
+          //             color: "#203764",
+          //             fontSize: "22px",
+          //             marginTop: "10px",
+          //           }}
+          //         />
+          //       </button>
+          //     )}
+          //   </div>
+          // ),
+          accessor: (a) => (
+            <div className="editIcon">
+              <Link to="/quotation_view" state={{ from: { ...a } }}>
+                <i className="mdi mdi-eye" />
+              </Link>
+
+              {(+a.Status_value === 1 || +a.Status_value === 2) && (
+                <Link to="/update_Quotation" state={{ from: { ...a } }}>
+                  <i className="mdi mdi-pencil" />
+                </Link>
+              )}
+
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                onClick={() => setFilterData1(a)}
+                data-bs-target="#exampleModalCustomization"
+              >
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <title>Quotation</title>
+                  <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
+                </svg>
+              </button>
+
+              {(+a.Status_value === 1 ||
+                +a.Status_value === 2 ||
+                +a.Status_value === 3 ||
+                +a.Status_value === 4) && (
+                <button
+                  type="button"
+                  style={{
+                    width: "20px",
+                    color: "#203764",
+                    fontSize: "22px",
+                    marginTop: "10px",
+                  }}
+                  onClick={() => performaOrder(a)}
+                >
+                  <i className="fi fi-sr-square-p" />
+                </button>
+              )}
+
+              {+a.Status_value > 2 && (
+                <button
+                  type="button"
+                  style={{
+                    width: "20px",
+                    color: "#203764",
+                    fontSize: "22px",
+                    marginTop: "10px",
+                  }}
+                  onClick={() => handleEditClick1(a.Order_ID)}
+                >
+                  <i
+                    className="mdi mdi-content-copy"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#consigneeOne"
+                  />{" "}
+                </button>
+              )}
+              {+a.Status_value === 3 && (
+                <button
+                  type="button"
+                  onClick={() => quotationConfirmation(a.Order_ID)}
+                >
+                  <i className="mdi mdi-check-circle" />
+                </button>
+              )}
+              {(+a.Status_value === 1 || +a.Status_value === 2) && (
+                <button
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal1"
+                  onClick={() => setDeleteOrderId(a.Order_ID)}
+                >
+                  <i className="mdi mdi-delete" />
+                </button>
+              )}
+
+              {[1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(
+                a.Status_value
+              ) && (
+                <button
+                  type="button"
+                  onClick={() => quotationConfirmationForOrder(a.Order_ID)}
+                >
+                  <i
+                    className="mdi mdi-check"
+                    style={{
+                      width: "20px",
+                      color: "#203764",
+                      fontSize: "22px",
+                      marginTop: "10px",
+                    }}
+                  />
+                </button>
+              )}
+              {(+a.Status_value === 1 || +a.Status_value === 2) && (
+                <button
+                  type="button"
+                  style={{
+                    width: "20px",
+                    color: "#203764",
+                    fontSize: "22px",
+                    marginTop: "10px",
+                  }}
+                  onClick={() => expireQoutation(a.Order_ID)}
+                >
+                  <i className="mdi mdi-clock-alert" />
+                </button>
+              )}
+            </div>
+          ),
+        });
+
+        setColumns(dynamicColumns);
+        setData(data || []);
       })
       .catch((err) => {
         console.error("Error fetching quotations:", err);
       });
   };
+
+  // State for columns
+
   const handleAgreedPricingChange1 = (e) => {
     setChargeVolume(e.target.checked);
   };
@@ -1178,172 +1364,173 @@ const QuotationTest = () => {
         console.log(error);
       });
   };
-  const columns = useMemo(
-    () => [
-      {
-        Header: t("number"),
-        accessor: "Quotation_Number",
-      },
-      {
-        Header: t("clientName"),
-        accessor: "client_name",
-      },
-      {
-        Header: t("destinationPort"),
-        accessor: "port_name",
-      },
-      {
-        Header: t("consigneeName"),
-        accessor: "consignee_name",
-      },
-      {
-        Header: t("location"),
-        accessor: "location_name",
-      },
-      {
-        Header: t("loadDate"),
-        accessor: "load_Before_date",
-      },
+  // const columns = useMemo(
+  //   () => [
+  //     {
+  //       Header: t("number"),
+  //       accessor: "Quotation_Number",
+  //     },
+  //     {
+  //       Header: t("clientName"),
+  //       accessor: "client_name",
+  //     },
+  //     {
+  //       Header: t("destinationPort"),
+  //       accessor: "port_name",
+  //     },
+  //     {
+  //       Header: t("consigneeName"),
+  //       accessor: "consignee_name",
+  //     },
+  //     {
+  //       Header: t("location"),
+  //       accessor: "location_name",
+  //     },
+  //     {
+  //       Header: t("loadDate"),
+  //       accessor: "load_Before_date",
+  //     },
 
-      {
-        Header: t("status"),
-        accessor: "status_name",
-      },
-      {
-        Header: t("actions"),
-        accessor: (a) => (
-          <div className="editIcon">
-            <Link to="/quotation_view" state={{ from: { ...a } }}>
-              <i className="mdi mdi-eye" />
-            </Link>
+  //     {
+  //       Header: t("status"),
+  //       accessor: "status_name",
+  //     },
+  //     {
+  //       Header: t("actions"),
+  //       accessor: (a) => (
+  //         <div className="editIcon">
+  //           <Link to="/quotation_view" state={{ from: { ...a } }}>
+  //             <i className="mdi mdi-eye" />
+  //           </Link>
 
-            {(+a.Status === 1 || +a.Status === 2) && (
-              <Link to="/update_Quotation" state={{ from: { ...a } }}>
-                <i className="mdi mdi-pencil" />
-              </Link>
-            )}
+  //           {(+a.Status === 1 || +a.Status === 2) && (
+  //             <Link to="/update_Quotation" state={{ from: { ...a } }}>
+  //               <i className="mdi mdi-pencil" />
+  //             </Link>
+  //           )}
 
-            <button
-              type="button"
-              data-bs-toggle="modal"
-              onClick={() => setFilterData1(a)}
-              data-bs-target="#exampleModalCustomization"
-            >
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <title>Quotation</title>
-                <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
-              </svg>
-            </button>
+  //           <button
+  //             type="button"
+  //             data-bs-toggle="modal"
+  //             onClick={() => setFilterData1(a)}
+  //             data-bs-target="#exampleModalCustomization"
+  //           >
+  //             <svg
+  //               className="SvgQuo"
+  //               xmlns="http://www.w3.org/2000/svg"
+  //               viewBox="0 0 24 24"
+  //             >
+  //               <title>Quotation</title>
+  //               <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
+  //             </svg>
+  //           </button>
 
-            {(+a.Status === 1 ||
-              +a.Status === 2 ||
-              +a.Status === 3 ||
-              +a.Status === 4) && (
-              <button
-                type="button"
-                style={{
-                  width: "20px",
-                  color: "#203764",
-                  fontSize: "22px",
-                  marginTop: "10px",
-                }}
-                onClick={() => performaOrder(a)}
-              >
-                <i className="fi fi-sr-square-p" />
-              </button>
-            )}
+  //           {(+a.Status === 1 ||
+  //             +a.Status === 2 ||
+  //             +a.Status === 3 ||
+  //             +a.Status === 4) && (
+  //             <button
+  //               type="button"
+  //               style={{
+  //                 width: "20px",
+  //                 color: "#203764",
+  //                 fontSize: "22px",
+  //                 marginTop: "10px",
+  //               }}
+  //               onClick={() => performaOrder(a)}
+  //             >
+  //               <i className="fi fi-sr-square-p" />
+  //             </button>
+  //           )}
 
-            {+a.Status > 2 && (
-              <button
-                type="button"
-                style={{
-                  width: "20px",
-                  color: "#203764",
-                  fontSize: "22px",
-                  marginTop: "10px",
-                }}
-                onClick={() => handleEditClick1(a.Order_ID)}
-              >
-                <i
-                  className="mdi mdi-content-copy"
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#consigneeOne"
-                />{" "}
-              </button>
-            )}
-            {+a.Status === 3 && (
-              <button
-                type="button"
-                onClick={() => quotationConfirmation(a.Order_ID)}
-              >
-                <i className="mdi mdi-check-circle" />
-              </button>
-            )}
-            {(+a.Status === 1 || +a.Status === 2) && (
-              // <button
-              //   type="button"
-              //   style={{
-              //     width: "20px",
-              //     color: "#203764",
-              //     fontSize: "22px",
-              //     marginTop: "10px",
-              //   }}
-              //   onClick={() => deleteOrder(a.Order_ID)}
-              // >
-              //   <i className="mdi mdi-delete" />
-              // </button>
+  //           {+a.Status > 2 && (
+  //             <button
+  //               type="button"
+  //               style={{
+  //                 width: "20px",
+  //                 color: "#203764",
+  //                 fontSize: "22px",
+  //                 marginTop: "10px",
+  //               }}
+  //               onClick={() => handleEditClick1(a.Order_ID)}
+  //             >
+  //               <i
+  //                 className="mdi mdi-content-copy"
+  //                 type="button"
+  //                 data-bs-toggle="modal"
+  //                 data-bs-target="#consigneeOne"
+  //               />{" "}
+  //             </button>
+  //           )}
+  //           {+a.Status === 3 && (
+  //             <button
+  //               type="button"
+  //               onClick={() => quotationConfirmation(a.Order_ID)}
+  //             >
+  //               <i className="mdi mdi-check-circle" />
+  //             </button>
+  //           )}
+  //           {(+a.Status === 1 || +a.Status === 2) && (
+  //             // <button
+  //             //   type="button"
+  //             //   style={{
+  //             //     width: "20px",
+  //             //     color: "#203764",
+  //             //     fontSize: "22px",
+  //             //     marginTop: "10px",
+  //             //   }}
+  //             //   onClick={() => deleteOrder(a.Order_ID)}
+  //             // >
+  //             //   <i className="mdi mdi-delete" />
+  //             // </button>
 
-              <button
-                type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal1"
-                onClick={() => setDeleteOrderId(a.Order_ID)}
-              >
-                <i className="mdi mdi-delete" />
-              </button>
-            )}
+  //             <button
+  //               type="button"
+  //               data-bs-toggle="modal"
+  //               data-bs-target="#exampleModal1"
+  //               onClick={() => setDeleteOrderId(a.Order_ID)}
+  //             >
+  //               <i className="mdi mdi-delete" />
+  //             </button>
+  //           )}
 
-            {+a.Status === 1 && (
-              <button
-                type="button"
-                onClick={() => quotationConfirmationForOrder(a.Order_ID)}
-              >
-                <i
-                  className="mdi mdi-check"
-                  style={{
-                    width: "20px",
-                    color: "#203764",
-                    fontSize: "22px",
-                    marginTop: "10px",
-                  }}
-                />
-              </button>
-            )}
-            {(+a.Status === 1 || +a.Status === 2) && (
-              <button
-                type="button"
-                style={{
-                  width: "20px",
-                  color: "#203764",
-                  fontSize: "22px",
-                  marginTop: "10px",
-                }}
-                onClick={() => expireQoutation(a.Order_ID)}
-              >
-                <i className="mdi mdi-clock-alert" />
-              </button>
-            )}
-          </div>
-        ),
-      },
-    ],
-    [i18n.language]
-  );
+  //           {[1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(a.Status) && (
+  //             <button
+  //               type="button"
+  //               onClick={() => quotationConfirmationForOrder(a.Order_ID)}
+  //             >
+  //               <i
+  //                 className="mdi mdi-check"
+  //                 style={{
+  //                   width: "20px",
+  //                   color: "#203764",
+  //                   fontSize: "22px",
+  //                   marginTop: "10px",
+  //                 }}
+  //               />
+  //             </button>
+  //           )}
+
+  //           {(+a.Status === 1 || +a.Status === 2) && (
+  //             <button
+  //               type="button"
+  //               style={{
+  //                 width: "20px",
+  //                 color: "#203764",
+  //                 fontSize: "22px",
+  //                 marginTop: "10px",
+  //               }}
+  //               onClick={() => expireQoutation(a.Order_ID)}
+  //             >
+  //               <i className="mdi mdi-clock-alert" />
+  //             </button>
+  //           )}
+  //         </div>
+  //       ),
+  //     },
+  //   ],
+  //   [i18n.language]
+  // );
   const dataSubmit1 = () => {
     axios
       .post(`${API_BASE_URL}/deleteQuotation`, {

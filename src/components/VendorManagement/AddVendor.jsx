@@ -14,6 +14,27 @@ const AddVendor = () => {
   const { from } = location.state || {};
   console.log(from);
   const navigate = useNavigate();
+  const { data: massengerTypeList } = useQuery("getMessengerType");
+  console.log(massengerTypeList);
+  const messengerOptions =
+    massengerTypeList?.map((item) => ({
+      label: item.Name_EN,
+      value: item.ID,
+    })) || [];
+  const [state1, setState1] = useState({
+    VCID: from?.ID || "",
+    Name_First: "",
+    Name_Last: "",
+    Email: "",
+    Phone: "",
+    Mobile: "",
+    Messenger_Type: "",
+    Messenger_ID: "",
+    Notes: "",
+    Accounting: false,
+    Invoice: false,
+    Logitics: false,
+  });
   const [state, setState] = useState({
     User_ID: localStorage.getItem("id"),
     Supplier: from?.Supplier ?? 1,
@@ -60,7 +81,76 @@ const AddVendor = () => {
         };
       });
   }, [state.subdistrict, dropdownSubDistrict]);
+  const handleChange1 = (e) => {
+    const { name, value, type, checked } = e.target;
+    setState1((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        ...state1, // assuming your state variable is `state`
+        User_ID: localStorage.getItem("id"), // Get from localStorage
+      };
 
+      const res = await axios.post(`${API_BASE_URL}/AddVcContact`, payload);
+      console.log("Response:", res.data);
+
+      // Reset form
+      setState1({
+        VCID: "",
+        Name_First: "",
+        Name_Last: "",
+        Email: "",
+        Phone: "",
+        Mobile: "",
+        Messenger_Type: "",
+        Messenger_ID: "",
+        Notes: "",
+        Accounting: false,
+        Invoice: false,
+        Logitics: false,
+      });
+
+      // Hide modal
+      const modalElement = document.getElementById("exampleModal");
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+
+      // Success toast (using message from API if available)
+      toast.success(res.data?.message, {
+        autoClose: 1000,
+        theme: "colored",
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error(t("networkError"), {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return false;
+    }
+  };
+  const clearAllData = () => {
+    setState1({
+      VCID: "",
+      Name_First: "",
+      Name_Last: "",
+      Email: "",
+      Phone: "",
+      Mobile: "",
+      Messenger_Type: "",
+      Messenger_ID: "",
+      Notes: "",
+      Accounting: false,
+      Invoice: false,
+      Logitics: false,
+    });
+  };
   const handleChange = (event) => {
     const { name, value } = event.target;
     setState((prevState) => {
@@ -365,7 +455,205 @@ const AddVendor = () => {
                 </div>
                 <div className="col-lg-4">
                   <div className="text-end">
-                    <button className="btn btn-danger">Add Contact</button>
+                    <button
+                      className="btn btn-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                    >
+                      Add Contact
+                    </button>
+                  </div>
+                  {/* add-contact-modal */}
+                  <div
+                    class="modal fade"
+                    id="exampleModal"
+                    tabindex="-1"
+                    aria-labelledby="exampleModalLabel"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog modalShipTo modal-xl">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="exampleModalLabel">
+                            Add Contact
+                          </h1>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            onClick={clearAllData}
+                            aria-label="Close"
+                          >
+                            <i class="mdi mdi-close"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div className="formCreate">
+                            <form action="">
+                              <div className="row">
+                                <div class="form-group col-lg-4">
+                                  <h6>First Name</h6>
+                                  <div class=" ">
+                                    <input
+                                      type="text"
+                                      name="Name_First"
+                                      value={state1.Name_First}
+                                      onChange={handleChange1}
+                                      placeholder="first name"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                  <h6>Last Name</h6>
+                                  <div class=" ">
+                                    <input
+                                      type="text"
+                                      name="Name_Last"
+                                      value={state1.Name_Last}
+                                      onChange={handleChange1}
+                                      placeholder="last name"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                  <h6>Email</h6>
+                                  <div class=" ">
+                                    <input
+                                      type="email"
+                                      name="Email"
+                                      value={state1.Email}
+                                      onChange={handleChange1}
+                                      placeholder="email"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="form-group col-lg-3">
+                                  <h6>Mobile</h6>
+                                  <div class=" ">
+                                    <input
+                                      type="number"
+                                      name="Mobile"
+                                      value={state1.Mobile}
+                                      onChange={handleChange1}
+                                      placeholder="mobile"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="form-group col-lg-3">
+                                  <h6>Phone</h6>
+                                  <div class=" ">
+                                    <input
+                                      type="number"
+                                      name="Phone"
+                                      value={state1.Phone}
+                                      onChange={handleChange1}
+                                      placeholder="phone"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="form-group col-lg-3">
+                                  <h6>Messenger type</h6>
+                                  <div class="ceateTransport autoComplete">
+                                   
+                                    <Autocomplete
+                                      options={messengerOptions}
+                                      getOptionLabel={(option) => option.label} // what to display in dropdown
+                                      value={
+                                        messengerOptions.find(
+                                          (opt) =>
+                                            opt.value ===
+                                            Number(state1.Messenger_Type)
+                                        ) || null
+                                      }
+                                      onChange={(event, newValue) =>
+                                        setState1({
+                                          ...state1,
+                                          Messenger_Type: newValue
+                                            ? newValue.value
+                                            : "",
+                                        })
+                                      }
+                                      renderInput={(params) => (
+                                        <TextField
+                                          {...params}
+                                          placeholder={t("messengerType")}
+                                          variant="outlined"
+                                        />
+                                      )}
+                                    />
+                                  </div>
+                                </div>
+                                <div class="form-group col-lg-3">
+                                  <h6>Messenger Id</h6>
+                                  <div class=" ">
+                                    <input
+                                      type="number"
+                                      name="Messenger_ID"
+                                      value={state1.Messenger_ID}
+                                      onChange={handleChange1}
+                                      placeholder="messenger id"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="form-group col-lg-12">
+                                  <h6>Notes</h6>
+                                  <div>
+                                    <textarea
+                                      name="Notes"
+                                      value={state1.Notes}
+                                      onChange={handleChange1}
+                                      cols="30"
+                                      rows="4"
+                                    ></textarea>
+                                  </div>
+                                </div>
+                                <div className="form-group col-lg-12">
+                                  <div className="invoiceModal">
+                                    <div>
+                                      <input
+                                        type="checkbox"
+                                        id="dap"
+                                        name="Accounting"
+                                        checked={state1.Accounting}
+                                        onChange={handleChange1}
+                                      />
+                                      <label htmlFor="dap">Accounting</label>
+                                    </div>
+                                    <div>
+                                      <input
+                                        type="checkbox"
+                                        id="cnf"
+                                        name="Invoice"
+                                        checked={state1.Invoice}
+                                        onChange={handleChange1}
+                                      />
+                                      <label htmlFor="cnf">Invoice</label>
+                                    </div>
+                                    <input
+                                      type="checkbox"
+                                      id="cif"
+                                      name="Logitics"
+                                      checked={state1.Logitics}
+                                      onChange={handleChange1}
+                                    />
+                                    <label htmlFor="cif">Logitics</label>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-primary mb-0"
+                            onClick={handleSubmit}
+                          >
+                            submit
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -396,11 +684,34 @@ const AddVendor = () => {
               <div className="col-lg-3 form-group autoComplete">
                 <h6>{t("messengerType")}</h6>
                 <div>
-                  <Autocomplete
+                  {/* <Autocomplete
                     options={countries}
                     value={state.Messenger_Type || ""}
                     onChange={(event, newValue) =>
                       setState({ ...state, Messenger_Type: newValue })
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder={t("messengerType")}
+                        variant="outlined"
+                      />
+                    )}
+
+                  /> */}
+                  <Autocomplete
+                    options={messengerOptions}
+                    getOptionLabel={(option) => option.label} // what to display in dropdown
+                    value={
+                      messengerOptions.find(
+                        (opt) => opt.value === Number(state.Messenger_Type)
+                      ) || null
+                    }
+                    onChange={(event, newValue) =>
+                      setState({
+                        ...state,
+                        Messenger_Type: newValue ? newValue.value : "",
+                      })
                     }
                     renderInput={(params) => (
                       <TextField

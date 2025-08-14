@@ -91,7 +91,7 @@ const CreateQuotationTest = () => {
           };
         });
         setOrderId(res?.data?.order_id);
-        setDeleteOrderId(res?.data?.order_id)
+        setDeleteOrderId(res?.data?.order_id);
         getOrdersDetails();
         toast.success(t("quotationPopulatedSuccess"), {
           autoClose: 1000,
@@ -515,7 +515,7 @@ const CreateQuotationTest = () => {
             toast.success(t("quotationDetailDeletedSuccess"));
           }
         });
-      } catch (e) { }
+      } catch (e) {}
     } else {
       setDetails((prevState) => {
         return prevState.filter((v, index) => index != i);
@@ -1005,6 +1005,7 @@ const CreateQuotationTest = () => {
           `${API_BASE_URL}/ConsigneeBrandDropdown`,
           {
             Consignee_id: state.consignee_id,
+            Client_id: state.client_id,
           }
         );
         console.log(response.data); // Log the response data
@@ -1071,7 +1072,7 @@ const CreateQuotationTest = () => {
 
     const consigneeFind = selectedConsigneeData
       ? selectedConsigneeData
-      : consigneesNew?.find(v => v.ID == state.consignee_id);
+      : consigneesNew?.find((v) => v.ID == state.consignee_id);
 
     const portDestinationFind = ports?.find(
       (v) =>
@@ -1122,18 +1123,17 @@ const CreateQuotationTest = () => {
     freights,
     unit,
     itf,
-    selectedConsigneeData // added dependency
+    selectedConsigneeData, // added dependency
   ]);
 
   // Update copyData whenever computedState changes
   useEffect(() => {
     const consigneeFind = selectedConsigneeData
       ? selectedConsigneeData
-      : consigneesNew?.find(v => v.ID == state.consignee_id);
+      : consigneesNew?.find((v) => v.ID == state.consignee_id);
 
     setCopyData(consigneeFind || null);
   }, [computedState, selectedConsigneeData, consigneesNew, state.consignee_id]);
-
 
   // useEffect(() => {
   //   // Don't run if no client
@@ -1199,13 +1199,13 @@ const CreateQuotationTest = () => {
   //   }
   // }, [state.client_id, state.consignee_id]);
 
-
   // Fetch full consignee list for a client
   useEffect(() => {
     if (!state.client_id) return;
 
-    axios.post(`${API_BASE_URL}/ConsigneeDropDown`, { Client_id: state.client_id })
-      .then(res => {
+    axios
+      .post(`${API_BASE_URL}/ConsigneeDropDown`, { Client_id: state.client_id })
+      .then((res) => {
         setConsigneesNew(res.data.data || []);
       })
       .catch(console.error);
@@ -1216,13 +1216,14 @@ const CreateQuotationTest = () => {
     if (!state.client_id || !state.consignee_id) return;
     console.log("run.............");
 
-    axios.post(`${API_BASE_URL}/ConsigneeDropDown`, {
-      Client_id: state.client_id,
-      Consignee_ID: state.consignee_id,
-      Is_Quotation: 1,
-      User_ID: localStorage.getItem("id")
-    })
-      .then(res => {
+    axios
+      .post(`${API_BASE_URL}/ConsigneeDropDown`, {
+        Client_id: state.client_id,
+        Consignee_ID: state.consignee_id,
+        Is_Quotation: 1,
+        User_ID: localStorage.getItem("id"),
+      })
+      .then((res) => {
         const detail = res.data.data?.[0] || null;
         setSelectedConsigneeData(detail); // store detailed data
       })
@@ -1237,7 +1238,6 @@ const CreateQuotationTest = () => {
       setCopyData(null);
     }
   }, [state.consignee_id]);
-
 
   const customStyles = {
     control: (base) => ({
@@ -1278,14 +1278,14 @@ const CreateQuotationTest = () => {
 
   const options = itfNew
     ? itfNew.map((v) => ({
-      value: v.ID, // Standardized property name for value
-      label: v.itf_name,
-      Produce: v.Produce, // Standardized property name for value
-      Claim_Markup: v.Claim_Markup,
-      HSCODE: v.HSCODE,
-      Produce_Status: v.Produce_Status,
-      // Standardized property name for label
-    }))
+        value: v.ID, // Standardized property name for value
+        label: v.itf_name,
+        Produce: v.Produce, // Standardized property name for value
+        Claim_Markup: v.Claim_Markup,
+        HSCODE: v.HSCODE,
+        Produce_Status: v.Produce_Status,
+        // Standardized property name for label
+      }))
     : [];
   const selectedOption = options.find(
     (option) =>
@@ -1387,13 +1387,10 @@ const CreateQuotationTest = () => {
                         <h6>{t("consignee")}</h6>
                         <Autocomplete
                           options={consigneesNew || []} // Ensure consignees is an array
-                          getOptionLabel={(option) =>
-                            option.Name || ""
-                          } // Display the consignee name
+                          getOptionLabel={(option) => option.Name || ""} // Display the consignee name
                           value={
                             consigneesNew?.find(
-                              (v) =>
-                                v.ID === computedState.consignee_id
+                              (v) => v.ID === computedState.consignee_id
                             ) || null
                           } // Find the selected consignee by consignee_id
                           onChange={(event, newValue) => {
@@ -1414,12 +1411,8 @@ const CreateQuotationTest = () => {
                               liner_id: "",
                               Q_Markup: "",
                               loading_location: "",
-                              consignee_id: newValue
-                                ? newValue.ID
-                                : "", // Set consignee_id from the selected consignee
-                              consignee_name: newValue
-                                ? newValue.Name
-                                : "",
+                              consignee_id: newValue ? newValue.ID : "", // Set consignee_id from the selected consignee
+                              consignee_name: newValue ? newValue.Name : "",
                             });
                           }}
                           renderInput={(params) => (
@@ -1573,14 +1566,14 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.destination_port_id
                               ? ports
-                                ?.map((v) => ({
-                                  id: v.port_id,
-                                  name: v.port_name,
-                                }))
-                                .find(
-                                  (v) =>
-                                    v.id === computedState.destination_port_id
-                                ) || null
+                                  ?.map((v) => ({
+                                    id: v.port_id,
+                                    name: v.port_name,
+                                  }))
+                                  .find(
+                                    (v) =>
+                                      v.id === computedState.destination_port_id
+                                  ) || null
                               : null
                           }
                           onChange={(e, newValue) =>
@@ -1614,13 +1607,13 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.liner_id
                               ? liners
-                                ?.map((v) => ({
-                                  id: v.liner_id,
-                                  name: v.liner_name,
-                                }))
-                                .find(
-                                  (v) => v.id === computedState.liner_id
-                                ) || null
+                                  ?.map((v) => ({
+                                    id: v.liner_id,
+                                    name: v.liner_name,
+                                  }))
+                                  .find(
+                                    (v) => v.id === computedState.liner_id
+                                  ) || null
                               : null
                           }
                           onChange={async (e, newValue) => {
@@ -1631,7 +1624,9 @@ const CreateQuotationTest = () => {
                               await axios.post(
                                 `${API_BASE_URL}/updateOrdersValues`,
                                 {
-                                  id: state.order_id || selectedConsigneeData.Order_ID,
+                                  id:
+                                    state.order_id ||
+                                    selectedConsigneeData.Order_ID,
                                   liner_id: newId,
                                   Freight_provider_: state.Freight_provider_,
                                 }
@@ -1705,10 +1700,10 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.Transportation_provider
                               ? transport?.find(
-                                (v) =>
-                                  v.Transportation_provider ===
-                                  computedState.Transportation_provider
-                              ) || null
+                                  (v) =>
+                                    v.Transportation_provider ===
+                                    computedState.Transportation_provider
+                                ) || null
                               : null
                           } // Ensure value is mapped to the full object
                           onChange={(e, newValue) =>
@@ -1739,10 +1734,10 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.Clearance_provider
                               ? clearance?.find(
-                                (v) =>
-                                  v.Clearance_provider ===
-                                  computedState.Clearance_provider
-                              ) || null
+                                  (v) =>
+                                    v.Clearance_provider ===
+                                    computedState.Clearance_provider
+                                ) || null
                               : null
                           } // Map the id to the full object
                           onChange={(e, newValue) =>
@@ -1804,10 +1799,10 @@ const CreateQuotationTest = () => {
                           value={
                             computedState.Freight_provider_
                               ? freights?.find(
-                                (v) =>
-                                  v.Freight_provider ===
-                                  computedState.Freight_provider_
-                              ) || null
+                                  (v) =>
+                                    v.Freight_provider ===
+                                    computedState.Freight_provider_
+                                ) || null
                               : null
                           }
                           onChange={async (e, newValue) => {
@@ -2249,9 +2244,9 @@ const CreateQuotationTest = () => {
                                     ((localStorage.getItem("level") ===
                                       "Level 1" &&
                                       localStorage.getItem("role") ===
-                                      "Admin") ||
+                                        "Admin") ||
                                       localStorage.getItem("level") ===
-                                      "Level 5")
+                                        "Level 5")
                                   ) {
                                     return null; // Hide "Profit"
                                   }
@@ -2287,9 +2282,9 @@ const CreateQuotationTest = () => {
                                     ((localStorage.getItem("level") ===
                                       "Level 1" &&
                                       localStorage.getItem("role") ===
-                                      "Admin") ||
+                                        "Admin") ||
                                       localStorage.getItem("level") ===
-                                      "Level 5")
+                                        "Level 5")
                                   ) {
                                     return null;
                                   }
@@ -2873,43 +2868,39 @@ const CreateQuotationTest = () => {
                   <i className="mdi mdi-close"></i>
                 </button>
               </div> */}
-              <div className="modal-body">
-                <div className="row tableCombinePayment">
-                  <div className="tableCreateClient tablepayment">
-                    <table>
+              <div className="row tableCombinePayment">
+                <div className="tableCreateClient tablepayment">
+                  <table>
                     <thead>
-                        <tr>
-                          {Object.values(calculateListData?.header || {}).map(
-                            (label, index) => (
-                              <th key={index}>{label}</th>
-                            )
+                      <tr>
+                        {Object.values(calculateListData?.header || {}).map(
+                          (label, index) => (
+                            <th key={index}>{label}</th>
+                          )
+                        )}
+                        <th>
+                          {" "}
+                          <i
+                            type="button"
+                            onClick={handleCloseModal}
+                            className="mdi mdi-close"
+                          ></i>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {calculateListData?.data?.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                          {Object.keys(calculateListData?.header || {}).map(
+                            (_, colIndex) => {
+                              const colKey = `COL${colIndex + 1}`; // Dynamically build COL1, COL2, ...
+                              return <td key={colKey}>{row[colKey] ?? ""}</td>;
+                            }
                           )}
-                          <th>
-                            {" "}
-                            <i
-                              type="button"
-                              onClick={handleCloseModal}
-                              className="mdi mdi-close"
-                            ></i>
-                          </th>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {calculateListData?.data?.map((row, rowIndex) => (
-                          <tr key={rowIndex}>
-                            {Object.keys(calculateListData?.header || {}).map(
-                              (_, colIndex) => {
-                                const colKey = `COL${colIndex + 1}`; // Dynamically build COL1, COL2, ...
-                                return (
-                                  <td key={colKey}>{row[colKey] ?? ""}</td>
-                                );
-                              }
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
               <div className="modal-footer justify-content-center">

@@ -501,6 +501,7 @@ const UpdateTest = () => {
           `${API_BASE_URL}/ConsigneeBrandDropdown`,
           {
             Consignee_id: state.consignee_id,
+            Client_id: state.client_id,
           }
         );
         console.log(response.data); // Log the response data
@@ -3463,7 +3464,7 @@ const UpdateTest = () => {
         >
           <div
             className="fixed w-screen h-screen bg-black/20 "
-             onClick={handleCloseModal}
+            onClick={handleCloseModal}
           />
           <div
             className="bg-white rounded-lg shadow-lg max-w-md w-full modalBillingTable"
@@ -3509,7 +3510,6 @@ const UpdateTest = () => {
                             ))}
                           </tbody>
                         </table>
-                       
                       </div>
                     </div>
                   </div>

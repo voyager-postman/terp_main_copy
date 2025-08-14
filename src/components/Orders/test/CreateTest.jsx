@@ -969,7 +969,7 @@ const CreateTest = () => {
   };
   const newItfList = async () => {
     console.log(state);
-    
+
     if (state.consignee_id) {
       try {
         const response = await axios.post(`${API_BASE_URL}/NewItfDropDown`, {
@@ -990,6 +990,7 @@ const CreateTest = () => {
           `${API_BASE_URL}/ConsigneeBrandDropdown`,
           {
             Consignee_id: state.consignee_id,
+            Client_id: state.client_id,
           }
         );
         console.log(response.data);
@@ -1292,9 +1293,7 @@ const CreateTest = () => {
                         <h6>{t("consignee")}</h6>
                         <Autocomplete
                           options={consigneesNew || []} // Ensure consignees is an array
-                          getOptionLabel={(option) =>
-                            option.Name || ""
-                          } // Display the consignee name
+                          getOptionLabel={(option) => option.Name || ""} // Display the consignee name
                           value={
                             consigneesNew?.find(
                               (v) =>
@@ -1320,9 +1319,7 @@ const CreateTest = () => {
                               consignee_id: newValue
                                 ? newValue.consignee_id
                                 : "", // Set consignee_id from the selected consignee
-                              consignee_name: newValue
-                                ? newValue.Name
-                                : "",
+                              consignee_name: newValue ? newValue.Name : "",
                             });
                           }}
                           renderInput={(params) => (

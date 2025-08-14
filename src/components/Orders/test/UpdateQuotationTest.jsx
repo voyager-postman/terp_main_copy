@@ -646,6 +646,7 @@ const UpdateQuotationTest = () => {
           `${API_BASE_URL}/ConsigneeBrandDropdown`,
           {
             Consignee_id: state.consignee_id,
+            Client_id: state.client_id,
           }
         );
         console.log(response.data); // Log the response data
@@ -3432,46 +3433,44 @@ const UpdateQuotationTest = () => {
         >
           <div className="modal-dialog modal-xl modalShipTo p-0">
             <div className="modal-content">
-              <div className="modal-body">
-                <div className="row tableCombinePayment">
-                  <div className="tableCreateClient tablepayment modalBillingTable">
-                    <table>
-                      <thead>
-                        <tr>
-                          {Object.values(calculateListData?.header || {}).map(
-                            (label, index) => (
-                              <th key={index}>{label}</th>
-                            )
+              {/* <div className="modal-body"> */}
+              <div className="row tableCombinePayment">
+                <div className="tableCreateClient tablepayment modalBillingTable">
+                  <table>
+                    <thead>
+                      <tr>
+                        {Object.values(calculateListData?.header || {}).map(
+                          (label, index) => (
+                            <th key={index}>{label}</th>
+                          )
+                        )}
+                        <th>
+                          {" "}
+                          <i
+                            type="button"
+                            onClick={handleCloseModal}
+                            className="mdi mdi-close"
+                          ></i>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {calculateListData?.data?.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                          {Object.keys(calculateListData?.header || {}).map(
+                            (_, colIndex) => {
+                              const colKey = `COL${colIndex + 1}`; // Dynamically build COL1, COL2, ...
+                              return <td key={colKey}>{row[colKey] ?? ""}</td>;
+                            }
                           )}
-                          <th>
-                            {" "}
-                            <i
-                              type="button"
-                              onClick={handleCloseModal}
-                              className="mdi mdi-close"
-                            ></i>
-                          </th>
+                          <td></td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {calculateListData?.data?.map((row, rowIndex) => (
-                          <tr key={rowIndex}>
-                            {Object.keys(calculateListData?.header || {}).map(
-                              (_, colIndex) => {
-                                const colKey = `COL${colIndex + 1}`; // Dynamically build COL1, COL2, ...
-                                return (
-                                  <td key={colKey}>{row[colKey] ?? ""}</td>
-                                );
-                              }
-                            )}
-                            <td></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
+              {/* </div> */}
               <div className="modal-footer justify-content-center">
                 <button
                   type="button"
