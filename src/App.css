@@ -4084,16 +4084,27 @@ td {
 .invOptionSetup p {
   margin-bottom: 10px;
 }
-.selectReact .select__placeholder{
+.selectReact .select__placeholder {
   margin-left: 10px !important;
 }
-.selectReact .select__control{
-border: 2px solid #203764 !important;
+.selectReact .select__control {
+  border: 2px solid #203764 !important;
 }
-.selectReact .select__input{
+.selectReact .select__input {
   border: unset !important;
   width: 100%;
 }
-.selectReact .select__control:focus{
- border: 2px solid #203764 !important;
+.selectReact .select__control:focus {
+  border: 2px solid #203764 !important;
+}
+/* surbhi(14-08-25) */
+.border-line {
+  background-color: #203764 !important;
+  height: 2px;
+  color: #203764 !important;
+  opacity: 1 !important;
+  margin: 10px 0px;
+}
+.form-group .MuiAutocomplete-root {
+  margin-bottom: 10px;
 }

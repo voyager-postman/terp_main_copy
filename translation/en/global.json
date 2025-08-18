@@ -488,7 +488,7 @@
   "addConsigneeItems": "Add Consignee Items",
   "quotationPopulate": "Quotation Populate",
   "netWeight": "Net Weight",
-  "pleaseAdjustITF": "Please adjust Select ITF to complete a box",
+  "pleaseAdjustITF": "Please adjust Select ITF to complete a box or Error in price calculation",
   "numberOfBox": "Number of Box",
   "nw": "NW",
   "adjustPrice": "Adjust Price",

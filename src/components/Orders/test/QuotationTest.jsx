@@ -26,6 +26,7 @@ const QuotationTest = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(false);
+  const [titleData, setTitleData] = useState("");
   const [useAgreedPricing, setUseAgreedPricing] = useState(false);
   const [itemDetails, setItemDetails] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState("Client");
@@ -79,8 +80,8 @@ const QuotationTest = () => {
       .then((res) => {
         console.log(res);
 
-        const { head, data } = res.data;
-
+        const { head, data, title } = res.data;
+        setTitleData(title);
         // Remove unwanted columns from table (Order_ID, Status_value)
         const columnsToHide = ["Order_ID", "Status_value"];
 
@@ -92,41 +93,9 @@ const QuotationTest = () => {
             accessor: key,
           }));
 
-        // Add the "actions" column at the end
         dynamicColumns.push({
           Header: t("actions"),
-          // accessor: (a) => (
-          //   <div className="editIcon">
-          //     <Link to="/quotation_view" state={{ from: { ...a } }}>
-          //       <i className="mdi mdi-eye" />
-          //     </Link>
 
-          //     {(+a.Status_value === 1 || +a.Status_value === 2) && (
-          //       <Link to="/update_Quotation" state={{ from: { ...a } }}>
-          //         <i className="mdi mdi-pencil" />
-          //       </Link>
-          //     )}
-
-          //     {[1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(
-          //       a.Status_value
-          //     ) && (
-          //       <button
-          //         type="button"
-          //         onClick={() => quotationConfirmationForOrder(a.Order_ID)}
-          //       >
-          //         <i
-          //           className="mdi mdi-check"
-          //           style={{
-          //             width: "20px",
-          //             color: "#203764",
-          //             fontSize: "22px",
-          //             marginTop: "10px",
-          //           }}
-          //         />
-          //       </button>
-          //     )}
-          //   </div>
-          // ),
           accessor: (a) => (
             <div className="editIcon">
               <Link to="/quotation_view" state={{ from: { ...a } }}>
@@ -1623,7 +1592,7 @@ const QuotationTest = () => {
         </div>
       </div>
       <Card
-        title={t("quotationTestManagement")}
+        title={titleData?.Title}
         endElement={
           <button
             type="button"

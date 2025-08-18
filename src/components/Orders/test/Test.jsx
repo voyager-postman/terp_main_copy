@@ -75,6 +75,8 @@ const Test = () => {
   const [selectedLinerId, setSelectedLinerId] = useState(null);
   const [totalDetails, setTotalDetails] = useState("");
   const [newDate, setNewDate] = useState("");
+  const [columns, setColumns] = useState([]);
+  const [titleData, setTitleData] = useState("");
 
   const [orderId, setOrderId] = useState("");
   const [deleteOrderId, setDeleteOrderId] = useState("");
@@ -107,13 +109,298 @@ const Test = () => {
 
   const [data, setData] = useState([]);
 
+  // const orderData = () => {
+  //   axios.get(`${API_BASE_URL}/OrderEN`).then((res) => {
+  //     console.log(res);
+  //     setData(res.data.data || []);
+  //   });
+  // };
+
   const orderData = () => {
     axios
-      .get(`${API_BASE_URL}/NewgetOrders`, {
-        params: { is_quotation: 0 }, // or is_quotation: 1
-      })
+      .get(`${API_BASE_URL}/OrderEN`)
       .then((res) => {
-        setData(res.data.data || []);
+        console.log(res);
+
+        const { head, data, title } = res.data;
+        setTitleData(title);
+        // Remove unwanted columns from table (Order_ID, Status_value)
+        const columnsToHide = ["Order_ID", "Status_value"];
+
+        // Create dynamic columns excluding hidden ones
+        const dynamicColumns = Object.keys(head)
+          .filter((key) => !columnsToHide.includes(key))
+          .map((key) => ({
+            Header: t(head[key]), // Translate header if needed
+            accessor: key,
+          }));
+
+        dynamicColumns.push({
+          Header: t("actions"),
+          accessor: (a) => (
+            <div className="editIcon">
+              {+a.is_deleted === 1 ? (
+                <button
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal2"
+                  onClick={() => setNotes2(a.deleted_note)}
+                >
+                  <i className="mdi mdi-eye" />
+                </button>
+              ) : (
+                <Link
+                  to="/order_view"
+                  state={{ from: { ...a, isReadOnly: true } }}
+                >
+                  <i className="mdi mdi-eye" />
+                </Link>
+              )}
+
+              {+a.is_deleted !== 1 && (
+                <>
+                  {(+a.Status_value === 3 ||
+                    +a.Status_value === 4 ||
+                    +a.Status_value === 5 ||
+                    +a.Status_value === 6) && (
+                    <>
+                      <Link to="/update_Order" state={{ from: { ...a } }}>
+                        <i className="mdi mdi-pencil" />
+                      </Link>
+                    </>
+                  )}
+                  {(+a.Status_value === 3 ||
+                    +a.Status_value === 4 ||
+                    +a.Status_value === 5 ||
+                    +a.Status_value >= 6) && (
+                    <button type="button" onClick={() => performaOrder(a)}>
+                      {" "}
+                      <i className="fi fi-sr-square-p"></i>
+                    </button>
+                  )}
+                  {(+a.Status_value === 4 ||
+                    +a.Status_value === 5 ||
+                    +a.Status_value >= 6) && (
+                    <button type="button" onClick={() => operationPdfTest(a)}>
+                      {" "}
+                      <i class="fi fi-sr-square-o"></i>
+                    </button>
+                  )}
+                  {(+a.Status_value === 4 ||
+                    +a.Status_value === 5 ||
+                    +a.Status_value === 6) && (
+                    <button type="button" onClick={() => generatePdf2(a)}>
+                      {" "}
+                      <svg
+                        className="SvgQuo"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                      >
+                        <title>alpha-c-box-outline</title>
+                        <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
+                      </svg>
+                    </button>
+                  )}
+                  {(+a.Status_value === 4 ||
+                    +a.Status_value === 5 ||
+                    +a.Status_value === 6) && (
+                    <button
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                      onClick={() => inventoryBoxes(a.Order_ID)}
+                    >
+                      {" "}
+                      <i className="mdi mdi-note-outline" />
+                    </button>
+                  )}
+                  {(+a.Status_value === 4 ||
+                    +a.Status_value === 5 ||
+                    +a.Status_value >= 6) && (
+                    <button
+                      type="button"
+                      style={{
+                        width: "20px",
+                        color: "#203764",
+                        fontSize: "22px",
+                        marginTop: "10px",
+                      }}
+                      onClick={() => handleEditClick1(a.Order_ID)}
+                    >
+                      <i
+                        className="mdi mdi-content-copy"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#consigneeOne"
+                      />{" "}
+                    </button>
+                  )}
+                  {(+a.Status_value === 4 ||
+                    +a.Status_value === 5 ||
+                    +a.Status_value === 6) && (
+                    <button
+                      type="button"
+                      onClick={() => openModal(a.Order_ID, a.Consignee_ID)}
+                    >
+                      <i className="mdi mdi-airplane-clock" />
+                    </button>
+                  )}
+                  {(+a.Status_value === 3 ||
+                    +a.Status_value === 4 ||
+                    +a.Status_value === 5 ||
+                    +a.Status_value === 6) && (
+                    <button
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal1"
+                      onClick={() => setDeleteOrderId(a.Order_ID)}
+                    >
+                      <i className="mdi mdi-delete " />
+                    </button>
+                  )}
+
+                  {+a.Status_value === 3 && (
+                    <button type="button" onClick={() => CheckBox(a.Order_ID)}>
+                      <i
+                        className="mdi mdi-check"
+                        style={{
+                          width: "20px",
+                          color: "#203764",
+                          fontSize: "22px",
+                          marginTop: "10px",
+                        }}
+                      />
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          ),
+          // accessor: (a) => (
+          //   <div className="editIcon">
+          //     <Link to="/quotation_view" state={{ from: { ...a } }}>
+          //       <i className="mdi mdi-eye" />
+          //     </Link>
+
+          //     {(+a.Status_value === 1 || +a.Status_value === 2) && (
+          //       <Link to="/update_Quotation" state={{ from: { ...a } }}>
+          //         <i className="mdi mdi-pencil" />
+          //       </Link>
+          //     )}
+
+          //     <button
+          //       type="button"
+          //       data-bs-toggle="modal"
+          //       onClick={() => setFilterData1(a)}
+          //       data-bs-target="#exampleModalCustomization"
+          //     >
+          //       <svg
+          //         className="SvgQuo"
+          //         xmlns="http://www.w3.org/2000/svg"
+          //         viewBox="0 0 24 24"
+          //       >
+          //         <title>Quotation</title>
+          //         <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
+          //       </svg>
+          //     </button>
+
+          //     {(+a.Status_value === 1 ||
+          //       +a.Status_value === 2 ||
+          //       +a.Status_value === 3 ||
+          //       +a.Status_value === 4) && (
+          //       <button
+          //         type="button"
+          //         style={{
+          //           width: "20px",
+          //           color: "#203764",
+          //           fontSize: "22px",
+          //           marginTop: "10px",
+          //         }}
+          //         onClick={() => performaOrder(a)}
+          //       >
+          //         <i className="fi fi-sr-square-p" />
+          //       </button>
+          //     )}
+
+          //     {+a.Status_value > 2 && (
+          //       <button
+          //         type="button"
+          //         style={{
+          //           width: "20px",
+          //           color: "#203764",
+          //           fontSize: "22px",
+          //           marginTop: "10px",
+          //         }}
+          //         onClick={() => handleEditClick1(a.Order_ID)}
+          //       >
+          //         <i
+          //           className="mdi mdi-content-copy"
+          //           type="button"
+          //           data-bs-toggle="modal"
+          //           data-bs-target="#consigneeOne"
+          //         />{" "}
+          //       </button>
+          //     )}
+          //     {+a.Status_value === 3 && (
+          //       <button
+          //         type="button"
+          //         onClick={() => quotationConfirmation(a.Order_ID)}
+          //       >
+          //         <i className="mdi mdi-check-circle" />
+          //       </button>
+          //     )}
+          //     {(+a.Status_value === 1 || +a.Status_value === 2) && (
+          //       <button
+          //         type="button"
+          //         data-bs-toggle="modal"
+          //         data-bs-target="#exampleModal1"
+          //         onClick={() => setDeleteOrderId(a.Order_ID)}
+          //       >
+          //         <i className="mdi mdi-delete" />
+          //       </button>
+          //     )}
+
+          //     {[1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(
+          //       a.Status_value
+          //     ) && (
+          //       <button
+          //         type="button"
+          //         onClick={() => quotationConfirmationForOrder(a.Order_ID)}
+          //       >
+          //         <i
+          //           className="mdi mdi-check"
+          //           style={{
+          //             width: "20px",
+          //             color: "#203764",
+          //             fontSize: "22px",
+          //             marginTop: "10px",
+          //           }}
+          //         />
+          //       </button>
+          //     )}
+          //     {(+a.Status_value === 1 || +a.Status_value === 2) && (
+          //       <button
+          //         type="button"
+          //         style={{
+          //           width: "20px",
+          //           color: "#203764",
+          //           fontSize: "22px",
+          //           marginTop: "10px",
+          //         }}
+          //         onClick={() => expireQoutation(a.Order_ID)}
+          //       >
+          //         <i className="mdi mdi-clock-alert" />
+          //       </button>
+          //     )}
+          //   </div>
+          // ),
+        });
+
+        setColumns(dynamicColumns);
+        setData(data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching quotations:", err);
       });
   };
   useEffect(() => {
@@ -2327,176 +2614,6 @@ const Test = () => {
       });
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        Header: t("number"),
-        accessor: "Order_Number",
-      },
-      {
-        Header: t("clientName"),
-        accessor: "client_name",
-      },
-      {
-        Header: t("destinationPort"),
-        accessor: "port_name",
-      },
-      {
-        Header: t("consigneeName"),
-        accessor: "Consignee_name",
-      },
-      {
-        Header: t("location"),
-        accessor: "Location_name",
-      },
-      {
-        Header: t("loadDate"),
-        accessor: (a) => {
-          return a?.load_date
-            ? new Date(a?.load_date).toLocaleDateString()
-            : "NA";
-        },
-      },
-      {
-        Header: t("status"),
-        accessor: "status_name",
-      },
-      {
-        Header: t("actions"),
-        accessor: (a) => (
-          <div className="editIcon">
-            {+a.is_deleted === 1 ? (
-              <button
-                type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal2"
-                onClick={() => setNotes2(a.deleted_note)}
-              >
-                <i className="mdi mdi-eye" />
-              </button>
-            ) : (
-              <Link
-                to="/order_view"
-                state={{ from: { ...a, isReadOnly: true } }}
-              >
-                <i className="mdi mdi-eye" />
-              </Link>
-            )}
-
-            {+a.is_deleted !== 1 && (
-              <>
-                {(+a.Status === 3 ||
-                  +a.Status === 4 ||
-                  +a.Status === 5 ||
-                  +a.Status === 6) && (
-                  <>
-                    <Link to="/update_Order" state={{ from: { ...a } }}>
-                      <i className="mdi mdi-pencil" />
-                    </Link>
-                  </>
-                )}
-                {(+a.Status === 3 ||
-                  +a.Status === 4 ||
-                  +a.Status === 5 ||
-                  +a.Status >= 6) && (
-                  <button type="button" onClick={() => performaOrder(a)}>
-                    {" "}
-                    <i className="fi fi-sr-square-p"></i>
-                  </button>
-                )}
-                {(+a.Status === 4 || +a.Status === 5 || +a.Status >= 6) && (
-                  <button type="button" onClick={() => operationPdfTest(a)}>
-                    {" "}
-                    <i class="fi fi-sr-square-o"></i>
-                  </button>
-                )}
-                {(+a.Status === 4 || +a.Status === 5 || +a.Status === 6) && (
-                  <button type="button" onClick={() => generatePdf2(a)}>
-                    {" "}
-                    <svg
-                      className="SvgQuo"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                    >
-                      <title>alpha-c-box-outline</title>
-                      <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
-                    </svg>
-                  </button>
-                )}
-                {(+a.Status === 4 || +a.Status === 5 || +a.Status === 6) && (
-                  <button
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                    onClick={() => inventoryBoxes(a.Order_ID)}
-                  >
-                    {" "}
-                    <i className="mdi mdi-note-outline" />
-                  </button>
-                )}
-                {(+a.Status === 4 || +a.Status === 5 || +a.Status >= 6) && (
-                  <button
-                    type="button"
-                    style={{
-                      width: "20px",
-                      color: "#203764",
-                      fontSize: "22px",
-                      marginTop: "10px",
-                    }}
-                    onClick={() => handleEditClick1(a.Order_ID)}
-                  >
-                    <i
-                      className="mdi mdi-content-copy"
-                      type="button"
-                      data-bs-toggle="modal"
-                      data-bs-target="#consigneeOne"
-                    />{" "}
-                  </button>
-                )}
-                {(+a.Status === 4 || +a.Status === 5 || +a.Status === 6) && (
-                  <button
-                    type="button"
-                    onClick={() => openModal(a.Order_ID, a.Consignee_ID)}
-                  >
-                    <i className="mdi mdi-airplane-clock" />
-                  </button>
-                )}
-                {(+a.Status === 3 ||
-                  +a.Status === 4 ||
-                  +a.Status === 5 ||
-                  +a.Status === 6) && (
-                  <button
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal1"
-                    onClick={() => setDeleteOrderId(a.Order_ID)}
-                  >
-                    <i className="mdi mdi-delete " />
-                  </button>
-                )}
-
-                {+a.Status === 3 && (
-                  <button type="button" onClick={() => CheckBox(a.Order_ID)}>
-                    <i
-                      className="mdi mdi-check"
-                      style={{
-                        width: "20px",
-                        color: "#203764",
-                        fontSize: "22px",
-                        marginTop: "10px",
-                      }}
-                    />
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        ),
-      },
-    ],
-    [data, form, t, i18n.language]
-  );
-
   return (
     <>
       <div
@@ -2551,7 +2668,7 @@ const Test = () => {
         </div>
       </div>
       <Card
-        title={t("orderManagement")}
+        title={titleData?.Title}
         endElement={
           <button
             type="button"

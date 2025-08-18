@@ -550,7 +550,7 @@ const UpdateQuotationTest = () => {
   console.log(computedState);
   const isError = useMemo(() => {
     return (details?.section5_Values || []).some((v) => {
-      return +v.Box % 1 !== 0;
+      return +v.Box % 1 !== 0  || +v.cal_error == 1 ;
     });
   }, [details]);
 
@@ -1381,12 +1381,35 @@ const UpdateQuotationTest = () => {
       console.error("Error fetching consignees:", error);
     }
   };
+  const fetchConsigneesNew1 = async () => {
+    console.log(computedState.client_id);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/OrderConsigneeUpdate`,
+        {
+          Client_id: computedState.client_id,
+          Consignee_ID: computedState.consignee_id,
+          Order_ID: state.order_id,
+          User_ID: localStorage.getItem("id"),
+        }
+      );
+      console.log(response);
+      oneQoutationDAta();
+      // setConsigneesNew(response.data.data);
+    } catch (error) {
+      console.error("Error fetching consignees:", error);
+    }
+  };
   console.log(computedState);
+
   useEffect(() => {
-    if (computedState.client_id) {
+    if (state.client_id) {
       fetchConsigneesNew();
     }
-  }, [computedState.client_id, computedState.consignee_id]);
+    if (state.client_id && state.consignee_id) {
+      fetchConsigneesNew1();
+    }
+  }, [state.client_id, state.consignee_id]);
 
   const reCalculate = () => {
     setIsLoading(true);
@@ -1608,15 +1631,34 @@ const UpdateQuotationTest = () => {
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
                         <h6>{t("consignee")}</h6>
                         <Autocomplete
-                          options={consigneesNew || []} // Ensure consignees is an array
-                          getOptionLabel={(option) => option.Name || ""} // Display the consignee name
+                          options={
+                            consigneesNew?.map((v) => ({
+                              consignee_id: v.ID, // normalize API field to match state
+                              consignee_name: v.Name, // normalize name
+                            })) || []
+                          }
+                          getOptionLabel={(option) =>
+                            option.consignee_name || ""
+                          }
                           value={
-                            consigneesNew?.find(
-                              (v) => v.ID === computedState.consignee_id
-                            ) || null
-                          } // Find the selected consignee by consignee_id
+                            consigneesNew
+                              ?.map((v) => ({
+                                consignee_id: v.ID,
+                                consignee_name: v.Name,
+                              }))
+                              .find(
+                                (c) => c.consignee_id === state.consignee_id
+                              ) || null
+                          }
+                          isOptionEqualToValue={(option, value) =>
+                            option.consignee_id === value?.consignee_id
+                          }
                           onChange={(event, newValue) => {
-                            // Handle the change and reset multiple fields in the state
+                            const consigneeId = newValue
+                              ? newValue.consignee_id
+                              : "";
+
+                            // ✅ Update state consistently
                             setState({
                               ...state,
                               rebate: "",
@@ -1632,13 +1674,16 @@ const UpdateQuotationTest = () => {
                               destination_port_id: "",
                               liner_id: "",
                               loading_location: "",
-                              consignee_id: newValue
-                                ? newValue.consignee_id
-                                : "", // Set consignee_id from the selected consignee
+                              consignee_id: consigneeId,
                               consignee_name: newValue
                                 ? newValue.consignee_name
                                 : "",
                             });
+
+                            // 🔥 Call API immediately after consignee change
+                            if (consigneeId) {
+                              fetchConsigneesNew1();
+                            }
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1647,9 +1692,6 @@ const UpdateQuotationTest = () => {
                               variant="outlined"
                             />
                           )}
-                          isOptionEqualToValue={(option, value) =>
-                            option.consignee_id === value?.consignee_id
-                          } // Compare based on consignee_id
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
@@ -2653,7 +2695,7 @@ const UpdateQuotationTest = () => {
 
                         <tbody>
                           {details?.section5_Values?.map((v, i) => {
-                            const isRed = +v.Box % 1 !== 0; // Apply red styling if Box is decimal
+                            const isRed = +v.Box % 1 !== 0 || +v.cal_error == 1;
 
                             return (
                               <tr

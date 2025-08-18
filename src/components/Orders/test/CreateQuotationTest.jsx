@@ -483,7 +483,7 @@ const CreateQuotationTest = () => {
 
   const isError = useMemo(() => {
     return (details?.section5_Values || []).some((v) => {
-      return +v.Box % 1 !== 0;
+      return +v.Box % 1 !== 0 | +v.cal_error == 1;
     });
   }, [details]);
 
@@ -1070,10 +1070,10 @@ const CreateQuotationTest = () => {
       client_id: state.client_id,
     };
 
-    const consigneeFind = selectedConsigneeData
-      ? selectedConsigneeData
-      : consigneesNew?.find((v) => v.ID == state.consignee_id);
-
+    const consigneeFind = selectedConsigneeData;
+    // ? selectedConsigneeData
+    // : consigneesNew?.find((v) => v.ID == state.consignee_id);
+    console.log(consigneeFind);
     const portDestinationFind = ports?.find(
       (v) =>
         v.port_id == (r.destination_port_id || consigneeFind?.Destination_Port)
@@ -1224,7 +1224,7 @@ const CreateQuotationTest = () => {
         User_ID: localStorage.getItem("id"),
       })
       .then((res) => {
-        const detail = res.data.data?.[0] || null;
+        const detail = res.data.detailRow || null;
         setSelectedConsigneeData(detail); // store detailed data
       })
       .catch(console.error);
@@ -2261,7 +2261,7 @@ const CreateQuotationTest = () => {
 
                         <tbody>
                           {details?.section5_Values?.map((v, i) => {
-                            const isRed = +v.Box % 1 !== 0; // Apply red styling if Box is decimal
+                            const isRed = +v.Box % 1 !== 0 || +v.cal_error == 1;
 
                             return (
                               <tr

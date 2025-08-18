@@ -1023,24 +1023,52 @@ const CreateTest = () => {
     }
   }, [computedState.client_id]);
 
-  const fetchConsigneesNew = async () => {
-    console.log(computedState.client_id);
-    try {
-      const response = await axios.post(`${API_BASE_URL}/ConsigneeDropDown`, {
-        Client_id: computedState.client_id,
-      });
-      console.log(response);
-      setConsigneesNew(response.data.data);
-    } catch (error) {
-      console.error("Error fetching consignees:", error);
-    }
-  };
+  // const fetchConsigneesNew = async () => {
+  //   console.log(computedState.client_id);
+  //   try {
+  //     const response = await axios.post(`${API_BASE_URL}/ConsigneeDropDown`, {
+  //       Client_id: computedState.client_id,
+  //     });
+  //     console.log(response);
+  //     setConsigneesNew(response.data.data);
+  //   } catch (error) {
+  //     console.error("Error fetching consignees:", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (computedState.client_id) {
+  //     fetchConsigneesNew();
+  //   }
+  // }, [computedState.client_id, computedState.consignee_id]);
   useEffect(() => {
-    if (computedState.client_id) {
-      fetchConsigneesNew();
-    }
-  }, [computedState.client_id, computedState.consignee_id]);
+    if (!state.client_id) return;
 
+    axios
+      .post(`${API_BASE_URL}/ConsigneeDropDown`, { Client_id: state.client_id })
+      .then((res) => {
+        setConsigneesNew(res.data.data || []);
+      })
+      .catch(console.error);
+  }, [state.client_id]);
+
+  // Fetch detailed info for selected consignee
+  useEffect(() => {
+    if (!state.client_id || !state.consignee_id) return;
+    console.log("run.............");
+
+    axios
+      .post(`${API_BASE_URL}/ConsigneeDropDown`, {
+        Client_id: state.client_id,
+        Consignee_ID: state.consignee_id,
+        Is_Quotation: 0,
+        User_ID: localStorage.getItem("id"),
+      })
+      .then((res) => {
+        const detail = res.data.data?.[0] || null;
+        setSelectedConsigneeData(detail); // store detailed data
+      })
+      .catch(console.error);
+  }, [state.consignee_id]);
   console.log(state);
   const closeIcon = () => {
     setShow(false);
@@ -1296,12 +1324,12 @@ const CreateTest = () => {
                           getOptionLabel={(option) => option.Name || ""} // Display the consignee name
                           value={
                             consigneesNew?.find(
-                              (v) =>
-                                v.consignee_id === computedState.consignee_id
+                              (v) => v.ID === computedState.consignee_id
                             ) || null
                           } // Find the selected consignee by consignee_id
                           onChange={(event, newValue) => {
                             // Handle the change and reset multiple fields in the state
+                            console.log("Updating state to:", newValue);
                             setState({
                               ...state,
                               rebate: "",
@@ -1315,10 +1343,9 @@ const CreateTest = () => {
                               from_port_: "",
                               destination_port_id: "",
                               liner_id: "",
+                              Q_Markup: "",
                               loading_location: "",
-                              consignee_id: newValue
-                                ? newValue.consignee_id
-                                : "", // Set consignee_id from the selected consignee
+                              consignee_id: newValue ? newValue.ID : "", // Set consignee_id from the selected consignee
                               consignee_name: newValue ? newValue.Name : "",
                             });
                           }}
@@ -1330,7 +1357,7 @@ const CreateTest = () => {
                             />
                           )}
                           isOptionEqualToValue={(option, value) =>
-                            option.consignee_id === value?.consignee_id
+                            option.ID === value?.consignee_id
                           } // Compare based on consignee_id
                         />
                       </div>
