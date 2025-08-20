@@ -520,6 +520,7 @@ const CreatePurchaseOrder = () => {
       getDetils(id);
       setModalOne(false);
       console.log(response);
+      summaryDeatils();
       setResponceId(response.data.id);
       toast.success(t("successfully"), {
         autoClose: 5000,
@@ -616,68 +617,115 @@ const CreatePurchaseOrder = () => {
   useEffect(() => {
     everyDataSet();
   }, [responceId]);
-  const update = async (e) => {
-    await fetchDropdownData(); // Load dropdown data
-    setButtonClicked(false);
+
+  const update = async (updatedState = state) => {
+    // Prevent API if mandatory fields missing
+    if (!updatedState.vendor_id || !updatedState.created) {
+      console.log("Vendor and PO Date are required");
+      return;
+    }
+
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/${"addPurchaseOrder"}`,
-        state
+        `${API_BASE_URL}/addPurchaseOrder`,
+        updatedState
       );
-      console.log(response);
-      setStock(response?.data);
 
-      // 🔥 Clear the item form fields for new entry
-      setFormDataAdd({
-        pod_type_id: 0,
-        unit_count_id: 0,
-        POD_Selection: 0,
-        pod_quantity: 0,
-        pod_price: 0,
-        pod_vat: 0,
-        pod_wht_id: 0,
-        pod_crate: 1,
-        Unit_Name_EN: 0,
-        Unit_Name_TH: 0,
-        item_Name_EN: 0,
-        item_Name_TH: 0,
-      });
+      if (response.status === 200 && response.data.success) {
+        setPodId(response.data?.po_id);
+        setFormDataAdd({
+          pod_type_id: 0,
+          unit_count_id: 0,
+          POD_Selection: 0,
+          pod_quantity: 0,
+          pod_price: 0,
+          pod_vat: 0,
+          pod_wht_id: 0,
+          pod_crate: 1,
+          Unit_Name_EN: 0,
+          Unit_Name_TH: 0,
+          item_Name_EN: 0,
+          item_Name_TH: 0,
+        });
 
-      // ✅ Keep the purchase order ID and vendor details
-      setState((prevState) => ({
-        ...prevState,
-        po_id: response.data?.po_id || from?.po_id || prevState.po_id,
-        vendor_id: prevState.vendor_id,
-        created: prevState.created,
-        supplier_invoice_number: prevState.supplier_invoice_number,
-        supplier_invoice_date: prevState.supplier_invoice_date,
-        supplier_dua_date: prevState.supplier_dua_date,
+        // ✅ Keep the purchase order ID and vendor details
+        setState((prevState) => ({
+          ...prevState,
+          po_id: response.data?.po_id || from?.po_id || prevState.po_id,
+          vendor_id: prevState.vendor_id,
+          created: prevState.created,
+          supplier_invoice_number: prevState.supplier_invoice_number,
+          supplier_invoice_date: prevState.supplier_invoice_date,
+          supplier_dua_date: prevState.supplier_dua_date,
 
-        rounding: prevState.rounding,
-      }));
-      console.log(state);
-      if (response.status === 200) {
-        if (response.data.success) {
-          const id = response.data?.po_id || from?.po_id;
-          console.log(id);
-
-          setPodId(id); //  Clear podId to avoid fetching last item data
-          setModalOne(true);
-          // toast.success("Create Purchase Orders", {
-          //   autoClose: 5000,
-          //   theme: "colored",
-          // });
-        } else {
-          setShow(true);
-        }
+          rounding: prevState.rounding,
+        }));
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.error(error);
       toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
     }
+  };
+
+  const update1 = async (e) => {
+    await fetchDropdownData(); // Load dropdown data
+
+    // Check both at the same time
+    // if (
+    //   !state.vendor_id &&
+    //   (!state.created || state.created === "0000-00-00")
+    // ) {
+    //   let data = {
+    //     message_en: "Please enter purchase order supplier and date",
+    //     message_th: "กรุณากรอกใบสั่งซื้อของซัพพลายเออร์และวันที่สั่งซื้อ",
+    //   };
+    //   setStock(data);
+    //   setShow(true);
+    //   setModalOne(true);
+    //   return;
+    // }
+    setFormDataAdd({
+      pod_type_id: 0,
+      unit_count_id: 0,
+      POD_Selection: 0,
+      pod_quantity: 0,
+      pod_price: 0,
+      pod_vat: 0,
+      pod_wht_id: 0,
+      pod_crate: 1,
+      Unit_Name_EN: 0,
+      Unit_Name_TH: 0,
+      item_Name_EN: 0,
+      item_Name_TH: 0,
+    });
+
+    // ✅ If vendor missing
+    if (!state.vendor_id) {
+      let data = {
+        message_en: "Please enter purchase order supplier",
+        message_th: "กรุณากรอกใบสั่งซื้อของซัพพลายเออร์",
+      };
+      setStock(data);
+      setShow(true);
+      return; // stop here
+    }
+
+    // ✅ If date missing
+    if (!state.created || state.created === "0000-00-00") {
+      let data = {
+        message_en: "Please enter date",
+        message_th: "กรุณาระบุวันที่สั่งซื้อ",
+      };
+      setStock(data);
+      setShow(true);
+      return; // stop here
+    }
+
+    // ✅ Otherwise proceed (both filled)
+    setModalOne(true);
   };
   const updateDataPayNow = async () => {
     try {
@@ -687,22 +735,6 @@ const CreatePurchaseOrder = () => {
       );
       console.log(response);
       setStock(response?.data);
-
-      // 🔥 Clear the form fields
-      setFormDataAdd({
-        pod_type_id: 0,
-        unit_count_id: 0,
-        POD_Selection: 0,
-        pod_quantity: 0,
-        pod_price: 0,
-        pod_vat: 0,
-        pod_wht_id: 0,
-        pod_crate: 0,
-        Unit_Name_EN: 0,
-        Unit_Name_TH: 0,
-        item_Name_EN: 0,
-        item_Name_TH: 0,
-      });
 
       // ✅ Keep purchase order ID and vendor details
       setState((prevState) => ({
@@ -814,86 +846,15 @@ const CreatePurchaseOrder = () => {
   }, [state?.po_id]);
   const updateData = async (e) => {
     try {
-      // ✅ Second: proceed to add purchase order
-      const response = await axios.post(
-        `${API_BASE_URL}/addPurchaseOrder`,
-        state
-      );
-      console.log("Purchase order response:", response);
-      setStock(response?.data);
-
-      // 🔥 Clear the item form fields for new entry
-      setFormDataAdd({
-        pod_type_id: 0,
-        unit_count_id: 0,
-        POD_Selection: 0,
-        pod_quantity: 0,
-        pod_price: 0,
-        pod_vat: 0,
-        pod_wht_id: 0,
-        pod_crate: 0,
-        Unit_Name_EN: 0,
-        Unit_Name_TH: 0,
-        item_Name_EN: 0,
-        item_Name_TH: 0,
+      const accessResponse = await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
+        id: state.po_id || from?.PO_ID,
+        edit: 1,
+        accesstype: 1, // Opening for edit
       });
-
-      // ✅ Keep the purchase order ID and vendor details
-      setState((prevState) => ({
-        ...prevState,
-        po_id: response.data?.po_id || from?.po_id || prevState.po_id,
-        vendor_id: prevState.vendor_id,
-        created: prevState.created,
-        supplier_invoice_number: prevState.supplier_invoice_number,
-        supplier_invoice_date: prevState.supplier_invoice_date,
-        rounding: prevState.rounding,
-      }));
-
-      if (response.status === 200) {
-        if (response.data.success) {
-          const id = response.data?.po_id || from?.po_id;
-          console.log("PO ID:", id);
-          if (id) {
-            const accessResponse = await axios.post(
-              `${API_BASE_URL}/ReleaseAccess`,
-              {
-                id: id,
-                edit: 1,
-                accesstype: 1, // Opening for edit
-              }
-            );
-            console.log(
-              "Access file updated (edit mode):",
-              accessResponse.data
-            );
-          }
-          setPodId(id);
-          if (from?.PO_ID) {
-            const accessResponse = await axios.post(
-              `${API_BASE_URL}/ReleaseAccess`,
-              {
-                id: from.PO_ID,
-                edit: 1,
-                accesstype: 1, // Opening for edit
-              }
-            );
-            console.log(
-              "Access file updated (edit mode):",
-              accessResponse.data
-            );
-          }
-          navigate("/purchase_orders");
-
-          // toast.success("Create Purchase Orders", {
-          //   autoClose: 5000,
-          //   theme: "colored",
-          // });
-        } else {
-          setShow(true);
-        }
-      }
-    } catch (e) {
-      console.log("Error in updateData:", e);
+      console.log("Access file updated (edit mode):", accessResponse.data);
+      navigate("/purchase_orders");
+    } catch (err) {
+      console.error("Error in updateData:", err);
       toast.error(t("tryAgain"));
     }
   };
@@ -1157,6 +1118,35 @@ const CreatePurchaseOrder = () => {
       },
     }),
   };
+
+  const [poData, setPoData] = useState(null);
+  const summaryDeatils = () => {
+    axios
+      .post(`${API_BASE_URL}/PO_Bottom_View_EN`, {
+        po_id: state.po_id || from?.PO_ID,
+      })
+      .then((res) => {
+        console.log("poData", res.data);
+        setPoData(res.data);
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+      });
+  };
+  useEffect(() => {
+    summaryDeatils();
+  }, []);
+
+  // Utility to render each section
+  const renderSection = (labels, values) => {
+    if (!labels || !values) return null;
+
+    return Object.keys(labels).map((key, i) => (
+      <div key={i}>
+        <b>{labels[key]}</b> {values[key] || 0}
+      </div>
+    ));
+  };
   return (
     <>
       <Card
@@ -1182,8 +1172,8 @@ const CreatePurchaseOrder = () => {
                             id: vendor.ID,
                             name: vendor.name,
                           })) || []
-                        } // Map the vendor list to create options with `id` and `name`
-                        getOptionLabel={(option) => option.name || ""} // Display the vendor name
+                        }
+                        getOptionLabel={(option) => option.name || ""}
                         value={
                           vendorList
                             ?.map((vendor) => ({
@@ -1192,43 +1182,50 @@ const CreatePurchaseOrder = () => {
                             }))
                             .find((option) => option.id === state.vendor_id) ||
                           null
-                        } // Find the selected vendor by `vendor_id`
-                        onChange={(e, newValue) => {
-                          setState({
+                        }
+                        onChange={async (e, newValue) => {
+                          const updatedState = {
                             ...state,
                             vendor_id: newValue?.id || "",
                             vendor_name: newValue?.name || "",
-                          }); // Update `state.vendor_id` with the selected option's `id`
+                          };
+                          setState(updatedState);
+
+                          // ✅ Call API only if vendor & date exist
+                          if (updatedState.vendor_id && updatedState.created) {
+                            await update(updatedState);
+                          }
                         }}
                         sx={{ width: 300 }}
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder={t("clickToSelectDate")} // Adds a placeholder
-                            InputLabelProps={{ shrink: false }} // Prevents floating label
+                            placeholder={t("vender")}
+                            InputLabelProps={{ shrink: false }}
+                            error={!state.vendor_id} // highlight if missing
                           />
                         )}
                       />
                     </div>
+                    {/* PO Date Picker */}
                     <div className="col-lg-2 form-group">
                       <h6>{t("poDate")}</h6>
-                      {/* <input
-                        type="date"
-                        name="created"
-                        value={state.created}
-                        onChange={handleChange}
-                      /> */}
+
                       <DatePicker
                         selected={
                           state.created && !isNaN(new Date(state.created))
                             ? new Date(state.created)
                             : null
                         }
-                        onChange={(date) =>
-                          handleChange({
-                            target: { name: "created", value: date },
-                          })
-                        }
+                        onChange={async (date) => {
+                          const updatedState = { ...state, created: date };
+                          setState(updatedState);
+
+                          // ✅ Call API only if vendor & date exist
+                          if (updatedState.vendor_id && updatedState.created) {
+                            await update(updatedState);
+                          }
+                        }}
                         dateFormat="dd/MM/yyyy"
                         className="form-control"
                         placeholderText="DD/MM/YYYY"
@@ -1241,8 +1238,22 @@ const CreatePurchaseOrder = () => {
                         className="w-full"
                         type="text"
                         name="supplier_invoice_number"
-                        onChange={handleChange}
                         value={state.supplier_invoice_number}
+                        onChange={async (e) => {
+                          const updatedState = {
+                            ...state,
+                            supplier_invoice_number: e.target.value,
+                          };
+                          setState(updatedState);
+
+                          // ✅ Call API only if vendor & supplier_invoice_number exist
+                          if (
+                            updatedState.vendor_id &&
+                            updatedState.supplier_invoice_number
+                          ) {
+                            await update(updatedState);
+                          }
+                        }}
                       />
                     </div>
                     <div className="col-lg-2 form-group">
@@ -1255,14 +1266,29 @@ const CreatePurchaseOrder = () => {
                       />   */}
                       <DatePicker
                         selected={state?.supplier_invoice_date || null}
-                        onChange={(date) =>
-                          handleChange({
-                            target: {
-                              name: "supplier_invoice_date",
-                              value: date,
-                            },
-                          })
-                        }
+                        // onChange={(date) =>
+                        //   handleChange({
+                        //     target: {
+                        //       name: "supplier_invoice_date",
+                        //       value: date,
+                        //     },
+                        //   })
+                        // }
+                        onChange={async (date) => {
+                          const updatedState = {
+                            ...state,
+                            supplier_invoice_date: date,
+                          };
+                          setState(updatedState);
+
+                          // ✅ Call API only if vendor & date exist
+                          if (
+                            updatedState.vendor_id &&
+                            updatedState.supplier_invoice_date
+                          ) {
+                            await update(updatedState);
+                          }
+                        }}
                         dateFormat="dd/MM/yyyy"
                         placeholderText={t("selectDate")}
                         customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
@@ -1278,11 +1304,26 @@ const CreatePurchaseOrder = () => {
                       /> */}
                       <DatePicker
                         selected={state?.supplier_dua_date || null}
-                        onChange={(date) =>
-                          handleChange({
-                            target: { name: "supplier_dua_date", value: date },
-                          })
-                        }
+                        // onChange={(date) =>
+                        //   handleChange({
+                        //     target: { name: "supplier_dua_date", value: date },
+                        //   })
+                        // }
+                        onChange={async (date) => {
+                          const updatedState = {
+                            ...state,
+                            supplier_dua_date: date,
+                          };
+                          setState(updatedState);
+
+                          // ✅ Call API only if vendor & date exist
+                          if (
+                            updatedState.vendor_id &&
+                            updatedState.supplier_dua_date
+                          ) {
+                            await update(updatedState);
+                          }
+                        }}
                         dateFormat="dd/MM/yyyy"
                         placeholderText={t("clickToSelectDate")}
                         customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
@@ -1295,7 +1336,7 @@ const CreatePurchaseOrder = () => {
                       type="button"
                       className="btn btn-primary"
                       // onClick={openModalOne}
-                      onClick={update}
+                      onClick={update1}
                     >
                       {t("add")}
                     </button>
@@ -1571,125 +1612,30 @@ const CreatePurchaseOrder = () => {
                     </table>
                   </div>
                   {/* table new end */}
-                  <div className="flex justify-content-end mt-4 totalBefore">
-                    <div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong> {t("totalBeforeTax")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(
-                              tableSummary?.Total_Before_Tax ?? 0
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>VAT {t("vat")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(tableSummary?.VAT ?? 0)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("wht")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(tableSummary?.WHT ?? 0)}
-                          </span>
-                        </div>
-                      </div>
-                      {/* <div className=" d-flex flexBefore">
-                        <div>
-                          <strong>Rounding</strong>
-                        </div>
-                        <input
-                          type="number"
-                          name="rounding"
-                          value={state.rounding}
-                          onChange={(e) =>
-                            handleChange({
-                              target: {
-                                name: "rounding",
-                                value: parseFloat(e.target.value) || 0,
-                              },
-                            })
-                          }
-                        />
-                      </div> */}
-                      <div className="d-flex flexBefore">
-                        <div>
-                          <strong> {t("rounding")}: </strong>
-                        </div>
-                        <input
-                          type="number"
-                          name="rounding"
-                          value={state.rounding}
-                          onChange={(e) => {
-                            let value = e.target.value;
-
-                            // Allow empty input (do not force 0 immediately)
-                            if (value === "") {
-                              handleChange({
-                                target: { name: "rounding", value: "" },
-                              });
-                              return;
-                            }
-
-                            // Allow "-" at the start for negative values
-                            if (value === "-" || value === "+") {
-                              handleChange({
-                                target: { name: "rounding", value },
-                              });
-                              return;
-                            }
-
-                            // Convert to float and ensure valid number
-                            let parsedValue = parseFloat(value);
-                            if (!isNaN(parsedValue)) {
-                              handleChange({
-                                target: {
-                                  name: "rounding",
-                                  value: parsedValue,
-                                },
-                              });
-                            }
-                          }}
-                          onBlur={(e) => {
-                            // If input is empty on blur, reset to 0
-                            if (
-                              e.target.value === "" ||
-                              e.target.value === "-"
-                            ) {
-                              handleChange({
-                                target: { name: "rounding", value: 0 },
-                              });
-                            }
-                          }}
-                        />
-                      </div>
-
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("amountToPay")}: </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(
-                              (tableSummary?.Total_Before_Tax ?? 0) +
-                                (tableSummary?.VAT ?? 0) -
-                                (tableSummary?.WHT ?? 0) +
-                                (state.rounding ?? 0)
-                            )}
-                          </span>
-                        </div>
-                      </div>
+                  <div className="row py-4">
+                    <div className="col-lg-3">
+                      {renderSection(
+                        poData?.section1_label,
+                        poData?.section1_values
+                      )}
+                    </div>
+                    <div className="col-lg-3">
+                      {renderSection(
+                        poData?.section2_label,
+                        poData?.section2_values
+                      )}
+                    </div>
+                    <div className="col-lg-3">
+                      {renderSection(
+                        poData?.section3_label,
+                        poData?.section3_values
+                      )}
+                    </div>
+                    <div className="col-lg-3">
+                      {renderSection(
+                        poData?.section4_label,
+                        poData?.section4_values
+                      )}
                     </div>
                   </div>
                 </form>

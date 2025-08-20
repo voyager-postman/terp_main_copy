@@ -12,6 +12,7 @@ const UpdateClearanceNew = () => {
   const nevigate = useNavigate();
   const location = useLocation();
   const { from } = location.state || {};
+  console.log(from);
   const defaultState = {
     vendor_id: from?.Clearance_provider || "",
     custom_clearance_charges: from?.custom_clearance_charges || "",

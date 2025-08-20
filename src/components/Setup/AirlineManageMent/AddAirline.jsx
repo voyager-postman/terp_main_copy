@@ -34,23 +34,32 @@ const AddAirline = () => {
     });
   };
 
-  const update = () => {
-    axios
-      .post(`${API_BASE_URL}/updateLiner`, state)
-      .then((response) => {
-        toast[response.data.success ? t("success") : /* t("error") */"error"](
-          response.data.success ? "Success" : "Error",
-          {
-            autoClose: 1000,
-            theme: "colored",
-          }
-        );
-        navigate("/airlinenew");
-      })
-      .catch((error) => {
-        // console.log(error)
+const update = () => {
+  axios
+    .post(`${API_BASE_URL}/updateLiner`, state)
+    .then((response) => {
+      if (response.data.success) {
+        toast.success(t("success"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      } else {
+        toast.error(t("error"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      }
+      navigate("/airlineNew");
+    })
+    .catch((error) => {
+      console.error("Update failed:", error);
+      toast.error(t("something_went_wrong"), {
+        autoClose: 1000,
+        theme: "colored",
       });
-  };
+    });
+};
+
   const dataComparison = [
     { id: 1, label: "Air" },
     { id: 2, label: "Sea" },
@@ -211,7 +220,7 @@ const AddAirline = () => {
                 {typeof state.liner_id !== "undefined" ? t("update") : t("create")}
               </button>
               <Link className="btn btn-danger" to="/airlineNew">
-                {t("cancel")}
+                {t("close")}
               </Link>
             </div>
           </div>

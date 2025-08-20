@@ -223,16 +223,16 @@ const QuotationTest = () => {
         console.error("Error fetching quotations:", err);
       });
   };
-
+  useEffect(() => {
+    getAllQuotation();
+  }, [i18n]);
   // State for columns
 
   const handleAgreedPricingChange1 = (e) => {
     setChargeVolume(e.target.checked);
   };
 
-  useEffect(() => {
-    getAllQuotation();
-  }, [i18n]);
+
   const orderData1 = () => {
     axios
       .get(`${API_BASE_URL}/getAllQuotation`, {

@@ -1,0 +1,29 @@
+.orderPacking td {
+  word-wrap: normal !important;
+}
+
+.tableorderFirst th {
+  padding: 0px 5px 13px 5px;
+}
+
+.tableorderFirst td p {
+  padding: 0px 5px 10px 5px;
+  position: relative;
+  top: -3px;
+  font-weight: 600;
+}
+
+.tableorderFirst td {
+  padding: 0px;
+}
+
+.packingUp th {
+  padding: 0px 5px 10px 5px !important;
+}
+
+.packingUp th p {
+  position: relative;
+  top: -2px;
+  color: #ffffff;
+  font-weight: 600;
+}

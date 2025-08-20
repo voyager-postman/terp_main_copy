@@ -24,6 +24,8 @@ const CreateQuotationTest = () => {
   const [color, setColor] = useState(false);
   const { data: RoundingDataList } = useQuery("GetRoundingTable");
   const [copyData, setCopyData] = useState("");
+  const [orderIdData, setOrderIdData] = useState("");
+
   const [selectedConsigneeData, setSelectedConsigneeData] = useState(null); // detailed data
   const [state5, setState5] = useState({
     Rounding: "", // Initial state
@@ -483,7 +485,7 @@ const CreateQuotationTest = () => {
 
   const isError = useMemo(() => {
     return (details?.section5_Values || []).some((v) => {
-      return +v.Box % 1 !== 0 | +v.cal_error == 1;
+      return (+v.Box % 1 !== 0) | (+v.cal_error == 1);
     });
   }, [details]);
 
@@ -1218,6 +1220,7 @@ const CreateQuotationTest = () => {
 
     axios
       .post(`${API_BASE_URL}/ConsigneeDropDown`, {
+        orderId: orderIdData || "",
         Client_id: state.client_id,
         Consignee_ID: state.consignee_id,
         Is_Quotation: 1,
@@ -1225,6 +1228,7 @@ const CreateQuotationTest = () => {
       })
       .then((res) => {
         const detail = res.data.detailRow || null;
+        setOrderIdData(res.data.detailRow.Order_ID);
         setSelectedConsigneeData(detail); // store detailed data
       })
       .catch(console.error);

@@ -16,9 +16,10 @@ import { useTranslation } from "react-i18next";
 // import Autocomplete from "@mui/material/Autocomplete";
 // import { useQuery } from "react-query";
 const FreightNew = () => {
-  const { t } = useTranslation("global");
+  const { t, i18n } = useTranslation("global");
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [columns, setColumns] = useState([]);
   const [isOn, setIsOn] = useState(true);
   const [clientId, setClientId] = useState("");
   // State to hold selected values
@@ -85,16 +86,7 @@ const FreightNew = () => {
       // Handle error appropriately
     }
   };
-  const getFreight = () => {
-    axios
-      .get(`${API_BASE_URL}/getFreight`)
-      .then((response) => {
-        setData(response.data.freightData);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+
   const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
@@ -124,7 +116,97 @@ const FreightNew = () => {
       }
     });
   };
-  useEffect(() => getFreight(), []);
+
+  const getFreight = () => {
+    axios
+      .get(`${API_BASE_URL}/Freight_EN`)
+      .then((res) => {
+        console.log(res);
+
+        const { head, data, title } = res.data;
+        // Remove unwanted columns from table (Order_ID, Status_value)
+        const columnsToHide = ["ID"];
+
+        // Create dynamic columns excluding hidden ones
+        const dynamicColumns = Object.keys(head)
+          .filter((key) => !columnsToHide.includes(key))
+          .map((key) => ({
+            Header: t(head[key]), // Translate header if needed
+            accessor: key,
+          }));
+
+        dynamicColumns.push({
+          Header: t("status"),
+          accessor: (a) => (
+            <label
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: "10px",
+              }}
+              className="toggleSwitch large"
+            >
+              <input
+                checked={a.Status == "on" ? true : false}
+                onChange={() => {
+                  setIsOn(!isOn);
+                }}
+                onClick={() => updateEanStatus(a.ID)}
+                value={a.Status}
+                type="checkbox"
+              />
+              <span>
+                <span>{t("off")}</span>
+                <span>{t("on")}</span>
+              </span>
+              <a></a>
+            </label>
+          ),
+        });
+
+        dynamicColumns.push({
+          Header: t("actions"),
+
+          accessor: (row) => (
+            <>
+              <Link to="/update_freight" state={{ from: row }}>
+                <i
+                  className="mdi mdi-pencil"
+                  style={{
+                    width: "20px",
+                    color: "#203764",
+                    fontSize: "20px",
+                    marginTop: "10px",
+                  }}
+                />
+              </Link>
+              <button type="button" >
+                <i
+                  className="mdi mdi-delete"
+                  style={{
+                    width: "20px",
+                    color: "#203764",
+                    fontSize: "22px",
+                    marginTop: "10px",
+                  }}
+                />
+              </button>
+            </>
+          ),
+        });
+
+        setColumns(dynamicColumns);
+        setData(data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching quotations:", err);
+      });
+  };
+  useEffect(() => {
+    getFreight();
+  }, [i18n]);
+
   const updateEanStatus = (eanID) => {
     const request = {
       Freight_Route_ID: eanID,
@@ -148,114 +230,6 @@ const FreightNew = () => {
       });
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        Header: t("id"),
-        Id: "index",
-        accessor: (_rows, i) => i + 1,
-      },
-      {
-        Header: t("freightProvider"),
-        accessor: (a) => a.Freight_provider_name,
-      },
-      {
-        Header: t("fromPort"),
-        accessor: (a) => a.FromPort,
-      },
-      {
-        Header: t("destinationPort"),
-        accessor: (a) => a.DestinationPort,
-      },
-      {
-        Header: t("liner"),
-        accessor: (a) => a.Airline,
-      },
-      {
-        Header: t("status"),
-        accessor: (a) => (
-          <label
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: "10px",
-            }}
-            className="toggleSwitch large"
-          >
-            <input
-              checked={a.Status == "on" ? true : false}
-              onChange={() => {
-                setIsOn(!isOn);
-              }}
-              onClick={() => updateEanStatus(a.ID)}
-              value={a.Status}
-              type="checkbox"
-            />
-            <span>
-              <span>{t("off")}</span>
-              <span>{t("on")}</span>
-            </span>
-            <a></a>
-          </label>
-        ),
-      },
-
-      // {
-      // 	Header: "Actions",
-      // 	accessor: (a) => (
-      // 		<Link to="/update_freight" state={{ from: a }}>
-      // 			<i
-      // 				i
-      // 				className="mdi mdi-pencil"
-      // 				style={{
-      // 					width: "20px",
-      // 					color: "#203764",
-      // 					fontSize: "22px",
-      // 					marginTop: "10px",
-      // 				}}
-      // 			/>
-      // 		</Link>
-      // 	),
-      // },
-      {
-        Header: t("actions"),
-        accessor: (a) => (
-          <>
-            <Link to="/update_freight" state={{ from: a }}>
-              <i
-                i
-                className="mdi mdi-pencil"
-                style={{
-                  width: "20px",
-                  color: "#203764",
-                  fontSize: "20px",
-                  marginTop: "10px",
-                }}
-              />
-            </Link>
-            <button type="button" onClick={() => deleteOrder(a.ID)}>
-              <i
-                className="mdi mdi-delete"
-                style={{
-                  width: "20px",
-                  color: "#203764",
-                  fontSize: "22px",
-                  marginTop: "10px",
-                }}
-              />
-            </button>
-          </>
-        ),
-      },
-      {
-        Header: t("stats"),
-        accessor: (a) => " ",
-      },
-    ],
-    [t]
-  );
-
   return (
     <>
       <Card
@@ -275,7 +249,7 @@ const FreightNew = () => {
                 setLinerId("");
               }}
             >
-               {t("create")}
+              {t("create")}
             </button>
 
             <div
@@ -312,8 +286,8 @@ const FreightNew = () => {
                             value={
                               vendorId
                                 ? vendors.find(
-                                  (vendors) => vendors.ID === vendorId
-                                )
+                                    (vendors) => vendors.ID === vendorId
+                                  )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) =>
@@ -341,8 +315,8 @@ const FreightNew = () => {
                             value={
                               portOfOrigin
                                 ? ports.find(
-                                  (ports) => ports.port_id === portOfOrigin
-                                )
+                                    (ports) => ports.port_id === portOfOrigin
+                                  )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) =>
@@ -369,8 +343,8 @@ const FreightNew = () => {
                           value={
                             destinationPort
                               ? ports.find(
-                                (ports) => ports.port_id === destinationPort
-                              )
+                                  (ports) => ports.port_id === destinationPort
+                                )
                               : null
                           } // Bind to state
                           onChange={(e, newValue) =>
@@ -396,8 +370,8 @@ const FreightNew = () => {
                           value={
                             linerId
                               ? liners.find(
-                                (liner_id) => liner_id.liner_id === linerId
-                              )
+                                  (liner_id) => liner_id.liner_id === linerId
+                                )
                               : null
                           } // Bind to state
                           onChange={(e, newValue) =>
@@ -440,7 +414,7 @@ const FreightNew = () => {
         <div className="modal-content">
           <div className="modal-header border-0">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
-             {t("freightCheck")} 
+              {t("freightCheck")}
             </h1>
             <button
               style={{ color: "#fff", fontSize: "30px" }}
