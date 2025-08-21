@@ -1210,28 +1210,39 @@ const CreatePurchaseOrder = () => {
                     {/* PO Date Picker */}
                     <div className="col-lg-2 form-group">
                       <h6>{t("poDate")}</h6>
+ 
 
-                      <DatePicker
-                        selected={
-                          state.created && !isNaN(new Date(state.created))
-                            ? new Date(state.created)
-                            : null
-                        }
-                        onChange={async (date) => {
-                          const updatedState = { ...state, created: date };
-                          setState(updatedState);
-
-                          // ✅ Call API only if vendor & date exist
-                          if (updatedState.vendor_id && updatedState.created) {
-                            await update(updatedState);
+                        <DatePicker
+                          selected={
+                            state.created && !isNaN(new Date(state.created))
+                              ? new Date(state.created)
+                              : null
                           }
-                        }}
-                        dateFormat="dd/MM/yyyy"
-                        className="form-control"
-                        placeholderText="DD/MM/YYYY"
-                        customInput={<CustomInput />}
-                      />
-                    </div>
+                          onChange={async (date) => {
+                            const formattedDate = date
+                              ? date.toISOString().split("T")[0]
+                              : null;
+                            const updatedState = {
+                              ...state,
+                              created: formattedDate,
+                            };
+
+                            setState(updatedState);
+
+                            if (
+                              updatedState.vendor_id &&
+                              updatedState.created
+                            ) {
+                              await update(updatedState);
+                            }
+                          }}
+                          dateFormat="dd/MM/yyyy"
+                          className="form-control"
+                          placeholderText="DD/MM/YYYY"
+                          customInput={<CustomInput />}
+                        />
+                      </div>
+                     
                     <div className="col-lg-3 form-group">
                       <h6> {t("invoiceNumber")}</h6>
                       <input
@@ -1275,13 +1286,17 @@ const CreatePurchaseOrder = () => {
                         //   })
                         // }
                         onChange={async (date) => {
+                          // ✅ convert to YYYY-MM-DD string
+                          const formattedDate = date
+                            ? date.toISOString().split("T")[0]
+                            : null;
+
                           const updatedState = {
                             ...state,
-                            supplier_invoice_date: date,
+                            supplier_invoice_date: formattedDate,
                           };
                           setState(updatedState);
 
-                          // ✅ Call API only if vendor & date exist
                           if (
                             updatedState.vendor_id &&
                             updatedState.supplier_invoice_date
@@ -1310,9 +1325,12 @@ const CreatePurchaseOrder = () => {
                         //   })
                         // }
                         onChange={async (date) => {
+                          const formattedDate = date
+                            ? date.toISOString().split("T")[0]
+                            : null;
                           const updatedState = {
                             ...state,
-                            supplier_dua_date: date,
+                            supplier_dua_date: formattedDate,
                           };
                           setState(updatedState);
 

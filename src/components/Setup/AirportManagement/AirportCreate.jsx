@@ -77,31 +77,37 @@ const AirportCreate = () => {
   const updatePort = () => {
     axios
       .post(
-        `${API_BASE_URL}/${typeof state.port_id == "undefined" ? "addAirport" : "updateAirPort"
+        `${API_BASE_URL}/${
+          typeof state.port_id === "undefined" ? "addAirport" : "updateAirPort"
         }`,
         {
           ...state,
-          CO_Chamber: chargeVolume ? 1 : 0, // Convert boolean to 1 or 0
+          CO_Chamber: chargeVolume ? 1 : 0,
+        },
+        {
+          validateStatus: () => true, // 👈 Always resolve, even if status is 400/500
         }
       )
       .then((response) => {
-        toast[response.data.success == true ? t("success") : t("error")](
-          response.data.message,
-          {
-            autoClose: 1000,
-            theme: "colored",
-          }
-        );
-        if (response.data.success == true) navigate("/airportnew");
-      })
-      .catch((error) => {
-        if (error) {
-          toast.error(t("networkError"), {
+        if (response.data.success) {
+          toast.success(t("successfully"), {
             autoClose: 1000,
             theme: "colored",
           });
-          return false;
+          navigate("/airportnew");
+        } else {
+          toast.error(response.data.message || t("networkError"), {
+            autoClose: 1000,
+            theme: "colored",
+          });
         }
+      })
+
+      .catch((error) => {
+        toast.error(t("networkError"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
       });
   };
   const handleAgreedPricingChange = async (e) => {
@@ -109,7 +115,9 @@ const AirportCreate = () => {
   };
   return (
     <Card
-      title={`${t("port_management")} / ${state.port_id ? t("update") : t("create")} ${t("form")}`}
+      title={`${t("port_management")} / ${
+        state.port_id ? t("update") : t("create")
+      } ${t("form")}`}
     >
       <div className="top-space-search-reslute">
         <div className="tab-content px-2 md:!px-4">
@@ -144,7 +152,7 @@ const AirportCreate = () => {
                             name="port_country"
                             value={state.port_country}
                             onChange={handleChange}
-                            placeholder= {t("country")}
+                            placeholder={t("country")}
                           />
                         </div>
                       </div>
@@ -165,17 +173,7 @@ const AirportCreate = () => {
                     </div>
                     <div className="col-lg-4 form-group autoComplete">
                       <h6>{t("portType")}</h6>
-                      {/* <select
-                        value={state.port_type_id}
-                        onChange={handleChange}
-                        name="port_type_id"
-                      >
-                        {portType.map((item) => (
-                          <option value={item.port_type_id}>
-                            {item.port_type}
-                          </option>
-                        ))}
-                      </select> */}
+                      
                       <Autocomplete
                         value={
                           portType.find(
@@ -212,7 +210,7 @@ const AirportCreate = () => {
                             <div className="childThb">
                               <input
                                 type="text"
-                                placeholder= {t("iataCode")}
+                                placeholder={t("iataCode")}
                                 name="IATA_code"
                                 value={state.IATA_code}
                                 onChange={handleChange}
@@ -226,7 +224,7 @@ const AirportCreate = () => {
                             <div className="childThb">
                               <input
                                 type="text"
-                                placeholder= {t("icaoCode")}
+                                placeholder={t("icaoCode")}
                                 name="ICAO_Code"
                                 value={state.ICAO_Code}
                                 onChange={handleChange}
@@ -279,8 +277,8 @@ const AirportCreate = () => {
                             value={
                               transportation?.length
                                 ? transportation.find(
-                                  (v) => v.ID === state.preferred_transport
-                                ) || null
+                                    (v) => v.ID === state.preferred_transport
+                                  ) || null
                                 : null
                             }
                             onChange={(event, newValue) => {
@@ -400,7 +398,7 @@ const AirportCreate = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder= {t("preferredCustoms")}
+                                placeholder={t("preferredCustoms")}
                                 variant="outlined"
                               />
                             )}
@@ -536,54 +534,7 @@ const AirportCreate = () => {
                         </div>
                         <div className="col-lg-4 form-group autoComplete">
                           <h6>{t("preferredCustoms")}</h6>
-                          {/* <ComboBox
-                            options={clearance?.map((v) => ({
-                              id: v.vendor_id,
-                              name: v.name,
-                            }))}
-                            value={state.preferred_clearance}
-                            onChange={(e) =>
-                              setState({ ...state, preferred_clearance: e })
-                            }
-                          /> */}
-                          {/* <Autocomplete
-                            options={
-                              clearance?.map((v) => ({
-                                id: v.ID,
-                                name: v.name,
-                              })) || []
-                            } // Ensure fallback to an empty array if clearance is null or undefined
-                            value={
-                              clearance
-                                ?.map((v) => ({
-                                  id: v.ID,
-                                  name: v.name,
-                                }))
-                                .find(
-                                  (option) =>
-                                    option.id === state.preferred_clearance?.id
-                                ) || null
-                            } // Match the selected value
-                            onChange={(event, newValue) => {
-                              setState({
-                                ...state,
-                                preferred_clearance: newValue
-                                  ? { id: newValue.id, name: newValue.name }
-                                  : null, // Update state with the selected option
-                              });
-                            }}
-                            getOptionLabel={(option) => option.name || ""} // Display name as the label
-                            isOptionEqualToValue={(option, value) =>
-                              option.id === value.id
-                            } // Ensure proper value comparison
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Select Clearance"
-                                variant="outlined"
-                              />
-                            )}
-                          /> */}
+
                           <Autocomplete
                             options={
                               clearance?.map((v) => ({
@@ -622,54 +573,7 @@ const AirportCreate = () => {
                         </div>
                         <div className="col-lg-4 form-group autoComplete">
                           <h6> {t("preferredLiner")}</h6>
-                          {/* <ComboBox
-                            options={linear?.map((v) => ({
-                              id: v.liner_id,
-                              name: v.liner_name,
-                            }))}
-                            value={state.prefered_liner}
-                            onChange={(e) =>
-                              setState({ ...state, prefered_liner: e })
-                            }
-                          /> */}
-                          {/* <Autocomplete
-                            options={
-                              linear?.map((v) => ({
-                                id: v.liner_id,
-                                name: v.liner_name,
-                              })) || []
-                            } // Ensure fallback to an empty array if linear is null or undefined
-                            value={
-                              linear
-                                ?.map((v) => ({
-                                  id: v.liner_id,
-                                  name: v.liner_name,
-                                }))
-                                .find(
-                                  (option) =>
-                                    option.id === state.prefered_liner?.id
-                                ) || null
-                            } // Match the selected value
-                            onChange={(event, newValue) => {
-                              setState({
-                                ...state,
-                                prefered_liner: newValue
-                                  ? { id: newValue.id, name: newValue.name }
-                                  : null, // Update state with the selected option
-                              });
-                            }}
-                            getOptionLabel={(option) => option.name || ""} // Display name as the label
-                            isOptionEqualToValue={(option, value) =>
-                              option.id === value.id
-                            } // Ensure proper value comparison
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Select Liner"
-                                variant="outlined"
-                              />
-                            )}
-                          /> */}
+
                           <Autocomplete
                             options={
                               linear?.map((v) => ({

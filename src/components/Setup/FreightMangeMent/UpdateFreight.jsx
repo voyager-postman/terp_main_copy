@@ -235,21 +235,21 @@ const UpdateFreight = () => {
                     <div className=" d-flex">
                       <div className=" d-flex pe-5">
                         <h6 className="me-2"> {t("vendor")} : </h6>
-                        <p> {from?.Freight_provider_name}</p>
+                        <p> {from?.Col4}</p>
                       </div>
                       <div className=" d-flex">
                         <h6 className="me-2">  {t("liner")}: </h6>
-                        <p>{from?.Airline}</p>
+                        <p>{from?.Col3}</p>
                       </div>
                     </div>
                     <div className=" d-flex">
                       <div className=" d-flex pe-5">
                         <h6 className="me-2"> {t("portOfOrigin")} : </h6>
-                        <p> {from?.FromPort}</p>
+                        <p> {from?.Col1}</p>
                       </div>
                       <div className=" d-flex">
                         <h6 className="me-2">{t("destinationPort")} : </h6>
-                        <p> {from?.DestinationPort}</p>
+                        <p> {from?.Col2}</p>
                       </div>
                     </div>
                   </div>

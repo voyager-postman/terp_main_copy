@@ -83,7 +83,19 @@ const QuotationTest = () => {
         const { head, data, title } = res.data;
         setTitleData(title);
         // Remove unwanted columns from table (Order_ID, Status_value)
-        const columnsToHide = ["Order_ID", "Status_value"];
+        const columnsToHide = [
+          "Order_ID",
+          "Status_value",
+          "QI1",
+          "QI2",
+          "QI3",
+          "QI4",
+          "QI5",
+          "QI6",
+          "QI7",
+          "QI8",
+          "QI9",
+        ];
 
         // Create dynamic columns excluding hidden ones
         const dynamicColumns = Object.keys(head)
@@ -98,11 +110,15 @@ const QuotationTest = () => {
 
           accessor: (a) => (
             <div className="editIcon">
-              <Link to="/quotation_view" state={{ from: { ...a } }}>
-                <i className="mdi mdi-eye" />
-              </Link>
+              {+a.QI1 === 1 && (
+                <Link to="/quotation_view" state={{ from: { ...a } }}>
+                  <i className="mdi mdi-eye" />
+                </Link>
+              )}
 
-              {(+a.Status_value === 1 || +a.Status_value === 2) && (
+              {(+a.Status_value === 1 ||
+                +a.Status_value === 2 ||
+                +a.QI2 !== 0) && (
                 <Link to="/update_Quotation" state={{ from: { ...a } }}>
                   <i className="mdi mdi-pencil" />
                 </Link>
@@ -212,6 +228,16 @@ const QuotationTest = () => {
                   <i className="mdi mdi-clock-alert" />
                 </button>
               )}
+              {/* {+a.QI1 === 1 && (
+                <Link to="/quotation_view" state={{ from: { ...a } }}>
+                  <i className="mdi mdi-eye" />
+                </Link>
+              )}
+              {+a.QI2 !== 0 && (
+                <Link to="/update_Quotation" state={{ from: { ...a } }}>
+                  <i className="mdi mdi-pencil" />
+                </Link>
+              )} */}
             </div>
           ),
         });
@@ -231,7 +257,6 @@ const QuotationTest = () => {
   const handleAgreedPricingChange1 = (e) => {
     setChargeVolume(e.target.checked);
   };
-
 
   const orderData1 = () => {
     axios
