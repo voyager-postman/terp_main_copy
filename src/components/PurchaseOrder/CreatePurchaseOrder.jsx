@@ -1143,7 +1143,7 @@ const CreatePurchaseOrder = () => {
 
     return Object.keys(labels).map((key, i) => (
       <div key={i}>
-        <b>{labels[key]}</b> {values[key] || 0}
+        <b>{labels[key]}</b> {values[key] || ""}
       </div>
     ));
   };
@@ -1210,39 +1210,35 @@ const CreatePurchaseOrder = () => {
                     {/* PO Date Picker */}
                     <div className="col-lg-2 form-group">
                       <h6>{t("poDate")}</h6>
- 
 
-                        <DatePicker
-                          selected={
-                            state.created && !isNaN(new Date(state.created))
-                              ? new Date(state.created)
-                              : null
+                      <DatePicker
+                        selected={
+                          state.created && !isNaN(new Date(state.created))
+                            ? new Date(state.created)
+                            : null
+                        }
+                        onChange={async (date) => {
+                          const formattedDate = date
+                            ? date.toISOString().split("T")[0]
+                            : null;
+                          const updatedState = {
+                            ...state,
+                            created: formattedDate,
+                          };
+
+                          setState(updatedState);
+
+                          if (updatedState.vendor_id && updatedState.created) {
+                            await update(updatedState);
                           }
-                          onChange={async (date) => {
-                            const formattedDate = date
-                              ? date.toISOString().split("T")[0]
-                              : null;
-                            const updatedState = {
-                              ...state,
-                              created: formattedDate,
-                            };
+                        }}
+                        dateFormat="dd/MM/yyyy"
+                        className="form-control"
+                        placeholderText="DD/MM/YYYY"
+                        customInput={<CustomInput />}
+                      />
+                    </div>
 
-                            setState(updatedState);
-
-                            if (
-                              updatedState.vendor_id &&
-                              updatedState.created
-                            ) {
-                              await update(updatedState);
-                            }
-                          }}
-                          dateFormat="dd/MM/yyyy"
-                          className="form-control"
-                          placeholderText="DD/MM/YYYY"
-                          customInput={<CustomInput />}
-                        />
-                      </div>
-                     
                     <div className="col-lg-3 form-group">
                       <h6> {t("invoiceNumber")}</h6>
                       <input
@@ -1432,28 +1428,35 @@ const CreatePurchaseOrder = () => {
                                     )}
                                   />
                                 </div>
-                                <div className="col-lg-12 mb-2">
-                                  <h6> {t("quantity")}</h6>
-                                  <input
-                                    className="mb-0"
-                                    type="text"
-                                    name="pod_quantity"
-                                    value={formDataAdd.pod_quantity || ""}
-                                    placeholder={t("quantity")}
-                                    onChange={handleChangeAdd}
-                                  />
-                                </div>
-                                <div className="col-lg-12 mb-2">
-                                  <h6> {t("crate")}</h6>
-                                  <input
-                                    className="mb-0"
-                                    type="text"
-                                    name="pod_crate"
-                                    value={formDataAdd.pod_crate}
-                                    placeholder={t("crate")}
-                                    onChange={handleChangeAdd}
-                                  />
-                                </div>
+                                {/* Only show Quantity and Crate if unit is NOT "Time" */}
+                                {formDataAdd.Unit_Name_EN !== "Time" &&
+                                  formDataAdd.unit_count_id !== 4 && (
+                                    <>
+                                      <div className="col-lg-12 mb-2">
+                                        <h6>{t("quantity")}</h6>
+                                        <input
+                                          className="mb-0"
+                                          type="text"
+                                          name="pod_quantity"
+                                          value={formDataAdd.pod_quantity || ""}
+                                          placeholder={t("quantity")}
+                                          onChange={handleChangeAdd}
+                                        />
+                                      </div>
+
+                                      <div className="col-lg-12 mb-2">
+                                        <h6>{t("crate")}</h6>
+                                        <input
+                                          className="mb-0"
+                                          type="text"
+                                          name="pod_crate"
+                                          value={formDataAdd.pod_crate}
+                                          placeholder={t("crate")}
+                                          onChange={handleChangeAdd}
+                                        />
+                                      </div>
+                                    </>
+                                  )}
 
                                 <div className="col-lg-12 mb-2">
                                   <h6> {t("price")}</h6>
