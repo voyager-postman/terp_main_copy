@@ -1,4 +1,4 @@
- import axios from "axios";
+import axios from "axios";
 import { useEffect, useMemo, useState, useRef } from "react";
 import Barcode from "react-barcode";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,6 +20,10 @@ const CombinePayment = () => {
   const [roundingData, setRoundingData] = useState("");
   const [VATTotal, setVATTotal] = useState(0);
   const [WHTTotal, setWHTTotal] = useState(0);
+  const [paymentSections, setPaymentSections] = useState({
+    labels: {},
+    data: {},
+  });
   const [TotalBeforeTaxTotal, setTotalBeforeTaxTotal] = useState(0);
   const [sumAmountToPay, setSumAmountToPay] = useState(0);
   const [singleFilterData, setSingleFilterData] = useState("");
@@ -36,6 +40,8 @@ const CombinePayment = () => {
   const [basePayment, setBasePayment] = useState(0); // from left_pay
   const [roundingNew1, setRoundingNew1] = useState("0");
   const [totalBeforText, setTotalBeforText] = useState("0");
+  const [lastInseartId, setLastInseartId] = useState("");
+
   const [leftRoundingNew, setLeftRoundingNew] = useState("");
   const handleRoundingChange = (e) => {
     let value = e.target.value;
@@ -71,7 +77,7 @@ const CombinePayment = () => {
   useEffect(() => {
     const modal = document.getElementById("modalCombine");
     modal?.addEventListener("hidden.bs.modal", () => {
-      setFormData({});
+      // setFormData({});
     });
 
     return () => {
@@ -164,7 +170,7 @@ const CombinePayment = () => {
     const request = {
       ean_id: eanID,
     };
-  axios
+    axios
       .post(`${API_BASE_URL}/eanStatus`, request)
       .then((resp) => {
         // console.log(resp, "Check Resp")
@@ -205,7 +211,7 @@ const CombinePayment = () => {
           getCombinedPayment();
           toast.success(t("combinedPaymentDeleteSuccess"));
         } catch (e) {
-           toast.error(t("genericError"));
+          toast.error(t("genericError"));
         }
       }
     });
@@ -217,7 +223,7 @@ const CombinePayment = () => {
   }, [depositAvailableNew, basePayment]);
   const columns = useMemo(
     () => [
-        {
+      {
         Header: t("cpnNumber"),
         accessor: "CPNCODE",
       },
@@ -228,27 +234,33 @@ const CombinePayment = () => {
       {
         Header: t("date"),
         accessor: (a) => {
-          const formattedDate = new Date(a.CPN_Date).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          });
+          const formattedDate = new Date(a.CPN_Date).toLocaleDateString(
+            "en-GB",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }
+          );
           return <div>{formattedDate}</div>;
         },
       },
       {
         Header: t("dueDate"),
         accessor: (a) => {
-          const formattedDate = new Date(a.Due_Date).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          });
+          const formattedDate = new Date(a.Due_Date).toLocaleDateString(
+            "en-GB",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }
+          );
           return <div>{formattedDate}</div>;
         },
       },
       {
-        Header:t("count"),
+        Header: t("count"),
         accessor: (a) => <div>{a.POCount}</div>,
       },
       {
@@ -288,7 +300,7 @@ const CombinePayment = () => {
                   <i className="mdi mdi-delete " />
                 </button>
               </>
-         )}
+            )}
 
             {!(a.Payment_Status === 4) && (
               <button
@@ -307,14 +319,85 @@ const CombinePayment = () => {
                   <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z"></path>
                 </svg>
               </button>
-            )}  
+            )}
           </div>
         ),
       },
     ],
     [t]
   );
+  const handlePaymentChange = (field, value) => {
+    // Update state
+    switch (field) {
+      case "Payment_Date":
+        setSelectedPaymentDate(value);
+        break;
+      case "Payment_Channel":
+        setSelectedPaymentChannel(value);
+        break;
+      case "Bank_Ref":
+        setBankReference(value);
+        break;
+      case "Bank_Fees":
+        setBankChargeAmount(value);
+        break;
+      case "available_Deposit":
+        setDepositAvailableNew(value);
+        break;
+      case "Rounding":
+        setRoundingNew(value);
+        break;
+      case "Payment_Amount":
+        setPaymentAmmountNew(value);
+        break;
+      case "Notes":
+        setPaymentNotes(value);
+        break;
+      default:
+        break;
+    }
 
+    // Build payload with only the changed field
+    const payload = {
+      Expense_Payment_ID: lastInseartId,
+      User_ID: localStorage.getItem("id"),
+      [field]: value, // ✅ only the changed field gets sent
+    };
+
+    axios
+      .post(`${API_BASE_URL}/POCPNPayment`, payload)
+      .then((res) => {
+        console.log(`✅ Updated ${field}:`, res.data);
+        if (res?.data?.success) {
+          toast.success(res?.data?.message || "Field updated successfully ✅");
+        }
+
+        paymentViewSection();
+      })
+      .catch((err) => {
+        console.error(`❌ Failed to update ${field}:`, err);
+      });
+  };
+  const paymentViewSection = () => {
+    axios
+      .post(`${API_BASE_URL}/EXPPaymentView`, {
+        PO_ID: "", // ✅ your PO_ID
+        CPN: singlePodId?.ID, // ✅ CPN if required
+      })
+      .then((res) => {
+        setPaymentSections({
+          labels: res.data.section_label || {},
+          data: res.data.section_data || {},
+        });
+        console.log("Payment updated ✅", res.data);
+      })
+      .catch((err) => {
+        console.error("Payment update failed ❌", err);
+      });
+  };
+  useEffect(() => {
+    paymentViewSection();
+  }, []);
   useEffect(() => {
     console.log("payableDATA:", payableDATA);
     console.log("roundingAmount:", roundingAmount);
@@ -325,16 +408,34 @@ const CombinePayment = () => {
     );
   }, [payableDATA, depositAvailable]);
   const everyDataSet = async (a) => {
-    console.log(a);
-    setSingleFilterData(a);
-    setHasUserChangedValues(false); // reset change flag
-    setSinglePodId(a);
-    setDepositAvailableNew(a?.Available_deposit);
-    setBasePayment(a?.left_pay || 0); // set it once
-    setVatNew(a?.Vat_payment || 0);
-    setWhtNew(a?.wht_payment || 0);
-    setRoundingNew1(a?.Rounding || 0);
-    setTotalBeforText(a?.Total_Before_Tax || 0);
+    console.log("everyDataSet called with:", a);
+
+    try {
+      setHasUserChangedValues(false);
+      setSinglePodId(a);
+
+      const payload = {
+        PO_ID: a?.PO_ID,
+        CPN: a?.ID, // ✅ use correct field
+        User_ID: localStorage.getItem("id"),
+      };
+
+      console.log("Payload sent:", payload);
+
+      const res1 = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, payload);
+
+      console.log("EXPPaymentStep1 response:", res1.data);
+
+      if (res1?.data?.success) {
+        const newId = res1?.data?.data?.last_insert_id;
+
+        setLastInseartId(newId);
+
+        paymentViewSection();
+      }
+    } catch (err) {
+      console.error("Error in EXPPaymentStep1:", err);
+    }
   };
 
   const paymentDataClear = () => {
@@ -351,57 +452,57 @@ const CombinePayment = () => {
     setTotalPaymentAmount("");
     setPaymentNotes("");
   };
+
   const submitPaymentData = async () => {
-    if (!selectedPaymentDate) {
-      setShow2(true);
-      return;
-    }
-    if (!selectedPaymentChannel) {
-      setShow2(true);
-      return;
-    }
+    // if (!selectedPaymentDate) {
+    //   setShow2(true);
+    //   return;
+    // }
+    // if (!selectedPaymentChannel) {
+    //   setShow2(true);
+    //   return;
+    // }
 
-    const paymentData = {
-      vendor_id: singlePodId.Vendor,
-      Payment_Date: selectedPaymentDate,
-      Payment_Channel: selectedPaymentChannel,
-      Bank_Fees: bankChargeAmount,
-      Rounding: roundingAmount,
-      available_Deposit: depositAvailable,
-      Payment_Amount: paymentAmmountNew,
-      Notes: paymentNotes,
-      Bank_Ref: bankReference,
-      CPN_id: singlePodId.ID,
-      amount_to_pay: (
-        Number(paymentAmmountNew) +
-        (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-          Number(vatNew) -
-        (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-          Number(whtNew) +
-        (Number(roundingNew1) + Number(roundingNew))
-      ).toFixed(2),
-      Deposit_Used: Number(depositAvailableNew),
-      VAT: (
-        (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
-        Number(vatNew)
-      ).toFixed(2),
-      WHT: (
-        (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
-        Number(whtNew)
-      ).toFixed(2),
-      left_Rounding: Number(roundingNew1) + Number(roundingNew),
-      Total_Before_Tax: Number(depositAvailableNew) + Number(paymentAmmountNew),
-      User_id: localStorage.getItem("id"),
-    };
+    // const paymentData = {
+    //   vendor_id: singlePodId.Vendor,
+    //   Payment_Date: selectedPaymentDate,
+    //   Payment_Channel: selectedPaymentChannel,
+    //   Bank_Fees: bankChargeAmount,
+    //   Rounding: roundingAmount,
+    //   available_Deposit: depositAvailable,
+    //   Payment_Amount: paymentAmmountNew,
+    //   Notes: paymentNotes,
+    //   Bank_Ref: bankReference,
+    //   CPN_id: singlePodId.ID,
+    //   amount_to_pay: (
+    //     Number(paymentAmmountNew) +
+    //     (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
+    //       Number(vatNew) -
+    //     (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
+    //       Number(whtNew) +
+    //     (Number(roundingNew1) + Number(roundingNew))
+    //   ).toFixed(2),
+    //   Deposit_Used: Number(depositAvailableNew),
+    //   VAT: (
+    //     (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
+    //     Number(vatNew)
+    //   ).toFixed(2),
+    //   WHT: (
+    //     (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
+    //     Number(whtNew)
+    //   ).toFixed(2),
+    //   left_Rounding: Number(roundingNew1) + Number(roundingNew),
+    //   Total_Before_Tax: Number(depositAvailableNew) + Number(paymentAmmountNew),
+    //   User_id: localStorage.getItem("id"),
+    // };
 
-    console.log(paymentData);
+    // console.log(paymentData);
 
     try {
       // Send POST request to insertClientPayment endpoint (first API)
-      const response = await axios.post(
-        `${API_BASE_URL}/POPayments`,
-        paymentData
-      );
+      const response = await axios.post(`${API_BASE_URL}/EXPPaymentStep2`, {
+        ID: singlePodId?.ID,
+      });
       console.log("Payment data submitted successfully", response);
       getCombinedPayment();
 
@@ -493,24 +594,24 @@ const CombinePayment = () => {
               <div className="row">
                 <div className="col-lg-9">
                   <div className="row">
-                    {/* Payment Date */}
                     <div className="col-lg-6">
                       <div className="parentFormPayment">
-                        <p>{t("paymentDate")}</p>
+                        <p> {t("paymentDate")}</p>
                         <DatePicker
                           selected={selectedPaymentDate}
-                          onChange={(date) => setSelectedPaymentDate(date)}
+                          onChange={(date) =>
+                            handlePaymentChange("Payment_Date", date)
+                          }
                           dateFormat="dd/MM/yyyy"
-                          placeholderText={t("clickToSelectDate")}
+                          placeholderText="Click to select a date"
                           customInput={<CustomInput />}
                         />
                       </div>
                     </div>
 
-                    {/* Payment Channel */}
                     <div className="col-lg-6">
                       <div className="parentFormPayment autoComplete">
-                        <p>{t("paymentChannel")}</p>
+                        <p> {t("paymentChannel")}</p>
                         <Autocomplete
                           disablePortal
                           options={paymentChannle || []}
@@ -524,247 +625,113 @@ const CombinePayment = () => {
                             option.Bank_nick_name || ""
                           }
                           onChange={(e, newValue) =>
-                            setSelectedPaymentChannel(newValue?.bank_id || "")
+                            handlePaymentChange(
+                              "Payment_Channel",
+                              newValue?.bank_id || ""
+                            )
                           }
                           sx={{ width: 300 }}
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder={t("searchChannel")}
-                              InputLabelProps={{ shrink: false }}
+                              placeholder="Search Payment Channel"
                             />
                           )}
                         />
                       </div>
                     </div>
 
-                    {/* Bank Ref */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>{t("bankRef")}</p>
+                        <p> {t("bankRef")}</p>
                         <input
                           type="text"
                           value={bankReference}
-                          onChange={(e) => setBankReference(e.target.value)}
+                          onChange={(e) =>
+                            handlePaymentChange("Bank_Ref", e.target.value)
+                          }
                         />
                       </div>
                     </div>
 
-                    {/* Bank Charges */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>{t("bankCharges")}</p>
+                        <p> {t("bankCharges")}</p>
                         <input
                           type="text"
                           value={bankChargeAmount}
-                          onChange={(e) => setBankChargeAmount(e.target.value)}
+                          onChange={(e) =>
+                            handlePaymentChange("Bank_Fees", e.target.value)
+                          }
                         />
                       </div>
                     </div>
 
-                    {/* Available Deposit */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>{t("availableDeposit")}</p>
+                        <p> {t("availableDeposit")}</p>
                         <input
-                          type="text"
+                          type="number"
                           value={depositAvailableNew}
-                          onChange={(e) => {
-                            setHasUserChangedValues(true);
-                            setDepositAvailableNew(e.target.value);
-                          }}
+                          onChange={(e) =>
+                            handlePaymentChange(
+                              "available_Deposit",
+                              e.target.value
+                            )
+                          }
                         />
                       </div>
                     </div>
-                    <div className="col-lg-6">
-                      <div className="parentFormPayment mt-3">
-                        <p>{t("rounding")}</p>
+                    <div className="col-lg-6 mt-3">
+                      <div className="parentFormPayment">
+                        <p> {t("rounding")}</p>
                         <input
                           type="text"
                           value={roundingNew}
-                          onChange={(e) => {
-                            setHasUserChangedValues(true);
-                            setRoundingNew(e.target.value);
-                          }}
+                          onChange={(e) =>
+                            handlePaymentChange("Rounding", e.target.value)
+                          }
                         />
                       </div>
                     </div>
-                    <div className="col-lg-6">
-                      <div className="parentFormPayment mt-3">
-                        <p>{t("paymentAmount")}</p>
-                        <input
-                          type="text"
-                          value={paymentAmmountNew}
-                          onChange={(e) => {
-                            setHasUserChangedValues(true);
-                            setPaymentAmmountNew(e.target.value); // Optional override
-                          }}
-                        />
-                      </div>
+
+                    <div className="parentFormPayment col-lg-6 mt-3">
+                      <p> {t("paymentAmount")}</p>
+                      <input
+                        type="text"
+                        value={paymentAmmountNew}
+                        onChange={(e) =>
+                          handlePaymentChange("Payment_Amount", e.target.value)
+                        }
+                      />
                     </div>
 
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p>{t("notes")}</p>
+                        <p> {t("notes")}</p>
                         <textarea
-                          type="text"
                           value={paymentNotes}
-                          onChange={(e) => setPaymentNotes(e.target.value)}
+                          onChange={(e) =>
+                            handlePaymentChange("Notes", e.target.value)
+                          }
                         ></textarea>
                       </div>
                     </div>
-                    {/* Rounding */}
-                    {/* <div className="col-lg-6 mt-3">
-                      <div className="parentFormPayment">
-                        <p>Rounding</p>
-                        <input
-                          type="text"
-                          value={roundingAmount}
-                          onChange={(e) => setRoundingAmount(e.target.value)}
-                        />
-                      </div>
-                    </div> */}
-
-                    {/* Payment Amount */}
                   </div>
                 </div>
                 <div className="col-lg-3">
-                  <div className="flex mt-5 pt-5 ps-3 totalBefore">
-                    <div style={{ width: "85%" }}>
-                      {/* Total Before Tax */}
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("totalBeforeTax")}  </strong>
+                  <div className="flex ps-3 pt-5 mt-4 totalBefore">
+                    <div className="pe-3" style={{ width: "85%" }}>
+                      {Object.keys(paymentSections.labels).map((key) => (
+                        <div className="flexBefore" key={key}>
+                          <div>
+                            <strong>{paymentSections.labels[key]}</strong>
+                          </div>
+                          <div>
+                            <span>{paymentSections.data[key]}</span>
+                          </div>
                         </div>
-                        <div>
-                          <span>
-                            {Number(depositAvailableNew) +
-                              Number(paymentAmmountNew)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* VAT */}
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("vat")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {" "}
-                            {(
-                              (Number(depositAvailableNew) +
-                                Number(paymentAmmountNew)) *
-                              Number(vatNew)
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* WHT */}
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("wht")} :</strong>
-                        </div>
-                        <div>
-                          <span>
-                            {(
-                              (Number(depositAvailableNew) +
-                                Number(paymentAmmountNew)) *
-                              Number(whtNew)
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Rounding Input */}
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("rounding")} :</strong>
-                        </div>
-                        <div>
-                          <span>
-                            {Number(roundingNew1) + Number(roundingNew)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("deposit")} : </strong>
-                        </div>
-                        <div>
-                          <span>{Number(depositAvailableNew)}</span>
-                        </div>
-                      </div>
-                      {/* <div className="d-flex flexBefore">
-                        <div className="me-3">
-                          <strong>Rounding</strong>
-                        </div>
-                        {/* <input
-                          type="number"
-                          name="rounding"
-                          value={roundingData}
-                          onChange={handleRoundingChange}
-                          onBlur={handleRoundingBlur}
-                        /> */}
-                      {/* <input
-                          type="text"
-                          value={roundingAmount}
-                          onChange={(e) => setRoundingAmount(e.target.value)}
-                        />
-                      </div> */}
-
-                      {/* Amount to Pay */}
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("amountToPay")} : </strong>
-                        </div>
-                        <div>
-                          {/* <span>
-                            {formatterTwo.format(
-                              (Number(totalPaymentAmount) || 0) +
-                                (Number(totalPaymentAmount) || 0) *
-                                  ((Number(singleFilterData?.VAT) || 0) /
-                                    (Number(
-                                      singleFilterData?.Total_Before_Tax
-                                    ) || 1)) -
-                                (Number(totalPaymentAmount) || 0) *
-                                  ((Number(singleFilterData?.WHT) || 0) /
-                                    (Number(
-                                      singleFilterData?.Total_Before_Tax
-                                    ) || 1)) -
-                                roundingAmount
-                            )}
-                          </span> */}
-                          <span>
-                            {(
-                              Number(paymentAmmountNew) +
-                              (Number(paymentAmmountNew) +
-                                Number(depositAvailableNew)) *
-                                Number(vatNew) -
-                              (Number(paymentAmmountNew) +
-                                Number(depositAvailableNew)) *
-                                Number(whtNew) +
-                              (Number(roundingNew1) + Number(roundingNew))
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("remainder")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {(
-                              (Number(totalBeforText) -
-                                (Number(depositAvailableNew) +
-                                  Number(paymentAmmountNew))) *
-                              (1 + Number(vatNew))
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -829,7 +796,7 @@ const CombinePayment = () => {
               )}
 
               <div className="closeBtnRece">
-                <button onClick={closeIcon2}>{("close")}</button>
+                <button onClick={closeIcon2}>{"close"}</button>
               </div>
             </div>
           </div>

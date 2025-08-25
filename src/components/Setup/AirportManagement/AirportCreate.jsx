@@ -33,7 +33,7 @@ const AirportCreate = () => {
     preferred_clearance: from?.preferred_clearance ?? "",
     preferred_transport: from?.preferred_transport ?? "",
     prefered_liner: from?.prefered_liner ?? "",
-    CO_Chamber: from?.CO_Chamber ?? 0,
+    CO_Chamber: from?.CO_Chamber_Required ?? 0,
   });
   console.log(state);
   const [chargeVolume, setChargeVolume] = useState(false);
@@ -115,7 +115,40 @@ const AirportCreate = () => {
         });
       });
   };
+  const updatePort1 = (payload) => {
+    const dataToSend = {
+      ...(payload || state),
+    };
 
+    axios
+      .post(
+        `${API_BASE_URL}/${
+          typeof state.port_id === "undefined" ? "addAirport" : "updateAirPort"
+        }`,
+        dataToSend,
+        { validateStatus: () => true }
+      )
+      .then((response) => {
+        if (response.data.success) {
+          toast.success(t("successfully"), {
+            autoClose: 1000,
+            theme: "colored",
+          });
+          navigate("/airportNew");
+        } else {
+          toast.error(response.data.message || t("networkError"), {
+            autoClose: 1000,
+            theme: "colored",
+          });
+        }
+      })
+      .catch(() => {
+        toast.error(t("networkError"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      });
+  };
   return (
     <Card
       title={`${t("port_management")} / ${
@@ -522,13 +555,13 @@ const AirportCreate = () => {
                 className="btn btn-primary"
                 type="submit"
                 name="signup"
-                onClick={() => updatePort(state)}
+                onClick={() => updatePort1(state)}
               >
                 {state.port_id ? t("update") : t("create")}
               </button>
-              <Link className="btn btn-danger" to="/airportNew">
+              {/* <Link className="btn btn-danger" to="/airportNew">
                 {t("cancel")}
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>

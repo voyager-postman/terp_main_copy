@@ -64,6 +64,10 @@ const PurchaseOrder = () => {
     paymentDate: null,
     dueDate: null,
   });
+  const [paymentSections, setPaymentSections] = useState({
+    labels: {},
+    data: {},
+  });
   const [exchangeRate3, setExchangeRate3] = useState(false);
   const handleAgreedPricingChange9 = (e) => {
     setExchangeRate3(e.target.checked);
@@ -78,12 +82,14 @@ const PurchaseOrder = () => {
   const [venderId, setVenderId] = useState("");
   const [amountToPayNew, setAmountToPayNew] = useState("");
   const [depositUsedNew, newDepositUsedNew] = useState("");
+  const [lastInseartId, setLastInseartId] = useState("");
+  const [dataShowPayment, setDataShowPayment] = useState("");
+
   const [vatNew, setVatNew] = useState("");
   const [whtNew, setWhtNew] = useState("");
 
   const [leftRoundingNew, setLeftRoundingNew] = useState("");
 
-  const [dataShow, setDataShow] = useState("");
   const [roundingNew, setRoundingNew] = useState("0");
   const [roundingNew1, setRoundingNew1] = useState("0");
   const [totalBeforText, setTotalBeforText] = useState("0");
@@ -93,6 +99,7 @@ const PurchaseOrder = () => {
   const [amountToPay, setAmountToPay] = useState({});
   const [responceId, setResponceId] = useState("");
   const [singlePodId, setSinglePodId] = useState("");
+  const [singlePodId1, setSinglePodId1] = useState("");
 
   const [podId, setPodId] = useState("");
   const [numericvalueofdata, setNumericvalueofdata] = useState("");
@@ -951,12 +958,48 @@ const PurchaseOrder = () => {
   //     console.error("Error fetching orders:", error);
   //   }
   // };
+  // const everyDataSet = async (a) => {
+  //   console.log(a);
+  //   setHasUserChangedValues(false); // reset change flag
+  //   setSinglePodId(a);
+
+  //   let deposit = 0;
+
+  //   if (a?.PO_ID) {
+  //     try {
+  //       const accessResponse = await axios.post(
+  //         `${API_BASE_URL}/Checkeaccessfile`,
+  //         {
+  //           id: a.PO_ID,
+  //           accesstype: 1, // Mark as in use
+  //         }
+  //       );
+  //       console.log(accessResponse);
+  //       if (accessResponse?.data?.success) {
+  //         const res1 = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, {
+  //           PO_ID: a?.PO_ID,
+  //           CPN: a?.CPN,
+  //           User_ID: localStorage.getItem("id"),
+  //         });
+  //         console.log(res1);
+  //         setLastInseartId(res1?.data?.data?.last_insert_id);
+
+  //         const modal = new bootstrap.Modal(
+  //           document.getElementById("modalCombine")
+  //         );
+  //         modal.show();
+  //       } else {
+  //         toast.warning(accessResponse?.data?.message);
+  //       }
+  //     } catch (error) {
+  //       console.log("Error fetching deposit:", error);
+  //     }
+  //   }
+  // };
   const everyDataSet = async (a) => {
     console.log(a);
-    setHasUserChangedValues(false); // reset change flag
+    setHasUserChangedValues(false);
     setSinglePodId(a);
-
-    let deposit = 0;
 
     if (a?.PO_ID) {
       try {
@@ -964,26 +1007,33 @@ const PurchaseOrder = () => {
           `${API_BASE_URL}/Checkeaccessfile`,
           {
             id: a.PO_ID,
-            accesstype: 1, // Mark as in use
+            accesstype: 1, // lock immediately
           }
         );
-        console.log(accessResponse);
+
         if (accessResponse?.data?.success) {
-          const res1 = await axios.get(
-            `${API_BASE_URL}/getPurchaseOrderDetails?po_id=${a?.PO_ID}`
-          );
-          console.log(res1);
-          deposit = res1?.data?.data1?.Available_deposit || 0;
-          setDepositAvailableNew(deposit);
-          setBasePayment(res1?.data?.data1?.left_pay || 0); // set it once
-          setVatNew(res1?.data?.data1?.Vat_payment || 0);
-          setWhtNew(res1?.data?.data1?.wht_payment || 0);
-          setRoundingNew1(res1?.data?.data1?.Rounding || 0);
-          setTotalBeforText(res1?.data?.data1?.Total_Before_Tax || 0);
+          // ✅ show modal immediately after access is granted
           const modal = new bootstrap.Modal(
             document.getElementById("modalCombine")
           );
           modal.show();
+
+          // 🔄 run EXPPaymentStep1 in background
+          axios
+            .post(`${API_BASE_URL}/EXPPaymentStep1`, {
+              PO_ID: a?.PO_ID,
+              CPN: a?.CPN,
+              User_ID: localStorage.getItem("id"),
+            })
+            .then((res1) => {
+              console.log(res1);
+              setLastInseartId(res1?.data?.data?.last_insert_id);
+              paymentViewSection();
+            })
+            .catch((err) => {
+              console.error("Error in EXPPaymentStep1:", err);
+              toast.error("Failed to initialize payment step");
+            });
         } else {
           toast.warning(accessResponse?.data?.message);
         }
@@ -992,15 +1042,79 @@ const PurchaseOrder = () => {
       }
     }
   };
+  const handlePaymentChange = (field, value) => {
+    // Update state
+    switch (field) {
+      case "Payment_Date":
+        setSelectedPaymentDate(value);
+        break;
+      case "Payment_Channel":
+        setSelectedPaymentChannel(value);
+        break;
+      case "Bank_Ref":
+        setBankReference(value);
+        break;
+      case "Bank_Fees":
+        setBankChargeAmount(value);
+        break;
+      case "available_Deposit":
+        setDepositAvailableNew(value);
+        break;
+      case "Rounding":
+        setRoundingNew(value);
+        break;
+      case "Payment_Amount":
+        setPaymentAmmountNew(value);
+        break;
+      case "Notes":
+        setPaymentNotes(value);
+        break;
+      default:
+        break;
+    }
 
+    // Build payload with only the changed field
+    const payload = {
+      Expense_Payment_ID: lastInseartId,
+      User_ID: localStorage.getItem("id"),
+      [field]: value, // ✅ only the changed field gets sent
+    };
+
+    axios
+      .post(`${API_BASE_URL}/POCPNPayment`, payload)
+      .then((res) => {
+        console.log(`✅ Updated ${field}:`, res.data);
+        if (res?.data?.success) {
+          toast.success(res?.data?.message || "Field updated successfully ✅");
+        }
+
+        paymentViewSection();
+      })
+      .catch((err) => {
+        console.error(`❌ Failed to update ${field}:`, err);
+      });
+  };
+
+  const paymentViewSection = () => {  
+    axios
+      .post(`${API_BASE_URL}/EXPPaymentView`, {
+        PO_ID: singlePodId?.PO_ID, // ✅ your PO_ID
+        CPN: singleCpnId, // ✅ CPN if required
+      })
+      .then((res) => {
+        setPaymentSections({
+          labels: res.data.section_label || {},
+          data: res.data.section_data || {},
+        });
+        console.log("Payment updated ✅", res.data);
+      })
+      .catch((err) => {
+        console.error("Payment update failed ❌", err);
+      });
+  };
   useEffect(() => {
-    console.log("payableDATA:", payableDATA);
-    console.log("roundingAmount:", roundingAmount);
-    console.log("depositAvailable:", depositAvailable);
-    setTotalPaymentAmount(
-      (Number(payableDATA) || 0) - (Number(depositAvailable) || 0)
-    );
-  }, [payableDATA, depositAvailable]);
+    paymentViewSection();
+  }, []);
   const claimDetails = async (po_id, a) => {
     console.log(a);
     setClaimPageData(a);
@@ -1793,13 +1907,13 @@ const PurchaseOrder = () => {
             right: 7,
           },
           tableWidth: "auto", // Adjust to ensure the table fits within the page
-            columnStyles: {
+          columnStyles: {
             0: { halign: "left", cellWidth: 22 },
             1: { halign: "left", cellWidth: 35, overflow: "linebreak" },
             2: { halign: "right", cellWidth: 27, overflow: "linebreak" },
             3: { halign: "right", cellWidth: 26 },
             4: { halign: "right", cellWidth: 26 },
-            5: { halign: "right", cellWidth: 26},
+            5: { halign: "right", cellWidth: 26 },
             6: { halign: "right", cellWidth: 33, overflow: "linebreak" },
             7: {
               halign: "right",
@@ -1807,10 +1921,8 @@ const PurchaseOrder = () => {
               overflow: "linebreak",
               font: "NotoSansThai",
             },
-            8: { halign: "right", cellWidth:58, overflow: "linebreak" },
- 
+            8: { halign: "right", cellWidth: 58, overflow: "linebreak" },
           },
- 
         });
 
         yTop = doc.autoTable.previous.finalY + 1;
@@ -2228,24 +2340,16 @@ const PurchaseOrder = () => {
         }
 
         try {
-          const detailsResponse = await axios.get(
-            `${API_BASE_URL}/GetCombinedPaymentByID`,
+          const detailsResponse = await axios.post(
+            `${API_BASE_URL}/EXPPaymentStep1`,
             {
-              params: { cpn_id: result.data },
+              PO_ID: "",
+              CPN: result?.data,
+              User_ID: localStorage.getItem("id"),
             }
           );
-
-          const deposit = detailsResponse.data.cpn_data?.Available_deposit || 0;
-          console.log(detailsResponse);
-          setDepositAvailableNew(deposit);
-          setBasePayment(detailsResponse.data.cpn_data?.left_pay || 0); // set it once
-          setVatNew(detailsResponse.data.cpn_data?.Vat_payment || 0);
-          setWhtNew(detailsResponse.data.cpn_data?.wht_payment || 0);
-          setRoundingNew1(detailsResponse.data.cpn_data?.Rounding || 0);
-          setTotalBeforText(
-            detailsResponse.data.cpn_data?.Total_Before_Tax || 0
-          );
-          setVenderId(detailsResponse.data.cpn_data);
+          paymentViewSection();
+          setLastInseartId(detailsResponse.data.data?.last_insert_id);
         } catch (detailErr) {
           console.error("Error fetching deposit details:", detailErr);
         }
@@ -2563,58 +2667,57 @@ const PurchaseOrder = () => {
   };
 
   const submitPaymentData = async () => {
-    if (!selectedPaymentDate) {
-      setShow2(true);
-      return;
-    }
-    if (!selectedPaymentChannel) {
-      setShow2(true);
-      return;
-    }
+    // if (!selectedPaymentDate) {
+    //   setShow2(true);
+    //   return;
+    // }
+    // if (!selectedPaymentChannel) {
+    //   setShow2(true);
+    //   return;
+    // }
 
-    const paymentData = {
-      vendor_id: singlePodId.Vendor || venderId.Vendor,
-      Payment_Date: selectedPaymentDate,
-      Payment_Channel: selectedPaymentChannel,
-      Bank_Fees: bankChargeAmount,
-      Rounding: roundingAmount,
-      available_Deposit: depositAvailable,
-      // Payment_Amount: totalPaymentAmount,
-      Payment_Amount: paymentAmmountNew,
-      Notes: paymentNotes,
-      Bank_Ref: bankReference,
-      PO_id: singlePodId.PO_ID,
-      CPN_id: venderId.ID,
-      User_id: localStorage.getItem("id"),
-      amount_to_pay: (
-        Number(paymentAmmountNew) +
-        (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-          Number(vatNew) -
-        (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-          Number(whtNew) +
-        (Number(roundingNew1) + Number(roundingNew))
-      ).toFixed(2),
-      Deposit_Used: Number(depositAvailableNew),
-      VAT: (
-        (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
-        Number(vatNew)
-      ).toFixed(2),
-      WHT: (
-        (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
-        Number(whtNew)
-      ).toFixed(2),
-      left_Rounding: Number(roundingNew1) + Number(roundingNew),
-      Total_Before_Tax: Number(depositAvailableNew) + Number(paymentAmmountNew),
-    };
+    // const paymentData = {
+    //   vendor_id: singlePodId.Vendor || venderId.Vendor,
+    //   Payment_Date: selectedPaymentDate,
+    //   Payment_Channel: selectedPaymentChannel,
+    //   Bank_Fees: bankChargeAmount,
+    //   Rounding: roundingAmount,
+    //   available_Deposit: depositAvailable,
+    //   // Payment_Amount: totalPaymentAmount,
+    //   Payment_Amount: paymentAmmountNew,
+    //   Notes: paymentNotes,
+    //   Bank_Ref: bankReference,
+    //   PO_id: singlePodId.PO_ID,
+    //   CPN_id: venderId.ID,
+    //   User_id: localStorage.getItem("id"),
+    //   amount_to_pay: (
+    //     Number(paymentAmmountNew) +
+    //     (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
+    //       Number(vatNew) -
+    //     (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
+    //       Number(whtNew) +
+    //     (Number(roundingNew1) + Number(roundingNew))
+    //   ).toFixed(2),
+    //   Deposit_Used: Number(depositAvailableNew),
+    //   VAT: (
+    //     (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
+    //     Number(vatNew)
+    //   ).toFixed(2),
+    //   WHT: (
+    //     (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
+    //     Number(whtNew)
+    //   ).toFixed(2),
+    //   left_Rounding: Number(roundingNew1) + Number(roundingNew),
+    //   Total_Before_Tax: Number(depositAvailableNew) + Number(paymentAmmountNew),
+    // };
 
-    console.log(paymentData);
+    // console.log(paymentData);
 
     try {
       // Send POST request to insertClientPayment endpoint (first API)
-      const response = await axios.post(
-        `${API_BASE_URL}/POPayments`,
-        paymentData
-      );
+      const response = await axios.post(`${API_BASE_URL}/EXPPaymentStep2`, {
+        ID: singlePodId?.PO_ID || singleCpnId,
+      });
       console.log("Payment data submitted successfully", response);
       getPurchaseOrder();
       if (response?.data?.success === true) {
@@ -3535,11 +3638,11 @@ const PurchaseOrder = () => {
   //   // Update sum based on selection
   //   calculateCheckedAmount(updatedChildren);
   // };
-  useEffect(() => {
-    const deposit = parseFloat(depositAvailableNew) || 0;
-    const finalPayment = basePayment - deposit;
-    setPaymentAmmountNew(finalPayment >= 0 ? finalPayment.toFixed(2) : 0);
-  }, [depositAvailableNew, basePayment]);
+  // useEffect(() => {
+  //   const deposit = parseFloat(depositAvailableNew) || 0;
+  //   const finalPayment = basePayment - deposit;
+  //   setPaymentAmmountNew(finalPayment >= 0 ? finalPayment.toFixed(2) : 0);
+  // }, [depositAvailableNew, basePayment]);
   const inputRef = useRef(null); // Ref for input field
 
   const handleChangeAmount = (e) => {
@@ -4025,7 +4128,9 @@ const PurchaseOrder = () => {
                             <p> {t("paymentDate")}</p>
                             <DatePicker
                               selected={selectedPaymentDate}
-                              onChange={(date) => setSelectedPaymentDate(date)}
+                              onChange={(date) =>
+                                handlePaymentChange("Payment_Date", date)
+                              }
                               dateFormat="dd/MM/yyyy"
                               placeholderText="Click to select a date"
                               customInput={<CustomInput />}
@@ -4049,7 +4154,8 @@ const PurchaseOrder = () => {
                                 option.Bank_nick_name || ""
                               }
                               onChange={(e, newValue) =>
-                                setSelectedPaymentChannel(
+                                handlePaymentChange(
+                                  "Payment_Channel",
                                   newValue?.bank_id || ""
                                 )
                               }
@@ -4058,7 +4164,6 @@ const PurchaseOrder = () => {
                                 <TextField
                                   {...params}
                                   placeholder="Search Payment Channel"
-                                  InputLabelProps={{ shrink: false }}
                                 />
                               )}
                             />
@@ -4071,7 +4176,9 @@ const PurchaseOrder = () => {
                             <input
                               type="text"
                               value={bankReference}
-                              onChange={(e) => setBankReference(e.target.value)}
+                              onChange={(e) =>
+                                handlePaymentChange("Bank_Ref", e.target.value)
+                              }
                             />
                           </div>
                         </div>
@@ -4083,7 +4190,7 @@ const PurchaseOrder = () => {
                               type="text"
                               value={bankChargeAmount}
                               onChange={(e) =>
-                                setBankChargeAmount(e.target.value)
+                                handlePaymentChange("Bank_Fees", e.target.value)
                               }
                             />
                           </div>
@@ -4095,8 +4202,12 @@ const PurchaseOrder = () => {
                             <input
                               type="number"
                               value={depositAvailableNew}
-                              name="availabledeposite"
-                              onChange={handleDepositeAvailable}
+                              onChange={(e) =>
+                                handlePaymentChange(
+                                  "available_Deposit",
+                                  e.target.value
+                                )
+                              }
                             />
                           </div>
                         </div>
@@ -4106,10 +4217,9 @@ const PurchaseOrder = () => {
                             <input
                               type="text"
                               value={roundingNew}
-                              onChange={(e) => {
-                                setHasUserChangedValues(true);
-                                setRoundingNew(e.target.value);
-                              }}
+                              onChange={(e) =>
+                                handlePaymentChange("Rounding", e.target.value)
+                              }
                             />
                           </div>
                         </div>
@@ -4119,10 +4229,12 @@ const PurchaseOrder = () => {
                           <input
                             type="text"
                             value={paymentAmmountNew}
-                            onChange={(e) => {
-                              setHasUserChangedValues(true);
-                              setPaymentAmmountNew(e.target.value); // Optional override
-                            }}
+                            onChange={(e) =>
+                              handlePaymentChange(
+                                "Payment_Amount",
+                                e.target.value
+                              )
+                            }
                           />
                         </div>
 
@@ -4130,9 +4242,10 @@ const PurchaseOrder = () => {
                           <div className="parentFormPayment">
                             <p> {t("notes")}</p>
                             <textarea
-                              type="text"
                               value={paymentNotes}
-                              onChange={(e) => setPaymentNotes(e.target.value)}
+                              onChange={(e) =>
+                                handlePaymentChange("Notes", e.target.value)
+                              }
                             ></textarea>
                           </div>
                         </div>
@@ -4141,105 +4254,16 @@ const PurchaseOrder = () => {
                     <div className="col-lg-3">
                       <div className="flex ps-3 pt-5 mt-4 totalBefore">
                         <div className="pe-3" style={{ width: "85%" }}>
-                          <div className="flexBefore">
-                            <div>
-                              <strong> {t("totalBeforeTax")} </strong>
-                            </div>
-                            <div>
-                              <span>
-                                {Number(depositAvailableNew) +
-                                  Number(paymentAmmountNew)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flexBefore">
-                            <div>
-                              <strong> {t("vat")}: </strong>
-                            </div>
-                            <div>
-                              <span>
-                                {" "}
-                                {(
-                                  (Number(depositAvailableNew) +
-                                    Number(paymentAmmountNew)) *
-                                  Number(vatNew)
-                                ).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="flexBefore">
-                            <div>
-                              <strong> {t("wht")} : </strong>
-                            </div>
-                            <div>
-                              <span>
-                                {(
-                                  (Number(depositAvailableNew) +
-                                    Number(paymentAmmountNew)) *
-                                  Number(whtNew)
-                                ).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className=" form-group">
-                            <div className="flexBefore">
+                          {Object.keys(paymentSections.labels).map((key) => (
+                            <div className="flexBefore" key={key}>
                               <div>
-                                <strong> {t("rounding")} : </strong>
+                                <strong>{paymentSections.labels[key]}</strong>
                               </div>
                               <div>
-                                <span>
-                                  {Number(roundingNew1) + Number(roundingNew)}
-                                </span>
+                                <span>{paymentSections.data[key]}</span>
                               </div>
                             </div>
-                            <div className="flexBefore">
-                              <div>
-                                <strong> {t("deposit")} : </strong>
-                              </div>
-                              <div>
-                                <span>{Number(depositAvailableNew)}</span>
-                              </div>
-                            </div>
-
-                            <div className="flexBefore">
-                              <div>
-                                <strong> {t("amountToPay")} : </strong>{" "}
-                              </div>
-
-                              <div>
-                                <span>
-                                  {(
-                                    Number(paymentAmmountNew) +
-                                    (Number(paymentAmmountNew) +
-                                      Number(depositAvailableNew)) *
-                                      Number(vatNew) -
-                                    (Number(paymentAmmountNew) +
-                                      Number(depositAvailableNew)) *
-                                      Number(whtNew) +
-                                    (Number(roundingNew1) + Number(roundingNew))
-                                  ).toFixed(2)}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flexBefore">
-                              <div>
-                                <strong>{t("remainder")} : </strong>{" "}
-                              </div>
-
-                              <div>
-                                <span>
-                                  {(
-                                    (Number(totalBeforText) -
-                                      (Number(depositAvailableNew) +
-                                        Number(paymentAmmountNew))) *
-                                    (1 + Number(vatNew))
-                                  ).toFixed(2)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
+                          ))}
                         </div>
                       </div>
                     </div>
