@@ -409,8 +409,11 @@ const CreatePurchaseOrder = () => {
         autoClose: 1000,
         theme: "colored",
       });
+      summaryDeatils();
       getDetils(podId);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const [state, setState] = React.useState({
@@ -749,7 +752,7 @@ const CreatePurchaseOrder = () => {
       // ✅ Keep purchase order ID and vendor details
       setState((prevState) => ({
         ...prevState,
-        po_id: response.data?.po_id || from?.po_id || prevState.po_id,
+        po_id: response.data?.po_id || prevState.po_id, // fixed from?.po_id
         vendor_id: prevState.vendor_id,
         created: prevState.created,
         supplier_invoice_number: prevState.supplier_invoice_number,
@@ -758,41 +761,130 @@ const CreatePurchaseOrder = () => {
       }));
 
       if (response.status === 200 && response.data.success) {
-        let modalElement = document.getElementById("modalCombine");
+        // ✅ Show modal
+        const modalElement = document.getElementById("modalCombine");
         if (modalElement) {
-          let modalInstance = new bootstrap.Modal(modalElement);
+          const modalInstance = new bootstrap.Modal(modalElement);
           modalInstance.show();
         } else {
           console.error("Modal element not found!");
         }
 
         const po_id = response.data.po_id;
-        setSingleDataSet1(response.data.po_id);
+        setSingleDataSet1(po_id);
 
         try {
-          const res1 = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, {
+          // ✅ Get purchase order details
+          const poDetailsRes = await axios.get(
+            `${API_BASE_URL}/getPurchaseOrderDetails?po_id=${po_id}`
+          );
+          console.log(poDetailsRes);
+
+          const deposit = poDetailsRes?.data?.data1?.Available_deposit || 0;
+          setDepositAvailableNew(deposit);
+
+          // ✅ Initialize payment step
+          const step1Res = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, {
             PO_ID: po_id,
             CPN: "",
             User_ID: localStorage.getItem("id"),
           });
-          console.log(res1);
+          console.log(step1Res);
 
-          setSingleDataSet(res1?.data?.data?.last_insert_id);
+          setSingleDataSet(step1Res?.data?.data?.last_insert_id);
           paymentViewSection();
-        } catch (error) {
-          console.log(error);
+        } catch (innerErr) {
+          console.error("Error in PO details or payment step:", innerErr);
+          toast.error(t("tryAgain"));
         }
       } else {
         setShow(true);
       }
     } catch (e) {
-      console.log(e);
+      console.error("Error in updateDataPayNow:", e);
       toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
     }
   };
+  const deleteOrderWithPayment = async () => {
+    try {
+      // ✅ Delete API
+      await axios.post(`${API_BASE_URL}/EXPPaymentDelete`, {
+        Expense_Payment_ID: singleDataSet || "",
+      });
+
+      // ✅ Hide modal after delete
+      const modal1 = document.getElementById("modalCombine");
+      if (modal1) {
+        const modalInstance1 = bootstrap.Modal.getInstance(modal1);
+        modalInstance1?.hide();
+      }
+      navigate("/purchase_orders");
+      toast.success(t("deleteSuccess"));
+    } catch (e) {
+      console.error("Delete error:", e);
+      toast.error(t("deleteError"));
+    }
+  };
+
+  // const updateDataPayNow = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${API_BASE_URL}/addPurchaseOrder`,
+  //       state
+  //     );
+  //     console.log(response);
+  //     setStock(response?.data);
+
+  //     // ✅ Keep purchase order ID and vendor details
+  //     setState((prevState) => ({
+  //       ...prevState,
+  //       po_id: response.data?.po_id || from?.po_id || prevState.po_id,
+  //       vendor_id: prevState.vendor_id,
+  //       created: prevState.created,
+  //       supplier_invoice_number: prevState.supplier_invoice_number,
+  //       supplier_invoice_date: prevState.supplier_invoice_date,
+  //       rounding: prevState.rounding,
+  //     }));
+
+  //     if (response.status === 200 && response.data.success) {
+  //       let modalElement = document.getElementById("modalCombine");
+  //       if (modalElement) {
+  //         let modalInstance = new bootstrap.Modal(modalElement);
+  //         modalInstance.show();
+  //       } else {
+  //         console.error("Modal element not found!");
+  //       }
+
+  //       const po_id = response.data.po_id;
+  //       setSingleDataSet1(response.data.po_id);
+
+  //       try {
+  //         const res1 = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, {
+  //           PO_ID: po_id,
+  //           CPN: "",
+  //           User_ID: localStorage.getItem("id"),
+  //         });
+  //         console.log(res1);
+
+  //         setSingleDataSet(res1?.data?.data?.last_insert_id);
+  //         paymentViewSection();
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     } else {
+  //       setShow(true);
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //     toast.error(t("errorOccurred"), {
+  //       autoClose: 5000,
+  //       theme: "colored",
+  //     });
+  //   }
+  // };
   const paymentViewSection = () => {
     axios
       .post(`${API_BASE_URL}/EXPPaymentView`, {
@@ -1795,7 +1887,7 @@ const CreatePurchaseOrder = () => {
               <h1 className="modal-title fs-5" id="exampleModalLabel">
                 {t("payments")}
               </h1>
-              <button
+              {/* <button
                 type="button"
                 onClick={paymentDataClear}
                 className="btn-close"
@@ -1803,7 +1895,7 @@ const CreatePurchaseOrder = () => {
                 aria-label="Close"
               >
                 <i className="mdi mdi-close"></i>
-              </button>
+              </button> */}
             </div>
             <div className="modal-body">
               <div className="row">
@@ -1813,10 +1905,22 @@ const CreatePurchaseOrder = () => {
                       <div className="parentFormPayment">
                         <p> {t("paymentDate")}</p>
                         <DatePicker
-                          selected={selectedPaymentDate}
-                          onChange={(date) =>
-                            handlePaymentChange("Payment_Date", date)
+                          selected={
+                            selectedPaymentDate &&
+                            !isNaN(new Date(selectedPaymentDate))
+                              ? new Date(selectedPaymentDate)
+                              : null
                           }
+                          onChange={(date) => {
+                            const formattedDate = date
+                              ? date.toISOString().split("T")[0] // ✅ store as YYYY-MM-DD
+                              : null;
+
+                            setSelectedPaymentDate(formattedDate);
+
+                            // ✅ trigger API call like before
+                            handlePaymentChange("Payment_Date", formattedDate);
+                          }}
                           dateFormat="dd/MM/yyyy"
                           placeholderText="Click to select a date"
                           customInput={<CustomInput />}
@@ -1960,6 +2064,13 @@ const CreatePurchaseOrder = () => {
                 className="btn btn-primary"
               >
                 {t("submit")}
+              </button>
+              <button
+                type="button"
+                onClick={deleteOrderWithPayment}
+                className="btn btn-primary"
+              >
+                {t("cancel")}
               </button>
             </div>
           </div>

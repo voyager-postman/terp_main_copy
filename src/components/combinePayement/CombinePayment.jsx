@@ -216,6 +216,26 @@ const CombinePayment = () => {
       }
     });
   };
+  const deleteOrderWithPayment = async () => {
+    try {
+      // ✅ Delete API
+      await axios.post(`${API_BASE_URL}/EXPPaymentDelete`, {
+        Expense_Payment_ID: lastInseartId || "",
+      });
+
+      // ✅ Hide modal after delete
+      const modal1 = document.getElementById("modalCombine");
+      if (modal1) {
+        const modalInstance1 = bootstrap.Modal.getInstance(modal1);
+        modalInstance1?.hide();
+      }
+      navigate("/combinePayment");
+      toast.success(t("deleteSuccess"));
+    } catch (e) {
+      console.error("Delete error:", e);
+      toast.error(t("deleteError"));
+    }
+  };
   useEffect(() => {
     const deposit = parseFloat(depositAvailableNew) || 0;
     const finalPayment = basePayment - deposit;
@@ -408,6 +428,7 @@ const CombinePayment = () => {
     );
   }, [payableDATA, depositAvailable]);
   const everyDataSet = async (a) => {
+    setDepositAvailableNew(a?.Available_deposit);
     console.log("everyDataSet called with:", a);
 
     try {
@@ -501,7 +522,7 @@ const CombinePayment = () => {
     try {
       // Send POST request to insertClientPayment endpoint (first API)
       const response = await axios.post(`${API_BASE_URL}/EXPPaymentStep2`, {
-        ID: singlePodId?.ID,
+        ID: lastInseartId,
       });
       console.log("Payment data submitted successfully", response);
       getCombinedPayment();
@@ -580,7 +601,7 @@ const CombinePayment = () => {
               <h1 className="modal-title fs-5" id="exampleModalLabel">
                 {t("payment")}
               </h1>
-              <button
+              {/* <button
                 type="button"
                 onClick={paymentDataClear}
                 className="btn-close"
@@ -588,7 +609,7 @@ const CombinePayment = () => {
                 aria-label="Close"
               >
                 <i className="mdi mdi-close"></i>
-              </button>
+              </button> */}
             </div>
             <div className="modal-body">
               <div className="row">
@@ -598,10 +619,22 @@ const CombinePayment = () => {
                       <div className="parentFormPayment">
                         <p> {t("paymentDate")}</p>
                         <DatePicker
-                          selected={selectedPaymentDate}
-                          onChange={(date) =>
-                            handlePaymentChange("Payment_Date", date)
+                          selected={
+                            selectedPaymentDate &&
+                            !isNaN(new Date(selectedPaymentDate))
+                              ? new Date(selectedPaymentDate)
+                              : null
                           }
+                          onChange={(date) => {
+                            const formattedDate = date
+                              ? date.toISOString().split("T")[0] // ✅ store as YYYY-MM-DD
+                              : null;
+
+                            setSelectedPaymentDate(formattedDate);
+
+                            // ✅ trigger API call like before
+                            handlePaymentChange("Payment_Date", formattedDate);
+                          }}
                           dateFormat="dd/MM/yyyy"
                           placeholderText="Click to select a date"
                           customInput={<CustomInput />}
@@ -745,6 +778,13 @@ const CombinePayment = () => {
                 className="btn btn-primary"
               >
                 {t("submit")}
+              </button>
+              <button
+                type="button"
+                onClick={deleteOrderWithPayment}
+                className="btn btn-primary"
+              >
+                {t("cancel")}
               </button>
             </div>
           </div>

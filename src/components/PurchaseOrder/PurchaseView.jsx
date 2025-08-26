@@ -11,6 +11,7 @@ import axios from "../../Url/Api";
 import { useTranslation } from "react-i18next";
 const PurchaseView = () => {
   const { t, i18n } = useTranslation("global");
+  const [poData, setPoData] = useState(null);
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -89,7 +90,31 @@ const PurchaseView = () => {
     getDetils1();
     setData(from);
   }, []);
+  const summaryDeatils = () => {
+    axios
+      .post(`${API_BASE_URL}/PO_Bottom_View_EN`, {
+        po_id:from?.PO_ID,
+      })
+      .then((res) => {
+        console.log("poData", res.data);
+        setPoData(res.data);
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+      });
+  };
+  useEffect(() => {
+    summaryDeatils();
+  }, []);
+  const renderSection = (labels, values) => {
+    if (!labels || !values) return null;
 
+    return Object.keys(labels).map((key, i) => (
+      <div key={i}>
+        <b>{labels[key]}</b> {values[key] || ""}
+      </div>
+    ));
+  };
   const handleSubmit = async () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/updatePurchaseOrder`, {
@@ -627,70 +652,30 @@ const PurchaseView = () => {
                       </table>
                       {/*--------------------------- table data end--------------------------------*/}
                     </div>
-                    <div className="flex justify-content-end mt-4 totalBefore">
-                      <div className="pe-3">
-                        <div className="flexBefore">
-                          <div>
-                            <strong>{t("totalBeforeTax")}:</strong>
-                          </div>
-                          <div>
-                            <span>{formatNumber(data?.Total_Before_Tax)}</span>
-                          </div>
-                        </div>
-                        <div className="flexBefore">
-                          <div>
-                            <strong>{t("vat")}:</strong>
-                          </div>
-                          <div>
-                            <span>{formatNumber(data?.VAT)}</span>
-                          </div>
-                        </div>
-                        <div className="flexBefore">
-                          <div>
-                            <strong>{t("wth")}:</strong>
-                          </div>
-                          <div>
-                            <span>{formatNumber(data?.WHT)}</span>
-                          </div>
-                        </div>
-                        <div className="flexBefore">
-                          <div>
-                            <strong>{t("rounding")}:</strong>
-                          </div>
-                          <div>
-                            <span>{formatNumber(data?.rounding)}</span>
-                          </div>
-                        </div>
-                        {/* <div className="form-group">
-                          <div className="parentFormPayment d-flex">
-                            <div className="me-3">
-                              <strong>Rounding</strong>
-                            </div>
-                            <input
-                              type="number"
-                              name="rounding"
-                              readOnly
-                              value={rounding}
-                              onChange={(e) => setRounding(e.target.value)}
-                            />
-                          </div>
-                        </div> */}
-
-                        <div className="flexBefore">
-                          <div>
-                            <strong> {t("amountToPay")}:</strong>
-                          </div>
-                          <div>
-                            <span>
-                              {formatNumber(
-                                data?.Total_Before_Tax +
-                                  data?.VAT -
-                                  data?.WHT +
-                                  data?.rounding
-                              )}
-                            </span>
-                          </div>
-                        </div>
+                    <div className="row py-4">
+                      <div className="col-lg-3">
+                        {renderSection(
+                          poData?.section1_label,
+                          poData?.section1_values
+                        )}
+                      </div>
+                      <div className="col-lg-3">
+                        {renderSection(
+                          poData?.section2_label,
+                          poData?.section2_values
+                        )}
+                      </div>
+                      <div className="col-lg-3">
+                        {renderSection(
+                          poData?.section3_label,
+                          poData?.section3_values
+                        )}
+                      </div>
+                      <div className="col-lg-3">
+                        {renderSection(
+                          poData?.section4_label,
+                          poData?.section4_values
+                        )}
                       </div>
                     </div>
                     {/* <div className="row selectPurchase">
