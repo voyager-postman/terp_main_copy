@@ -982,7 +982,7 @@ const ReceiptCreate = () => {
                           />
                         )}
                       /> */}
-                      <Autocomplete
+                      {/* <Autocomplete
                         options={
                           recieptDroupDown?.map((vendor) => ({
                             id: vendor.VendorID,
@@ -995,6 +995,39 @@ const ReceiptCreate = () => {
                             ?.map((vendor) => ({
                               id: vendor.VendorID,
                               name: vendor.Payor, // ✅ Same fix here
+                            }))
+                            .find((option) => option.id === state.vendor_id) ||
+                          null
+                        }
+                        onChange={(e, newValue) => {
+                          setState({
+                            ...state,
+                            vendor_id: newValue?.id || "",
+                            vendor_name: newValue?.name || "",
+                          });
+                        }}
+                        sx={{ width: 300 }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("vendorsAndClients")}
+                            InputLabelProps={{ shrink: false }}
+                          />
+                        )}
+                      /> */}
+                      <Autocomplete
+                        options={
+                          recieptDroupDown?.map((vendor) => ({
+                            id: vendor.ID, // ✅ use ID
+                            name: vendor.Name, // ✅ use Name
+                          })) || []
+                        }
+                        getOptionLabel={(option) => option.name || ""}
+                        value={
+                          recieptDroupDown
+                            ?.map((vendor) => ({
+                              id: vendor.ID,
+                              name: vendor.Name,
                             }))
                             .find((option) => option.id === state.vendor_id) ||
                           null
@@ -1265,7 +1298,6 @@ const ReceiptCreate = () => {
                     >
                       <thead>
                         <tr>
-                          
                           <th style={{ width: "350px" }}> {t("item")}</th>
                           <th style={{ width: "150px" }}> {t("quantity")}</th>
                           <th style={{ width: "100px" }}> {t("unit")}</th>
@@ -1273,7 +1305,7 @@ const ReceiptCreate = () => {
                           <th style={{ width: "70px" }}> {t("price")}</th>
                           <th style={{ width: "150px" }}> {t("total")}</th>
                           <th style={{ width: "100px" }}> {t("vat")}</th>
-                          
+
                           <th style={{ width: "100px" }}> {t("action")}</th>
                         </tr>
                       </thead>

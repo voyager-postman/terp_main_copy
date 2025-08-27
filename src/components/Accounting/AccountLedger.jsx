@@ -13,19 +13,66 @@ const AccountLedger = () => {
 
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(true);
+  const [columns, setColumns] = useState([]);
+
   const navigate = useNavigate();
 
   const getEanData = () => {
     axios
       .get(`${API_BASE_URL}/AccountingLedger`)
       .then((response) => {
-        setData(response.data.data || []);
+        const { data: data = [], header = {} } = response.data;
+
+        // Step 1: Create dynamic columns from head
+        const generatedColumns = Object.entries(header)
+          .filter(
+            ([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID"
+          )
+          .map(([key, label]) => ({
+            Header: t(label || key),
+            accessor: key,
+            Cell: ({ value }) => {
+              // ✅ Format only Col1 (date column)
+              if (key === "Col1" && value) {
+                return new Date(value).toISOString().split("T")[0]; // "2025-08-17"
+              }
+              return value ?? ""; // fallback for null values
+            },
+          }));
+
+        // Step 2: Add actions column
+        generatedColumns.push({
+          Header: t("actions"),
+          accessor: "actions",
+          Cell: ({ row }) => {
+            const a = row.original;
+            return (
+              <>
+                <Link to="/update_ean" state={{ from: a }}>
+                  <i
+                    i
+                    className="mdi mdi-pencil"
+                    style={{
+                      width: "20px",
+                      color: "#203764",
+                      fontSize: "22px",
+                      marginTop: "10px",
+                    }}
+                  />
+                </Link>
+              </>
+            );
+          },
+        });
+
+        setColumns(generatedColumns);
+        setData(data);
       })
       .catch((error) => {
-        console.log(error);
+        console.error("Error fetching Debit Note:", error);
+        toast.error(t("genericError"));
       });
   };
-
   useEffect(() => {
     getEanData();
   }, []);
@@ -57,78 +104,74 @@ const AccountLedger = () => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-  const columns = useMemo(
-    () => [
-      {
-        Header: t("AL_Date"),
-        accessor: (row) => {
-          const date = new Date(row.AL_Date);
-          const day = String(date.getDate()).padStart(2, "0");
-          const month = String(date.getMonth() + 1).padStart(2, "0");
-          const year = String(date.getFullYear()).slice(-2); // last 2 digits
-          return `${day}-${month}-${year}`; // dd-mm-yy
-        },
-      },
-      {
-        Header: t("AL_Number"),
-        accessor: (a) => <div>{a.AL_Number}</div>,
-      },
+  // const columns = useMemo(
+  //   () => [
+  //     {
+  //       Header: t("AL_Date"),
+  //       accessor: (row) => {
+  //         const date = new Date(row.AL_Date);
+  //         const day = String(date.getDate()).padStart(2, "0");
+  //         const month = String(date.getMonth() + 1).padStart(2, "0");
+  //         const year = String(date.getFullYear()).slice(-2); // last 2 digits
+  //         return `${day}-${month}-${year}`; // dd-mm-yy
+  //       },
+  //     },
+  //     {
+  //       Header: t("AL_Number"),
+  //       accessor: (a) => <div>{a.AL_Number}</div>,
+  //     },
 
-      {
-        Header: t("Account_No"),
-        accessor: (a) => <div>{a.Account_No}</div>,
-      },
+  //     {
+  //       Header: t("Account_No"),
+  //       accessor: (a) => <div>{a.Account_No}</div>,
+  //     },
 
-      {
-        Header: t("client"),
-        accessor: (a) => <div>{a.client_name}</div>,
-      },
-      {
-        Header: t("consignee"),
-        accessor: (a) => <div>{a.consignee_name}</div>,
-      },
-      {
-        Header: t("vendor"),
-        accessor: (a) => <div>{a.vendor_name}</div>,
-      },
-      {
-        Header: t("Debit"),
-        accessor: (a) => (
-          <div style={{ textAlign: "right" }}>
-            {formatTwoDecimal.format(a.Debit)}
-          </div>
-        ),
-      },
-      {
-        Header:  t("Transaction_Description"),
-        accessor: (a) => <div>{a.Transaction_Description}</div>,
-      },
+  //     {
+  //       Header: t("client"),
+  //       accessor: (a) => <div>{a.client_name}</div>,
+  //     },
+  //     {
+  //       Header: t("consignee"),
+  //       accessor: (a) => <div>{a.consignee_name}</div>,
+  //     },
+  //     {
+  //       Header: t("vendor"),
+  //       accessor: (a) => <div>{a.vendor_name}</div>,
+  //     },
+  //     {
+  //       Header: t("Debit"),
+  //       accessor: (a) => (
+  //         <div style={{ textAlign: "right" }}>
+  //           {formatTwoDecimal.format(a.Debit)}
+  //         </div>
+  //       ),
+  //     },
+  //     {
+  //       Header:  t("Transaction_Description"),
+  //       accessor: (a) => <div>{a.Transaction_Description}</div>,
+  //     },
 
-      {
-        Header: t("actions"),
-        accessor: (a) => (
-          <Link to="/update_ean" state={{ from: a }}>
-            <i
-              i
-              className="mdi mdi-pencil"
-              style={{
-                width: "20px",
-                color: "#203764",
-                fontSize: "22px",
-                marginTop: "10px",
-              }}
-            />
-          </Link>
-        ),
-      },
+  //     {
+  //       Header: t("actions"),
+  //       accessor: (a) => (
+  //         <Link to="/update_ean" state={{ from: a }}>
+  //           <i
+  //             i
+  //             className="mdi mdi-pencil"
+  //             style={{
+  //               width: "20px",
+  //               color: "#203764",
+  //               fontSize: "22px",
+  //               marginTop: "10px",
+  //             }}
+  //           />
+  //         </Link>
+  //       ),
+  //     },
 
-      // {
-      //   Header: "Salary",
-      //   accessor: (a) => <>{"10000000"}</>,
-      // },
-    ],
-    [t]
-  );
+  //   ],
+  //   [t]
+  // );
 
   return (
     <Card

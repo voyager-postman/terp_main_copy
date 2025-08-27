@@ -57,7 +57,7 @@ const CreatePurchaseOrder = () => {
   const [singleDataSet, setSingleDataSet] = useState("");
   const [totalBeforText, setTotalBeforText] = useState("0");
   const [singleDataSet1, setSingleDataSet1] = useState("");
-
+  const [depositValue, setDepositValue] = useState("");
   const [buttonClicked, setButtonClicked] = React.useState(false);
   const [responceId, setResponceId] = useState("");
   const location = useLocation();
@@ -781,7 +781,7 @@ const CreatePurchaseOrder = () => {
           console.log(poDetailsRes);
 
           const deposit = poDetailsRes?.data?.data1?.Available_deposit || 0;
-          setDepositAvailableNew(deposit);
+          setDepositValue(deposit);
 
           // ✅ Initialize payment step
           const step1Res = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, {
@@ -907,7 +907,7 @@ const CreatePurchaseOrder = () => {
   }, []);
   const resetPaymentFormFields = (data) => {
     console.log(data);
-    setDepositAvailableNew(data?.Available_deposit || 0);
+    // setDepositAvailableNew(data?.Available_deposit || 0);
     setBasePayment(data?.left_pay || 0);
     setVatNew(data?.Vat_payment || 0);
     setWhtNew(data?.wht_payment || 0);
@@ -1988,7 +1988,10 @@ const CreatePurchaseOrder = () => {
 
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p> {t("availableDeposit")}</p>
+                        <p>
+                          {" "}
+                          {t("availableDeposit")} ({depositValue})
+                        </p>
                         <input
                           type="number"
                           value={depositAvailableNew}

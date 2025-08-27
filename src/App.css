@@ -834,8 +834,7 @@ button.btn.btn-primary {
   border: 2px solid #203764 !important;
   padding: 7px 30px;
   height: unset !important;
-  /* width: 125px; */
-}
+ }
 
 .btn-danger:hover {
   border: 2px solid #203764 !important;
@@ -2073,14 +2072,15 @@ ul.dropdown-menu {
 .modal-footer button {
   margin: unset !important;
   box-shadow: unset !important;
-  width: 100px;
-  background: #fff !important;
+   background: #fff !important;
   border: unset !important;
   color: #000 !important;
   padding: 7px 30px !important;
   height: unset !important;
 }
-
+.modal-footer button:nth-child(1){
+  margin-right: 5px !important;
+}
 /* 17 */
 button.swal2-confirm.swal2-styled {
   background: #203764;

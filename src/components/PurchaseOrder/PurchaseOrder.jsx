@@ -209,6 +209,8 @@ const PurchaseOrder = () => {
   const [depositAvailable, setDepositAvailable] = useState("");
   const [paymentAmmountNew, setPaymentAmmountNew] = useState("");
   const [depositAvailableNew, setDepositAvailableNew] = useState("");
+  const [depositValue, setDepositValue] = useState("");
+
   const [roundingAmount, setRoundingAmount] = useState("0");
   const [totalPaymentAmount, setTotalPaymentAmount] = useState("");
   const [paymentNotes, setPaymentNotes] = useState("");
@@ -1128,7 +1130,8 @@ const PurchaseOrder = () => {
           console.log(res1);
 
           const deposit = res1?.data?.data1?.Available_deposit || 0;
-          setDepositAvailableNew(deposit);
+          // setDepositAvailableNew(deposit);
+          setDepositValue(deposit);
 
           // ✅ show modal after access is granted
           const modal = new bootstrap.Modal(
@@ -2563,7 +2566,7 @@ const PurchaseOrder = () => {
           );
           const deposit = depositResponse.data.cpn_data?.Available_deposit || 0;
           console.log(depositResponse);
-          setDepositAvailableNew(deposit);
+          setDepositValue(deposit);
 
           // ✅ Initialize EXPPaymentStep1
           const step1Response = await axios.post(
@@ -3530,9 +3533,46 @@ const PurchaseOrder = () => {
 
               {a.Payment_Status === 1 &&
                 (a.Receiving_Status === 1 || a.Receiving_Status === 2) && (
+                  // <button
+                  //   onClick={async () => {
+                  //     try {
+                  //       const res = await axios.post(
+                  //         `${API_BASE_URL}/Checkeaccessfile`,
+                  //         {
+                  //           id: a.PO_ID,
+                  //           accesstype: 1, // Mark as in use
+                  //           edit: 1,
+                  //         }
+                  //       );
+
+                  //       if (res?.data?.success) {
+                  //         navigate("/updatePurchaseOrder", {
+                  //           state: { from: a },
+                  //         });
+                  //       } else {
+                  //         toast.warning(res?.data?.message);
+                  //       }
+                  //     } catch (error) {
+                  //       console.error("Access API error:", error);
+                  //       toast.error(
+                  //         "Something went wrong while checking file access."
+                  //       );
+                  //     }
+                  //   }}
+                  //   style={{
+                  //     background: "none",
+                  //     border: "none",
+                  //     cursor: "pointer",
+                  //   }}
+                  // >
+                  //   <i className="mdi mdi-pencil pl-2" />
+                  // </button>
                   <button
                     onClick={async () => {
                       try {
+                        // ✅ show loader before API call
+                        loadingModal.fire();
+
                         const res = await axios.post(
                           `${API_BASE_URL}/Checkeaccessfile`,
                           {
@@ -3554,6 +3594,9 @@ const PurchaseOrder = () => {
                         toast.error(
                           "Something went wrong while checking file access."
                         );
+                      } finally {
+                        // ✅ ALWAYS close loader
+                        loadingModal.close();
                       }
                     }}
                     style={{
@@ -4485,7 +4528,10 @@ const PurchaseOrder = () => {
 
                         <div className="col-lg-6 mt-3">
                           <div className="parentFormPayment">
-                            <p> {t("availableDeposit")}</p>
+                            <p>
+                              {" "}
+                              {t("availableDeposit")} ({depositValue})
+                            </p>
                             <input
                               type="number"
                               value={depositAvailableNew}

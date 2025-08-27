@@ -33,6 +33,7 @@ const CombinePayment = () => {
   const [procesureResult, setProcesureResult] = useState("");
   const [amountToPayNew, setAmountToPayNew] = useState("");
   const [depositAvailableNew, setDepositAvailableNew] = useState("");
+  const [depositValue, setDepositValue] = useState("");
   const [depositUsedNew, newDepositUsedNew] = useState("");
   const [vatNew, setVatNew] = useState("");
   const [whtNew, setWhtNew] = useState("");
@@ -428,7 +429,8 @@ const CombinePayment = () => {
     );
   }, [payableDATA, depositAvailable]);
   const everyDataSet = async (a) => {
-    setDepositAvailableNew(a?.Available_deposit);
+    // setDepositAvailableNew(a?.Available_deposit);
+    setDepositValue(a?.Available_deposit);
     console.log("everyDataSet called with:", a);
 
     try {
@@ -702,7 +704,9 @@ const CombinePayment = () => {
 
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p> {t("availableDeposit")}</p>
+                        <p>
+                          {t("availableDeposit")} ({depositValue}){" "}
+                        </p>
                         <input
                           type="number"
                           value={depositAvailableNew}
