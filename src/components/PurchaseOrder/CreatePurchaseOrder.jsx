@@ -261,6 +261,19 @@ const CreatePurchaseOrder = () => {
   //   setPaymentAmmountNew(finalPayment >= 0 ? finalPayment.toFixed(2) : 0);
   // }, [depositAvailableNew, basePayment]);
   const submitPaymentData = async () => {
+    if (!selectedPaymentDate) {
+      setShow2(true);
+      return;
+    }
+    if (!selectedPaymentChannel) {
+      setShow2(true);
+      return;
+    }
+    if (!paymentAmmountNew) {
+      setShow2(true);
+      return;
+    }
+
     try {
       const response = await axios.post(`${API_BASE_URL}/EXPPaymentStep2`, {
         ID: singleDataSet,
@@ -809,10 +822,15 @@ const CreatePurchaseOrder = () => {
     }
   };
   const deleteOrderWithPayment = async () => {
+    if (!singleDataSet) {
+      toast.error(t("deleteError"));
+      return;
+    }
+
     try {
       // ✅ Delete API
       await axios.post(`${API_BASE_URL}/EXPPaymentDelete`, {
-        Expense_Payment_ID: singleDataSet || "",
+        Expense_Payment_ID: singleDataSet,
       });
 
       // ✅ Hide modal after delete
@@ -821,13 +839,50 @@ const CreatePurchaseOrder = () => {
         const modalInstance1 = bootstrap.Modal.getInstance(modal1);
         modalInstance1?.hide();
       }
-      navigate("/purchase_orders");
+
+      // ✅ Release access
+      await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
+        id: state.po_id,
+        accesstype: 1, // Mark as in use
+      });
+
+      // ✅ Show toast first, then navigate
       toast.success(t("deleteSuccess"));
+      navigate("/purchase_orders");
     } catch (e) {
       console.error("Delete error:", e);
       toast.error(t("deleteError"));
     }
   };
+
+  // const deleteOrderWithPayment = async () => {
+  //   try {
+  //     // ✅ Delete API
+  //     await axios.post(`${API_BASE_URL}/EXPPaymentDelete`, {
+  //       Expense_Payment_ID: singleDataSet || "",
+  //     });
+
+  //     // ✅ Hide modal after delete
+  //     const modal1 = document.getElementById("modalCombine");
+  //     if (modal1) {
+  //       const modalInstance1 = bootstrap.Modal.getInstance(modal1);
+  //       modalInstance1?.hide();
+  //     }
+  //     const accessResponse = await axios.post(
+  //         `${API_BASE_URL}/ReleaseAccess`,
+  //         {
+  //           id: singleDataSet,
+
+  //           accesstype: 1, // Mark as in use
+  //         }
+  //       );
+  //     navigate("/purchase_orders");
+  //     toast.success(t("deleteSuccess"));
+  //   } catch (e) {
+  //     console.error("Delete error:", e);
+  //     toast.error(t("deleteError"));
+  //   }
+  // };
 
   // const updateDataPayNow = async () => {
   //   try {
@@ -2122,7 +2177,13 @@ const CreatePurchaseOrder = () => {
               ) : (
                 ""
               )}
-
+              {!paymentAmmountNew ? (
+                <p style={{ backgroundColor: color ? "" : "#631f37" }}>
+                  {"Payment amount is Required"}
+                </p>
+              ) : (
+                ""
+              )}
               <div className="closeBtnRece">
                 <button onClick={closeIcon2}>{t("close")}</button>
               </div>

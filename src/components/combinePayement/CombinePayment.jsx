@@ -230,6 +230,17 @@ const CombinePayment = () => {
         const modalInstance1 = bootstrap.Modal.getInstance(modal1);
         modalInstance1?.hide();
       }
+      setPaymentAmmountNew("");
+      setProcesureResult("");
+      setRoundingNew("");
+      setSelectedPaymentDate(null);
+      setSelectedPaymentChannel("");
+      setBankReference("");
+      setBankChargeAmount("0");
+      setDepositAvailable("");
+      setRoundingAmount("");
+      setTotalPaymentAmount("");
+      setPaymentNotes("");
       navigate("/combinePayment");
       toast.success(t("deleteSuccess"));
     } catch (e) {
@@ -237,11 +248,12 @@ const CombinePayment = () => {
       toast.error(t("deleteError"));
     }
   };
-  useEffect(() => {
-    const deposit = parseFloat(depositAvailableNew) || 0;
-    const finalPayment = basePayment - deposit;
-    setPaymentAmmountNew(finalPayment >= 0 ? finalPayment.toFixed(2) : 0);
-  }, [depositAvailableNew, basePayment]);
+  
+  // useEffect(() => {
+  //   const deposit = parseFloat(depositAvailableNew) || 0;
+  //   const finalPayment = basePayment - deposit;
+  //   setPaymentAmmountNew(finalPayment >= 0 ? finalPayment.toFixed(2) : 0);
+  // }, [depositAvailableNew, basePayment]);
   const columns = useMemo(
     () => [
       {
@@ -477,15 +489,18 @@ const CombinePayment = () => {
   };
 
   const submitPaymentData = async () => {
-    // if (!selectedPaymentDate) {
-    //   setShow2(true);
-    //   return;
-    // }
-    // if (!selectedPaymentChannel) {
-    //   setShow2(true);
-    //   return;
-    // }
-
+    if (!selectedPaymentDate) {
+      setShow2(true);
+      return;
+    }
+    if (!selectedPaymentChannel) {
+      setShow2(true);
+      return;
+    }
+    if (!paymentAmmountNew) {
+      setShow2(true);
+      return;
+    }
     // const paymentData = {
     //   vendor_id: singlePodId.Vendor,
     //   Payment_Date: selectedPaymentDate,
@@ -838,7 +853,13 @@ const CombinePayment = () => {
               ) : (
                 ""
               )}
-
+              {!paymentAmmountNew ? (
+                <p style={{ backgroundColor: color ? "" : "#631f37" }}>
+                  {"Payment amount is Required"}
+                </p>
+              ) : (
+                ""
+              )}
               <div className="closeBtnRece">
                 <button onClick={closeIcon2}>{"close"}</button>
               </div>

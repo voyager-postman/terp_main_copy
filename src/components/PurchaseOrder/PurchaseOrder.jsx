@@ -1226,22 +1226,37 @@ const PurchaseOrder = () => {
   };
 
   const paymentViewSection = () => {
-    axios
-      .post(`${API_BASE_URL}/EXPPaymentView`, {
-        PO_ID: singlePodId?.PO_ID, // ✅ your PO_ID
-        CPN: singleCpnId, // ✅ CPN if required
-      })
-      .then((res) => {
-        setPaymentSections({
-          labels: res.data.section_label || {},
-          data: res.data.section_data || {},
+    try {
+      let payload = {};
+
+      if (singlePodId?.PO_ID) {
+        // ✅ Priority 1: use PO_ID
+        payload = { PO_ID: singlePodId.PO_ID };
+      } else if (singleCpnId) {
+        // ✅ Priority 2: use CPN
+        payload = { CPN: singleCpnId };
+      } else {
+        console.warn("❌ No PO_ID or CPN found, skipping API call.");
+        return;
+      }
+
+      axios
+        .post(`${API_BASE_URL}/EXPPaymentView`, payload)
+        .then((res) => {
+          setPaymentSections({
+            labels: res.data.section_label || {},
+            data: res.data.section_data || {},
+          });
+          console.log("Payment updated ✅", res.data);
+        })
+        .catch((err) => {
+          console.error("Payment update failed ❌", err);
         });
-        console.log("Payment updated ✅", res.data);
-      })
-      .catch((err) => {
-        console.error("Payment update failed ❌", err);
-      });
+    } catch (err) {
+      console.error("Unexpected error ❌", err);
+    }
   };
+
   useEffect(() => {
     paymentViewSection();
   }, []);
@@ -2897,51 +2912,18 @@ const PurchaseOrder = () => {
   };
 
   const submitPaymentData = async () => {
-    // if (!selectedPaymentDate) {
-    //   setShow2(true);
-    //   return;
-    // }
-    // if (!selectedPaymentChannel) {
-    //   setShow2(true);
-    //   return;
-    // }
-
-    // const paymentData = {
-    //   vendor_id: singlePodId.Vendor || venderId.Vendor,
-    //   Payment_Date: selectedPaymentDate,
-    //   Payment_Channel: selectedPaymentChannel,
-    //   Bank_Fees: bankChargeAmount,
-    //   Rounding: roundingAmount,
-    //   available_Deposit: depositAvailable,
-    //   // Payment_Amount: totalPaymentAmount,
-    //   Payment_Amount: paymentAmmountNew,
-    //   Notes: paymentNotes,
-    //   Bank_Ref: bankReference,
-    //   PO_id: singlePodId.PO_ID,
-    //   CPN_id: venderId.ID,
-    //   User_id: localStorage.getItem("id"),
-    //   amount_to_pay: (
-    //     Number(paymentAmmountNew) +
-    //     (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-    //       Number(vatNew) -
-    //     (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-    //       Number(whtNew) +
-    //     (Number(roundingNew1) + Number(roundingNew))
-    //   ).toFixed(2),
-    //   Deposit_Used: Number(depositAvailableNew),
-    //   VAT: (
-    //     (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
-    //     Number(vatNew)
-    //   ).toFixed(2),
-    //   WHT: (
-    //     (Number(depositAvailableNew) + Number(paymentAmmountNew)) *
-    //     Number(whtNew)
-    //   ).toFixed(2),
-    //   left_Rounding: Number(roundingNew1) + Number(roundingNew),
-    //   Total_Before_Tax: Number(depositAvailableNew) + Number(paymentAmmountNew),
-    // };
-
-    // console.log(paymentData);
+    if (!selectedPaymentDate) {
+      setShow2(true);
+      return;
+    }
+    if (!selectedPaymentChannel) {
+      setShow2(true);
+      return;
+    }
+    if (!paymentAmmountNew) {
+      setShow2(true);
+      return;
+    }
 
     try {
       // Send POST request to insertClientPayment endpoint (first API)
@@ -3210,7 +3192,18 @@ const PurchaseOrder = () => {
         const modalInstance1 = bootstrap.Modal.getInstance(modal1);
         modalInstance1?.hide();
       }
-
+      setProcesureResult("");
+      setRoundingNew("");
+      setPaymentAmmountNew("");
+      setDepositAvailableNew("");
+      setSelectedPaymentDate(null);
+      setSelectedPaymentChannel("");
+      setBankReference("");
+      setBankChargeAmount("0");
+      setDepositAvailable("");
+      setRoundingAmount("");
+      setTotalPaymentAmount("");
+      setPaymentNotes("");
       toast.success(t("deleteSuccess"));
       getPurchaseOrder();
     } catch (e) {
@@ -6795,6 +6788,13 @@ const PurchaseOrder = () => {
               {!selectedPaymentChannel ? (
                 <p style={{ backgroundColor: color ? "" : "#631f37" }}>
                   {"Payment Channel is Required"}
+                </p>
+              ) : (
+                ""
+              )}
+              {!paymentAmmountNew ? (
+                <p style={{ backgroundColor: color ? "" : "#631f37" }}>
+                  {"Payment amount is Required"}
                 </p>
               ) : (
                 ""

@@ -54,7 +54,7 @@ const Accounts = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [notes, setNotes] = useState("");
   const [filterData, setFilterData] = useState("");
-
+  const [columns, setColumns] = useState([]);
   const { data: clientVendor } = useQuery("getAllVendor");
   const loadingModal = MySwal.mixin({
     title: "Loading...",
@@ -472,10 +472,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_Invoices),
             105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Invoices)
-            ),
+              valueWidth -
+              doc.getTextWidth(
+                formatter.format(response.data.data?.statement_Invoices)
+              ),
             finalY + 1
           );
 
@@ -484,10 +484,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_claims),
             105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_claims)
-            ),
+              valueWidth -
+              doc.getTextWidth(
+                formatter.format(response.data.data?.statement_claims)
+              ),
             finalY + 5
           );
 
@@ -496,10 +496,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_payments),
             105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_payments)
-            ),
+              valueWidth -
+              doc.getTextWidth(
+                formatter.format(response.data.data?.statement_payments)
+              ),
             finalY + 9
           );
 
@@ -511,10 +511,10 @@ const Accounts = () => {
           doc.text(
             formatter.format(response.data.data?.statement_Totals),
             105 +
-            valueWidth -
-            doc.getTextWidth(
-              formatter.format(response.data.data?.statement_Totals)
-            ),
+              valueWidth -
+              doc.getTextWidth(
+                formatter.format(response.data.data?.statement_Totals)
+              ),
             finalY + 16
           );
 
@@ -960,8 +960,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row1 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
           finalY + 1
         );
 
@@ -970,8 +970,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row2 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
           finalY + 5
         );
 
@@ -980,8 +980,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row3 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
           finalY + 9
         );
         // new
@@ -989,8 +989,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row4 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
           finalY + 13
         );
 
@@ -998,8 +998,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row5 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
           finalY + 17
         );
 
@@ -1007,8 +1007,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row6 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
           finalY + 21
         );
 
@@ -1020,8 +1020,8 @@ const Accounts = () => {
         doc.text(
           `${response?.data.section6_Values.Row4 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
           finalY + 29
         );
 
@@ -1170,7 +1170,7 @@ const Accounts = () => {
       // Automatically set Paid Amount to the corresponding amount_to_pay if checked
       const amountToPay = isChecked
         ? paymentTable2.find((item) => item.po_id === invoiceNumber)
-          ?.amount_to_pay || 0
+            ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -2383,10 +2383,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Invoices)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Invoices)
+            ),
           finalY + 1
         );
 
@@ -2395,10 +2395,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_claims)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_claims)
+            ),
           finalY + 5
         );
 
@@ -2407,10 +2407,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_payments)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_payments)
+            ),
           finalY + 9
         );
 
@@ -2422,10 +2422,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Totals)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Totals)
+            ),
           finalY + 16
         );
 
@@ -2588,19 +2588,24 @@ const Accounts = () => {
         const startX1 = 7;
         const lineHeight1 = 4.2;
 
-        const longText1_1 = `${response.data.vendorData?.name ? response.data.vendorData?.name : ""
-          }(${response.data.vendorData?.id_card
+        const longText1_1 = `${
+          response.data.vendorData?.name ? response.data.vendorData?.name : ""
+        }(${
+          response.data.vendorData?.id_card
             ? response.data.vendorData?.id_card
             : ""
-          })`;
+        })`;
         doc.setFont("helvetica", "normal");
-        const longText1_2 = `${response.data.vendorData?.address
-          ? response.data.vendorData?.address
-          : ""
-          }`;
-        const longText1_3 = `${response.data.vendorData?.email ? response.data.vendorData?.email : ""
-          } / ${response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
-          }`;
+        const longText1_2 = `${
+          response.data.vendorData?.address
+            ? response.data.vendorData?.address
+            : ""
+        }`;
+        const longText1_3 = `${
+          response.data.vendorData?.email ? response.data.vendorData?.email : ""
+        } / ${
+          response.data.vendorData?.phone ? response.data.vendorData?.phone : ""
+        }`;
 
         // Render client details
         doc.setFont("NotoSansThai"); // Set the font to use
@@ -2758,10 +2763,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Invoices)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Invoices)
+            ),
           finalY + 1
         );
 
@@ -2770,10 +2775,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_claims)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_claims)
+            ),
           finalY + 5
         );
 
@@ -2782,10 +2787,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_payments)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_payments)
+            ),
           finalY + 9
         );
 
@@ -2797,10 +2802,10 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Totals)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Totals)
+            ),
           finalY + 16
         );
 
@@ -3070,11 +3075,11 @@ const Accounts = () => {
             response.data.statement_details?.Starting_Balance
           ),
           alignmentX -
-          doc.getTextWidth(
-            formatterTwo.format(
-              response.data.statement_details?.Starting_Balance
-            )
-          ),
+            doc.getTextWidth(
+              formatterTwo.format(
+                response.data.statement_details?.Starting_Balance
+              )
+            ),
           finalY + 1
         );
         doc.text("Credit :", labelX, finalY + 5);
@@ -3083,11 +3088,11 @@ const Accounts = () => {
             response.data.statement_details?.Statement_Credits
           ),
           alignmentX -
-          doc.getTextWidth(
-            formatterTwo.format(
-              response.data.statement_details?.Statement_Credits
-            )
-          ),
+            doc.getTextWidth(
+              formatterTwo.format(
+                response.data.statement_details?.Statement_Credits
+              )
+            ),
           finalY + 5
         );
 
@@ -3097,11 +3102,11 @@ const Accounts = () => {
             response.data.statement_details?.Statement_Debits
           ),
           alignmentX -
-          doc.getTextWidth(
-            formatterTwo.format(
-              response.data.statement_details?.Statement_Debits
-            )
-          ),
+            doc.getTextWidth(
+              formatterTwo.format(
+                response.data.statement_details?.Statement_Debits
+              )
+            ),
           finalY + 9
         );
 
@@ -3112,11 +3117,11 @@ const Accounts = () => {
         doc.text(
           formatter.format(response.data.statement_details?.Statement_Balance),
           alignmentX -
-          doc.getTextWidth(
-            formatter.format(
-              response.data.statement_details?.Statement_Balance
-            )
-          ),
+            doc.getTextWidth(
+              formatter.format(
+                response.data.statement_details?.Statement_Balance
+              )
+            ),
           finalY + 16
         );
 
@@ -3173,7 +3178,7 @@ const Accounts = () => {
       const updatedCheckedItems = { ...prev, [invoiceNumber]: isChecked };
       const amountToPay = isChecked
         ? paymentTable1.find((item) => item.transaction_ref === invoiceNumber)
-          ?.amount_to_pay || 0
+            ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -3674,9 +3679,10 @@ const Accounts = () => {
       currentYRight = renderLabelAndValue(
         doc,
         "Bank Name:",
-        `${response?.data?.vendorBankDetails?.bank_name
-          ? response?.data?.vendorBankDetails?.bank_name
-          : ""
+        `${
+          response?.data?.vendorBankDetails?.bank_name
+            ? response?.data?.vendorBankDetails?.bank_name
+            : ""
         }`,
         130,
         200,
@@ -3834,9 +3840,9 @@ const Accounts = () => {
       const totalAmount = parseFloat(
         response?.data?.Toataldata?.total_commision_THB
           ? String(response.data.Toataldata.total_commision_THB).replace(
-            /,/g,
-            ""
-          )
+              /,/g,
+              ""
+            )
           : 0
       );
 
@@ -3996,12 +4002,430 @@ const Accounts = () => {
       reader.readAsDataURL(file);
     }
   };
+  // const getInventoryList = () => {
+  //   axios.get(`${API_BASE_URL}/LedgerList`).then((res) => {
+  //     console.log(res);
+  //     setData(res.data.details || []);
+  //   });
+  // };
+  // useEffect(() => {
+  //   getInventoryList();
+  // }, []);
+
+  // const getInventoryList = () => {
+  //   axios
+  //     .get(`${API_BASE_URL}/LedgerList`)
+  //     .then((response) => {
+  //       const { data: header = [], details = {} } = response.data;
+
+  //       // Step 1: Create dynamic columns from head
+  //       const generatedColumns = Object.entries(details)
+  //         .filter(
+  //           ([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID"
+  //         )
+  //         .map(([key, label]) => ({
+  //           Header: t(label || key),
+  //           accessor: key,
+  //           Cell: ({ value }) => {
+  //             // ✅ Format only Col1 (date column)
+  //             if (key === "Col1" && value) {
+  //               return new Date(value).toISOString().split("T")[0]; // "2025-08-17"
+  //             }
+  //             return value ?? ""; // fallback for null values
+  //           },
+  //         }));
+
+  //       // Step 2: Add actions column
+  //       generatedColumns.push({
+  //         Header: t("actions"),
+  //         accessor: "actions",
+  //         Cell: ({ row }) => {
+  //           const a = row.original;
+  //           return (
+  //             <>
+  //               <div className="editIcon">
+  //                 {a.Reconcile_Status === 1 && (
+  //                   <butto
+  //                     type="button"
+  //                     data-bs-toggle="modal"
+  //                     data-bs-target="#accountEdit"
+  //                     onClick={() =>
+  //                       editAccountdata(
+  //                         a.Expense_Payment_ID,
+  //                         a.Invoice_payment_Id,
+  //                         a
+  //                       )
+  //                     }
+  //                   >
+  //                     <i className="mdi mdi-pencil pl-2" />
+  //                   </butto>
+  //                 )}
+  //                 {a.Credit !== "0.00" ? (
+  //                   <button
+  //                     type="button"
+  //                     onClick={() => deleteOrder(a.Invoice_payment_Id)}
+  //                   >
+  //                     <i className="mdi mdi-delete " />
+  //                   </button>
+  //                 ) : a.Debit !== "0.00" ? (
+  //                   <button
+  //                     type="button"
+  //                     onClick={() => deleteOrder1(a.Expense_Payment_ID)}
+  //                   >
+  //                     <i className="mdi mdi-delete " />
+  //                   </button>
+  //                 ) : null}
+  //                 {/* Conditionally render the PDF button based on Credit or Debit */}
+  //                 {a.Credit !== "0.00" ? (
+  //                   <button
+  //                     type="button"
+  //                     className="accountSvg"
+  //                     data-bs-toggle="modal"
+  //                     data-bs-target="#exampleModalCustomization"
+  //                     onClick={() => handleDownloadPDF(a.Invoice_payment_Id, a)}
+  //                   >
+  //                     <div className="d-flex">
+  //                       <svg
+  //                         className="me-2"
+  //                         viewBox="0 0 24 24"
+  //                         fill="none"
+  //                         xmlns="http://www.w3.org/2000/svg"
+  //                         stroke="#000000"
+  //                       >
+  //                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+  //                         <g
+  //                           id="SVGRepo_tracerCarrier"
+  //                           stroke-linecap="round"
+  //                           stroke-linejoin="round"
+  //                         ></g>
+  //                         <g id="SVGRepo_iconCarrier">
+  //                           <path
+  //                             d="M3.5 10H20.5"
+  //                             stroke="#203764"
+  //                             stroke-width="2"
+  //                             stroke-linecap="round"
+  //                           ></path>
+  //                           <path
+  //                             d="M6 14H8"
+  //                             stroke="#203764"
+  //                             stroke-width="2"
+  //                             stroke-linecap="round"
+  //                           ></path>
+  //                           <path
+  //                             d="M11 14H13"
+  //                             stroke="#203764"
+  //                             stroke-width="2"
+  //                             stroke-linecap="round"
+  //                           ></path>{" "}
+  //                           <path
+  //                             d="M3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5H12H17C18.8856 5 19.8284 5 20.4142 5.58579C21 6.17157 21 7.11438 21 9V12V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H12H7C5.11438 19 4.17157 19 3.58579 18.4142C3 17.8284 3 16.8856 3 15V12V9Z"
+  //                             stroke="#203764"
+  //                             stroke-width="2"
+  //                             stroke-linejoin="round"
+  //                           ></path>{" "}
+  //                         </g>
+  //                       </svg>
+  //                     </div>
+  //                   </button>
+  //                 ) : a.Debit !== "0.00" ? (
+  //                   <button
+  //                     type="button"
+  //                     className="svgIconPurchase"
+  //                     onClick={() =>
+  //                       handleDownloadPDFSlip(a.Expense_Payment_ID, a)
+  //                     }
+  //                   >
+  //                     <div>
+  //                       <svg
+  //                         fill="#203764"
+  //                         height="200px"
+  //                         width="200px"
+  //                         viewBox="0 0 512 512"
+  //                         stroke="#203764"
+  //                       >
+  //                         <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+  //                         <g
+  //                           id="SVGRepo_tracerCarrier"
+  //                           strokeLinecap="round"
+  //                           strokeLinejoin="round"
+  //                         ></g>
+  //                         <g id="SVGRepo_iconCarrier">
+  //                           <g>
+  //                             <g>
+  //                               <g>
+  //                                 <path d="M502.747,160.381c-0.032,0-0.063,0.005-0.095,0.005H120.289c-5.11,0-9.253,4.142-9.253,9.253s4.143,9.253,9.253,9.253h373.205v55.518H18.506v-55.518h64.771c5.11,0,9.253-4.142,9.253-9.253s-4.143-9.253-9.253-9.253H18.506v-27.759c0-15.306,12.452-27.759,27.759-27.759h419.47c15.306,0,27.759,12.453,27.759,27.759c0,5.111,4.142,9.253,9.253,9.253s9.253-4.142,9.253-9.253c0-25.511-20.754-46.265-46.265-46.265H46.265C20.754,86.361,0,108.115,0,132.627v246.747c0,25.511,20.754,46.265,46.265,46.265h419.47c25.511,0,46.265-20.754,46.265-46.265V169.639v-0.005C512,164.523,507.858,160.381,502.747,160.381z M493.494,379.373c0,15.306-12.453,27.759-27.759,27.759H46.265c-15.307,0-27.759-12.453-27.759-27.759V252.916h474.988V379.373z"></path>
+  //                                 <path d="M95.614,376.289c8.799,0,17.334-2.495,24.675-7.13c7.342,4.635,15.876,7.13,24.675,7.13c25.511,0,46.265-20.754,46.265-46.265s-20.754-46.265-46.265-46.265c-8.799,0-17.333,2.495-24.675,7.13c-7.341-4.635-15.876-7.13-24.675-7.13c-25.511,0-46.265,20.754-46.265,46.265S70.103,376.289,95.614,376.289z M95.614,302.265c6.837,0,13.409,2.512,18.502,7.072c3.514,3.144,8.83,3.144,12.344,0c5.094-4.56,11.666-7.072,18.504-7.072c15.307,0,27.759,12.453,27.759,27.759s-12.452,27.759-27.759,27.759c-6.837,0-13.408-2.512-18.504-7.072c-1.757-1.572-3.964-2.359-6.171-2.359s-4.416,0.787-6.172,2.359c-5.093,4.56-11.665,7.072-18.502,7.072c-15.307,0-27.759-12.453-27.759-27.759S80.307,302.265,95.614,302.265z"></path>
+  //                                 <path d="M243.663,314.602H441.06c5.111,0,9.253-4.142,9.253-9.253c0-5.111-4.142-9.253-9.253-9.253H243.663c-5.11,0-9.253,4.142-9.253,9.253C234.41,310.461,238.553,314.602,243.663,314.602z"></path>
+  //                                 <path d="M416.386,333.108h-74.024c-5.111,0-9.253,4.142-9.253,9.253s4.142,9.253,9.253,9.253h74.024c5.111,0,9.253-4.142,9.253-9.253S421.497,333.108,416.386,333.108z"></path>
+  //                                 <path d="M243.663,351.614h61.687c5.111,0,9.253-4.142,9.253-9.253s-4.142-9.253-9.253-9.253h-61.687c-5.11,0-9.253,4.142-9.253,9.253S238.553,351.614,243.663,351.614z"></path>
+  //                               </g>
+  //                             </g>
+  //                           </g>
+  //                         </g>
+  //                       </svg>
+  //                     </div>
+  //                   </button>
+  //                 ) : null}
+
+  //                 {+a.Commission == 1 && (
+  //                   <button
+  //                     className="svgIconPurchase"
+  //                     onClick={() =>
+  //                       handleDownloadCommission(a.Expense_Payment_ID, a)
+  //                     }
+  //                   >
+  //                     {" "}
+  //                     <svg
+  //                       fill="#203764"
+  //                       version="1.1"
+  //                       xmlns="http://www.w3.org/2000/svg"
+  //                       xmlnsXlink="http://www.w3.org/1999/xlink"
+  //                       viewBox="0 0 64 64"
+  //                       width="64px"
+  //                       height="64px"
+  //                       stroke="#203764"
+  //                     >
+  //                       <g id="SVGRepo_iconCarrier">
+  //                         <path d="M54.836,41.196c-0.741-0.624-1.72-0.883-2.664-0.719L32.34,43.926l-5.633-5.633C26.52,38.105,26.266,38,26,38H16 c0-0.552-0.447-1-1-1h-4H4v2h6v14H4v2h7h4c0.553,0,1-0.448,1-1h2.764l10.691,5.346c0.463,0.231,0.963,0.347,1.463,0.346 c0.568,0,1.137-0.149,1.646-0.446L54.38,46.52c0.999-0.584,1.62-1.666,1.62-2.823C56,42.73,55.575,41.818,54.836,41.196z M14,53h-2 V39h2V53z M53.371,44.793L31.556,57.518c-0.37,0.216-0.821,0.231-1.206,0.039l-10.902-5.451C19.309,52.036,19.155,52,19,52h-3V40 h9.586l7.879,7.878C33.81,48.224,34,48.683,34,49.171C34,50.18,33.18,51,32.172,51c-0.481,0-0.952-0.195-1.293-0.536l-5.172-5.171 l-1.414,1.414l5.172,5.171C30.188,52.602,31.148,53,32.172,53C34.282,53,36,51.283,36,49.171c0-1.022-0.398-1.983-1.121-2.707 l-0.809-0.809l18.444-3.208c0.372-0.065,0.747,0.038,1.034,0.279C53.835,42.968,54,43.322,54,43.697 C54,44.146,53.759,44.566,53.371,44.793z"></path>
+  //                         <rect
+  //                           x="26.567"
+  //                           y="19.5"
+  //                           transform="matrix(0.6727 -0.7399 0.7399 0.6727 -4.0396 31.8682)"
+  //                           width="10"
+  //                           height="10"
+  //                         ></rect>
+  //                         <path d="M30,20.5c1.654,0,3-1.346,3-3s-1.346-3-3-3s-3,1.346-3,3S28.346,20.5,30,20.5z M30,16.5c0.552,0,1,0.449,1,1s-0.448,1-1,1 s-1-0.449-1-1S29.448,16.5,30,16.5z"></path>
+  //                         <path d="M35,23.5c0,1.654,1.346,3,3,3s3-1.346,3-3s-1.346-3-3-3S35,21.846,35,23.5z M39,23.5c0,0.551-0.448,1-1,1s-1-0.449-1-1 s0.448-1,1-1S39,22.949,39,23.5z"></path>
+  //                         <path d="M33.274,41.688C33.464,41.887,33.726,42,34,42s0.536-0.113,0.726-0.312L50.584,24.98c4.542-4.786,4.542-12.573,0-17.358 C48.367,5.286,45.416,4,42.274,4C39.148,4,36.212,5.272,34,7.584C31.788,5.272,28.852,4,25.726,4c-3.142,0-6.093,1.286-8.31,3.622 c-4.542,4.786-4.542,12.573,0,17.358L33.274,41.688z"></path>
+  //                         <rect x="29" y="28" width="2" height="2"></rect>
+  //                         <rect x="33" y="28" width="2" height="2"></rect>
+  //                         <rect x="37" y="28" width="2" height="2"></rect>
+  //                       </g>
+  //                     </svg>
+  //                   </button>
+  //                 )}
+  //               </div>
+  //             </>
+  //           );
+  //         },
+  //       });
+
+  //       setColumns(generatedColumns);
+  //       setData(header);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching Debit Note:", error);
+  //       toast.error(t("genericError"));
+  //     });
+  // };
+  // useEffect(() => {
+  //   getInventoryList();
+  // }, []);
   const getInventoryList = () => {
-    axios.get(`${API_BASE_URL}/LedgerList`).then((res) => {
-      console.log(res);
-      setData(res.data.details || []);
-    });
+    axios
+      .get(`${API_BASE_URL}/LedgerList`)
+      .then((response) => {
+        const { header = {}, details = [] } = response.data;
+
+        // Step 1: Create dynamic columns from header
+        const generatedColumns = Object.entries(header)
+          .filter(
+            ([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID"
+          )
+          .map(([key, label]) => ({
+            Header: t(label || key),
+            accessor: key,
+            Cell: ({ value }) => {
+              if (key === "Col1" && value) {
+                return new Date(value).toISOString().split("T")[0]; // format date
+              }
+              return value ?? ""; // fallback
+            },
+          }));
+
+        // Step 2: Add actions column
+        generatedColumns.push({
+          Header: t("actions"),
+          accessor: "actions",
+          Cell: ({ row }) => {
+            const a = row.original;
+            return (
+              <div className="editIcon">
+                {a.Reconcile_Status === 1 && (
+                  <butto
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#accountEdit"
+                    onClick={() =>
+                      editAccountdata(
+                        a.Expense_Payment_ID,
+                        a.Invoice_payment_Id,
+                        a
+                      )
+                    }
+                  >
+                    <i className="mdi mdi-pencil pl-2" />
+                  </butto>
+                )}
+                {a.Credit !== "0.00" ? (
+                  <button
+                    type="button"
+                    onClick={() => deleteOrder(a.Invoice_payment_Id)}
+                  >
+                    <i className="mdi mdi-delete " />
+                  </button>
+                ) : a.Debit !== "0.00" ? (
+                  <button
+                    type="button"
+                    onClick={() => deleteOrder1(a.Expense_Payment_ID)}
+                  >
+                    <i className="mdi mdi-delete " />
+                  </button>
+                ) : null}
+                {/* Conditionally render the PDF button based on Credit or Debit */}
+                {a.Credit !== "0.00" ? (
+                  <button
+                    type="button"
+                    className="accountSvg"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModalCustomization"
+                    onClick={() => handleDownloadPDF(a.Invoice_payment_Id, a)}
+                  >
+                    <div className="d-flex">
+                      <svg
+                        className="me-2"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        stroke="#000000"
+                      >
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></g>
+                        <g id="SVGRepo_iconCarrier">
+                          <path
+                            d="M3.5 10H20.5"
+                            stroke="#203764"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          ></path>
+                          <path
+                            d="M6 14H8"
+                            stroke="#203764"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          ></path>
+                          <path
+                            d="M11 14H13"
+                            stroke="#203764"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          ></path>{" "}
+                          <path
+                            d="M3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5H12H17C18.8856 5 19.8284 5 20.4142 5.58579C21 6.17157 21 7.11438 21 9V12V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H12H7C5.11438 19 4.17157 19 3.58579 18.4142C3 17.8284 3 16.8856 3 15V12V9Z"
+                            stroke="#203764"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                          ></path>{" "}
+                        </g>
+                      </svg>
+                    </div>
+                  </button>
+                ) : a.Debit !== "0.00" ? (
+                  <button
+                    type="button"
+                    className="svgIconPurchase"
+                    onClick={() =>
+                      handleDownloadPDFSlip(a.Expense_Payment_ID, a)
+                    }
+                  >
+                    <div>
+                      <svg
+                        fill="#203764"
+                        height="200px"
+                        width="200px"
+                        viewBox="0 0 512 512"
+                        stroke="#203764"
+                      >
+                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        ></g>
+                        <g id="SVGRepo_iconCarrier">
+                          <g>
+                            <g>
+                              <g>
+                                <path d="M502.747,160.381c-0.032,0-0.063,0.005-0.095,0.005H120.289c-5.11,0-9.253,4.142-9.253,9.253s4.143,9.253,9.253,9.253h373.205v55.518H18.506v-55.518h64.771c5.11,0,9.253-4.142,9.253-9.253s-4.143-9.253-9.253-9.253H18.506v-27.759c0-15.306,12.452-27.759,27.759-27.759h419.47c15.306,0,27.759,12.453,27.759,27.759c0,5.111,4.142,9.253,9.253,9.253s9.253-4.142,9.253-9.253c0-25.511-20.754-46.265-46.265-46.265H46.265C20.754,86.361,0,108.115,0,132.627v246.747c0,25.511,20.754,46.265,46.265,46.265h419.47c25.511,0,46.265-20.754,46.265-46.265V169.639v-0.005C512,164.523,507.858,160.381,502.747,160.381z M493.494,379.373c0,15.306-12.453,27.759-27.759,27.759H46.265c-15.307,0-27.759-12.453-27.759-27.759V252.916h474.988V379.373z"></path>
+                                <path d="M95.614,376.289c8.799,0,17.334-2.495,24.675-7.13c7.342,4.635,15.876,7.13,24.675,7.13c25.511,0,46.265-20.754,46.265-46.265s-20.754-46.265-46.265-46.265c-8.799,0-17.333,2.495-24.675,7.13c-7.341-4.635-15.876-7.13-24.675-7.13c-25.511,0-46.265,20.754-46.265,46.265S70.103,376.289,95.614,376.289z M95.614,302.265c6.837,0,13.409,2.512,18.502,7.072c3.514,3.144,8.83,3.144,12.344,0c5.094-4.56,11.666-7.072,18.504-7.072c15.307,0,27.759,12.453,27.759,27.759s-12.452,27.759-27.759,27.759c-6.837,0-13.408-2.512-18.504-7.072c-1.757-1.572-3.964-2.359-6.171-2.359s-4.416,0.787-6.172,2.359c-5.093,4.56-11.665,7.072-18.502,7.072c-15.307,0-27.759-12.453-27.759-27.759S80.307,302.265,95.614,302.265z"></path>
+                                <path d="M243.663,314.602H441.06c5.111,0,9.253-4.142,9.253-9.253c0-5.111-4.142-9.253-9.253-9.253H243.663c-5.11,0-9.253,4.142-9.253,9.253C234.41,310.461,238.553,314.602,243.663,314.602z"></path>
+                                <path d="M416.386,333.108h-74.024c-5.111,0-9.253,4.142-9.253,9.253s4.142,9.253,9.253,9.253h74.024c5.111,0,9.253-4.142,9.253-9.253S421.497,333.108,416.386,333.108z"></path>
+                                <path d="M243.663,351.614h61.687c5.111,0,9.253-4.142,9.253-9.253s-4.142-9.253-9.253-9.253h-61.687c-5.11,0-9.253,4.142-9.253,9.253S238.553,351.614,243.663,351.614z"></path>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </svg>
+                    </div>
+                  </button>
+                ) : null}
+
+                {+a.Commission == 1 && (
+                  <button
+                    className="svgIconPurchase"
+                    onClick={() =>
+                      handleDownloadCommission(a.Expense_Payment_ID, a)
+                    }
+                  >
+                    {" "}
+                    <svg
+                      fill="#203764"
+                      version="1.1"
+                      xmlns="http://www.w3.org/2000/svg"
+                      xmlnsXlink="http://www.w3.org/1999/xlink"
+                      viewBox="0 0 64 64"
+                      width="64px"
+                      height="64px"
+                      stroke="#203764"
+                    >
+                      <g id="SVGRepo_iconCarrier">
+                        <path d="M54.836,41.196c-0.741-0.624-1.72-0.883-2.664-0.719L32.34,43.926l-5.633-5.633C26.52,38.105,26.266,38,26,38H16 c0-0.552-0.447-1-1-1h-4H4v2h6v14H4v2h7h4c0.553,0,1-0.448,1-1h2.764l10.691,5.346c0.463,0.231,0.963,0.347,1.463,0.346 c0.568,0,1.137-0.149,1.646-0.446L54.38,46.52c0.999-0.584,1.62-1.666,1.62-2.823C56,42.73,55.575,41.818,54.836,41.196z M14,53h-2 V39h2V53z M53.371,44.793L31.556,57.518c-0.37,0.216-0.821,0.231-1.206,0.039l-10.902-5.451C19.309,52.036,19.155,52,19,52h-3V40 h9.586l7.879,7.878C33.81,48.224,34,48.683,34,49.171C34,50.18,33.18,51,32.172,51c-0.481,0-0.952-0.195-1.293-0.536l-5.172-5.171 l-1.414,1.414l5.172,5.171C30.188,52.602,31.148,53,32.172,53C34.282,53,36,51.283,36,49.171c0-1.022-0.398-1.983-1.121-2.707 l-0.809-0.809l18.444-3.208c0.372-0.065,0.747,0.038,1.034,0.279C53.835,42.968,54,43.322,54,43.697 C54,44.146,53.759,44.566,53.371,44.793z"></path>
+                        <rect
+                          x="26.567"
+                          y="19.5"
+                          transform="matrix(0.6727 -0.7399 0.7399 0.6727 -4.0396 31.8682)"
+                          width="10"
+                          height="10"
+                        ></rect>
+                        <path d="M30,20.5c1.654,0,3-1.346,3-3s-1.346-3-3-3s-3,1.346-3,3S28.346,20.5,30,20.5z M30,16.5c0.552,0,1,0.449,1,1s-0.448,1-1,1 s-1-0.449-1-1S29.448,16.5,30,16.5z"></path>
+                        <path d="M35,23.5c0,1.654,1.346,3,3,3s3-1.346,3-3s-1.346-3-3-3S35,21.846,35,23.5z M39,23.5c0,0.551-0.448,1-1,1s-1-0.449-1-1 s0.448-1,1-1S39,22.949,39,23.5z"></path>
+                        <path d="M33.274,41.688C33.464,41.887,33.726,42,34,42s0.536-0.113,0.726-0.312L50.584,24.98c4.542-4.786,4.542-12.573,0-17.358 C48.367,5.286,45.416,4,42.274,4C39.148,4,36.212,5.272,34,7.584C31.788,5.272,28.852,4,25.726,4c-3.142,0-6.093,1.286-8.31,3.622 c-4.542,4.786-4.542,12.573,0,17.358L33.274,41.688z"></path>
+                        <rect x="29" y="28" width="2" height="2"></rect>
+                        <rect x="33" y="28" width="2" height="2"></rect>
+                        <rect x="37" y="28" width="2" height="2"></rect>
+                      </g>
+                    </svg>
+                  </button>
+                )}
+              </div>
+            );
+          },
+        });
+
+        // ✅ set data correctly
+        setColumns(generatedColumns);
+        setData(details);
+      })
+      .catch((error) => {
+        console.error("Error fetching LedgerList:", error);
+        toast.error(t("genericError"));
+      });
   };
+
   useEffect(() => {
     getInventoryList();
   }, []);
@@ -4132,239 +4556,238 @@ const Accounts = () => {
       });
   };
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: t("id"),
-        accessor: "ID",
-      },
-      {
-        Header: t("bankNickname"),
-        accessor: "Bank_nick_name",
-      },
-      {
-        Header: t("transaction"),
-        accessor: (a) => {
-          if (a.Credit !== "0.00") {
-            return "Credit";
-          } else if (a.Debit !== "0.00") {
-            return "Debit";
-          }
-          return ""; // return an empty string if neither condition is met
-        },
-        // Add this to center align the header and the data
-        headerStyle: {
-          halign: "center",
-        },
-        cellStyle: {
-          halign: "center",
-        },
-      },
-      {
-        Header: t("date"),
-        accessor: (a) => {
-          return a.Transaction_Date
-            ? new Date(a.Transaction_Date).toLocaleDateString()
-            : "NA";
-        },
-        headerStyle: {
-          halign: "center",
-          textAlign: "center",
-        },
-        cellStyle: {
-          halign: "center",
-        },
-      },
+  // const columns = React.useMemo(
+  //   () => [
+  //     {
+  //       Header: t("id"),
+  //       accessor: "ID",
+  //     },
+  //     {
+  //       Header: t("bankNickname"),
+  //       accessor: "Bank_nick_name",
+  //     },
+  //     {
+  //       Header: t("transaction"),
+  //       accessor: (a) => {
+  //         if (a.Credit !== "0.00") {
+  //           return "Credit";
+  //         } else if (a.Debit !== "0.00") {
+  //           return "Debit";
+  //         }
+  //         return ""; // return an empty string if neither condition is met
+  //       },
+  //       // Add this to center align the header and the data
+  //       headerStyle: {
+  //         halign: "center",
+  //       },
+  //       cellStyle: {
+  //         halign: "center",
+  //       },
+  //     },
+  //     {
+  //       Header: t("date"),
+  //       accessor: (a) => {
+  //         return a.Transaction_Date
+  //           ? new Date(a.Transaction_Date).toLocaleDateString()
+  //           : "NA";
+  //       },
+  //       headerStyle: {
+  //         halign: "center",
+  //         textAlign: "center",
+  //       },
+  //       cellStyle: {
+  //         halign: "center",
+  //       },
+  //     },
 
-      {
-        Header: t("bankRef"),
-        accessor: "Reference",
-      },
-      {
-        Header: t("amount"),
-        accessor: (a) => {
-          if (a.Credit !== "0.00") {
-            return newFormatterTwo.format(a.Credit);
-          } else if (a.Debit !== "0.00") {
-            return newFormatterTwo.format(a.Debit);
-          }
-          return "";
-        },
-      },
-      {
-        Header: t("clientVendor"),
-        accessor: "Vendor_Client",
-      },
-      {
-        Header: t("account"),
-        accessor: "Account",
-      },
+  //     {
+  //       Header: t("bankRef"),
+  //       accessor: "Reference",
+  //     },
+  //     {
+  //       Header: t("amount"),
+  //       accessor: (a) => {
+  //         if (a.Credit !== "0.00") {
+  //           return newFormatterTwo.format(a.Credit);
+  //         } else if (a.Debit !== "0.00") {
+  //           return newFormatterTwo.format(a.Debit);
+  //         }
+  //         return "";
+  //       },
+  //     },
+  //     {
+  //       Header: t("clientVendor"),
+  //       accessor: "Vendor_Client",
+  //     },
+  //     {
+  //       Header: t("account"),
+  //       accessor: "Account",
+  //     },
 
-      {
-        Header: t("action"),
-        accessor: (a) => (
-          <div className="editIcon">
-            {a.Reconcile_Status === 1 && (
-              <butto
-                type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#accountEdit"
-                onClick={() =>
-                  editAccountdata(a.Expense_Payment_ID, a.Invoice_payment_Id, a)
-                }
-              >
-                <i className="mdi mdi-pencil pl-2" />
-              </butto>
-            )}
-            {a.Credit !== "0.00" ? (
-              <button
-                type="button"
-                onClick={() => deleteOrder(a.Invoice_payment_Id)}
-              >
-                <i className="mdi mdi-delete " />
-              </button>
-            ) : a.Debit !== "0.00" ? (
-              <button
-                type="button"
-                onClick={() => deleteOrder1(a.Expense_Payment_ID)}
-              >
-                <i className="mdi mdi-delete " />
-              </button>
-            ) : null}
-            {/* Conditionally render the PDF button based on Credit or Debit */}
-            {a.Credit !== "0.00" ? (
-              <button
-                type="button"
-                className="accountSvg"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModalCustomization"
-                onClick={() => handleDownloadPDF(a.Invoice_payment_Id, a)}
-              >
-                <div className="d-flex">
-                  <svg
-                    className="me-2"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#000000"
-                  >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      <path
-                        d="M3.5 10H20.5"
-                        stroke="#203764"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      ></path>
-                      <path
-                        d="M6 14H8"
-                        stroke="#203764"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      ></path>
-                      <path
-                        d="M11 14H13"
-                        stroke="#203764"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      ></path>{" "}
-                      <path
-                        d="M3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5H12H17C18.8856 5 19.8284 5 20.4142 5.58579C21 6.17157 21 7.11438 21 9V12V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H12H7C5.11438 19 4.17157 19 3.58579 18.4142C3 17.8284 3 16.8856 3 15V12V9Z"
-                        stroke="#203764"
-                        stroke-width="2"
-                        stroke-linejoin="round"
-                      ></path>{" "}
-                    </g>
-                  </svg>
-                </div>
-              </button>
-            ) : a.Debit !== "0.00" ? (
-              <button
-                type="button"
-                className="svgIconPurchase"
-                onClick={() => handleDownloadPDFSlip(a.Expense_Payment_ID, a)}
-              >
-                <div>
-                  <svg
-                    fill="#203764"
-                    height="200px"
-                    width="200px"
-                    viewBox="0 0 512 512"
-                    stroke="#203764"
-                  >
-                    <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      <g>
-                        <g>
-                          <g>
-                            <path d="M502.747,160.381c-0.032,0-0.063,0.005-0.095,0.005H120.289c-5.11,0-9.253,4.142-9.253,9.253s4.143,9.253,9.253,9.253h373.205v55.518H18.506v-55.518h64.771c5.11,0,9.253-4.142,9.253-9.253s-4.143-9.253-9.253-9.253H18.506v-27.759c0-15.306,12.452-27.759,27.759-27.759h419.47c15.306,0,27.759,12.453,27.759,27.759c0,5.111,4.142,9.253,9.253,9.253s9.253-4.142,9.253-9.253c0-25.511-20.754-46.265-46.265-46.265H46.265C20.754,86.361,0,108.115,0,132.627v246.747c0,25.511,20.754,46.265,46.265,46.265h419.47c25.511,0,46.265-20.754,46.265-46.265V169.639v-0.005C512,164.523,507.858,160.381,502.747,160.381z M493.494,379.373c0,15.306-12.453,27.759-27.759,27.759H46.265c-15.307,0-27.759-12.453-27.759-27.759V252.916h474.988V379.373z"></path>
-                            <path d="M95.614,376.289c8.799,0,17.334-2.495,24.675-7.13c7.342,4.635,15.876,7.13,24.675,7.13c25.511,0,46.265-20.754,46.265-46.265s-20.754-46.265-46.265-46.265c-8.799,0-17.333,2.495-24.675,7.13c-7.341-4.635-15.876-7.13-24.675-7.13c-25.511,0-46.265,20.754-46.265,46.265S70.103,376.289,95.614,376.289z M95.614,302.265c6.837,0,13.409,2.512,18.502,7.072c3.514,3.144,8.83,3.144,12.344,0c5.094-4.56,11.666-7.072,18.504-7.072c15.307,0,27.759,12.453,27.759,27.759s-12.452,27.759-27.759,27.759c-6.837,0-13.408-2.512-18.504-7.072c-1.757-1.572-3.964-2.359-6.171-2.359s-4.416,0.787-6.172,2.359c-5.093,4.56-11.665,7.072-18.502,7.072c-15.307,0-27.759-12.453-27.759-27.759S80.307,302.265,95.614,302.265z"></path>
-                            <path d="M243.663,314.602H441.06c5.111,0,9.253-4.142,9.253-9.253c0-5.111-4.142-9.253-9.253-9.253H243.663c-5.11,0-9.253,4.142-9.253,9.253C234.41,310.461,238.553,314.602,243.663,314.602z"></path>
-                            <path d="M416.386,333.108h-74.024c-5.111,0-9.253,4.142-9.253,9.253s4.142,9.253,9.253,9.253h74.024c5.111,0,9.253-4.142,9.253-9.253S421.497,333.108,416.386,333.108z"></path>
-                            <path d="M243.663,351.614h61.687c5.111,0,9.253-4.142,9.253-9.253s-4.142-9.253-9.253-9.253h-61.687c-5.11,0-9.253,4.142-9.253,9.253S238.553,351.614,243.663,351.614z"></path>
-                          </g>
-                        </g>
-                      </g>
-                    </g>
-                  </svg>
-                </div>
-              </button>
-            ) : null}
+  //     {
+  //       Header: t("action"),
+  //       accessor: (a) => (
+  //         <div className="editIcon">
+  //           {a.Reconcile_Status === 1 && (
+  //             <butto
+  //               type="button"
+  //               data-bs-toggle="modal"
+  //               data-bs-target="#accountEdit"
+  //               onClick={() =>
+  //                 editAccountdata(a.Expense_Payment_ID, a.Invoice_payment_Id, a)
+  //               }
+  //             >
+  //               <i className="mdi mdi-pencil pl-2" />
+  //             </butto>
+  //           )}
+  //           {a.Credit !== "0.00" ? (
+  //             <button
+  //               type="button"
+  //               onClick={() => deleteOrder(a.Invoice_payment_Id)}
+  //             >
+  //               <i className="mdi mdi-delete " />
+  //             </button>
+  //           ) : a.Debit !== "0.00" ? (
+  //             <button
+  //               type="button"
+  //               onClick={() => deleteOrder1(a.Expense_Payment_ID)}
+  //             >
+  //               <i className="mdi mdi-delete " />
+  //             </button>
+  //           ) : null}
+  //           {/* Conditionally render the PDF button based on Credit or Debit */}
+  //           {a.Credit !== "0.00" ? (
+  //             <button
+  //               type="button"
+  //               className="accountSvg"
+  //               data-bs-toggle="modal"
+  //               data-bs-target="#exampleModalCustomization"
+  //               onClick={() => handleDownloadPDF(a.Invoice_payment_Id, a)}
+  //             >
+  //               <div className="d-flex">
+  //                 <svg
+  //                   className="me-2"
+  //                   viewBox="0 0 24 24"
+  //                   fill="none"
+  //                   xmlns="http://www.w3.org/2000/svg"
+  //                   stroke="#000000"
+  //                 >
+  //                   <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+  //                   <g
+  //                     id="SVGRepo_tracerCarrier"
+  //                     stroke-linecap="round"
+  //                     stroke-linejoin="round"
+  //                   ></g>
+  //                   <g id="SVGRepo_iconCarrier">
+  //                     <path
+  //                       d="M3.5 10H20.5"
+  //                       stroke="#203764"
+  //                       stroke-width="2"
+  //                       stroke-linecap="round"
+  //                     ></path>
+  //                     <path
+  //                       d="M6 14H8"
+  //                       stroke="#203764"
+  //                       stroke-width="2"
+  //                       stroke-linecap="round"
+  //                     ></path>
+  //                     <path
+  //                       d="M11 14H13"
+  //                       stroke="#203764"
+  //                       stroke-width="2"
+  //                       stroke-linecap="round"
+  //                     ></path>{" "}
+  //                     <path
+  //                       d="M3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5H12H17C18.8856 5 19.8284 5 20.4142 5.58579C21 6.17157 21 7.11438 21 9V12V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H12H7C5.11438 19 4.17157 19 3.58579 18.4142C3 17.8284 3 16.8856 3 15V12V9Z"
+  //                       stroke="#203764"
+  //                       stroke-width="2"
+  //                       stroke-linejoin="round"
+  //                     ></path>{" "}
+  //                   </g>
+  //                 </svg>
+  //               </div>
+  //             </button>
+  //           ) : a.Debit !== "0.00" ? (
+  //             <button
+  //               type="button"
+  //               className="svgIconPurchase"
+  //               onClick={() => handleDownloadPDFSlip(a.Expense_Payment_ID, a)}
+  //             >
+  //               <div>
+  //                 <svg
+  //                   fill="#203764"
+  //                   height="200px"
+  //                   width="200px"
+  //                   viewBox="0 0 512 512"
+  //                   stroke="#203764"
+  //                 >
+  //                   <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+  //                   <g
+  //                     id="SVGRepo_tracerCarrier"
+  //                     strokeLinecap="round"
+  //                     strokeLinejoin="round"
+  //                   ></g>
+  //                   <g id="SVGRepo_iconCarrier">
+  //                     <g>
+  //                       <g>
+  //                         <g>
+  //                           <path d="M502.747,160.381c-0.032,0-0.063,0.005-0.095,0.005H120.289c-5.11,0-9.253,4.142-9.253,9.253s4.143,9.253,9.253,9.253h373.205v55.518H18.506v-55.518h64.771c5.11,0,9.253-4.142,9.253-9.253s-4.143-9.253-9.253-9.253H18.506v-27.759c0-15.306,12.452-27.759,27.759-27.759h419.47c15.306,0,27.759,12.453,27.759,27.759c0,5.111,4.142,9.253,9.253,9.253s9.253-4.142,9.253-9.253c0-25.511-20.754-46.265-46.265-46.265H46.265C20.754,86.361,0,108.115,0,132.627v246.747c0,25.511,20.754,46.265,46.265,46.265h419.47c25.511,0,46.265-20.754,46.265-46.265V169.639v-0.005C512,164.523,507.858,160.381,502.747,160.381z M493.494,379.373c0,15.306-12.453,27.759-27.759,27.759H46.265c-15.307,0-27.759-12.453-27.759-27.759V252.916h474.988V379.373z"></path>
+  //                           <path d="M95.614,376.289c8.799,0,17.334-2.495,24.675-7.13c7.342,4.635,15.876,7.13,24.675,7.13c25.511,0,46.265-20.754,46.265-46.265s-20.754-46.265-46.265-46.265c-8.799,0-17.333,2.495-24.675,7.13c-7.341-4.635-15.876-7.13-24.675-7.13c-25.511,0-46.265,20.754-46.265,46.265S70.103,376.289,95.614,376.289z M95.614,302.265c6.837,0,13.409,2.512,18.502,7.072c3.514,3.144,8.83,3.144,12.344,0c5.094-4.56,11.666-7.072,18.504-7.072c15.307,0,27.759,12.453,27.759,27.759s-12.452,27.759-27.759,27.759c-6.837,0-13.408-2.512-18.504-7.072c-1.757-1.572-3.964-2.359-6.171-2.359s-4.416,0.787-6.172,2.359c-5.093,4.56-11.665,7.072-18.502,7.072c-15.307,0-27.759-12.453-27.759-27.759S80.307,302.265,95.614,302.265z"></path>
+  //                           <path d="M243.663,314.602H441.06c5.111,0,9.253-4.142,9.253-9.253c0-5.111-4.142-9.253-9.253-9.253H243.663c-5.11,0-9.253,4.142-9.253,9.253C234.41,310.461,238.553,314.602,243.663,314.602z"></path>
+  //                           <path d="M416.386,333.108h-74.024c-5.111,0-9.253,4.142-9.253,9.253s4.142,9.253,9.253,9.253h74.024c5.111,0,9.253-4.142,9.253-9.253S421.497,333.108,416.386,333.108z"></path>
+  //                           <path d="M243.663,351.614h61.687c5.111,0,9.253-4.142,9.253-9.253s-4.142-9.253-9.253-9.253h-61.687c-5.11,0-9.253,4.142-9.253,9.253S238.553,351.614,243.663,351.614z"></path>
+  //                         </g>
+  //                       </g>
+  //                     </g>
+  //                   </g>
+  //                 </svg>
+  //               </div>
+  //             </button>
+  //           ) : null}
 
-            {+a.Commission == 1 && (
-              <button
-                className="svgIconPurchase"
-                onClick={() =>
-                  handleDownloadCommission(a.Expense_Payment_ID, a)
-                }
-              >
-                {" "}
-                <svg
-                  fill="#203764"
-                  version="1.1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlnsXlink="http://www.w3.org/1999/xlink"
-                  viewBox="0 0 64 64"
-                  width="64px"
-                  height="64px"
-                  stroke="#203764"
-                >
-                  <g id="SVGRepo_iconCarrier">
-                    <path d="M54.836,41.196c-0.741-0.624-1.72-0.883-2.664-0.719L32.34,43.926l-5.633-5.633C26.52,38.105,26.266,38,26,38H16 c0-0.552-0.447-1-1-1h-4H4v2h6v14H4v2h7h4c0.553,0,1-0.448,1-1h2.764l10.691,5.346c0.463,0.231,0.963,0.347,1.463,0.346 c0.568,0,1.137-0.149,1.646-0.446L54.38,46.52c0.999-0.584,1.62-1.666,1.62-2.823C56,42.73,55.575,41.818,54.836,41.196z M14,53h-2 V39h2V53z M53.371,44.793L31.556,57.518c-0.37,0.216-0.821,0.231-1.206,0.039l-10.902-5.451C19.309,52.036,19.155,52,19,52h-3V40 h9.586l7.879,7.878C33.81,48.224,34,48.683,34,49.171C34,50.18,33.18,51,32.172,51c-0.481,0-0.952-0.195-1.293-0.536l-5.172-5.171 l-1.414,1.414l5.172,5.171C30.188,52.602,31.148,53,32.172,53C34.282,53,36,51.283,36,49.171c0-1.022-0.398-1.983-1.121-2.707 l-0.809-0.809l18.444-3.208c0.372-0.065,0.747,0.038,1.034,0.279C53.835,42.968,54,43.322,54,43.697 C54,44.146,53.759,44.566,53.371,44.793z"></path>
-                    <rect
-                      x="26.567"
-                      y="19.5"
-                      transform="matrix(0.6727 -0.7399 0.7399 0.6727 -4.0396 31.8682)"
-                      width="10"
-                      height="10"
-                    ></rect>
-                    <path d="M30,20.5c1.654,0,3-1.346,3-3s-1.346-3-3-3s-3,1.346-3,3S28.346,20.5,30,20.5z M30,16.5c0.552,0,1,0.449,1,1s-0.448,1-1,1 s-1-0.449-1-1S29.448,16.5,30,16.5z"></path>
-                    <path d="M35,23.5c0,1.654,1.346,3,3,3s3-1.346,3-3s-1.346-3-3-3S35,21.846,35,23.5z M39,23.5c0,0.551-0.448,1-1,1s-1-0.449-1-1 s0.448-1,1-1S39,22.949,39,23.5z"></path>
-                    <path d="M33.274,41.688C33.464,41.887,33.726,42,34,42s0.536-0.113,0.726-0.312L50.584,24.98c4.542-4.786,4.542-12.573,0-17.358 C48.367,5.286,45.416,4,42.274,4C39.148,4,36.212,5.272,34,7.584C31.788,5.272,28.852,4,25.726,4c-3.142,0-6.093,1.286-8.31,3.622 c-4.542,4.786-4.542,12.573,0,17.358L33.274,41.688z"></path>
-                    <rect x="29" y="28" width="2" height="2"></rect>
-                    <rect x="33" y="28" width="2" height="2"></rect>
-                    <rect x="37" y="28" width="2" height="2"></rect>
-                  </g>
-                </svg>
-              </button>
-            )}
-          </div>
-        ),
-      },
-    ],
-    [t]
-  );
-  // js part start for editing end
+  //           {+a.Commission == 1 && (
+  //             <button
+  //               className="svgIconPurchase"
+  //               onClick={() =>
+  //                 handleDownloadCommission(a.Expense_Payment_ID, a)
+  //               }
+  //             >
+  //               {" "}
+  //               <svg
+  //                 fill="#203764"
+  //                 version="1.1"
+  //                 xmlns="http://www.w3.org/2000/svg"
+  //                 xmlnsXlink="http://www.w3.org/1999/xlink"
+  //                 viewBox="0 0 64 64"
+  //                 width="64px"
+  //                 height="64px"
+  //                 stroke="#203764"
+  //               >
+  //                 <g id="SVGRepo_iconCarrier">
+  //                   <path d="M54.836,41.196c-0.741-0.624-1.72-0.883-2.664-0.719L32.34,43.926l-5.633-5.633C26.52,38.105,26.266,38,26,38H16 c0-0.552-0.447-1-1-1h-4H4v2h6v14H4v2h7h4c0.553,0,1-0.448,1-1h2.764l10.691,5.346c0.463,0.231,0.963,0.347,1.463,0.346 c0.568,0,1.137-0.149,1.646-0.446L54.38,46.52c0.999-0.584,1.62-1.666,1.62-2.823C56,42.73,55.575,41.818,54.836,41.196z M14,53h-2 V39h2V53z M53.371,44.793L31.556,57.518c-0.37,0.216-0.821,0.231-1.206,0.039l-10.902-5.451C19.309,52.036,19.155,52,19,52h-3V40 h9.586l7.879,7.878C33.81,48.224,34,48.683,34,49.171C34,50.18,33.18,51,32.172,51c-0.481,0-0.952-0.195-1.293-0.536l-5.172-5.171 l-1.414,1.414l5.172,5.171C30.188,52.602,31.148,53,32.172,53C34.282,53,36,51.283,36,49.171c0-1.022-0.398-1.983-1.121-2.707 l-0.809-0.809l18.444-3.208c0.372-0.065,0.747,0.038,1.034,0.279C53.835,42.968,54,43.322,54,43.697 C54,44.146,53.759,44.566,53.371,44.793z"></path>
+  //                   <rect
+  //                     x="26.567"
+  //                     y="19.5"
+  //                     transform="matrix(0.6727 -0.7399 0.7399 0.6727 -4.0396 31.8682)"
+  //                     width="10"
+  //                     height="10"
+  //                   ></rect>
+  //                   <path d="M30,20.5c1.654,0,3-1.346,3-3s-1.346-3-3-3s-3,1.346-3,3S28.346,20.5,30,20.5z M30,16.5c0.552,0,1,0.449,1,1s-0.448,1-1,1 s-1-0.449-1-1S29.448,16.5,30,16.5z"></path>
+  //                   <path d="M35,23.5c0,1.654,1.346,3,3,3s3-1.346,3-3s-1.346-3-3-3S35,21.846,35,23.5z M39,23.5c0,0.551-0.448,1-1,1s-1-0.449-1-1 s0.448-1,1-1S39,22.949,39,23.5z"></path>
+  //                   <path d="M33.274,41.688C33.464,41.887,33.726,42,34,42s0.536-0.113,0.726-0.312L50.584,24.98c4.542-4.786,4.542-12.573,0-17.358 C48.367,5.286,45.416,4,42.274,4C39.148,4,36.212,5.272,34,7.584C31.788,5.272,28.852,4,25.726,4c-3.142,0-6.093,1.286-8.31,3.622 c-4.542,4.786-4.542,12.573,0,17.358L33.274,41.688z"></path>
+  //                   <rect x="29" y="28" width="2" height="2"></rect>
+  //                   <rect x="33" y="28" width="2" height="2"></rect>
+  //                   <rect x="37" y="28" width="2" height="2"></rect>
+  //                 </g>
+  //               </svg>
+  //             </button>
+  //           )}
+  //         </div>
+  //       ),
+  //     },
+  //   ],
+  //   [t]
+  // );
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState("");
   const [datePay, setPayDate] = useState();
@@ -4816,8 +5239,8 @@ const Accounts = () => {
                         value={
                           Array.isArray(clients)
                             ? clients.find(
-                              (client) => client.client_id === clientIdSet
-                            ) || null
+                                (client) => client.client_id === clientIdSet
+                              ) || null
                             : null
                         }
                         isOptionEqualToValue={(option, value) =>
@@ -4860,9 +5283,9 @@ const Accounts = () => {
                           // Find the consignee object corresponding to the selected ID
                           Array.isArray(consignees)
                             ? consignees.find(
-                              (consignee) =>
-                                consignee.consignee_id === consigneeIdSet
-                            ) || null
+                                (consignee) =>
+                                  consignee.consignee_id === consigneeIdSet
+                              ) || null
                             : null
                         }
                         isOptionEqualToValue={(option, value) =>
@@ -5447,8 +5870,8 @@ const Accounts = () => {
                                 // Find the client object corresponding to the selected ID
                                 Array.isArray(clients)
                                   ? clients.find(
-                                    (client) => client.client_id === clientId
-                                  ) || null
+                                      (client) => client.client_id === clientId
+                                    ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5486,9 +5909,9 @@ const Accounts = () => {
                                 // Find the consignee object corresponding to the selected ID
                                 Array.isArray(consignees)
                                   ? consignees.find(
-                                    (consignee) =>
-                                      consignee.consignee_id === consigneeId
-                                  ) || null
+                                      (consignee) =>
+                                        consignee.consignee_id === consigneeId
+                                    ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5570,9 +5993,9 @@ const Accounts = () => {
                                 // Find the payment channel object corresponding to the selected ID
                                 Array.isArray(paymentChannle)
                                   ? paymentChannle.find(
-                                    (channel) =>
-                                      channel.bank_id === paymentChannel
-                                  ) || null
+                                      (channel) =>
+                                        channel.bank_id === paymentChannel
+                                    ) || null
                                   : null
                               }
                               isOptionEqualToValue={(option, value) =>
@@ -5657,8 +6080,8 @@ const Accounts = () => {
                                   // Find the currency object corresponding to the selected fxId
                                   Array.isArray(currency)
                                     ? currency.find(
-                                      (item) => item.currency_id === fxId
-                                    ) || null
+                                        (item) => item.currency_id === fxId
+                                      ) || null
                                     : null
                                 }
                                 isOptionEqualToValue={(option, value) =>
@@ -5964,7 +6387,7 @@ const Accounts = () => {
                       value={ref}
                       onChange={(e) => setRef(e.target.value)}
                       placeholder={t("ref")}
-                    // placeholder={t("amount")}
+                      // placeholder={t("amount")}
                     />
                   </div>
                   <div className="modal-footer">
@@ -6000,9 +6423,9 @@ const Accounts = () => {
                       dangerouslySetInnerHTML={{
                         __html: item.Name_exp_2
                           ? item.Name_exp_2.replace(/\r\n/g, "<br/>").replace(
-                            /\n/g,
-                            "<br/>"
-                          )
+                              /\n/g,
+                              "<br/>"
+                            )
                           : "",
                       }}
                     />
