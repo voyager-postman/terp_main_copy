@@ -1227,14 +1227,16 @@ const PurchaseOrder = () => {
 
   const paymentViewSection = () => {
     try {
-      let payload = {};
+      let payload = {
+        Expense_Payment_ID: lastInseartId, // ✅ Always include this
+      };
 
       if (singlePodId?.PO_ID) {
         // ✅ Priority 1: use PO_ID
-        payload = { PO_ID: singlePodId.PO_ID };
+        payload = { ...payload, PO_ID: singlePodId.PO_ID };
       } else if (singleCpnId) {
         // ✅ Priority 2: use CPN
-        payload = { CPN: singleCpnId };
+        payload = { ...payload, CPN: singleCpnId };
       } else {
         console.warn("❌ No PO_ID or CPN found, skipping API call.");
         return;
@@ -4432,7 +4434,7 @@ const PurchaseOrder = () => {
                     <div className="col-lg-9">
                       <div className="row">
                         <div className="col-lg-6">
-                          <div className="parentFormPayment">
+                           <div className="parentFormPayment">
                             <p> {t("paymentDate")}</p>
                             <DatePicker
                               selected={
@@ -4442,12 +4444,16 @@ const PurchaseOrder = () => {
                                   : null
                               }
                               onChange={(date) => {
-                                const formattedDate = date
-                                  ? date.toISOString().split("T")[0] // ✅ store as YYYY-MM-DD
-                                  : null;
-
+                                  const formattedDate =  date
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
+                            : null;
+ 
                                 setSelectedPaymentDate(formattedDate);
-
+ 
                                 // ✅ trigger API call like before
                                 handlePaymentChange(
                                   "Payment_Date",

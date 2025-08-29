@@ -4267,29 +4267,22 @@ const Accounts = () => {
                     <i className="mdi mdi-pencil pl-2" />
                   </butto>
                 )}
-                {a.Credit !== "0.00" ? (
+             
                   <button
                     type="button"
-                    onClick={() => deleteOrder(a.Invoice_payment_Id)}
+                    onClick={() => deleteOrder(a.PAY_ID,a.RID)}
                   >
                     <i className="mdi mdi-delete " />
                   </button>
-                ) : a.Debit !== "0.00" ? (
-                  <button
-                    type="button"
-                    onClick={() => deleteOrder1(a.Expense_Payment_ID)}
-                  >
-                    <i className="mdi mdi-delete " />
-                  </button>
-                ) : null}
-                {/* Conditionally render the PDF button based on Credit or Debit */}
+            
+                
                 {a.Credit !== "0.00" ? (
                   <button
                     type="button"
                     className="accountSvg"
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModalCustomization"
-                    onClick={() => handleDownloadPDF(a.Invoice_payment_Id, a)}
+                    onClick={() => handleDownloadPDF(a.PAY_ID, a)}
                   >
                     <div className="d-flex">
                       <svg
@@ -4339,7 +4332,7 @@ const Accounts = () => {
                     type="button"
                     className="svgIconPurchase"
                     onClick={() =>
-                      handleDownloadPDFSlip(a.Expense_Payment_ID, a)
+                      handleDownloadPDFSlip(a.PAY_ID, a)
                     }
                   >
                     <div>
@@ -4467,7 +4460,7 @@ const Accounts = () => {
     }
   };
 
-  const deleteOrder = (id) => {
+  const deleteOrder = (id,id1) => {
     console.log(id);
     MySwal.fire({
       title: t("areYouSure"),
@@ -4484,7 +4477,8 @@ const Accounts = () => {
           const response = await axios.post(
             `${API_BASE_URL}/DeleteInvoicePayment`,
             {
-              Invoice_payment_Id: id,
+              PAY_ID: id,
+              RID:id1
             }
           );
           console.log(response);

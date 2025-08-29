@@ -1057,11 +1057,21 @@ const ReceiptCreate = () => {
                             ? new Date(state.created)
                             : null
                         }
-                        onChange={(date) =>
-                          handleChange({
-                            target: { name: "created", value: date },
-                          })
-                        }
+                        onChange={(date) => {
+                          const formattedDate = date
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
+                            : null;
+
+                          // अगर आप state को object में maintain कर रहे हैं (जैसे formData)
+                          setState((prev) => ({
+                            ...prev,
+                            created: formattedDate,
+                          }));
+                        }}
                         dateFormat="dd/MM/yyyy"
                         className="form-control"
                         placeholderText="DD/MM/YYYY"
@@ -1607,8 +1617,22 @@ const ReceiptCreate = () => {
                       <div className="parentFormPayment">
                         <p> {t("paymentDate")}</p>
                         <DatePicker
-                          selected={selectedPaymentDate}
-                          onChange={(date) => setSelectedPaymentDate(date)}
+                          selected={
+                            selectedPaymentDate
+                              ? new Date(selectedPaymentDate)
+                              : null
+                          }
+                          onChange={(date) => {
+                            const formattedDate = date
+                              ? `${date.getFullYear()}-${String(
+                                  date.getMonth() + 1
+                                ).padStart(2, "0")}-${String(
+                                  date.getDate()
+                                ).padStart(2, "0")}`
+                              : null;
+
+                            setSelectedPaymentDate(formattedDate); // ✅ अब state में सिर्फ YYYY-MM-DD जाएगा
+                          }}
                           dateFormat="dd/MM/yyyy"
                           placeholderText={t("clickToSelectDate")}
                           customInput={<CustomInput />}

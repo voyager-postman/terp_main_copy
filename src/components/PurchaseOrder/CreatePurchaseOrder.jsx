@@ -803,9 +803,11 @@ const CreatePurchaseOrder = () => {
             User_ID: localStorage.getItem("id"),
           });
           console.log(step1Res);
+          const lastInsertId = step1Res?.data?.data?.last_insert_id;
+          setSingleDataSet(lastInsertId);
 
-          setSingleDataSet(step1Res?.data?.data?.last_insert_id);
-          paymentViewSection();
+          // ✅ Call with direct value instead of stale state
+          paymentViewSection(po_id, lastInsertId);
         } catch (innerErr) {
           console.error("Error in PO details or payment step:", innerErr);
           toast.error(t("tryAgain"));
@@ -940,11 +942,15 @@ const CreatePurchaseOrder = () => {
   //     });
   //   }
   // };
-  const paymentViewSection = () => {
+  const paymentViewSection = (
+    po_id = state.po_id,
+    expensePaymentId = singleDataSet
+  ) => {
     axios
       .post(`${API_BASE_URL}/EXPPaymentView`, {
-        PO_ID: state.po_id, // ✅ your PO_ID
-        CPN: "", // ✅ CPN if required
+        PO_ID: po_id,
+        Expense_Payment_ID: expensePaymentId,
+        CPN: "",
       })
       .then((res) => {
         setPaymentSections({
@@ -957,9 +963,13 @@ const CreatePurchaseOrder = () => {
         console.error("Payment update failed ❌", err);
       });
   };
+
   useEffect(() => {
-    paymentViewSection();
-  }, []);
+    if (singleDataSet) {
+      paymentViewSection();
+    }
+  }, [singleDataSet]);
+
   const resetPaymentFormFields = (data) => {
     console.log(data);
     // setDepositAvailableNew(data?.Available_deposit || 0);
@@ -1389,8 +1399,13 @@ const CreatePurchaseOrder = () => {
                         }
                         onChange={async (date) => {
                           const formattedDate = date
-                            ? date.toISOString().split("T")[0]
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
                             : null;
+
                           const updatedState = {
                             ...state,
                             created: formattedDate,
@@ -1442,19 +1457,18 @@ const CreatePurchaseOrder = () => {
                         onChange={handleChange}
                       />   */}
                       <DatePicker
-                        selected={state?.supplier_invoice_date || null}
-                        // onChange={(date) =>
-                        //   handleChange({
-                        //     target: {
-                        //       name: "supplier_invoice_date",
-                        //       value: date,
-                        //     },
-                        //   })
-                        // }
+                        selected={
+                          state?.supplier_invoice_date
+                            ? new Date(state.supplier_invoice_date)
+                            : null
+                        }
                         onChange={async (date) => {
-                          // ✅ convert to YYYY-MM-DD string
                           const formattedDate = date
-                            ? date.toISOString().split("T")[0]
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
                             : null;
 
                           const updatedState = {
@@ -1472,7 +1486,7 @@ const CreatePurchaseOrder = () => {
                         }}
                         dateFormat="dd/MM/yyyy"
                         placeholderText={t("selectDate")}
-                        customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
+                        customInput={<CustomInput />}
                       />
                     </div>
                     <div className="col-lg-2 form-group">
@@ -1492,7 +1506,11 @@ const CreatePurchaseOrder = () => {
                         // }
                         onChange={async (date) => {
                           const formattedDate = date
-                            ? date.toISOString().split("T")[0]
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
                             : null;
                           const updatedState = {
                             ...state,
@@ -1957,30 +1975,37 @@ const CreatePurchaseOrder = () => {
                 <div className="col-lg-9">
                   <div className="row">
                     <div className="col-lg-6">
-                      <div className="parentFormPayment">
-                        <p> {t("paymentDate")}</p>
-                        <DatePicker
-                          selected={
-                            selectedPaymentDate &&
-                            !isNaN(new Date(selectedPaymentDate))
-                              ? new Date(selectedPaymentDate)
-                              : null
-                          }
-                          onChange={(date) => {
-                            const formattedDate = date
-                              ? date.toISOString().split("T")[0] // ✅ store as YYYY-MM-DD
-                              : null;
-
-                            setSelectedPaymentDate(formattedDate);
-
-                            // ✅ trigger API call like before
-                            handlePaymentChange("Payment_Date", formattedDate);
-                          }}
-                          dateFormat="dd/MM/yyyy"
-                          placeholderText="Click to select a date"
-                          customInput={<CustomInput />}
-                        />
-                      </div>
+                     <div className="parentFormPayment">
+                            <p> {t("paymentDate")}</p>
+                            <DatePicker
+                              selected={
+                                selectedPaymentDate &&
+                                !isNaN(new Date(selectedPaymentDate))
+                                  ? new Date(selectedPaymentDate)
+                                  : null
+                              }
+                              onChange={(date) => {
+                                  const formattedDate =  date
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
+                            : null;
+ 
+                                setSelectedPaymentDate(formattedDate);
+ 
+                                // ✅ trigger API call like before
+                                handlePaymentChange(
+                                  "Payment_Date",
+                                  formattedDate
+                                );
+                              }}
+                              dateFormat="dd/MM/yyyy"
+                              placeholderText="Click to select a date"
+                              customInput={<CustomInput />}
+                            />
+                          </div>
                     </div>
 
                     <div className="col-lg-6">

@@ -248,7 +248,7 @@ const CombinePayment = () => {
       toast.error(t("deleteError"));
     }
   };
-  
+
   // useEffect(() => {
   //   const deposit = parseFloat(depositAvailableNew) || 0;
   //   const finalPayment = basePayment - deposit;
@@ -415,6 +415,7 @@ const CombinePayment = () => {
     axios
       .post(`${API_BASE_URL}/EXPPaymentView`, {
         PO_ID: "", // ✅ your PO_ID
+        Expense_Payment_ID: lastInseartId,
         CPN: singlePodId?.ID, // ✅ CPN if required
       })
       .then((res) => {
@@ -633,30 +634,37 @@ const CombinePayment = () => {
                 <div className="col-lg-9">
                   <div className="row">
                     <div className="col-lg-6">
-                      <div className="parentFormPayment">
-                        <p> {t("paymentDate")}</p>
-                        <DatePicker
-                          selected={
-                            selectedPaymentDate &&
-                            !isNaN(new Date(selectedPaymentDate))
-                              ? new Date(selectedPaymentDate)
-                              : null
-                          }
-                          onChange={(date) => {
-                            const formattedDate = date
-                              ? date.toISOString().split("T")[0] // ✅ store as YYYY-MM-DD
-                              : null;
-
-                            setSelectedPaymentDate(formattedDate);
-
-                            // ✅ trigger API call like before
-                            handlePaymentChange("Payment_Date", formattedDate);
-                          }}
-                          dateFormat="dd/MM/yyyy"
-                          placeholderText="Click to select a date"
-                          customInput={<CustomInput />}
-                        />
-                      </div>
+                       <div className="parentFormPayment">
+                            <p> {t("paymentDate")}dsd</p>
+                            <DatePicker
+                              selected={
+                                selectedPaymentDate &&
+                                !isNaN(new Date(selectedPaymentDate))
+                                  ? new Date(selectedPaymentDate)
+                                  : null
+                              }
+                              onChange={(date) => {
+                                  const formattedDate =  date
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
+                            : null;
+ 
+                                setSelectedPaymentDate(formattedDate);
+ 
+                                // ✅ trigger API call like before
+                                handlePaymentChange(
+                                  "Payment_Date",
+                                  formattedDate
+                                );
+                              }}
+                              dateFormat="dd/MM/yyyy"
+                              placeholderText="Click to select a date"
+                              customInput={<CustomInput />}
+                            />
+                          </div>
                     </div>
 
                     <div className="col-lg-6">
