@@ -430,7 +430,7 @@ const UpdateEan = () => {
                           {!selectedImage && imagePath && (
                             <div style={{ marginTop: "10px" }}>
                               <img
-                                crossorigin="anonymous"
+                                  crossorigin="anonymous"
                                 src={`${API_IMAGE_URL}/${imagePath}`}
                                 alt="Existing"
                                 style={{ width: "200px", height: "200px" }}

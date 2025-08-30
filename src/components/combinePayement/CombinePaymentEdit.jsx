@@ -1119,7 +1119,7 @@ const CombinePaymentEdit = () => {
 
                       <div className="col-lg-3 form-group">
                         <h6>{t("combinedPaymentDate")}</h6>
-                        <DatePicker
+                        {/* <DatePicker
                           selected={state.supplier_dua_date}
                           onChange={(date) =>
                             handleChange({
@@ -1132,11 +1132,38 @@ const CombinePaymentEdit = () => {
                           dateFormat="dd/MM/yyyy"
                           placeholderText={"dateFormat"}
                           customInput={<CustomInput />} // Ensure you have the `CustomInput` component defined or imported
+                        /> */}
+                        <DatePicker
+                          selected={
+                            state.supplier_dua_date &&
+                            !isNaN(new Date(state.supplier_dua_date))
+                              ? new Date(state.supplier_dua_date)
+                              : null
+                          }
+                          onChange={(date) => {
+                            const formattedDate = date
+                              ? `${date.getFullYear()}-${String(
+                                  date.getMonth() + 1
+                                ).padStart(2, "0")}-${String(
+                                  date.getDate()
+                                ).padStart(2, "0")}`
+                              : null;
+
+                            handleChange({
+                              target: {
+                                name: "supplier_dua_date",
+                                value: formattedDate,
+                              },
+                            });
+                          }}
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="DD/MM/YYYY"
+                          customInput={<CustomInput />}
                         />
                       </div>
                       <div className="col-lg-3 form-group">
                         <h6>{t("dueDate")}</h6>
-                        <DatePicker
+                        {/* <DatePicker
                           selected={state?.supplier_invoice_date || null} // Ensuring it works even if the value is initially undefined
                           onChange={(date) =>
                             handleChange({
@@ -1149,6 +1176,33 @@ const CombinePaymentEdit = () => {
                           dateFormat="dd/MM/yyyy"
                           placeholderText={"dateFormat"}
                           customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
+                        /> */}
+                        <DatePicker
+                          selected={
+                            state?.supplier_invoice_date &&
+                            !isNaN(new Date(state.supplier_invoice_date))
+                              ? new Date(state.supplier_invoice_date)
+                              : null
+                          }
+                          onChange={(date) => {
+                            const formattedDate = date
+                              ? `${date.getFullYear()}-${String(
+                                  date.getMonth() + 1
+                                ).padStart(2, "0")}-${String(
+                                  date.getDate()
+                                ).padStart(2, "0")}`
+                              : null;
+
+                            handleChange({
+                              target: {
+                                name: "supplier_invoice_date",
+                                value: formattedDate,
+                              },
+                            });
+                          }}
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="DD/MM/YYYY"
+                          customInput={<CustomInput />}
                         />
                       </div>
                     </div>
@@ -1201,35 +1255,57 @@ const CombinePaymentEdit = () => {
                       <div className="col-lg-3 form-group">
                         <h6>{t("combinedPaymentDate")}</h6>
                         <DatePicker
-                          selected={state.supplier_dua_date}
-                          onChange={(date) =>
+                          selected={
+                            state.supplier_dua_date
+                              ? new Date(state.supplier_dua_date)
+                              : null
+                          }
+                          onChange={(date) => {
                             handleChange({
                               target: {
                                 name: "supplier_dua_date",
-                                value: date,
+                                // ✅ Save only YYYY-MM-DD (local date, no timezone shift)
+                                value: date
+                                  ? `${date.getFullYear()}-${String(
+                                      date.getMonth() + 1
+                                    ).padStart(2, "0")}-${String(
+                                      date.getDate()
+                                    ).padStart(2, "0")}`
+                                  : "",
                               },
-                            })
-                          }
+                            });
+                          }}
                           dateFormat="dd/MM/yyyy"
-                          placeholderText={"dateFormat"}
-                          customInput={<CustomInput />} // Ensure you have the `CustomInput` component defined or imported
+                          placeholderText="Select Date"
+                          customInput={<CustomInput />}
                         />
                       </div>
                       <div className="col-lg-3 form-group">
                         <h6>Due Date</h6>
                         <DatePicker
-                          selected={state?.supplier_invoice_date || null} // Ensuring it works even if the value is initially undefined
+                          selected={
+                            state?.supplier_invoice_date
+                              ? new Date(state.supplier_invoice_date)
+                              : null
+                          }
                           onChange={(date) =>
                             handleChange({
                               target: {
                                 name: "supplier_invoice_date",
-                                value: date,
+                                // ✅ Store only local date string (no timezone issue)
+                                value: date
+                                  ? `${date.getFullYear()}-${String(
+                                      date.getMonth() + 1
+                                    ).padStart(2, "0")}-${String(
+                                      date.getDate()
+                                    ).padStart(2, "0")}`
+                                  : "",
                               },
                             })
                           }
                           dateFormat="dd/MM/yyyy"
-                          placeholderText={"dateFormat"}
-                          customInput={<CustomInput />} // Ensure `CustomInput` is defined or remove this line if not needed
+                          placeholderText="Select Date"
+                          customInput={<CustomInput />}
                         />
                       </div>
                     </div>
