@@ -45,7 +45,6 @@ const CreateClient = () => {
   const [fromDate, setFromDate] = useState("");
   const [orderItem, setOrderItem] = useState([]);
   const [paymentTable1, setPaymentTable1] = useState([]);
-
   const [paidAmounts, setPaidAmounts] = useState({});
   const [totalPaidAmount, setTotalPaidAmount] = useState(0);
   const [clientId, setClientId] = useState("");
@@ -290,7 +289,8 @@ const CreateClient = () => {
     try {
       setIsButtonClicked(true); // Set button clicked state to true
       await axios.post(
-        `${API_BASE_URL}/${typeof state5.vendor_id == "undefined" ? "addVC" : "updateVC"
+        `${API_BASE_URL}/${
+          typeof state5.vendor_id == "undefined" ? "addVC" : "updateVC"
         }`,
         {
           id: state5.vendor_id,
@@ -891,10 +891,10 @@ const CreateClient = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Invoices),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Invoices)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Invoices)
+            ),
           finalY + 1
         );
 
@@ -903,10 +903,10 @@ const CreateClient = () => {
         doc.text(
           formatter.format(response.data.data?.statement_claims),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_claims)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_claims)
+            ),
           finalY + 5
         );
 
@@ -915,10 +915,10 @@ const CreateClient = () => {
         doc.text(
           formatter.format(response.data.data?.statement_payments),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_payments)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_payments)
+            ),
           finalY + 9
         );
 
@@ -930,10 +930,10 @@ const CreateClient = () => {
         doc.text(
           formatter.format(response.data.data?.statement_Totals),
           105 +
-          valueWidth -
-          doc.getTextWidth(
-            formatter.format(response.data.data?.statement_Totals)
-          ),
+            valueWidth -
+            doc.getTextWidth(
+              formatter.format(response.data.data?.statement_Totals)
+            ),
           finalY + 16
         );
 
@@ -1266,9 +1266,10 @@ const CreateClient = () => {
 
     axios
       .post(
-        `${API_BASE_URL}/${isCreate
-          ? "AddMarginPaymentClientConsignee"
-          : "updateMarginPaymentClientConsignee"
+        `${API_BASE_URL}/${
+          isCreate
+            ? "AddMarginPaymentClientConsignee"
+            : "updateMarginPaymentClientConsignee"
         }`,
         {
           id: updateId, // only send id if updating
@@ -1867,7 +1868,7 @@ const CreateClient = () => {
       // Automatically set Paid Amount to the corresponding amount_to_pay if checked
       const amountToPay = isChecked
         ? paymentTable1.find((item) => item.transaction_ref === invoiceNumber)
-          ?.amount_to_pay || 0
+            ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -2046,217 +2047,2393 @@ const CreateClient = () => {
 
   console.log(state.Commission_Currency);
   return (
-    <Card
-      title={`${t("clients")} / ${from?.consignee_id ? t("update") : t("create")
+    <>
+      <Card
+        title={`${t("clients")} / ${
+          from?.consignee_id ? t("update") : t("create")
         } ${t("form")}`}
-    >
-      <div className="top-space-search-reslute newSmallCard">
-        <div className="tab-content px-2 md:!px-4">
-          <div className="tab-pane active" id="header" role="tabpanel">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link active"
-                  id="first-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#first-tab-pane"
-                  type="button"
-                  role="tab"
-                  aria-controls="first-tab-pane"
-                >
-                  {t("details")}
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link "
-                  id="home-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#home-tab-pane"
-                  type="button"
-                  role="tab"
-                  aria-controls="home-tab-pane"
-                >
-                  {t("contact")}
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link"
-                  id="profile-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#profile-tab-pane"
-                  type="button"
-                  role="tab"
-                  aria-controls="profile-tab-pane"
-                  aria-selected="false"
-                >
-                  {t("customization")}
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link"
-                  id="profile-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#consigneeTab"
-                  type="button"
-                  role="tab"
-                  aria-controls="consigneeTab"
-                  aria-selected="false"
-                >
-                  {t("consignee")}
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link "
-                  id="notify-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#notify-tab-pane"
-                  type="button"
-                  role="tab"
-                  aria-controls="notify-tab-pane"
-                >
-                  {t("statistics")}
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link "
-                  id="notifyNew"
-                  data-bs-toggle="tab"
-                  data-bs-target="#notifyNew-pane"
-                  type="button"
-                  role="tab"
-                  aria-controls="notifyNew-pane"
-                >
-                  {t("notify")}
-                </button>
-              </li>
-              {localStorage.getItem("level") !== "Level 5" && (
+      >
+        <div className="top-space-search-reslute newSmallCard">
+          <div className="tab-content px-2 md:!px-4">
+            <div className="tab-pane active" id="header" role="tabpanel">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link active"
+                    id="first-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#first-tab-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="first-tab-pane"
+                  >
+                    {t("details")}
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link "
+                    id="home-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#home-tab-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="home-tab-pane"
+                  >
+                    {t("contact")}
+                  </button>
+                </li>
                 <li class="nav-item" role="presentation">
                   <button
                     class="nav-link"
-                    id="contact-tab"
+                    id="profile-tab"
                     data-bs-toggle="tab"
-                    data-bs-target="#contact-tab-pane"
+                    data-bs-target="#profile-tab-pane"
                     type="button"
                     role="tab"
-                    aria-controls="contact-tab-pane"
+                    aria-controls="profile-tab-pane"
                     aria-selected="false"
                   >
-                    {t("accounting")}
+                    {t("customization")}
                   </button>
                 </li>
-              )}
-            </ul>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="profile-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#consigneeTab"
+                    type="button"
+                    role="tab"
+                    aria-controls="consigneeTab"
+                    aria-selected="false"
+                  >
+                    {t("consignee")}
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link "
+                    id="notify-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#notify-tab-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="notify-tab-pane"
+                  >
+                    {t("statistics")}
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link "
+                    id="notifyNew"
+                    data-bs-toggle="tab"
+                    data-bs-target="#notifyNew-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="notifyNew-pane"
+                  >
+                    {t("notify")}
+                  </button>
+                </li>
+                {localStorage.getItem("level") !== "Level 5" && (
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link"
+                      id="contact-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#contact-tab-pane"
+                      type="button"
+                      role="tab"
+                      aria-controls="contact-tab-pane"
+                      aria-selected="false"
+                    >
+                      {t("accounting")}
+                    </button>
+                  </li>
+                )}
+              </ul>
 
-            <div class="tab-content" id="myTabContent">
-              {/* consignee tab detail */}
-              <div
-                class="tab-pane fade show"
-                id="consigneeTab"
-                role="tabpanel"
-                aria-labelledby="consigneeTab"
-                tabindex="0"
-              >
-                <div className="table-responsive">
-                  <table className="tableContact striped table borderTerpProduce">
-                    <thead>
-                      <tr>
-                        {/* Dynamic headers from API (excluding ID) */}
-                        {Object.entries(headers)
-                          .filter(([key]) => key !== "ID") // exclude ID
-                          .map(([_, headerTitle], index) => (
-                            <th key={index}>{headerTitle}</th>
-                          ))}
-
-                        {/* Fixed Action Header */}
-                        <th>{t("action")}</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {data.map((item, rowIndex) => (
-                        <tr key={rowIndex}>
-                          {/* Dynamic row data (excluding ID) */}
-                          {Object.keys(headers)
-                            .filter((key) => key !== "ID") // exclude ID
-                            .map((key, colIndex) => (
-                              <td key={colIndex}>{item[key]}</td>
+              <div class="tab-content" id="myTabContent">
+                {/* consignee tab detail */}
+                <div
+                  class="tab-pane fade show"
+                  id="consigneeTab"
+                  role="tabpanel"
+                  aria-labelledby="consigneeTab"
+                  tabindex="0"
+                >
+                  <div className="table-responsive">
+                    <table className="tableContact striped table borderTerpProduce">
+                      <thead>
+                        <tr>
+                          {/* Dynamic headers from API (excluding ID) */}
+                          {Object.entries(headers)
+                            .filter(([key]) => key !== "ID") // exclude ID
+                            .map(([_, headerTitle], index) => (
+                              <th key={index}>{headerTitle}</th>
                             ))}
 
-                          {/* Action column */}
-                          <td>
-                            <div>
-                              {/* Edit button */}
-                              <button
-                                type="button"
-                                onClick={() => handleEditClick1(item)}
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModalContact"
-                              >
-                                <i className="mdi mdi-pencil"></i>
-                              </button>
-
-                              {/* Delete button */}
-                              <button
-                                type="button"
-                                onClick={() => deleteOrder2(item.ID)}
-                              >
-                                <i className="mdi mdi-delete "></i>
-                              </button>
-                            </div>
-                          </td>
+                          {/* Fixed Action Header */}
+                          <th>{t("action")}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="row">
-                  <Link
-                    style={{ width: "170px" }}
-                    className="btn btn-danger mb-4"
-                    to="/"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModalContact"
-                  >
-                    {t("add_consignee")}
-                  </Link>
-                  {/* modal */}
-                  <div
-                    class="modal fade"
-                    id="exampleModalContact"
-                    tabindex="-1"
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                  >
-                    <div class="modal-dialog modalShipTo modal-xl modal-dialog-scrollable">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h1 class="modal-title fs-5" id="exampleModalLabel">
-                            {t("add_consignee")}
-                          </h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                            onClick={clearAllFields1}
-                          >
-                            <i class="mdi mdi-close"></i>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <div className="formCreate createPackage">
-                            <form>
-                              <div className="row justify-content-center">
+                      </thead>
+
+                      <tbody>
+                        {data.map((item, rowIndex) => (
+                          <tr key={rowIndex}>
+                            {/* Dynamic row data (excluding ID) */}
+                            {Object.keys(headers)
+                              .filter((key) => key !== "ID") // exclude ID
+                              .map((key, colIndex) => (
+                                <td key={colIndex}>{item[key]}</td>
+                              ))}
+
+                            {/* Action column */}
+                            <td>
+                              <div>
+                                {/* Edit button */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditClick1(item)}
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#exampleModalContact"
+                                >
+                                  <i className="mdi mdi-pencil"></i>
+                                </button>
+
+                                {/* Delete button */}
+                                <button
+                                  type="button"
+                                  onClick={() => deleteOrder2(item.ID)}
+                                >
+                                  <i className="mdi mdi-delete "></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="row">
+                    <Link
+                      style={{ width: "170px" }}
+                      className="btn btn-danger mb-4"
+                      to="/"
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModalContact"
+                    >
+                      {t("add_consignee")}
+                    </Link>
+                    {/* modal */}
+                    <div
+                      class="modal fade"
+                      id="exampleModalContact"
+                      tabindex="-1"
+                      aria-labelledby="exampleModalLabel"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modalShipTo modal-xl modal-dialog-scrollable">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                              {t("add_consignee")}
+                            </h1>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                              onClick={clearAllFields1}
+                            >
+                              <i class="mdi mdi-close"></i>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <div className="formCreate createPackage">
+                              <form>
+                                <div className="row">
+                                  <div className="consigneeEditTab">
+                                    <ul
+                                      className="nav nav-tabs"
+                                      id="consigneeTabNew"
+                                      role="tablist"
+                                    >
+                                      <li
+                                        className="nav-item"
+                                        role="presentation"
+                                      >
+                                        <button
+                                          className="nav-link active"
+                                          id="consignee-customization-tab"
+                                          data-bs-toggle="tab"
+                                          data-bs-target="#consignee-customization-pane"
+                                          type="button"
+                                          role="tab"
+                                          aria-controls="consignee-customization-pane"
+                                          aria-selected="true"
+                                        >
+                                          {t("customization")}
+                                        </button>
+                                      </li>
+
+                                      <li
+                                        className="nav-item"
+                                        role="presentation"
+                                      >
+                                        <button
+                                          className="nav-link"
+                                          id="consignee-notify-tab"
+                                          data-bs-toggle="tab"
+                                          data-bs-target="#consignee-notify-pane"
+                                          type="button"
+                                          role="tab"
+                                          aria-controls="consignee-notify-pane"
+                                          aria-selected="false"
+                                        >
+                                          {t("notify")}
+                                        </button>
+                                      </li>
+
+                                      <li
+                                        className="nav-item"
+                                        role="presentation"
+                                      >
+                                        <button
+                                          className="nav-link"
+                                          id="consignee-margins-tab"
+                                          data-bs-toggle="tab"
+                                          data-bs-target="#consignee-margins-pane"
+                                          type="button"
+                                          role="tab"
+                                          aria-controls="consignee-margins-pane"
+                                          aria-selected="false"
+                                        >
+                                          {t("marginsAndPayments")}
+                                        </button>
+                                      </li>
+
+                                      <li
+                                        className="nav-item"
+                                        role="presentation"
+                                      >
+                                        <button
+                                          className="nav-link"
+                                          id="consignee-invoice-tab"
+                                          data-bs-toggle="tab"
+                                          data-bs-target="#consignee-invoice-pane"
+                                          type="button"
+                                          role="tab"
+                                          aria-controls="consignee-invoice-pane"
+                                          aria-selected="false"
+                                        >
+                                          {t("invoiceSetup")}
+                                        </button>
+                                      </li>
+                                    </ul>
+
+                                    <div
+                                      className="tab-content"
+                                      id="consigneeTabContentNew"
+                                    >
+                                      <div
+                                        className="tab-pane fade show active"
+                                        id="consignee-customization-pane"
+                                        role="tabpanel"
+                                        aria-labelledby="consignee-customization-tab"
+                                        tabIndex="0"
+                                      >
+                                        <div className="table-responsive">
+                                          <table className="  tableContact striped  table borderTerpProduce">
+                                            <tbody>
+                                              <tr className="">
+                                                <th>{t("itfName")}</th>
+                                                <th>{t("customName")}</th>
+                                                <th>{t("dummyPrice")}</th>
+                                                <th>{t("customMargin")}</th>
+                                                <th>{t("maxPrice")}</th>
+                                                <th>{t("brand")}</th>
+                                                <th>{t("unit")}</th>
+                                                <th>{t("barcode")}</th>
+                                                <th>{t("action")}</th>
+                                              </tr>
+                                              {customization?.map((item) => {
+                                                return (
+                                                  <tr>
+                                                    <td>{item.Name_EN}rere</td>
+                                                    <td>
+                                                      {item.Custom_Name}sadas
+                                                    </td>
+                                                    <td>{item.Dummy_Price}</td>
+                                                    <td>{item.brand_name}</td>
+                                                    <td>{item.unit_name}</td>
+                                                    <td>{item.Barcode}</td>
+                                                    <td>
+                                                      <div>
+                                                        <button
+                                                          type="button"
+                                                          onClick={() =>
+                                                            handleEditClickCustomization(
+                                                              item.Id
+                                                            )
+                                                          }
+                                                          data-bs-toggle="modal"
+                                                          data-bs-target="#exampleModalCustomizationEdit"
+                                                        >
+                                                          <i class="mdi mdi-pencil"></i>
+                                                        </button>
+                                                        {/* customixation modal */}
+                                                        <div
+                                                          className="modal fade"
+                                                          id="exampleModalCustomizationEdit"
+                                                          tabIndex={-1}
+                                                          aria-labelledby="exampleModalLabel"
+                                                          aria-hidden="true"
+                                                        >
+                                                          <div className=" modal-dialog modalShipTo">
+                                                            <div className="modal-content">
+                                                              <div className="modal-header">
+                                                                <h1
+                                                                  className="modal-title fs-5"
+                                                                  id="exampleModalLabel"
+                                                                >
+                                                                  {t(
+                                                                    "updateCustomization"
+                                                                  )}
+                                                                </h1>
+                                                                <button
+                                                                  type="button"
+                                                                  class="btn-close"
+                                                                  data-bs-dismiss="modal"
+                                                                  aria-label="Close"
+                                                                >
+                                                                  <i class="mdi mdi-close"></i>
+                                                                </button>
+                                                              </div>
+                                                              <div className="modal-body">
+                                                                <div className="formCreate">
+                                                                  <div className="row">
+                                                                    <div className="form-group col-lg-12 mb-2">
+                                                                      <h6>
+                                                                        {t(
+                                                                          "itfName"
+                                                                        )}
+                                                                      </h6>
+                                                                      <div className="ceateTransport autoComplete">
+                                                                        <Autocomplete
+                                                                          disablePortal
+                                                                          options={
+                                                                            getItf ||
+                                                                            []
+                                                                          }
+                                                                          getOptionLabel={(
+                                                                            option
+                                                                          ) =>
+                                                                            option.ITF_Internal_Name_EN ||
+                                                                            ""
+                                                                          }
+                                                                          onChange={(
+                                                                            e,
+                                                                            newValue
+                                                                          ) =>
+                                                                            setDataCustomization(
+                                                                              (
+                                                                                prevState
+                                                                              ) => ({
+                                                                                ...prevState,
+                                                                                ITF:
+                                                                                  newValue?.ID ||
+                                                                                  "",
+                                                                              })
+                                                                            )
+                                                                          }
+                                                                          value={
+                                                                            getItf?.find(
+                                                                              (
+                                                                                item
+                                                                              ) =>
+                                                                                item.ID ===
+                                                                                dataCustomization.ITF
+                                                                            ) ||
+                                                                            null
+                                                                          }
+                                                                          sx={{
+                                                                            width: 300,
+                                                                          }}
+                                                                          renderInput={(
+                                                                            params
+                                                                          ) => (
+                                                                            <TextField
+                                                                              {...params}
+                                                                              placeholder={t(
+                                                                                "selectItf"
+                                                                              )}
+                                                                              InputLabelProps={{
+                                                                                shrink: false,
+                                                                              }}
+                                                                            />
+                                                                          )}
+                                                                        />
+                                                                      </div>
+                                                                    </div>
+                                                                    <div class="form-group col-lg-12">
+                                                                      <h6>
+                                                                        {t(
+                                                                          "customName"
+                                                                        )}
+                                                                      </h6>
+                                                                      <div>
+                                                                        <input
+                                                                          type="text"
+                                                                          name="Custom_Name"
+                                                                          onChange={
+                                                                            handleChange2
+                                                                          }
+                                                                          value={
+                                                                            dataCustomization.Custom_Name
+                                                                          }
+                                                                          placeholder={t(
+                                                                            "customName"
+                                                                          )}
+                                                                          className="mb-2"
+                                                                        />
+                                                                      </div>
+                                                                    </div>
+                                                                    <div class="form-group col-lg-12">
+                                                                      <h6>
+                                                                        {t(
+                                                                          "agreedPrice"
+                                                                        )}
+                                                                      </h6>
+                                                                      <div>
+                                                                        <input
+                                                                          type="number"
+                                                                          name="Dummy_Price"
+                                                                          onChange={
+                                                                            handleChange2
+                                                                          }
+                                                                          value={
+                                                                            dataCustomization.Dummy_Price
+                                                                          }
+                                                                          placeholder={t(
+                                                                            "agreedPrice"
+                                                                          )}
+                                                                        />
+                                                                      </div>
+                                                                    </div>
+
+                                                                    <div className="form-group col-lg-12 ">
+                                                                      <h6>
+                                                                        {t(
+                                                                          "brand"
+                                                                        )}
+                                                                      </h6>
+                                                                      <div className="ceateTransport autoComplete">
+                                                                        <Autocomplete
+                                                                          options={
+                                                                            brands ||
+                                                                            []
+                                                                          } // List of brand options
+                                                                          getOptionLabel={(
+                                                                            option
+                                                                          ) =>
+                                                                            option.Name_EN ||
+                                                                            ""
+                                                                          } // Label to display
+                                                                          onChange={(
+                                                                            event,
+                                                                            newValue
+                                                                          ) => {
+                                                                            handleChange2(
+                                                                              {
+                                                                                target:
+                                                                                  {
+                                                                                    name: "brand",
+                                                                                    value:
+                                                                                      newValue
+                                                                                        ? newValue.ID
+                                                                                        : "",
+                                                                                  }, // Update selected brand_id
+                                                                              }
+                                                                            );
+                                                                          }}
+                                                                          renderInput={(
+                                                                            params
+                                                                          ) => (
+                                                                            <TextField
+                                                                              {...params}
+                                                                              placeholder={t(
+                                                                                "selectBrand"
+                                                                              )}
+                                                                              variant="outlined"
+                                                                            />
+                                                                          )}
+                                                                          value={
+                                                                            brands?.find(
+                                                                              (
+                                                                                item
+                                                                              ) =>
+                                                                                item.ID ===
+                                                                                dataCustomization.brand
+                                                                            ) ||
+                                                                            null
+                                                                          } // Set value based on selected brand_id
+                                                                          isOptionEqualToValue={(
+                                                                            option,
+                                                                            value
+                                                                          ) =>
+                                                                            option.ID ===
+                                                                            value.ID
+                                                                          } // Option comparison
+                                                                        />
+                                                                      </div>
+                                                                    </div>
+
+                                                                    <div className="form-group col-lg-12 ">
+                                                                      <h6>
+                                                                        {t(
+                                                                          "unit"
+                                                                        )}
+                                                                      </h6>
+                                                                      <div className="ceateTransport autoComplete">
+                                                                        <Autocomplete
+                                                                          options={
+                                                                            unitDropdown ||
+                                                                            []
+                                                                          } // List of ITFs
+                                                                          getOptionLabel={(
+                                                                            option
+                                                                          ) =>
+                                                                            option.Name_EN ||
+                                                                            ""
+                                                                          } // Label to display (itf_name_en for each ITF)
+                                                                          onChange={(
+                                                                            event,
+                                                                            newValue
+                                                                          ) => {
+                                                                            handleChange2(
+                                                                              {
+                                                                                target:
+                                                                                  {
+                                                                                    name: "Unit",
+                                                                                    value:
+                                                                                      newValue
+                                                                                        ? newValue.ID
+                                                                                        : "",
+                                                                                  }, // Update ITF in state
+                                                                              }
+                                                                            );
+                                                                          }}
+                                                                          renderInput={(
+                                                                            params
+                                                                          ) => (
+                                                                            <TextField
+                                                                              {...params}
+                                                                              placeholder={t(
+                                                                                "selectUnit"
+                                                                              )}
+                                                                              variant="outlined"
+                                                                            />
+                                                                          )}
+                                                                          value={
+                                                                            unitDropdown?.find(
+                                                                              (
+                                                                                item
+                                                                              ) =>
+                                                                                item.ID ===
+                                                                                dataCustomization.Unit
+                                                                            ) ||
+                                                                            null
+                                                                          } // Set selected value based on ITF
+                                                                          isOptionEqualToValue={(
+                                                                            option,
+                                                                            value
+                                                                          ) =>
+                                                                            option.ID ===
+                                                                            value.ID
+                                                                          } // Option comparison by itf_id
+                                                                        />
+                                                                      </div>
+                                                                      <div class="form-group col-lg-12 mt-2">
+                                                                        <h6>
+                                                                          {t(
+                                                                            "barcode"
+                                                                          )}
+                                                                        </h6>
+                                                                        <div className=" ">
+                                                                          <input
+                                                                            type="text"
+                                                                            name="Barcode"
+                                                                            onChange={
+                                                                              handleChange2
+                                                                            }
+                                                                            value={
+                                                                              dataCustomization.Barcode
+                                                                            }
+                                                                            placeholder={t(
+                                                                              "barcode"
+                                                                            )}
+                                                                          />
+                                                                        </div>
+                                                                      </div>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                              <div className="modal-footer">
+                                                                <button
+                                                                  type="button "
+                                                                  onClick={
+                                                                    customizationDataSubmit
+                                                                  }
+                                                                  className="btn mb-0 btn-primary"
+                                                                >
+                                                                  {t("update")}
+                                                                </button>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+
+                                                        {/* customization modal end */}
+                                                        <button
+                                                          type="button"
+                                                          onClick={() =>
+                                                            deleteOrder(item.Id)
+                                                          }
+                                                        >
+                                                          <i class="mdi mdi-delete "></i>
+                                                        </button>
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                );
+                                              })}
+                                            </tbody>
+                                          </table>
+                                        </div>
+
+                                        <button
+                                          style={{ width: "100px" }}
+                                          className="btn btn-danger mb-4"
+                                          type="button"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#exampleModalCustomization"
+                                        >
+                                          {t("add")}
+                                        </button>
+                                      </div>
+                                      <div
+                                        className="tab-pane fade"
+                                        id="consignee-notify-pane"
+                                        role="tabpanel"
+                                        aria-labelledby="consignee-notify-tab"
+                                        tabIndex="0"
+                                      >
+                                        <div className="row formCreate my-3">
+                                          <div className="form-group col-lg-6">
+                                            <h6>{t("name")}</h6>
+                                            <input
+                                              type="text"
+                                              id="name_en"
+                                              className="form-control"
+                                              placeholder={t("name")}
+                                              value={state.notify_name}
+                                              name="notify_name"
+                                              onChange={handleChange}
+                                            />
+                                          </div>
+                                          <div className="form-group col-lg-6">
+                                            <h6>{t("taxNumber")}</h6>
+                                            <input
+                                              type="number"
+                                              id="name_en"
+                                              className="form-control"
+                                              placeholder={t("taxNumber")}
+                                              value={state.notify_tax_number}
+                                              name="notify_tax_number"
+                                              onChange={handleChange}
+                                            />
+                                          </div>
+                                          <div className="form-group col-lg-6">
+                                            <h6> {t("email")}</h6>
+                                            <input
+                                              onChange={handleChange}
+                                              type="email"
+                                              id="hs_name"
+                                              className="form-control"
+                                              placeholder={t("email")}
+                                              value={state.notify_email}
+                                              name="notify_email"
+                                            />
+                                          </div>
+                                          <div className="form-group col-lg-6">
+                                            <h6>{t("phoneNumber")}</h6>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder={t("phoneNumber")}
+                                              value={state.notify_phone}
+                                              name="notify_phone"
+                                              onChange={handleChange}
+                                            />
+                                          </div>
+                                          <div className="form-group col-lg-12">
+                                            <h6>{t("address")}</h6>
+                                            <textarea
+                                              className="col-lg-12 rounded h-20 w-full"
+                                              style={{
+                                                border: "2px solid #245486",
+                                              }}
+                                              value={state.notify_address}
+                                              name="notify_address"
+                                              onChange={handleChange}
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className="tab-pane fade"
+                                        id="consignee-margins-pane"
+                                        role="tabpanel"
+                                        aria-labelledby="consignee-margins-tab"
+                                        tabIndex="0"
+                                      >
+                                        <div className="formCreate createPackage">
+                                          <div className="row">
+                                            <div className="col-lg-3 form-group autoComplete">
+                                              <h6>{t("invoiceCurrency")}</h6>
+                                              <Autocomplete
+                                                options={currency || []} // List of currencies
+                                                getOptionLabel={(option) =>
+                                                  option.FX || ""
+                                                } // Label to display (currency name for each item)
+                                                onChange={(event, newValue) => {
+                                                  handleChange6({
+                                                    target: {
+                                                      name: "invoiceCurrency",
+                                                      value: newValue
+                                                        ? newValue.ID
+                                                        : "",
+                                                    },
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder={t(
+                                                      "selectCurrency"
+                                                    )}
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  currency?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      state6.invoiceCurrency
+                                                  ) || null
+                                                } // Set selected value based on invoiceCurrency
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID}
+                                              />
+                                            </div>
+                                            <div className="col-lg-2 form-group autoComplete">
+                                              <h6>{t("invoiceUnit")}</h6>
+
+                                              <Autocomplete
+                                                options={unitDropdown || []}
+                                                getOptionLabel={(option) =>
+                                                  option.Name_EN || ""
+                                                } // Use Name_EN from API
+                                                onChange={(event, newValue) => {
+                                                  handleChange6({
+                                                    target: {
+                                                      name: "Invoice_Unit",
+                                                      value: newValue
+                                                        ? newValue.ID
+                                                        : "",
+                                                    },
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder={t(
+                                                      "selectUnit"
+                                                    )}
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  unitDropdown?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      state6.Invoice_Unit
+                                                  ) || null
+                                                }
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID}
+                                              />
+                                            </div>
+                                            {/* <div className="col-lg-3 form-group autoComplete">
+                                          <h6>{t("selectConsignee")}</h6>
+
+                                          <Autocomplete
+                                            options={getVcConsigneeList || []}
+                                            getOptionLabel={(option) =>
+                                              option.Name || ""
+                                            }
+                                            onChange={(event, newValue) => {
+                                              handleChange6({
+                                                target: {
+                                                  name: "consigneeType",
+                                                  value: newValue
+                                                    ? newValue.ID
+                                                    : "", // ✅ use capital ID
+                                                },
+                                              });
+                                            }}
+                                            renderInput={(params) => (
+                                              <TextField
+                                                {...params}
+                                                placeholder={t(
+                                                  "selectConsignee"
+                                                )}
+                                                variant="outlined"
+                                              />
+                                            )}
+                                            value={
+                                              (getVcConsigneeList || []).find(
+                                                (item) =>
+                                                  item.ID ===
+                                                  state6.consigneeType // ✅ use capital ID
+                                              ) || null
+                                            }
+                                            isOptionEqualToValue={(
+                                              option,
+                                              value
+                                            ) => option.ID === value.ID} // ✅ use capital ID
+                                          />
+                                        </div>
+                                        <div className="col-lg-3 form-group">
+                                          <h6>{t("Consignee Code")}</h6>
+                                          <div className="parentthb packParent">
+                                            <div className="childThb">
+                                              <input
+                                                type="text"
+                                                name="consigneeCode"
+                                                placeholder={t(
+                                                  "Consignee Code"
+                                                )}
+                                                value={state6.consigneeCode}
+                                                onChange={handleChange6}
+                                              />
+                                            </div>
+                                          </div>
+                                        </div> */}
+                                            <div className="col-lg-2 form-group autoComplete">
+                                              <h6>{t("commission")}</h6>
+
+                                              <Autocomplete
+                                                options={commission || []}
+                                                getOptionLabel={(option) =>
+                                                  option.commission_name_en ||
+                                                  ""
+                                                }
+                                                onChange={(event, newValue) => {
+                                                  handleChange6({
+                                                    target: {
+                                                      name: "commissionType",
+                                                      value: newValue
+                                                        ? newValue.id
+                                                        : "",
+                                                    },
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder={t(
+                                                      "selectCommission"
+                                                    )}
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  commission?.find(
+                                                    (item) =>
+                                                      item.id ===
+                                                      state6.commissionType
+                                                  ) || null
+                                                } // Set selected value based on commissionType
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.id === value.id} // Option comparison by id
+                                              />
+                                            </div>
+                                            <div className="col-lg-2 form-group">
+                                              <h6>{t("commissionValue")}</h6>
+                                              <div className="parentthb packParent">
+                                                <div className="childThb">
+                                                  <input
+                                                    type="text"
+                                                    name="commissionValue"
+                                                    placeholder={t(
+                                                      "commissionValue"
+                                                    )}
+                                                    value={
+                                                      state6.commissionValue
+                                                    }
+                                                    onChange={handleChange6}
+                                                  />
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div className="col-lg-1 shipToToggle">
+                                              <h6>{t("commission")}</h6>
+                                              <label
+                                                style={{
+                                                  display: "flex",
+                                                  justifyContent: "center",
+                                                  alignItems: "center",
+                                                  padding: "10px",
+                                                }}
+                                                className="toggleSwitch large"
+                                              >
+                                                <input
+                                                  type="checkbox"
+                                                  checked={
+                                                    state6.commissionCurrency ===
+                                                    "THB"
+                                                  }
+                                                  onChange={handleChange6}
+                                                  name="commissionCurrency"
+                                                />
+                                                <span>
+                                                  <span>{t("fx")}</span>
+                                                  <span> {t("thb")}</span>
+                                                </span>
+                                                <a> </a>
+                                              </label>
+                                            </div>
+                                            <div className="col-lg-2 shipToToggle">
+                                              <h6>{t("chargeVolume")}</h6>
+                                              <label
+                                                style={{
+                                                  display: "flex",
+                                                  justifyContent: "center",
+                                                  alignItems: "center",
+                                                  padding: "10px",
+                                                }}
+                                                className="toggleSwitch large"
+                                              >
+                                                <input
+                                                  type="checkbox"
+                                                  checked={
+                                                    state6.chargeVolume == 1
+                                                  }
+                                                  onChange={handleChange6}
+                                                  name="chargeVolume"
+                                                />
+                                                <span>
+                                                  <span>{t("no")}</span>
+                                                  <span>{t("yes")}</span>
+                                                </span>
+                                                <a> </a>
+                                              </label>
+                                            </div>
+
+                                            <div className="col-lg-2 form-group autoComplete">
+                                              <h6>
+                                                {t("deliveryTermsIncoterms")}
+                                              </h6>
+                                              <Autocomplete
+                                                options={DropdownDelivery || []} // List of delivery terms and incoterms
+                                                getOptionLabel={(option) =>
+                                                  option.Incoterms || ""
+                                                } // Label to display (Incoterms)
+                                                onChange={(event, newValue) => {
+                                                  handleChange6({
+                                                    target: {
+                                                      name: "deliveryTerms",
+                                                      value: newValue
+                                                        ? newValue.id
+                                                        : "",
+                                                    }, // Update deliveryTerms in state
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder={t(
+                                                      "selectDeliveryTermsIncoterms"
+                                                    )}
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  DropdownDelivery?.find(
+                                                    (item) =>
+                                                      item.id ===
+                                                      state6.deliveryTerms
+                                                  ) || null
+                                                } // Set selected value based on deliveryTerms
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.id === value.id} // Option comparison by id
+                                              />
+                                            </div>
+
+                                            <div className="col-lg-2 form-group autoComplete">
+                                              <h6>{t("paymentTerms")}</h6>
+                                              <Autocomplete
+                                                options={FXCorrection || []} // List of payment terms
+                                                getOptionLabel={(option) =>
+                                                  `${option.DAYS} DAYS` || ""
+                                                } // Label to display (e.g., "30 DAYS")
+                                                onChange={(event, newValue) => {
+                                                  handleChange6({
+                                                    target: {
+                                                      name: "paymentTerms",
+                                                      value: newValue
+                                                        ? newValue.ID
+                                                        : "",
+                                                    }, // Update paymentTerms in state
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder={t(
+                                                      "selectPaymentTerms"
+                                                    )}
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  FXCorrection?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      state6.paymentTerms
+                                                  ) || null
+                                                } // Set selected value based on paymentTerms
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID} // Option comparison by ID
+                                              />
+                                            </div>
+
+                                            <div className="col-lg-2 form-group autoComplete">
+                                              <h6>{t("statementDueDate")}</h6>
+                                              <Autocomplete
+                                                disablePortal
+                                                options={[
+                                                  {
+                                                    id: 1,
+                                                    label: "Pre Shipment",
+                                                  },
+                                                  { id: 2, label: "Seaport" },
+                                                ]} // Define the options array
+                                                getOptionLabel={(option) =>
+                                                  option.label
+                                                } // Display the `label` for each option
+                                                onChange={handleChange6} // Use the handleChange function
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder={t(
+                                                      "selectStatementDueDate"
+                                                    )}
+                                                    InputLabelProps={{
+                                                      shrink: false,
+                                                    }} // Prevents floating label
+                                                  />
+                                                )}
+                                                sx={{ width: 300 }}
+                                              />
+                                            </div>
+
+                                            <div className="col-lg-2 form-group autoComplete">
+                                              <h6>{t("rounding")}</h6>
+                                              <Autocomplete
+                                                options={RoundingDataList || []} // List of delivery terms and incoterms
+                                                getOptionLabel={(option) =>
+                                                  option.DropDown || ""
+                                                } // Label to display (Incoterms)
+                                                onChange={(event, newValue) => {
+                                                  handleChange6({
+                                                    target: {
+                                                      name: "Rounding",
+                                                      value: newValue
+                                                        ? newValue.ID
+                                                        : "",
+                                                    }, // Update deliveryTerms in state
+                                                  });
+                                                }}
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder={t(
+                                                      "selectRounding"
+                                                    )}
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                                value={
+                                                  RoundingDataList?.find(
+                                                    (item) =>
+                                                      item.ID ===
+                                                      state6.Rounding
+                                                  ) || null
+                                                } // Set selected value based on deliveryTerms
+                                                isOptionEqualToValue={(
+                                                  option,
+                                                  value
+                                                ) => option.ID === value.ID} // Option comparison by id
+                                              />
+                                            </div>
+                                            <div className="col-lg-2 form-group">
+                                              <h6>{t("extraCost")}</h6>
+                                              <input
+                                                type="text"
+                                                name="extraCost"
+                                                className="form-control"
+                                                placeholder={t("extraCost")}
+                                                value={state6.extraCost}
+                                                onChange={handleChange6}
+                                              />
+                                            </div>
+                                            <div className="col-lg-2 form-group  ">
+                                              <h6>{t("freightAdjustment")}</h6>
+                                              <input
+                                                type="text"
+                                                name="freightAdjust"
+                                                className="form-control"
+                                                placeholder={t(
+                                                  "freightAdjustment"
+                                                )}
+                                                value={state6.freightAdjust}
+                                                onChange={handleChange6}
+                                              />
+                                            </div>
+                                            <div className="col-lg-2 form-group">
+                                              <h6>{t("markupValue")}</h6>
+                                              <div className="parentShip">
+                                                <div className="markupShip">
+                                                  <input
+                                                    type="text"
+                                                    name="markupValue"
+                                                    className="form-control"
+                                                    placeholder={t(
+                                                      "markupValue"
+                                                    )}
+                                                    value={state6.markupValue}
+                                                    onChange={handleChange6}
+                                                  />
+                                                </div>
+                                                <div className="shipPercent">
+                                                  <span>%</span>
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            <div className="col-lg-2 form-group">
+                                              <h6>{t("rebateValue")}</h6>
+                                              <div className="parentShip">
+                                                <div className="markupShip">
+                                                  <input
+                                                    type="text"
+                                                    name="rebateValue"
+                                                    className="form-control"
+                                                    placeholder={t(
+                                                      "rebateValue"
+                                                    )}
+                                                    value={state6.rebateValue}
+                                                    onChange={handleChange6}
+                                                  />
+                                                </div>
+                                                <div className="shipPercent">
+                                                  <span>%</span>
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            <div className="col-lg-2 form-group">
+                                              <h6>{t("quotation")}</h6>
+                                              <div className="parentShip">
+                                                <div className="markupShip">
+                                                  <input
+                                                    type="text"
+                                                    name="quotation"
+                                                    className="form-control"
+                                                    placeholder={t("quotation")}
+                                                    value={state6.quotation}
+                                                    onChange={handleChange6}
+                                                  />
+                                                </div>
+                                                <div className="shipPercent">
+                                                  <span>%</span>
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            <div className="col-lg-2 form-group">
+                                              <h6>{t("claim")}</h6>
+                                              <div className="parentShip">
+                                                <div className="markupShip">
+                                                  <input
+                                                    type="text"
+                                                    name="claim"
+                                                    className="form-control"
+                                                    placeholder={t("claim")}
+                                                    value={claimValue1}
+                                                    onChange={handleChange6}
+                                                  />
+                                                </div>
+                                                <div className="shipPercent">
+                                                  <span>%</span>
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            <div className="col-lg-2 form-group">
+                                              <h6>{t("other")}</h6>
+                                              <div className="parentShip">
+                                                <div className="markupShip">
+                                                  <input
+                                                    type="text"
+                                                    name="other"
+                                                    className="form-control"
+                                                    placeholder={t("other")}
+                                                    value={state6.other}
+                                                    onChange={handleChange6}
+                                                  />
+                                                </div>
+                                                <div className="shipPercent">
+                                                  <span>%</span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div className="col-lg-2 form-group">
+                                              <h6>{t("final")}</h6>
+                                              <div className="parentShip">
+                                                <div className="markupShip">
+                                                  <input
+                                                    type="text"
+                                                    name="final"
+                                                    className="form-control"
+                                                    placeholder={t("final")}
+                                                    value={claimValue}
+                                                    onChange={handleChange6}
+                                                  />
+                                                </div>
+                                                <div className="shipPercent">
+                                                  <span>%</span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className="tab-pane fade"
+                                        id="consignee-invoice-pane"
+                                        role="tabpanel"
+                                        aria-labelledby="consignee-invoice-tab"
+                                        tabIndex="0"
+                                      >
+                                        <div className="formCreate">
+                                          <div className="d-flex flex-wrap invAutoGen">
+                                            <div>
+                                              <h6>{t("clientAutoGenerate")}</h6>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>Invoice only</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>{t("packingListOnly")}</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>{t("statement")}</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="d-flex flex-wrap invAutoGen">
+                                            <div>
+                                              <h6>
+                                                {t("consigneeAutoGenerate")}
+                                              </h6>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>Invoice only</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>{t("packingListOnly")}</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>{t("statement")}</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="d-flex flex-wrap invAutoGen">
+                                            <div>
+                                              <h6>
+                                                {t(
+                                                  "shippingDocumentsAutoGenerate"
+                                                )}
+                                              </h6>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>Invoice only</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>{t("packingListOnly")}</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <div className="d-flex">
+                                                <p>{t("statement")}</p>
+                                                <div className="ms-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row mt-4">
+                                            <div className="form-group col-lg-6 invOptionSetup">
+                                              <div className="row">
+                                                <div className="col-lg-6">
+                                                  <h6>Invoice Options</h6>
+                                                </div>
+
+                                                <div className="col-lg-2">
+                                                  <h6>{t("clients")}</h6>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <h6>{t("consignee")}</h6>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <h6>{t("shipping")}</h6>
+                                                </div>
+                                                <div className="col-lg-6">
+                                                  <p>{t("useAgreedPricing")}</p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-6">
+                                                  <p>{t("useCustomName")}</p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-6">
+                                                  <p>
+                                                    {t("showGrossWeightAndCBM")}
+                                                  </p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-12">
+                                                  <div className="invoiceModal">
+                                                    <p>
+                                                      {t("invoiceNameCanBe")} -
+                                                    </p>
+                                                    <input
+                                                      type="radio"
+                                                      id="html1"
+                                                      name="fav_language"
+                                                      value="Client"
+                                                    />
+                                                    <label htmlFor="html1">
+                                                      {t("client")}
+                                                    </label>
+
+                                                    <input
+                                                      type="radio"
+                                                      id="css1"
+                                                      name="fav_language"
+                                                      value="Consignee"
+                                                    />
+                                                    <label htmlFor="css1">
+                                                      {t("consignee")}
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-6">
+                                                  <p>
+                                                    {t("showExchangeRate")}{" "}
+                                                  </p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <label
+                                                    className="toggleSwitch large"
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                      padding: 10,
+                                                    }}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      name="Commission_Currency"
+                                                    />
+                                                    <span>
+                                                      <span>{t("no")}</span>
+                                                      <span>{t("yes")}</span>
+                                                    </span>
+                                                    <a> </a>
+                                                  </label>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div className="col-lg-12">
+                                                <div className="invoiceModal">
+                                                  <p>{t("deliveryTerms")} -</p>
+                                                  <div>
+                                                    <input
+                                                      type="radio"
+                                                      id="dap"
+                                                      name="delivery_term"
+                                                      value="DAP"
+                                                    />
+                                                    <label htmlFor="dap">
+                                                      {t("dap")}
+                                                    </label>
+                                                  </div>
+                                                  <div>
+                                                    <input
+                                                      type="radio"
+                                                      id="cnf"
+                                                      name="delivery_term"
+                                                      value="CNF"
+                                                    />
+                                                    <label htmlFor="cnf">
+                                                      {t("cnf")}
+                                                    </label>
+                                                  </div>
+                                                  <input
+                                                    type="radio"
+                                                    id="cif"
+                                                    name="delivery_term"
+                                                    value="CIF"
+                                                  />
+                                                  <label htmlFor="cif">
+                                                    {t("cif")}
+                                                  </label>
+
+                                                  <div>
+                                                    <input
+                                                      type="radio"
+                                                      id="fob"
+                                                      name="delivery_term"
+                                                      value="FOB"
+                                                    />
+                                                    <label htmlFor="fob">
+                                                      {t("fob")}
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div className="form-group col-lg-6">
+                                              <div className="row">
+                                                <div className="col-lg-6">
+                                                  <h6>Packing List Options</h6>
+                                                </div>
+
+                                                <div className="col-lg-2">
+                                                  <h6>{t("clients")}</h6>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <h6>{t("consignee")}</h6>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <h6>{t("shipping")}</h6>
+                                                </div>
+
+                                                <div className="col-lg-6">
+                                                  <p>{t("useCustomName")}</p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-6">
+                                                  <p>
+                                                    {t("showGrossWeightAndCBM")}
+                                                  </p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-12">
+                                                  <div className="invoiceModal">
+                                                    <p>
+                                                      {t("invoiceNameCanBe")} -
+                                                    </p>
+                                                    <input
+                                                      type="radio"
+                                                      id="html1"
+                                                      name="fav_language"
+                                                      value="Client"
+                                                    />
+                                                    <label htmlFor="html1">
+                                                      {t("client")}
+                                                    </label>
+
+                                                    <input
+                                                      type="radio"
+                                                      id="css1"
+                                                      name="fav_language"
+                                                      value="Consignee"
+                                                    />
+                                                    <label htmlFor="css1">
+                                                      {t("consignee")}
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-6">
+                                                  <p>{t("bardcode")} </p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-6">
+                                                  <p>{t("customBarcode")}</p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-6">
+                                                  <p>{t("notes")} </p>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                                <div className="col-lg-2">
+                                                  <div>
+                                                    <label
+                                                      className="toggleSwitch large"
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                        padding: 10,
+                                                      }}
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        name="Commission_Currency"
+                                                      />
+                                                      <span>
+                                                        <span>{t("no")}</span>
+                                                        <span>{t("yes")}</span>
+                                                      </span>
+                                                      <a> </a>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                {/* <div className="row justify-content-center">
                                 <div className="col-lg-4 form-group autoComplete">
                                   <h6>{t("brand")}</h6>
                                   <Autocomplete
-                                    options={brands || []} // API data array
+                                    options={brands || []}
                                     getOptionLabel={(option) =>
                                       option.Name_EN || ""
                                     } // Display English name
@@ -2430,1502 +4607,33 @@ const CreateClient = () => {
                                     } // Option comparison
                                   />
                                 </div>
-
-                                <div className="col-lg-3 form-group autoComplete">
-                                  <h6>{t("invoiceCurrency")}</h6>
-                                  <Autocomplete
-                                    options={currency || []} // List of currencies
-                                    getOptionLabel={(option) => option.FX || ""} // Label to display (currency name for each item)
-                                    onChange={(event, newValue) => {
-                                      handleChange6({
-                                        target: {
-                                          name: "invoiceCurrency",
-                                          value: newValue ? newValue.ID : "",
-                                        },
-                                      });
-                                    }}
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder={t("selectCurrency")}
-                                        variant="outlined"
-                                      />
-                                    )}
-                                    value={
-                                      currency?.find(
-                                        (item) =>
-                                          item.ID === state6.invoiceCurrency
-                                      ) || null
-                                    } // Set selected value based on invoiceCurrency
-                                    isOptionEqualToValue={(option, value) =>
-                                      option.ID === value.ID
-                                    }
-                                  />
-                                </div>
-                                <div className="col-lg-3 form-group autoComplete">
-                                  <h6>{t("invoiceUnit")}</h6>
-
-                                  <Autocomplete
-                                    options={unitDropdown || []}
-                                    getOptionLabel={(option) =>
-                                      option.Name_EN || ""
-                                    } // Use Name_EN from API
-                                    onChange={(event, newValue) => {
-                                      handleChange6({
-                                        target: {
-                                          name: "Invoice_Unit",
-                                          value: newValue ? newValue.ID : "",
-                                        },
-                                      });
-                                    }}
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder={t("selectUnit")}
-                                        variant="outlined"
-                                      />
-                                    )}
-                                    value={
-                                      unitDropdown?.find(
-                                        (item) =>
-                                          item.ID === state6.Invoice_Unit
-                                      ) || null
-                                    }
-                                    isOptionEqualToValue={(option, value) =>
-                                      option.ID === value.ID
-                                    }
-                                  />
-                                </div>
-                                <div className="col-lg-3 form-group autoComplete">
-                                  <h6>{t("selectConsignee")}</h6>
-
-                                  <Autocomplete
-                                    options={getVcConsigneeList || []}
-                                    getOptionLabel={(option) =>
-                                      option.Name || ""
-                                    }
-                                    onChange={(event, newValue) => {
-                                      handleChange6({
-                                        target: {
-                                          name: "consigneeType",
-                                          value: newValue ? newValue.ID : "", // ✅ use capital ID
-                                        },
-                                      });
-                                    }}
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder={t("selectConsignee")}
-                                        variant="outlined"
-                                      />
-                                    )}
-                                    value={
-                                      (getVcConsigneeList || []).find(
-                                        (item) =>
-                                          item.ID === state6.consigneeType // ✅ use capital ID
-                                      ) || null
-                                    }
-                                    isOptionEqualToValue={(option, value) =>
-                                      option.ID === value.ID
-                                    } // ✅ use capital ID
-                                  />
-                                </div>
-                                <div className="col-lg-3 form-group">
-                                  <h6>{t("Consignee Code")}</h6>
-                                  <div className="parentthb packParent">
-                                    <div className="childThb">
-                                      <input
-                                        type="text"
-                                        name="consigneeCode"
-                                        placeholder={t("Consignee Code")}
-                                        value={state6.consigneeCode}
-                                        onChange={handleChange6}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 form-group autoComplete">
-                                  <h6>{t("commission")}</h6>
-
-                                  <Autocomplete
-                                    options={commission || []}
-                                    getOptionLabel={(option) =>
-                                      option.commission_name_en || ""
-                                    }
-                                    onChange={(event, newValue) => {
-                                      handleChange6({
-                                        target: {
-                                          name: "commissionType",
-                                          value: newValue ? newValue.id : "",
-                                        },
-                                      });
-                                    }}
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder={t("selectCommission")}
-                                        variant="outlined"
-                                      />
-                                    )}
-                                    value={
-                                      commission?.find(
-                                        (item) =>
-                                          item.id === state6.commissionType
-                                      ) || null
-                                    } // Set selected value based on commissionType
-                                    isOptionEqualToValue={(option, value) =>
-                                      option.id === value.id
-                                    } // Option comparison by id
-                                  />
-                                </div>
-                                <div className="col-lg-4 form-group">
-                                  <h6>{t("commissionValue")}</h6>
-                                  <div className="parentthb packParent">
-                                    <div className="childThb">
-                                      <input
-                                        type="text"
-                                        name="commissionValue"
-                                        placeholder={t("commissionValue")}
-                                        value={state6.commissionValue}
-                                        onChange={handleChange6}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-lg-2 shipToToggle">
-                                  <h6>{t("commission")}</h6>
-                                  <label
-                                    style={{
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      padding: "10px",
-                                    }}
-                                    className="toggleSwitch large"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={
-                                        state6.commissionCurrency === "THB"
-                                      }
-                                      onChange={handleChange6}
-                                      name="commissionCurrency"
-                                    />
-                                    <span>
-                                      <span>{t("fx")}</span>
-                                      <span> {t("thb")}</span>
-                                    </span>
-                                    <a> </a>
-                                  </label>
-                                </div>
-                                <div className="col-lg-2 shipToToggle">
-                                  <h6>{t("chargeVolume")}</h6>
-                                  <label
-                                    style={{
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      padding: "10px",
-                                    }}
-                                    className="toggleSwitch large"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={state6.chargeVolume == 1}
-                                      onChange={handleChange6}
-                                      name="chargeVolume"
-                                    />
-                                    <span>
-                                      <span>{t("no")}</span>
-                                      <span>{t("yes")}</span>
-                                    </span>
-                                    <a> </a>
-                                  </label>
-                                </div>
-
-                                <div className="col-lg-2 form-group autoComplete">
-                                  <h6>{t("deliveryTermsIncoterms")}</h6>
-                                  <Autocomplete
-                                    options={DropdownDelivery || []} // List of delivery terms and incoterms
-                                    getOptionLabel={(option) =>
-                                      option.Incoterms || ""
-                                    } // Label to display (Incoterms)
-                                    onChange={(event, newValue) => {
-                                      handleChange6({
-                                        target: {
-                                          name: "deliveryTerms",
-                                          value: newValue ? newValue.id : "",
-                                        }, // Update deliveryTerms in state
-                                      });
-                                    }}
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder={t(
-                                          "selectDeliveryTermsIncoterms"
-                                        )}
-                                        variant="outlined"
-                                      />
-                                    )}
-                                    value={
-                                      DropdownDelivery?.find(
-                                        (item) =>
-                                          item.id === state6.deliveryTerms
-                                      ) || null
-                                    } // Set selected value based on deliveryTerms
-                                    isOptionEqualToValue={(option, value) =>
-                                      option.id === value.id
-                                    } // Option comparison by id
-                                  />
-                                </div>
-
-                                <div className="col-lg-2 form-group autoComplete">
-                                  <h6>{t("paymentTerms")}</h6>
-                                  <Autocomplete
-                                    options={FXCorrection || []} // List of payment terms
-                                    getOptionLabel={(option) =>
-                                      `${option.DAYS} DAYS` || ""
-                                    } // Label to display (e.g., "30 DAYS")
-                                    onChange={(event, newValue) => {
-                                      handleChange6({
-                                        target: {
-                                          name: "paymentTerms",
-                                          value: newValue ? newValue.ID : "",
-                                        }, // Update paymentTerms in state
-                                      });
-                                    }}
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder={t("selectPaymentTerms")}
-                                        variant="outlined"
-                                      />
-                                    )}
-                                    value={
-                                      FXCorrection?.find(
-                                        (item) =>
-                                          item.ID === state6.paymentTerms
-                                      ) || null
-                                    } // Set selected value based on paymentTerms
-                                    isOptionEqualToValue={(option, value) =>
-                                      option.ID === value.ID
-                                    } // Option comparison by ID
-                                  />
-                                </div>
-
-                                <div className="col-lg-2 form-group autoComplete">
-                                  <h6>{t("statementDueDate")}</h6>
-                                  <Autocomplete
-                                    disablePortal
-                                    options={[
-                                      { id: 1, label: "Pre Shipment" },
-                                      { id: 2, label: "Seaport" },
-                                    ]} // Define the options array
-                                    getOptionLabel={(option) => option.label} // Display the `label` for each option
-                                    onChange={handleChange6} // Use the handleChange function
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder={t(
-                                          "selectStatementDueDate"
-                                        )}
-                                        InputLabelProps={{ shrink: false }} // Prevents floating label
-                                      />
-                                    )}
-                                    sx={{ width: 300 }}
-                                  />
-                                </div>
-
-                                <div className="col-lg-2 form-group autoComplete">
-                                  <h6>{t("rounding")}</h6>
-                                  <Autocomplete
-                                    options={RoundingDataList || []} // List of delivery terms and incoterms
-                                    getOptionLabel={(option) =>
-                                      option.DropDown || ""
-                                    } // Label to display (Incoterms)
-                                    onChange={(event, newValue) => {
-                                      handleChange6({
-                                        target: {
-                                          name: "Rounding",
-                                          value: newValue ? newValue.ID : "",
-                                        }, // Update deliveryTerms in state
-                                      });
-                                    }}
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        placeholder={t("selectRounding")}
-                                        variant="outlined"
-                                      />
-                                    )}
-                                    value={
-                                      RoundingDataList?.find(
-                                        (item) => item.ID === state6.Rounding
-                                      ) || null
-                                    } // Set selected value based on deliveryTerms
-                                    isOptionEqualToValue={(option, value) =>
-                                      option.ID === value.ID
-                                    } // Option comparison by id
-                                  />
-                                </div>
-                                <div className="col-lg-2 form-group">
-                                  <h6>{t("extraCost")}</h6>
-                                  <input
-                                    type="text"
-                                    name="extraCost"
-                                    className="form-control"
-                                    placeholder={t("extraCost")}
-                                    value={state6.extraCost}
-                                    onChange={handleChange6}
-                                  />
-                                </div>
-                                <div className="col-lg-2 form-group  ">
-                                  <h6>{t("freightAdjustment")}</h6>
-                                  <input
-                                    type="text"
-                                    name="freightAdjust"
-                                    className="form-control"
-                                    placeholder={t("freightAdjustment")}
-                                    value={state6.freightAdjust}
-                                    onChange={handleChange6}
-                                  />
-                                </div>
-                                <div className="col-lg-2 form-group">
-                                  <h6>{t("markupValue")}</h6>
-                                  <div className="parentShip">
-                                    <div className="markupShip">
-                                      <input
-                                        type="text"
-                                        name="markupValue"
-                                        className="form-control"
-                                        placeholder={t("markupValue")}
-                                        value={state6.markupValue}
-                                        onChange={handleChange6}
-                                      />
-                                    </div>
-                                    <div className="shipPercent">
-                                      <span>%</span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="col-lg-2 form-group">
-                                  <h6>{t("rebateValue")}</h6>
-                                  <div className="parentShip">
-                                    <div className="markupShip">
-                                      <input
-                                        type="text"
-                                        name="rebateValue"
-                                        className="form-control"
-                                        placeholder={t("rebateValue")}
-                                        value={state6.rebateValue}
-                                        onChange={handleChange6}
-                                      />
-                                    </div>
-                                    <div className="shipPercent">
-                                      <span>%</span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="col-lg-2 form-group">
-                                  <h6>{t("quotation")}</h6>
-                                  <div className="parentShip">
-                                    <div className="markupShip">
-                                      <input
-                                        type="text"
-                                        name="quotation"
-                                        className="form-control"
-                                        placeholder={t("quotation")}
-                                        value={state6.quotation}
-                                        onChange={handleChange6}
-                                      />
-                                    </div>
-                                    <div className="shipPercent">
-                                      <span>%</span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="col-lg-2 form-group">
-                                  <h6>{t("claim")}</h6>
-                                  <div className="parentShip">
-                                    <div className="markupShip">
-                                      <input
-                                        type="text"
-                                        name="claim"
-                                        className="form-control"
-                                        placeholder={t("claim")}
-                                        value={claimValue1}
-                                        onChange={handleChange6}
-                                      />
-                                    </div>
-                                    <div className="shipPercent">
-                                      <span>%</span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="col-lg-2 form-group">
-                                  <h6>{t("other")}</h6>
-                                  <div className="parentShip">
-                                    <div className="markupShip">
-                                      <input
-                                        type="text"
-                                        name="other"
-                                        className="form-control"
-                                        placeholder={t("other")}
-                                        value={state6.other}
-                                        onChange={handleChange6}
-                                      />
-                                    </div>
-                                    <div className="shipPercent">
-                                      <span>%</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-lg-2 form-group">
-                                  <h6>{t("final")}</h6>
-                                  <div className="parentShip">
-                                    <div className="markupShip">
-                                      <input
-                                        type="text"
-                                        name="final"
-                                        className="form-control"
-                                        placeholder={t("final")}
-                                        value={claimValue}
-                                        onChange={handleChange6}
-                                      />
-                                    </div>
-                                    <div className="shipPercent">
-                                      <span>%</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <hr className="border-line"></hr>
-                              <div className="formCreate">
-                                <div className="d-flex flex-wrap invAutoGen">
-                                  <div>
-                                    <h6>{t("clientAutoGenerate")}</h6>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>Invoice only</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>{t("packingListOnly")}</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>{t("statement")}</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="d-flex flex-wrap invAutoGen">
-                                  <div>
-                                    <h6>{t("consigneeAutoGenerate")}</h6>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>Invoice only</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>{t("packingListOnly")}</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>{t("statement")}</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="d-flex flex-wrap invAutoGen">
-                                  <div>
-                                    <h6>{t("shippingDocumentsAutoGenerate")}</h6>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>Invoice only</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>{t("packingListOnly")}</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="d-flex">
-                                      <p>{t("statement")}</p>
-                                      <div className="ms-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input type="checkbox" name="Commission_Currency" />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="row mt-4">
-                                  <div className="form-group col-lg-6 invOptionSetup">
-                                    <div className="row">
-                                      <div className="col-lg-6">
-                                        <h6>Invoice Options</h6>
-                                      </div>
-
-                                      <div className="col-lg-2">
-                                        <h6>{t("clients")}</h6>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <h6>{t("consignee")}</h6>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <h6>{t("shipping")}</h6>
-                                      </div>
-                                      <div className="col-lg-6">
-                                        <p>{t("useAgreedPricing")}</p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-6">
-                                        <p>{t("useCustomName")}</p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-6">
-                                        <p>{t("showGrossWeightAndCBM")}</p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-12">
-                                        <div className="invoiceModal">
-                                          <p>{t("invoiceNameCanBe")} -</p>
-                                          <input
-                                            type="radio"
-                                            id="html1"
-                                            name="fav_language"
-                                            value="Client"
-                                           
-                                          />
-                                          <label htmlFor="html1">{t("client")}</label>
-
-                                          <input
-                                            type="radio"
-                                            id="css1"
-                                            name="fav_language"
-                                            value="Consignee"
-                                            
-                                          />
-                                          <label htmlFor="css1">{t("consignee")}</label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-6">
-                                        <p>{t("showExchangeRate")} </p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <label
-                                          className="toggleSwitch large"
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            padding: 10,
-                                          }}
-                                        >
-                                          <input
-                                            type="checkbox"
-                                            name="Commission_Currency"
-                                            
-                                          />
-                                          <span>
-                                            <span>{t("no")}</span>
-                                            <span>{t("yes")}</span>
-                                          </span>
-                                          <a> </a>
-                                        </label>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                      <div className="invoiceModal">
-                                        <p>{t("deliveryTerms")} -</p>
-                                        <div>
-                                          <input
-                                            type="radio"
-                                            id="dap"
-                                            name="delivery_term"
-                                            value="DAP"
-                                           
-                                          />
-                                          <label htmlFor="dap">{t("dap")}</label>
-                                        </div>
-                                        <div>
-                                          <input
-                                            type="radio"
-                                            id="cnf"
-                                            name="delivery_term"
-                                            value="CNF"
-                                         
-                                          />
-                                          <label htmlFor="cnf">{t("cnf")}</label>
-                                        </div>
-                                        <input
-                                          type="radio"
-                                          id="cif"
-                                          name="delivery_term"
-                                          value="CIF"
-                                         
-                                        />
-                                        <label htmlFor="cif">{t("cif")}</label>
-
-                                        <div>
-                                          <input
-                                            type="radio"
-                                            id="fob"
-                                            name="delivery_term"
-                                            value="FOB"
-                                         
-                                          />
-                                          <label htmlFor="fob">{t("fob")}</label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div className="form-group col-lg-6">
-                                    <div className="row">
-                                      <div className="col-lg-6">
-                                        <h6>Packing List Options</h6>
-                                      </div>
-
-                                      <div className="col-lg-2">
-                                        <h6>{t("clients")}</h6>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <h6>{t("consignee")}</h6>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <h6>{t("shipping")}</h6>
-                                      </div>
-
-                                      <div className="col-lg-6">
-                                        <p>{t("useCustomName")}</p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-6">
-                                        <p>{t("showGrossWeightAndCBM")}</p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-12">
-                                        <div className="invoiceModal">
-                                          <p>{t("invoiceNameCanBe")} -</p>
-                                          <input
-                                            type="radio"
-                                            id="html1"
-                                            name="fav_language"
-                                            value="Client"
-                                           
-                                          />
-                                          <label htmlFor="html1">{t("client")}</label>
-
-                                          <input
-                                            type="radio"
-                                            id="css1"
-                                            name="fav_language"
-                                            value="Consignee"
-                                           
-                                          />
-                                          <label htmlFor="css1">{t("consignee")}</label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-6">
-                                        <p>{t("bardcode")} </p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-6">
-                                        <p>{t("customBarcode")}</p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-6">
-                                        <p>{t("notes")} </p>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-2">
-                                        <div>
-                                          <label
-                                            className="toggleSwitch large"
-                                            style={{
-                                              display: "flex",
-                                              justifyContent: "center",
-                                              alignItems: "center",
-                                              padding: 10,
-                                            }}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              name="Commission_Currency"
-                                            />
-                                            <span>
-                                              <span>{t("no")}</span>
-                                              <span>{t("yes")}</span>
-                                            </span>
-                                            <a> </a>
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
+                              </div> */}
+                              </form>
+                            </div>
                           </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button
-                            type="button"
-                            class="btn btn-primary mb-0"
-                            onClick={updatePaymentValue}
-                          >
-                            {t("submit")}{" "}
-                          </button>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-primary mb-0"
+                              onClick={updatePaymentValue}
+                            >
+                              {t("submit")}{" "}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
+                    {/* modal end */}
                   </div>
-                  {/* modal end */}
                 </div>
-              </div>
-              <div
-                class="tab-pane fade show active"
-                id="first-tab-pane"
-                role="tabpanel"
-                aria-labelledby="first-tab"
-                tabindex="0"
-              >
-                {/* <div
+                <div
+                  class="tab-pane fade show active"
+                  id="first-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="first-tab"
+                  tabindex="0"
+                >
+                  {/* <div
                   id="datatable_wrapper"
                   className="information_dataTables dataTables_wrapper dt-bootstrap4 "
                 >
@@ -4106,689 +4814,726 @@ const CreateClient = () => {
                     </Link>
                   </div>
                 </div> */}
-                <div className="tab-content px-2 md:!px-4">
-                  <div className="vc_form formCreate ">
-                    <div className="row">
-                      <div className="row justify-content-between">
-                        <div className="col-lg-8">
-                          <div className="row">
-                            <div className="col-lg-4 form-group">
-                              <h6>{t("name")}</h6>
-                              <input
-                                type="text"
-                                id="name"
-                                onChange={handleChange5}
-                                name="name"
-                                className="form-control"
-                                placeholder="Name"
-                                defaultValue={state5.name}
-                              />
-                            </div>
+                  <div className="tab-content px-2 md:!px-4">
+                    <div className="vc_form formCreate ">
+                      <div className="row">
+                        <div className="row justify-content-between">
+                          <div className="col-lg-8">
+                            <div className="row">
+                              <div className="col-lg-4 form-group">
+                                <h6>{t("name")}</h6>
+                                <input
+                                  type="text"
+                                  id="name"
+                                  onChange={handleChange5}
+                                  name="name"
+                                  className="form-control"
+                                  placeholder="Name"
+                                  defaultValue={state5.name}
+                                />
+                              </div>
 
-                            <div className="col-lg-4 form-group">
-                              <h6>{t("taxId")}</h6>
-                              <input
-                                type="text"
-                                id="taxId"
-                                value={state5.taxId || ""}
-                                onChange={handleChange5}
-                                name="taxId"
-                                className="form-control"
-                                placeholder="Tax"
-                              />
-                            </div>
-                            <div className="form-group col-lg-4 autoComplete">
-                              <h6>{t("Entity")}</h6>
+                              <div className="col-lg-4 form-group">
+                                <h6>{t("taxId")}</h6>
+                                <input
+                                  type="text"
+                                  id="taxId"
+                                  value={state5.taxId || ""}
+                                  onChange={handleChange5}
+                                  name="taxId"
+                                  className="form-control"
+                                  placeholder="Tax"
+                                />
+                              </div>
+                              <div className="form-group col-lg-4 autoComplete">
+                                <h6>{t("Entity")}</h6>
 
-                              <Autocomplete
-                                options={dropdownVendor || []} // Populate with the list of vendors
-                                getOptionLabel={(option) =>
-                                  option.entity_name_en || ""
-                                } // Display the English name of the entity
-                                value={
-                                  dropdownVendor?.find(
-                                    (vendor) => vendor.id === state5.Entity
-                                  ) || null
-                                } // Match the current entity ID in state with the options
-                                onChange={(e, newValue) => {
-                                  handleChange5({
-                                    target: {
-                                      name: "Entity",
-                                      value: newValue?.id || "",
-                                    },
-                                  }); // Trigger handleChange with the selected entity's ID
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder={t("SelectEntity")} // Adds a placeholder
-                                    InputLabelProps={{ shrink: false }} // Prevents floating label
-                                  />
-                                )}
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value.id
-                                } // Ensure proper matching
-                                sx={{ width: 300 }}
-                              />
+                                <Autocomplete
+                                  options={dropdownVendor || []} // Populate with the list of vendors
+                                  getOptionLabel={(option) =>
+                                    option.entity_name_en || ""
+                                  } // Display the English name of the entity
+                                  value={
+                                    dropdownVendor?.find(
+                                      (vendor) => vendor.id === state5.Entity
+                                    ) || null
+                                  } // Match the current entity ID in state with the options
+                                  onChange={(e, newValue) => {
+                                    handleChange5({
+                                      target: {
+                                        name: "Entity",
+                                        value: newValue?.id || "",
+                                      },
+                                    }); // Trigger handleChange with the selected entity's ID
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("SelectEntity")} // Adds a placeholder
+                                      InputLabelProps={{ shrink: false }} // Prevents floating label
+                                    />
+                                  )}
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.id === value.id
+                                  } // Ensure proper matching
+                                  sx={{ width: 300 }}
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="col-lg-4">
-                          <div className="text-end">
-                            <button
-                              className="btn btn-danger"
-                              data-bs-toggle="modal"
-                              data-bs-target="#exampleModal"
+                          <div className="col-lg-4">
+                            <div className="text-end">
+                              <button
+                                className="btn btn-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#exampleModal"
+                              >
+                                Add Contact
+                              </button>
+                            </div>
+                            {/* add-contact-modal */}
+                            <div
+                              class="modal fade"
+                              id="exampleModal"
+                              tabindex="-1"
+                              aria-labelledby="exampleModalLabel"
+                              aria-hidden="true"
                             >
-                              Add Contact
-                            </button>
-                          </div>
-                          {/* add-contact-modal */}
-                          <div
-                            class="modal fade"
-                            id="exampleModal"
-                            tabindex="-1"
-                            aria-labelledby="exampleModalLabel"
-                            aria-hidden="true"
-                          >
-                            <div class="modal-dialog modalShipTo modal-xl">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h1
-                                    class="modal-title fs-5"
-                                    id="exampleModalLabel"
-                                  >
-                                    Add Contact
-                                  </h1>
-                                  <button
-                                    type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    onClick={clearAllData8}
-                                    aria-label="Close"
-                                  >
-                                    <i class="mdi mdi-close"></i>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <div className="formCreate">
-                                    <form action="">
-                                      <div className="row">
-                                        <div class="form-group col-lg-4">
-                                          <h6>First Name</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="Name_First"
-                                              value={state8.Name_First}
-                                              onChange={handleChange8}
-                                              placeholder="first name"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                          <h6>Last Name</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="Name_Last"
-                                              value={state8.Name_Last}
-                                              onChange={handleChange8}
-                                              placeholder="last name"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                          <h6>Email</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="email"
-                                              name="Email"
-                                              value={state8.Email}
-                                              onChange={handleChange8}
-                                              placeholder="email"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>Mobile</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Mobile"
-                                              value={state8.Mobile}
-                                              onChange={handleChange8}
-                                              placeholder="mobile"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>Phone</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Phone"
-                                              value={state8.Phone}
-                                              onChange={handleChange8}
-                                              placeholder="phone"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>Messenger type</h6>
-                                          <div class="ceateTransport autoComplete">
-                                            <Autocomplete
-                                              options={messengerOptions}
-                                              getOptionLabel={(option) =>
-                                                option.label
-                                              } // what to display in dropdown
-                                              value={
-                                                messengerOptions.find(
-                                                  (opt) =>
-                                                    opt.value ===
-                                                    Number(
-                                                      state1.Messenger_Type
-                                                    )
-                                                ) || null
-                                              }
-                                              onChange={(event, newValue) =>
-                                                setState8({
-                                                  ...state8,
-                                                  Messenger_Type: newValue
-                                                    ? newValue.value
-                                                    : "",
-                                                })
-                                              }
-                                              renderInput={(params) => (
-                                                <TextField
-                                                  {...params}
-                                                  placeholder={t(
-                                                    "messengerType"
-                                                  )}
-                                                  variant="outlined"
-                                                />
-                                              )}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>Messenger Id</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Messenger_ID"
-                                              value={state8.Messenger_ID}
-                                              onChange={handleChange8}
-                                              placeholder="messenger id"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-12">
-                                          <h6>Notes</h6>
-                                          <div>
-                                            <textarea
-                                              name="Notes"
-                                              value={state8.Notes}
-                                              onChange={handleChange8}
-                                              cols="30"
-                                              rows="4"
-                                            ></textarea>
-                                          </div>
-                                        </div>
-                                        <div className="form-group col-lg-12">
-                                          <div className="invoiceModal">
-                                            <div>
+                              <div class="modal-dialog modalShipTo modal-xl">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h1
+                                      class="modal-title fs-5"
+                                      id="exampleModalLabel"
+                                    >
+                                      Add Contact
+                                    </h1>
+                                    <button
+                                      type="button"
+                                      class="btn-close"
+                                      data-bs-dismiss="modal"
+                                      onClick={clearAllData8}
+                                      aria-label="Close"
+                                    >
+                                      <i class="mdi mdi-close"></i>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <div className="formCreate">
+                                      <form action="">
+                                        <div className="row">
+                                          <div class="form-group col-lg-2">
+                                            <h6>First Name</h6>
+                                            <div class=" ">
                                               <input
-                                                type="checkbox"
-                                                id="dap"
-                                                name="Accounting"
-                                                checked={state8.Accounting}
+                                                type="text"
+                                                name="Name_First"
+                                                value={state8.Name_First}
                                                 onChange={handleChange8}
+                                                placeholder="first name"
                                               />
-                                              <label htmlFor="dap">
-                                                Accounting
-                                              </label>
                                             </div>
-                                            <div>
-                                              <input
-                                                type="checkbox"
-                                                id="cnf"
-                                                name="Invoice"
-                                                checked={state8.Invoice}
-                                                onChange={handleChange8}
-                                              />
-                                              <label htmlFor="cnf">
-                                                Invoice
-                                              </label>
-                                            </div>
-                                            <input
-                                              type="checkbox"
-                                              id="cif"
-                                              name="Logitics"
-                                              checked={state8.Logitics}
-                                              onChange={handleChange8}
-                                            />
-                                            <label htmlFor="cif">
-                                              Logitics
-                                            </label>
                                           </div>
-                                        </div>
-                                      </div>
-                                    </form>
+                                          <div class="form-group col-lg-2">
+                                            <h6>Last Name</h6>
+                                            <div class=" ">
+                                              <input
+                                                type="text"
+                                                name="Name_Last"
+                                                value={state8.Name_Last}
+                                                onChange={handleChange8}
+                                                placeholder="last name"
+                                              />
+                                            </div>
+                                          </div>
+                                          <div class="form-group col-lg-3">
+                                            <h6>Email</h6>
+                                            <div class=" ">
+                                              <input
+                                                type="email"
+                                                name="Email"
+                                                value={state8.Email}
+                                                onChange={handleChange8}
+                                                placeholder="email"
+                                              />
+                                            </div>
+                                          </div>
+                                          <div class="form-group col-lg-2">
+                                            <h6>Mobile</h6>
+                                            <div class=" ">
+                                              <input
+                                                type="number"
+                                                name="Mobile"
+                                                value={state8.Mobile}
+                                                onChange={handleChange8}
+                                                placeholder="mobile"
+                                              />
+                                            </div>
+                                          </div>
+                                          <div class="form-group col-lg-3">
+                                            <h6>Phone</h6>
+                                            <div class=" ">
+                                              <input
+                                                type="number"
+                                                name="Phone"
+                                                value={state8.Phone}
+                                                onChange={handleChange8}
+                                                placeholder="phone"
+                                              />
+                                            </div>
+                                          </div>
+                                          <div class="form-group col-lg-3">
+                                            <h6>Messenger type</h6>
+                                            <div class="ceateTransport autoComplete">
+                                              <Autocomplete
+                                                options={messengerOptions}
+                                                getOptionLabel={(option) =>
+                                                  option.label
+                                                } // what to display in dropdown
+                                                value={
+                                                  messengerOptions.find(
+                                                    (opt) =>
+                                                      opt.value ===
+                                                      Number(
+                                                        state1.Messenger_Type
+                                                      )
+                                                  ) || null
+                                                }
+                                                onChange={(event, newValue) =>
+                                                  setState8({
+                                                    ...state8,
+                                                    Messenger_Type: newValue
+                                                      ? newValue.value
+                                                      : "",
+                                                  })
+                                                }
+                                                renderInput={(params) => (
+                                                  <TextField
+                                                    {...params}
+                                                    placeholder={t(
+                                                      "messengerType"
+                                                    )}
+                                                    variant="outlined"
+                                                  />
+                                                )}
+                                              />
+                                            </div>
+                                          </div>
+                                          <div class="form-group col-lg-3">
+                                            <h6>Messenger Id</h6>
+                                            <div class=" ">
+                                              <input
+                                                type="number"
+                                                name="Messenger_ID"
+                                                value={state8.Messenger_ID}
+                                                onChange={handleChange8}
+                                                placeholder="messenger id"
+                                              />
+                                            </div>
+                                          </div>
+                                          <div class="form-group col-lg-3">
+                                 <h6> Position </h6>
+                                  <div class=" ">
+                                    <input
+                                      type="number"
+                                      name="Messenger_ID"
+                                      value={state1.Messenger_ID}
+                                      onChange={handleChange1}
+                                      placeholder="messenger id"
+                                    />
                                   </div>
                                 </div>
-                                <div class="modal-footer">
-                                  <button
-                                    type="button"
-                                    class="btn btn-primary mb-0"
-                                    onClick={handleSubmit8}
-                                  >
-                                    submit
-                                  </button>
+                                 <div class="form-group col-lg-3">
+                                  <h6>Title</h6>
+                                  <div class=" ">
+                                    <input
+                                      type="number"
+                                      name="Messenger_ID"
+                                      value={state1.Messenger_ID}
+                                      onChange={handleChange1}
+                                      placeholder="messenger id"
+                                    />
+                                  </div>
+                                </div>
+                                          <div class="form-group col-lg-12">
+                                            <h6>{t("notes")}</h6>
+                                            <div>
+                                              <textarea
+                                                name="Notes"
+                                                value={state8.Notes}
+                                                onChange={handleChange8}
+                                                cols="30"
+                                                rows="4"
+                                              ></textarea>
+                                            </div>
+                                          </div>
+                                          <div className="form-group col-lg-12">
+                                            <div className="invoiceModal">
+                                              <div>
+                                                <input
+                                                  type="checkbox"
+                                                  id="dap"
+                                                  name="Accounting"
+                                                  checked={state8.Accounting}
+                                                  onChange={handleChange8}
+                                                />
+                                                <label htmlFor="dap">
+                                                  Accounting
+                                                </label>
+                                              </div>
+                                              <div>
+                                                <input
+                                                  type="checkbox"
+                                                  id="cnf"
+                                                  name="Invoice"
+                                                  checked={state8.Invoice}
+                                                  onChange={handleChange8}
+                                                />
+                                                <label htmlFor="cnf">
+                                                  Invoice
+                                                </label>
+                                              </div>
+                                              <input
+                                                type="checkbox"
+                                                id="cif"
+                                                name="Logitics"
+                                                checked={state8.Logitics}
+                                                onChange={handleChange8}
+                                              />
+                                              <label htmlFor="cif">
+                                                Logitics
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button
+                                      type="button"
+                                      class="btn btn-primary mb-0"
+                                      onClick={handleSubmit8}
+                                    >
+                                      submit
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("phone")}</h6>
-                        <input
-                          type="text"
-                          id="phone"
-                          value={state5.phone || ""}
-                          onChange={handleChange5}
-                          name="phone"
-                          className="form-control"
-                          placeholder="Phone"
-                        />
-                      </div>
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("email")}</h6>
-                        <input
-                          type="text"
-                          id="phone"
-                          value={state5.email || ""}
-                          onChange={handleChange5}
-                          name="email"
-                          className="form-control"
-                          placeholder="Email"
-                        />
-                      </div>
-                      <div className="col-lg-3 form-group autoComplete">
-                        <h6>{t("messengerType")}</h6>
-                        <div>
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("phone")}</h6>
+                          <input
+                            type="text"
+                            id="phone"
+                            value={state5.phone || ""}
+                            onChange={handleChange5}
+                            name="phone"
+                            className="form-control"
+                            placeholder="Phone"
+                          />
+                        </div>
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("email")}</h6>
+                          <input
+                            type="text"
+                            id="phone"
+                            value={state5.email || ""}
+                            onChange={handleChange5}
+                            name="email"
+                            className="form-control"
+                            placeholder="Email"
+                          />
+                        </div>
+                        <div className="col-lg-3 form-group autoComplete">
+                          <h6>{t("messengerType")}</h6>
+                          <div>
+                            <Autocomplete
+                              options={messengerOptions}
+                              getOptionLabel={(option) => option.label} // what to display in dropdown
+                              value={
+                                messengerOptions.find(
+                                  (opt) =>
+                                    opt.value === Number(state5.Messenger_Type)
+                                ) || null
+                              }
+                              onChange={(event, newValue) =>
+                                setState5({
+                                  ...state5,
+                                  Messenger_Type: newValue
+                                    ? newValue.value
+                                    : "",
+                                })
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("messengerType")}
+                                  variant="outlined"
+                                />
+                              )}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("messangerId")}</h6>
+                          <div>
+                            <input
+                              type="text"
+                              id="messangerId"
+                              value={state5.messangerId || ""}
+                              onChange={handleChange5}
+                              name="messangerId"
+                              className="form-control"
+                              placeholder="Messanger ID"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="col-lg-3 form-group autoComplete mb-3">
+                          <h6>{t("country")}</h6>
+                          <div>
+                            <Autocomplete
+                              options={countryList}
+                              getOptionLabel={(option) => option.name || ""}
+                              isOptionEqualToValue={(option, value) =>
+                                option.id === value?.id
+                              }
+                              value={selectedCountry}
+                              onChange={(event, newValue) =>
+                                setSelectedCountry(newValue)
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("country")}
+                                  variant="outlined"
+                                />
+                              )}
+                            />
+                          </div>
+                        </div>
+                        <div className="form-group col-lg-3 autoComplete mb-3">
+                          <h6>{t("province")}</h6>
                           <Autocomplete
-                            options={messengerOptions}
-                            getOptionLabel={(option) => option.label} // what to display in dropdown
-                            value={
-                              messengerOptions.find(
-                                (opt) =>
-                                  opt.value === Number(state5.Messenger_Type)
-                              ) || null
+                            options={provinceList}
+                            getOptionLabel={(opt) => opt.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt.id === val?.id
                             }
-                            onChange={(event, newValue) =>
-                              setState5({
-                                ...state5,
-                                Messenger_Type: newValue ? newValue.value : "",
-                              })
+                            value={selectedProvince}
+                            onChange={(e, newProv) =>
+                              setSelectedProvince(newProv)
                             }
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder={t("messengerType")}
+                                placeholder={t("province")}
+                                variant="outlined"
+                              />
+                            )}
+                            style={{ marginTop: 16 }}
+                          />
+                        </div>
+                        <div className="form-group col-lg-3 autoComplete mb-3">
+                          <h6>{t("district")}</h6>
+                          <Autocomplete
+                            options={districtList}
+                            getOptionLabel={(opt) => opt.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt.id === val?.id
+                            }
+                            value={selectedDistrict}
+                            onChange={(e, dis) => setSelectedDistrict(dis)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("district")}
                                 variant="outlined"
                               />
                             )}
                           />
                         </div>
-                      </div>
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("messangerId")}</h6>
-                        <div>
+                        <div className="col-lg-3 form-group autoComplete">
+                          <h6>{t("subDistrict")}</h6>
+                          <Autocomplete
+                            options={subdistrictList || []}
+                            getOptionLabel={(opt) => opt?.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt?.id === val?.id
+                            }
+                            value={selectedSubdistrict || null}
+                            onChange={(e, sub) => setSelectedSubdistrict(sub)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder="Select Subdistrict"
+                                variant="outlined"
+                              />
+                            )}
+                          />
+                        </div>
+
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("postCode")}</h6>
                           <input
                             type="text"
-                            id="messangerId"
-                            value={state5.messangerId || ""}
-                            onChange={handleChange5}
-                            name="messangerId"
                             className="form-control"
-                            placeholder="Messanger ID"
+                            value={postalCode || ""}
+                            onChange={(e) => setPostalCode(e.target.value)}
+                          />
+                        </div>
+
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("address")} 1</h6>
+                          <input
+                            type="text"
+                            id="address1"
+                            value={state5.address1 || ""}
+                            onChange={handleChange5}
+                            name="address1"
+                            className="form-control"
+                            placeholder="Address1"
+                          />
+                        </div>
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("address")} 2</h6>
+                          <input
+                            type="text"
+                            id="address2"
+                            value={state5.address2 || ""}
+                            onChange={handleChange5}
+                            name="address2"
+                            className="form-control"
+                            placeholder="Address2"
                           />
                         </div>
                       </div>
+                      <div className="row">
+                        <div className="col-lg-12 form-group autoComplete">
+                          <h6 style={{ fontWeight: "bold" }}>
+                            {" "}
+                            {t("BankDetails")}:
+                          </h6>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankName")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state5.Bank_Name || ""}
+                            onChange={(e) =>
+                              setState5({
+                                ...state5,
+                                Bank_Name: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
 
-                      <div className="col-lg-3 form-group autoComplete mb-3">
-                        <h6>{t("country")}</h6>
-                        <div>
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankBranch")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state5.Bank_Branch || ""}
+                            onChange={(e) =>
+                              setState5({
+                                ...state5,
+                                Bank_Branch: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankAccount")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state5.Bank_Account || ""}
+                            onChange={(e) =>
+                              setState5({
+                                ...state5,
+                                Bank_Account: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankIbon")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state5.Bank_IBAN || ""}
+                            onChange={(e) =>
+                              setState5({
+                                ...state5,
+                                Bank_IBAN: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankSwift")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state5.Bank_Swift || ""}
+                            onChange={(e) =>
+                              setState5({
+                                ...state5,
+                                Bank_Swift: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="col-lg-4 form-group autoComplete">
+                          <h6>{t("bankCountry")}</h6>
                           <Autocomplete
                             options={countryList}
                             getOptionLabel={(option) => option.name || ""}
                             isOptionEqualToValue={(option, value) =>
                               option.id === value?.id
                             }
-                            value={selectedCountry}
+                            value={
+                              countryList.find(
+                                (c) =>
+                                  String(c.id) === String(state5.Bank_Country)
+                              ) || null
+                            }
                             onChange={(event, newValue) =>
-                              setSelectedCountry(newValue)
+                              setState5({
+                                ...state5,
+                                Bank_Country: newValue ? newValue.id : "",
+                              })
                             }
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder={t("country")}
+                                placeholder={t("bankCountry")}
                                 variant="outlined"
                               />
                             )}
                           />
                         </div>
-                      </div>
-                      <div className="form-group col-lg-3 autoComplete mb-3">
-                        <h6>{t("province")}</h6>
-                        <Autocomplete
-                          options={provinceList}
-                          getOptionLabel={(opt) => opt.name ?? ""}
-                          isOptionEqualToValue={(opt, val) =>
-                            opt.id === val?.id
-                          }
-                          value={selectedProvince}
-                          onChange={(e, newProv) =>
-                            setSelectedProvince(newProv)
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("province")}
-                              variant="outlined"
-                            />
-                          )}
-                          style={{ marginTop: 16 }}
-                        />
-                      </div>
-                      <div className="form-group col-lg-3 autoComplete mb-3">
-                        <h6>{t("district")}</h6>
-                        <Autocomplete
-                          options={districtList}
-                          getOptionLabel={(opt) => opt.name ?? ""}
-                          isOptionEqualToValue={(opt, val) =>
-                            opt.id === val?.id
-                          }
-                          value={selectedDistrict}
-                          onChange={(e, dis) => setSelectedDistrict(dis)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("district")}
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </div>
-                      <div className="col-lg-3 form-group autoComplete">
-                        <h6>{t("subDistrict")}</h6>
-                        <Autocomplete
-                          options={subdistrictList || []}
-                          getOptionLabel={(opt) => opt?.name ?? ""}
-                          isOptionEqualToValue={(opt, val) =>
-                            opt?.id === val?.id
-                          }
-                          value={selectedSubdistrict || null}
-                          onChange={(e, sub) => setSelectedSubdistrict(sub)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select Subdistrict"
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </div>
 
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("postCode")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={postalCode || ""}
-                          onChange={(e) => setPostalCode(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("address")} 1</h6>
-                        <input
-                          type="text"
-                          id="address1"
-                          value={state5.address1 || ""}
-                          onChange={handleChange5}
-                          name="address1"
-                          className="form-control"
-                          placeholder="Address1"
-                        />
-                      </div>
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("address")} 2</h6>
-                        <input
-                          type="text"
-                          id="address2"
-                          value={state5.address2 || ""}
-                          onChange={handleChange5}
-                          name="address2"
-                          className="form-control"
-                          placeholder="Address2"
-                        />
+                        <div className="col-lg-12 form-group">
+                          <h6>{t("bankAddress")}</h6>
+                          <textarea
+                            className="form-control p-2"
+                            placeholder={t("bankAddress")}
+                            value={state5.Bank_Address || ""}
+                            onChange={(e) =>
+                              setState5({
+                                ...state5,
+                                Bank_Address: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="row">
-                      <div className="col-lg-12 form-group autoComplete">
-                        <h6 style={{ fontWeight: "bold" }}>
-                          {" "}
-                          {t("BankDetails")}:
-                        </h6>
-                      </div>
+                    <div className="card-footer">
+                      <button
+                        className="btn btn-primary"
+                        type="submit"
+                        name="signup"
+                        onClick={updateVendor}
+                        disabled={isButtonClicked}
+                      >
+                        {typeof state.vendor_id !== "undefined"
+                          ? t("update")
+                          : t("create")}
+                      </button>
+                      <Link className="btn btn-danger" to={"/shipToNew"}>
+                        {t("cancel")}
+                      </Link>
                     </div>
-                    <div className="row">
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankName")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={state5.Bank_Name || ""}
-                          onChange={(e) =>
-                            setState5({ ...state5, Bank_Name: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankBranch")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={state5.Bank_Branch || ""}
-                          onChange={(e) =>
-                            setState5({
-                              ...state5,
-                              Bank_Branch: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankAccount")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={state5.Bank_Account || ""}
-                          onChange={(e) =>
-                            setState5({
-                              ...state5,
-                              Bank_Account: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankIbon")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={state5.Bank_IBAN || ""}
-                          onChange={(e) =>
-                            setState5({ ...state5, Bank_IBAN: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankSwift")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={state5.Bank_Swift || ""}
-                          onChange={(e) =>
-                            setState5({ ...state5, Bank_Swift: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="col-lg-4 form-group autoComplete">
-                        <h6>{t("bankCountry")}</h6>
-                        <Autocomplete
-                          options={countryList}
-                          getOptionLabel={(option) => option.name || ""}
-                          isOptionEqualToValue={(option, value) =>
-                            option.id === value?.id
-                          }
-                          value={
-                            countryList.find(
-                              (c) =>
-                                String(c.id) === String(state5.Bank_Country)
-                            ) || null
-                          }
-                          onChange={(event, newValue) =>
-                            setState5({
-                              ...state5,
-                              Bank_Country: newValue ? newValue.id : "",
-                            })
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("bankCountry")}
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </div>
-
-                      <div className="col-lg-12 form-group">
-                        <h6>{t("bankAddress")}</h6>
-                        <textarea
-                          className="form-control p-2"
-                          placeholder={t("bankAddress")}
-                          value={state5.Bank_Address || ""}
-                          onChange={(e) =>
-                            setState5({
-                              ...state5,
-                              Bank_Address: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card-footer">
-                    <button
-                      className="btn btn-primary"
-                      type="submit"
-                      name="signup"
-                      onClick={updateVendor}
-                      disabled={isButtonClicked}
-                    >
-                      {typeof state.vendor_id !== "undefined"
-                        ? t("update")
-                        : t("create")}
-                    </button>
-                    <Link className="btn btn-danger" to={"/shipToNew"}>
-                      {t("cancel")}
-                    </Link>
                   </div>
                 </div>
-              </div>
 
-              <div
-                class="tab-pane fade"
-                id="home-tab-pane"
-                role="tabpanel"
-                aria-labelledby="home-tab"
-                tabindex="0"
-              >
-                <div className="table-responsive">
-                  <table className="  tableContact striped  table borderTerpProduce">
-                    <tr className="">
-                      <th>{t("firstName")}</th>
-                      <th>{t("lastName")}</th>
-                      <th>{t("nickName")}</th>
-                      <th>{t("position")}</th>
-                      <th>{t("type")}</th>
-                      <th>{t("email")}</th>
-                      <th>{t("mobile")}</th>
-                      <th>{t("action")}</th>
-                    </tr>
+                <div
+                  class="tab-pane fade"
+                  id="home-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="home-tab"
+                  tabindex="0"
+                >
+                  <div className="table-responsive">
+                    <table className="  tableContact striped  table borderTerpProduce">
+                      <tr className="">
+                        <th>{t("firstName")}</th>
+                        <th>{t("lastName")}</th>
+                        <th>{t("nickName")}</th>
+                        <th>{t("position")}</th>
+                        <th>{t("type")}</th>
+                        <th>{t("email")}</th>
+                        <th>{t("mobile")}</th>
+                        <th>{t("action")}</th>
+                      </tr>
 
-                    {data?.map((item) => {
-                      return (
-                        <tr>
-                          <td>{item.first_name}</td>
-                          <td>{item.last_name}</td>
-                          <td>{item.Nick_name}</td>
-                          <td>{item.position}</td>
-                          <td>{item.type}</td>
-                          <td>{item.Email}</td>
-                          <td>{item.mobile}</td>
-                          <td>
-                            <div>
-                              {/* edit popup */}
-                              <button
-                                type="button"
-                                onClick={() => handleEditClick(item.contact_id)}
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModalEdit"
-                              >
-                                <i class="mdi mdi-pencil"></i>
+                      {data?.map((item) => {
+                        return (
+                          <tr>
+                            <td>{item.first_name}</td>
+                            <td>{item.last_name}</td>
+                            <td>{item.Nick_name}</td>
+                            <td>{item.position}</td>
+                            <td>{item.type}</td>
+                            <td>{item.Email}</td>
+                            <td>{item.mobile}</td>
+                            <td>
+                              <div>
                                 {/* edit popup */}
-                              </button>
-                              <div
-                                class="modal fade"
-                                id="exampleModalEdit"
-                                tabindex="-1"
-                                aria-labelledby="exampleModalLabel"
-                                aria-hidden="true"
-                              >
-                                <div class="modal-dialog modalShipTo modal-xl">
-                                  <div class="modal-content">
-                                    <div class="modal-header">
-                                      <h1
-                                        class="modal-title fs-5"
-                                        id="exampleModalLabel"
-                                      >
-                                        {t("contactUp")}
-                                      </h1>
-                                      <button
-                                        type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close"
-                                      >
-                                        <i class="mdi mdi-close"></i>
-                                      </button>
-                                    </div>
-                                    <div class="modal-body">
-                                      <div className="formCreate">
-                                        <form action="">
-                                          <div className="row">
-                                            {/* <div className="col-lg-12">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleEditClick(item.contact_id)
+                                  }
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#exampleModalEdit"
+                                >
+                                  <i class="mdi mdi-pencil"></i>
+                                  {/* edit popup */}
+                                </button>
+                                <div
+                                  class="modal fade"
+                                  id="exampleModalEdit"
+                                  tabindex="-1"
+                                  aria-labelledby="exampleModalLabel"
+                                  aria-hidden="true"
+                                >
+                                  <div class="modal-dialog modalShipTo modal-xl">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h1
+                                          class="modal-title fs-5"
+                                          id="exampleModalLabel"
+                                        >
+                                          {t("contactUp")}
+                                        </h1>
+                                        <button
+                                          type="button"
+                                          class="btn-close"
+                                          data-bs-dismiss="modal"
+                                          aria-label="Close"
+                                        >
+                                          <i class="mdi mdi-close"></i>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <div className="formCreate">
+                                          <form action="">
+                                            <div className="row">
+                                              {/* <div className="col-lg-12">
                                                <div class="form-group col-lg-3">
                                                  <h6>Client </h6>
                                                  <div class="ceateTransport">
@@ -4812,405 +5557,407 @@ const CreateClient = () => {
                                                  </div>
                                                </div>
                                              </div> */}
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("contactType")}</h6>
-                                              <div class="ceateTransport autoComplete">
-                                                <Autocomplete
-                                                  disablePortal
-                                                  options={contactType || []} // Use your contactType array as options
-                                                  getOptionLabel={(option) =>
-                                                    option.type_en || ""
-                                                  }
-                                                  onChange={(e, newValue) =>
-                                                    setState1((prevState) => ({
-                                                      ...prevState,
-                                                      contact_type_id:
-                                                        newValue?.contact_type_id ||
-                                                        "",
-                                                    }))
-                                                  }
-                                                  value={
-                                                    (contactType || []).find(
-                                                      (item) =>
-                                                        item.contact_type_id ===
-                                                        state1.contact_type_id
-                                                    ) || null
-                                                  }
-                                                  sx={{ width: 300 }} // Customize the width as needed
-                                                  renderInput={(params) => (
-                                                    <TextField
-                                                      {...params}
-                                                      placeholder={t(
-                                                        "selectType"
-                                                      )}
-                                                      InputLabelProps={{
-                                                        shrink: false,
-                                                      }} // Prevents floating label
-                                                    />
-                                                  )}
-                                                />
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("contactType")}</h6>
+                                                <div class="ceateTransport autoComplete">
+                                                  <Autocomplete
+                                                    disablePortal
+                                                    options={contactType || []} // Use your contactType array as options
+                                                    getOptionLabel={(option) =>
+                                                      option.type_en || ""
+                                                    }
+                                                    onChange={(e, newValue) =>
+                                                      setState1(
+                                                        (prevState) => ({
+                                                          ...prevState,
+                                                          contact_type_id:
+                                                            newValue?.contact_type_id ||
+                                                            "",
+                                                        })
+                                                      )
+                                                    }
+                                                    value={
+                                                      (contactType || []).find(
+                                                        (item) =>
+                                                          item.contact_type_id ===
+                                                          state1.contact_type_id
+                                                      ) || null
+                                                    }
+                                                    sx={{ width: 300 }} // Customize the width as needed
+                                                    renderInput={(params) => (
+                                                      <TextField
+                                                        {...params}
+                                                        placeholder={t(
+                                                          "selectType"
+                                                        )}
+                                                        InputLabelProps={{
+                                                          shrink: false,
+                                                        }} // Prevents floating label
+                                                      />
+                                                    )}
+                                                  />
+                                                </div>
                                               </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("firstName")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="text"
-                                                  name="first_name"
-                                                  onChange={handleChange1}
-                                                  value={state1.first_name}
-                                                  placeholder={t("firstName")}
-                                                />
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("firstName")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="text"
+                                                    name="first_name"
+                                                    onChange={handleChange1}
+                                                    value={state1.first_name}
+                                                    placeholder={t("firstName")}
+                                                  />
+                                                </div>
                                               </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("lastName")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="text"
-                                                  name="last_name"
-                                                  onChange={handleChange1}
-                                                  value={state1.last_name}
-                                                  placeholder={t("lastName")}
-                                                />
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("lastName")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="text"
+                                                    name="last_name"
+                                                    onChange={handleChange1}
+                                                    value={state1.last_name}
+                                                    placeholder={t("lastName")}
+                                                  />
+                                                </div>
                                               </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("nickName")}</h6>
-                                              <div>
-                                                <input
-                                                  type="text"
-                                                  name="Nick_name"
-                                                  onChange={handleChange1}
-                                                  value={state1.Nick_name}
-                                                  placeholder={t("nickName")}
-                                                />
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("nickName")}</h6>
+                                                <div>
+                                                  <input
+                                                    type="text"
+                                                    name="Nick_name"
+                                                    onChange={handleChange1}
+                                                    value={state1.Nick_name}
+                                                    placeholder={t("nickName")}
+                                                  />
+                                                </div>
                                               </div>
-                                            </div>
 
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("position")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="text"
-                                                  name="position"
-                                                  onChange={handleChange1}
-                                                  value={state1.position}
-                                                  placeholder={t("position")}
-                                                />
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("position")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="text"
+                                                    name="position"
+                                                    onChange={handleChange1}
+                                                    value={state1.position}
+                                                    placeholder={t("position")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("email")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="email"
+                                                    name="Email"
+                                                    onChange={handleChange1}
+                                                    value={state1.Email}
+                                                    placeholder={t("email")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("mobile")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="number"
+                                                    name="mobile"
+                                                    onChange={handleChange1}
+                                                    value={state1.mobile}
+                                                    placeholder={t("mobile")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("landline")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="number"
+                                                    name="landline"
+                                                    onChange={handleChange1}
+                                                    value={state1.landline}
+                                                    placeholder={t("landline")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-4">
+                                                <h6>{t("birthday")}</h6>
+                                                <div>
+                                                  <input
+                                                    type="date"
+                                                    name="birthday"
+                                                    onChange={handleChange1}
+                                                    value={state1.birthday}
+                                                    placeholder={t("birthday")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-8">
+                                                <h6>{t("notes")}</h6>
+                                                <div>
+                                                  <textarea
+                                                    name="Notes"
+                                                    onChange={handleChange1}
+                                                    value={state1.Notes}
+                                                    cols="30"
+                                                    rows="5"
+                                                  ></textarea>
+                                                </div>
                                               </div>
                                             </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("email")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="email"
-                                                  name="Email"
-                                                  onChange={handleChange1}
-                                                  value={state1.Email}
-                                                  placeholder={t("email")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("mobile")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="number"
-                                                  name="mobile"
-                                                  onChange={handleChange1}
-                                                  value={state1.mobile}
-                                                  placeholder={t("mobile")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("landline")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="number"
-                                                  name="landline"
-                                                  onChange={handleChange1}
-                                                  value={state1.landline}
-                                                  placeholder={t("landline")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-4">
-                                              <h6>{t("birthday")}</h6>
-                                              <div>
-                                                <input
-                                                  type="date"
-                                                  name="birthday"
-                                                  onChange={handleChange1}
-                                                  value={state1.birthday}
-                                                  placeholder={t("birthday")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-8">
-                                              <h6>{t("notes")}</h6>
-                                              <div>
-                                                <textarea
-                                                  name="Notes"
-                                                  onChange={handleChange1}
-                                                  value={state1.Notes}
-                                                  cols="30"
-                                                  rows="5"
-                                                ></textarea>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </form>
+                                          </form>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer justify-center">
+                                        <button
+                                          onClick={contactDetailsEdit}
+                                          type="button"
+                                          class="btn btn-primary mb-0"
+                                        >
+                                          {t("update")}
+                                        </button>
                                       </div>
                                     </div>
-                                    <div class="modal-footer justify-center">
-                                      <button
-                                        onClick={contactDetailsEdit}
-                                        type="button"
-                                        class="btn btn-primary mb-0"
-                                      >
-                                        {t("update")}
-                                      </button>
+                                  </div>
+                                </div>
+                                {/* edit popup end */}
+
+                                <button
+                                  type="button"
+                                  onClick={() => deleteOrder1(item.contact_id)}
+                                >
+                                  <i class="mdi mdi-delete "></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </table>
+                  </div>
+                  <div className="row">
+                    <Link
+                      style={{ width: "170px" }}
+                      className="btn btn-danger mb-4"
+                      to="/"
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModalContact"
+                    >
+                      {t("addContact")}
+                    </Link>
+                    {/* modal */}
+                    <div
+                      class="modal fade"
+                      id="exampleModalContact"
+                      tabindex="-1"
+                      aria-labelledby="exampleModalLabel"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modalShipTo modal-xl ">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                              {t("contact")}
+                            </h1>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                              onClick={dataClear}
+                            >
+                              <i class="mdi mdi-close"></i>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <div className="formCreate">
+                              <form action="">
+                                <div className="row">
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("contactType")}</h6>
+                                    <div class="ceateTransport autoComplete">
+                                      <Autocomplete
+                                        disablePortal
+                                        options={contactType}
+                                        getOptionLabel={(option) =>
+                                          option.type_en
+                                        }
+                                        isOptionEqualToValue={(option, value) =>
+                                          option.contact_type_id ===
+                                          value.contact_type_id
+                                        }
+                                        onChange={(e, newValue) =>
+                                          handleChange1({
+                                            target: {
+                                              name: "contact_type_id",
+                                              value:
+                                                newValue?.contact_type_id || "",
+                                            },
+                                          })
+                                        }
+                                        value={
+                                          contactType?.find(
+                                            (item) =>
+                                              item.contact_type_id ===
+                                              state1?.contact_type_id
+                                          ) || null
+                                        }
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            // label="Select Type"
+                                            placeholder={t("selectType")}
+                                            variant="outlined"
+                                          />
+                                        )}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("firstName")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="text"
+                                        name="first_name"
+                                        onChange={handleChange1}
+                                        value={state1.first_name}
+                                        placeholder={t("firstName")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("lastName")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="text"
+                                        name="last_name"
+                                        onChange={handleChange1}
+                                        value={state1.last_name}
+                                        placeholder={t("lastName")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("nickName")}</h6>
+                                    <div>
+                                      <input
+                                        type="text"
+                                        name="Nick_name"
+                                        onChange={handleChange1}
+                                        value={state1.Nick_name}
+                                        placeholder={t("nickName")}
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("position")}</h6>
+
+                                    <div class=" ">
+                                      <input
+                                        type="text"
+                                        name="position"
+                                        onChange={handleChange1}
+                                        value={state1.position}
+                                        placeholder={t("position")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("email")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="email"
+                                        name="Email"
+                                        onChange={handleChange1}
+                                        value={state1.Email}
+                                        placeholder={t("email")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("mobile")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="number"
+                                        name="mobile"
+                                        onChange={handleChange1}
+                                        value={state1.mobile}
+                                        placeholder={t("mobile")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("landline")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="number"
+                                        name="landline"
+                                        onChange={handleChange1}
+                                        value={state1.landline}
+                                        placeholder={t("landline")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-4">
+                                    <h6>{t("birthday")}</h6>
+                                    <div>
+                                      <input
+                                        type="date"
+                                        name="birthday"
+                                        onChange={handleChange1}
+                                        value={state1.birthday}
+                                        placeholder={t("birthday")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-8">
+                                    <h6>{t("notes")}</h6>
+                                    <div>
+                                      <textarea
+                                        name="Notes"
+                                        onChange={handleChange1}
+                                        value={state1.Notes}
+                                        cols="30"
+                                        rows="5"
+                                      ></textarea>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                              {/* edit popup end */}
-
-                              <button
-                                type="button"
-                                onClick={() => deleteOrder1(item.contact_id)}
-                              >
-                                <i class="mdi mdi-delete "></i>
-                              </button>
+                              </form>
                             </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </table>
-                </div>
-                <div className="row">
-                  <Link
-                    style={{ width: "170px" }}
-                    className="btn btn-danger mb-4"
-                    to="/"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModalContact"
-                  >
-                    {t("addContact")}
-                  </Link>
-                  {/* modal */}
-                  <div
-                    class="modal fade"
-                    id="exampleModalContact"
-                    tabindex="-1"
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                  >
-                    <div class="modal-dialog modalShipTo modal-xl ">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h1 class="modal-title fs-5" id="exampleModalLabel">
-                            {t("contact")}
-                          </h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                            onClick={dataClear}
-                          >
-                            <i class="mdi mdi-close"></i>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <div className="formCreate">
-                            <form action="">
-                              <div className="row">
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("contactType")}</h6>
-                                  <div class="ceateTransport autoComplete">
-                                    <Autocomplete
-                                      disablePortal
-                                      options={contactType}
-                                      getOptionLabel={(option) =>
-                                        option.type_en
-                                      }
-                                      isOptionEqualToValue={(option, value) =>
-                                        option.contact_type_id ===
-                                        value.contact_type_id
-                                      }
-                                      onChange={(e, newValue) =>
-                                        handleChange1({
-                                          target: {
-                                            name: "contact_type_id",
-                                            value:
-                                              newValue?.contact_type_id || "",
-                                          },
-                                        })
-                                      }
-                                      value={
-                                        contactType?.find(
-                                          (item) =>
-                                            item.contact_type_id ===
-                                            state1?.contact_type_id
-                                        ) || null
-                                      }
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          // label="Select Type"
-                                          placeholder={t("selectType")}
-                                          variant="outlined"
-                                        />
-                                      )}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("firstName")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="text"
-                                      name="first_name"
-                                      onChange={handleChange1}
-                                      value={state1.first_name}
-                                      placeholder={t("firstName")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("lastName")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="text"
-                                      name="last_name"
-                                      onChange={handleChange1}
-                                      value={state1.last_name}
-                                      placeholder={t("lastName")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("nickName")}</h6>
-                                  <div>
-                                    <input
-                                      type="text"
-                                      name="Nick_name"
-                                      onChange={handleChange1}
-                                      value={state1.Nick_name}
-                                      placeholder={t("nickName")}
-                                    />
-                                  </div>
-                                </div>
-
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("position")}</h6>
-
-                                  <div class=" ">
-                                    <input
-                                      type="text"
-                                      name="position"
-                                      onChange={handleChange1}
-                                      value={state1.position}
-                                      placeholder={t("position")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("email")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="email"
-                                      name="Email"
-                                      onChange={handleChange1}
-                                      value={state1.Email}
-                                      placeholder={t("email")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("mobile")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="mobile"
-                                      onChange={handleChange1}
-                                      value={state1.mobile}
-                                      placeholder={t("mobile")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("landline")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="landline"
-                                      onChange={handleChange1}
-                                      value={state1.landline}
-                                      placeholder={t("landline")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                  <h6>{t("birthday")}</h6>
-                                  <div>
-                                    <input
-                                      type="date"
-                                      name="birthday"
-                                      onChange={handleChange1}
-                                      value={state1.birthday}
-                                      placeholder={t("birthday")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-8">
-                                  <h6>{t("notes")}</h6>
-                                  <div>
-                                    <textarea
-                                      name="Notes"
-                                      onChange={handleChange1}
-                                      value={state1.Notes}
-                                      cols="30"
-                                      rows="5"
-                                    ></textarea>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
                           </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button
-                            type="button"
-                            class="btn btn-primary mb-0"
-                            onClick={contactDataSubmit}
-                          >
-                            {t("submit")}
-                          </button>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-primary mb-0"
+                              onClick={contactDataSubmit}
+                            >
+                              {t("submit")}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
+                    {/* modal end */}
                   </div>
-                  {/* modal end */}
                 </div>
-              </div>
-              {/* statics */}
-              <div
-                class="tab-pane fade"
-                id="notify-tab-pane"
-                role="tabpanel"
-                aria-labelledby="notify-tab"
-                tabindex="0"
-              >
-                <div className="py-3">
-                  <div className="row newSmallCard ">
-                    <div className="flex flex-wrap">
-                      {/* <div className="selectProduce me-3">
+                {/* statics */}
+                <div
+                  class="tab-pane fade"
+                  id="notify-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="notify-tab"
+                  tabindex="0"
+                >
+                  <div className="py-3">
+                    <div className="row newSmallCard ">
+                      <div className="flex flex-wrap">
+                        {/* <div className="selectProduce me-3">
              <h6 className="mb-2"> Select Produce</h6>
              <Autocomplete
                disablePortal
@@ -5228,310 +5975,310 @@ const CreateClient = () => {
                )}
              />
            </div> */}
-                      <div>
-                        <div className="selectTimeHead">
-                          <h6>{t("selectTimePeriod")} :</h6>
-                        </div>
-                        <div className="selectTimeParent">
-                          {dataPeriod.map((item) => (
-                            <div
-                              key={item.ID}
-                              className="timeMonth timePeriod"
-                              onClick={() =>
-                                handlePeriodClick(item.Period, item.ID)
-                              }
-                            >
-                              <p>{item.Period}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="selectProduce comparisonNone mt-2">
-                        <h6 style={{ color: "#fff" }}>
-                          {t("comparisonPeriod")}
-                        </h6>
-                        <Autocomplete
-                          disablePortal
-                          options={dataComparison}
-                          getOptionLabel={(option) => option.Name_EN || ""}
-                          sx={{ width: 300 }}
-                          onChange={(event, value) => {
-                            setSelectedComparison(value ? value.ID : null);
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("comparisonPeriod")}
-                            />
-                          )}
-                        />
-                      </div>
-                    </div>
-                    <div className="dateSelect row">
-                      <div className="col-lg-3">
-                        <input
-                          type="date"
-                          value={date1}
-                          onChange={(e) => setDate1(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-lg-3">
-                        <input
-                          type="date"
-                          value={date2}
-                          onChange={(e) => setDate2(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-lg-3">
-                        <input
-                          type="date"
-                          value={date3}
-                          onChange={(e) => setDate3(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-lg-3">
-                        <input
-                          type="date"
-                          value={date4}
-                          onChange={(e) => setDate4(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="dateSelect row">
-                      <div className="col-lg-3">
-                        <button
-                          className="btn btn-primary"
-                          type="submit"
-                          onClick={confirmData}
-                        >
-                          {t("confirm")}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row dashCard53 consigneeCard">
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
-                      <div className="card  ">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {consigeeDetails?.Total_shipments}
-                            </div>
+                        <div>
+                          <div className="selectTimeHead">
+                            <h6>{t("selectTimePeriod")} :</h6>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalShipments")}
-                            </p>
-                            <h4 className="mb-0">
-                              {formatter.format(
-                                consigeeDetails?.Total_invoiced_value
-                              )}
-                            </h4>
+                          <div className="selectTimeParent">
+                            {dataPeriod.map((item) => (
+                              <div
+                                key={item.ID}
+                                className="timeMonth timePeriod"
+                                onClick={() =>
+                                  handlePeriodClick(item.Period, item.ID)
+                                }
+                              >
+                                <p>{item.Period}</p>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +55%{" "}
-                            </span>
-                            {t("thanLastWeek")}
-                          </p>
+                        <div className="selectProduce comparisonNone mt-2">
+                          <h6 style={{ color: "#fff" }}>
+                            {t("comparisonPeriod")}
+                          </h6>
+                          <Autocomplete
+                            disablePortal
+                            options={dataComparison}
+                            getOptionLabel={(option) => option.Name_EN || ""}
+                            sx={{ width: 300 }}
+                            onChange={(event, value) => {
+                              setSelectedComparison(value ? value.ID : null);
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("comparisonPeriod")}
+                              />
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <div className="dateSelect row">
+                        <div className="col-lg-3">
+                          <input
+                            type="date"
+                            value={date1}
+                            onChange={(e) => setDate1(e.target.value)}
+                          />
+                        </div>
+                        <div className="col-lg-3">
+                          <input
+                            type="date"
+                            value={date2}
+                            onChange={(e) => setDate2(e.target.value)}
+                          />
+                        </div>
+                        <div className="col-lg-3">
+                          <input
+                            type="date"
+                            value={date3}
+                            onChange={(e) => setDate3(e.target.value)}
+                          />
+                        </div>
+                        <div className="col-lg-3">
+                          <input
+                            type="date"
+                            value={date4}
+                            onChange={(e) => setDate4(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="dateSelect row">
+                        <div className="col-lg-3">
+                          <button
+                            className="btn btn-primary"
+                            type="submit"
+                            onClick={confirmData}
+                          >
+                            {t("confirm")}
+                          </button>
                         </div>
                       </div>
                     </div>
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {consigeeDetails?.Total_Claims}
+                    <div className="row dashCard53 consigneeCard">
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
+                        <div className="card  ">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {consigeeDetails?.Total_shipments}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalShipments")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(
+                                  consigeeDetails?.Total_invoiced_value
+                                )}
+                              </h4>
                             </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalClaims")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +55%{" "}
+                              </span>
+                              {t("thanLastWeek")}
                             </p>
-                            <h4 className="mb-0">
-                              {" "}
-                              {formatter.format(
-                                consigeeDetails?.Total_Claims_value
-                              )}{" "}
-                            </h4>
                           </div>
                         </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%{" "}
-                            </span>
-                            {t("thanYesterday")}
-                          </p>
-                        </div>
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {formatter.format(
-                                consigeeDetails?.Average_Payment
-                                  ? consigeeDetails?.Average_Payment
-                                  : 0
-                              )}
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {consigeeDetails?.Total_Claims}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalClaims")}
+                              </p>
+                              <h4 className="mb-0">
+                                {" "}
+                                {formatter.format(
+                                  consigeeDetails?.Total_Claims_value
+                                )}{" "}
+                              </h4>
                             </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalPayment")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%{" "}
+                              </span>
+                              {t("thanYesterday")}
                             </p>
-                            <h4 className="mb-0">
-                              {" "}
-                              {formatter.format(
-                                consigeeDetails?.Total_payments_value
-                              )}
-                            </h4>
                           </div>
                         </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              -2%
-                            </span>{" "}
-                            {t("thanYesterday")}
-                          </p>
+                      </div>
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {formatter.format(
+                                  consigeeDetails?.Average_Payment
+                                    ? consigeeDetails?.Average_Payment
+                                    : 0
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalPayment")}
+                              </p>
+                              <h4 className="mb-0">
+                                {" "}
+                                {formatter.format(
+                                  consigeeDetails?.Total_payments_value
+                                )}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                -2%
+                              </span>{" "}
+                              {t("thanYesterday")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-credit-card-outline" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("pendingPayment")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(consigeeDetails?.Balance)}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%{" "}
+                              </span>
+                              {t("thanYesterday")}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-credit-card-outline" />
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("pendingPayment")}
-                            </p>
-                            <h4 className="mb-0">
-                              {formatter.format(consigeeDetails?.Balance)}
-                            </h4>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%{" "}
-                            </span>
-                            {t("thanYesterday")}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="row dashCard53 consigneeCard">
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-weight" />
+                    <div className="row dashCard53 consigneeCard">
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-weight" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalNetWeightShipped")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(consigeeDetails?.Total_NW)}
+                              </h4>
+                            </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalNetWeightShipped")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%
+                              </span>{" "}
+                              {t("thanYesterday")}{" "}
                             </p>
-                            <h4 className="mb-0">
-                              {formatter.format(consigeeDetails?.Total_NW)}
-                            </h4>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%
-                            </span>{" "}
-                            {t("thanYesterday")}{" "}
-                          </p>
                         </div>
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons mdi mdi-weight-gram" />
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons mdi mdi-weight-gram" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalGrossWeightShipped")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(consigeeDetails?.Total_GW)}
+                              </h4>
+                            </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalGrossWeightShipped")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%
+                              </span>{" "}
+                              {t("thanYesterday")}
                             </p>
-                            <h4 className="mb-0">
-                              {formatter.format(consigeeDetails?.Total_GW)}
-                            </h4>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%
-                            </span>{" "}
-                            {t("thanYesterday")}
-                          </p>
                         </div>
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-checkbox-multiple-blank-outline" />
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-checkbox-multiple-blank-outline" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalBoxesShipped")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(consigeeDetails?.Total_Box)}
+                              </h4>
+                            </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalBoxesShipped")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%
+                              </span>{" "}
+                              {t("thanYesterday")}
                             </p>
-                            <h4 className="mb-0">
-                              {formatter.format(consigeeDetails?.Total_Box)}
-                            </h4>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%
-                            </span>{" "}
-                            {t("thanYesterday")}
-                          </p>
                         </div>
                       </div>
-                    </div>
-                    {/* <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
+                      {/* <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
              <div className="card  ">
                <div className="card-header p-3 pt-2">
                  <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
@@ -5556,7 +6303,7 @@ const CreateClient = () => {
                </div>
              </div>
            </div> */}
-                    {/* <div className="col-xl-3 col-sm-6 mb-xl-0 mb- mb20">
+                      {/* <div className="col-xl-3 col-sm-6 mb-xl-0 mb- mb20">
              <div className="card">
                <div className="card-header p-3 pt-2">
                  <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
@@ -5580,34 +6327,34 @@ const CreateClient = () => {
                </div>
              </div>
            </div> */}
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-pipe" />
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalShipments")}
-                            </p>
-                            <div className="parentFirstShip mt-4">
-                              <p>{t("dateOfFirstShipment")}</p>
-                              <p> {consigeeDetails?.First_Shipment} </p>
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-pipe" />
                             </div>
-                            <div className="parentFirstShip">
-                              <p>{t("dateOfLastShipment")}</p>
-                              <p>{consigeeDetails?.Last_Shipment}</p>
-                            </div>
-                            <div className="parentFirstShip">
-                              <p>{t("shipmentsInPipeLine")}</p>
-                              <p>
-                                {formatter.format(consigeeDetails?.Pipe_Line)}
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalShipments")}
                               </p>
+                              <div className="parentFirstShip mt-4">
+                                <p>{t("dateOfFirstShipment")}</p>
+                                <p> {consigeeDetails?.First_Shipment} </p>
+                              </div>
+                              <div className="parentFirstShip">
+                                <p>{t("dateOfLastShipment")}</p>
+                                <p>{consigeeDetails?.Last_Shipment}</p>
+                              </div>
+                              <div className="parentFirstShip">
+                                <p>{t("shipmentsInPipeLine")}</p>
+                                <p>
+                                  {formatter.format(consigeeDetails?.Pipe_Line)}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        {/* <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                          <hr className="dark horizontal my-0" />
+                          {/* <div className="card-footer ps-3 pe-3 pt-1 pb-1">
                  <p className="mb-0">
                    <span className="text-success text-sm font-weight-bolder">
                      -2%
@@ -5615,68 +6362,69 @@ const CreateClient = () => {
                    than yesterday
                  </p>
                </div> */}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-lg-6 mb20">
-                      <div className="itemsOrderSearch">
-                        <h3 className="itemOrder">{t("topItems")}</h3>
-                        <div className="selectProduce">
-                          <Autocomplete
-                            disablePortal
-                            options={value}
-                            value={
-                              value.find(
-                                (item) => item.produce_id === selectedInvoiceId
-                              ) || null
-                            }
-                            getOptionLabel={(option) =>
-                              option.produce_name_en || ""
-                            }
-                            sx={{ width: 200 }}
-                            onChange={(event, value) => {
-                              setSelectedInvoiceId(
-                                value ? value.produce_id : null
-                              );
-                              // setProduceImages(value ? value.images : null); // Update images state
-                            }}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder={t("invoiceValue")}
-                              />
-                            )}
-                          />
                         </div>
                       </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-6 mb20">
+                        <div className="itemsOrderSearch">
+                          <h3 className="itemOrder">{t("topItems")}</h3>
+                          <div className="selectProduce">
+                            <Autocomplete
+                              disablePortal
+                              options={value}
+                              value={
+                                value.find(
+                                  (item) =>
+                                    item.produce_id === selectedInvoiceId
+                                ) || null
+                              }
+                              getOptionLabel={(option) =>
+                                option.produce_name_en || ""
+                              }
+                              sx={{ width: 200 }}
+                              onChange={(event, value) => {
+                                setSelectedInvoiceId(
+                                  value ? value.produce_id : null
+                                );
+                                // setProduceImages(value ? value.images : null); // Update images state
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("invoiceValue")}
+                                />
+                              )}
+                            />
+                          </div>
+                        </div>
 
-                      <div className="tableCreateClient">
-                        <table>
-                          <tr>
-                            <th>{t("itfName")}</th>
-                            <th>{t("lastPeriodKg")}</th>
-                            <th>{t("currentPeriodKg")}</th>
-                            <th>{t("diff")}</th>
-                            <th>{t("percentChange")}</th>
-                          </tr>
-                          <tbody>
+                        <div className="tableCreateClient">
+                          <table>
                             <tr>
-                              <td>Dragon Fruit Red-Kg x 15</td>
-                              <td>1,320.00</td>
-                              <td>1,320.00</td>
-                              <td>1,320.00</td>
-                              <td>1,320.00</td>
+                              <th>{t("itfName")}</th>
+                              <th>{t("lastPeriodKg")}</th>
+                              <th>{t("currentPeriodKg")}</th>
+                              <th>{t("diff")}</th>
+                              <th>{t("percentChange")}</th>
                             </tr>
-                            <tr>
-                              <td>Chilli Red-100g x 60</td>
-                              <td>840.00</td>
-                              <td>840.00</td>
-                              <td>840.00</td>
-                              <td>840.00</td>
-                            </tr>
-                          </tbody>
-                          {/* {orderItem?.map((item) => {
+                            <tbody>
+                              <tr>
+                                <td>Dragon Fruit Red-Kg x 15</td>
+                                <td>1,320.00</td>
+                                <td>1,320.00</td>
+                                <td>1,320.00</td>
+                                <td>1,320.00</td>
+                              </tr>
+                              <tr>
+                                <td>Chilli Red-100g x 60</td>
+                                <td>840.00</td>
+                                <td>840.00</td>
+                                <td>840.00</td>
+                                <td>840.00</td>
+                              </tr>
+                            </tbody>
+                            {/* {orderItem?.map((item) => {
                  return (
                    <tr key={item?.id}>
                     
@@ -5688,629 +6436,456 @@ const CreateClient = () => {
                    
                  );
                })} */}
-                        </table>
+                          </table>
+                        </div>
                       </div>
-                    </div>
-                    <div className="col-lg-6 mb20 ">
-                      <div className="chartConsignee">
-                        <ChartConsi />
+                      <div className="col-lg-6 mb20 ">
+                        <div className="chartConsignee">
+                          <ChartConsi />
+                        </div>
                       </div>
                     </div>
                   </div>
+
+                  <div className="card-footer text-center">
+                    <Link className="btn btn-danger" to="/shipToNew">
+                      {t("close")}
+                    </Link>
+                  </div>
                 </div>
-
-                <div className="card-footer text-center">
-                  <Link className="btn btn-danger" to="/shipToNew">
-                    {t("close")}
-                  </Link>
-                </div>
-              </div>
-              {/* customization */}
-              <div
-                class="tab-pane fade"
-                id="profile-tab-pane"
-                role="tabpanel"
-                aria-labelledby="profile-tab"
-                tabindex="0"
-              >
-                <div className="table-responsive">
-                  <table className="  tableContact striped  table borderTerpProduce">
-                    <tr className="">
-                      <th>{t("itfName")}</th>
-                      <th>{t("customName")}</th>
-                      <th>{t("dummyPrice")}</th>
-                      <th>{t("brand")}</th>
-                      <th>{t("unit")}</th>
-                      <th>{t("barcode")}</th>
-                      <th>{t("action")}</th>
-                    </tr>
-                    {customization?.map((item) => {
-                      return (
-                        <tr>
-                          <td>{item.Name_EN}</td>
-                          <td>{item.Custom_Name}</td>
-                          <td>{item.Dummy_Price}</td>
-                          <td>{item.brand_name}</td>
-                          <td>{item.unit_name}</td>
-                          <td>{item.Barcode}</td>
-                          <td>
-                            <div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleEditClickCustomization(item.Id)
-                                }
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModalCustomizationEdit"
-                              >
-                                <i class="mdi mdi-pencil"></i>
-                              </button>
-                              {/* customixation modal */}
-                              <div
-                                className="modal fade"
-                                id="exampleModalCustomizationEdit"
-                                tabIndex={-1}
-                                aria-labelledby="exampleModalLabel"
-                                aria-hidden="true"
-                              >
-                                <div className=" modal-dialog modalShipTo">
-                                  <div className="modal-content">
-                                    <div className="modal-header">
-                                      <h1
-                                        className="modal-title fs-5"
-                                        id="exampleModalLabel"
-                                      >
-                                        {t("updateCustomization")}
-                                      </h1>
-                                      <button
-                                        type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close"
-                                      >
-                                        <i class="mdi mdi-close"></i>
-                                      </button>
-                                    </div>
-                                    <div className="modal-body">
-                                      <div className="formCreate">
-                                        <div className="row">
-                                          <div className="form-group col-lg-12 mb-2">
-                                            <h6>{t("itfName")}</h6>
-                                            <div className="ceateTransport autoComplete">
-                                              <Autocomplete
-                                                disablePortal
-                                                options={getItf || []}
-                                                getOptionLabel={(option) =>
-                                                  option.ITF_Internal_Name_EN ||
-                                                  ""
-                                                }
-                                                onChange={(e, newValue) =>
-                                                  setDataCustomization(
-                                                    (prevState) => ({
-                                                      ...prevState,
-                                                      ITF: newValue?.ID || "",
-                                                    })
-                                                  )
-                                                }
-                                                value={
-                                                  getItf?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      dataCustomization.ITF
-                                                  ) || null
-                                                }
-                                                sx={{ width: 300 }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t("selectItf")}
-                                                    InputLabelProps={{
-                                                      shrink: false,
-                                                    }}
-                                                  />
-                                                )}
-                                              />
+                {/* customization */}
+                <div
+                  class="tab-pane fade"
+                  id="profile-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="profile-tab"
+                  tabindex="0"
+                >
+                  <div className="table-responsive">
+                    <table className="  tableContact striped  table borderTerpProduce">
+                      <tr className="">
+                        <th>{t("itfName")}</th>
+                        <th>{t("customName")}</th>
+                        <th>{t("dummyPrice")}</th>
+                        <th>{t("brand")}</th>
+                        <th>{t("unit")}</th>
+                        <th>{t("barcode")}</th>
+                        <th>{t("action")}</th>
+                      </tr>
+                      {customization?.map((item) => {
+                        return (
+                          <tr>
+                            <td>{item.Name_EN}</td>
+                            <td>{item.Custom_Name}</td>
+                            <td>{item.Dummy_Price}</td>
+                            <td>{item.brand_name}</td>
+                            <td>{item.unit_name}</td>
+                            <td>{item.Barcode}</td>
+                            <td>
+                              <div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleEditClickCustomization(item.Id)
+                                  }
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#exampleModalCustomizationEdit"
+                                >
+                                  <i class="mdi mdi-pencil"></i>
+                                </button>
+                                {/* customixation modal */}
+                                <div
+                                  className="modal fade"
+                                  id="exampleModalCustomizationEdit"
+                                  tabIndex={-1}
+                                  aria-labelledby="exampleModalLabel"
+                                  aria-hidden="true"
+                                >
+                                  <div className=" modal-dialog modalShipTo">
+                                    <div className="modal-content">
+                                      <div className="modal-header">
+                                        <h1
+                                          className="modal-title fs-5"
+                                          id="exampleModalLabel"
+                                        >
+                                          {t("updateCustomization")}
+                                        </h1>
+                                        <button
+                                          type="button"
+                                          class="btn-close"
+                                          data-bs-dismiss="modal"
+                                          aria-label="Close"
+                                        >
+                                          <i class="mdi mdi-close"></i>
+                                        </button>
+                                      </div>
+                                      <div className="modal-body">
+                                        <div className="formCreate">
+                                          <div className="row">
+                                            <div className="form-group col-lg-12 mb-2">
+                                              <h6>{t("itfName")}</h6>
+                                              <div className="ceateTransport autoComplete">
+                                                <Autocomplete
+                                                  disablePortal
+                                                  options={getItf || []}
+                                                  getOptionLabel={(option) =>
+                                                    option.ITF_Internal_Name_EN ||
+                                                    ""
+                                                  }
+                                                  onChange={(e, newValue) =>
+                                                    setDataCustomization(
+                                                      (prevState) => ({
+                                                        ...prevState,
+                                                        ITF: newValue?.ID || "",
+                                                      })
+                                                    )
+                                                  }
+                                                  value={
+                                                    getItf?.find(
+                                                      (item) =>
+                                                        item.ID ===
+                                                        dataCustomization.ITF
+                                                    ) || null
+                                                  }
+                                                  sx={{ width: 300 }}
+                                                  renderInput={(params) => (
+                                                    <TextField
+                                                      {...params}
+                                                      placeholder={t(
+                                                        "selectItf"
+                                                      )}
+                                                      InputLabelProps={{
+                                                        shrink: false,
+                                                      }}
+                                                    />
+                                                  )}
+                                                />
+                                              </div>
                                             </div>
-                                          </div>
-                                          <div class="form-group col-lg-12">
-                                            <h6>{t("customName")}</h6>
-                                            <div>
-                                              <input
-                                                type="text"
-                                                name="Custom_Name"
-                                                onChange={handleChange2}
-                                                value={
-                                                  dataCustomization.Custom_Name
-                                                }
-                                                placeholder={t("customName")}
-                                                className="mb-2"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-12">
-                                            <h6>{t("agreedPrice")}</h6>
-                                            <div>
-                                              <input
-                                                type="number"
-                                                name="Dummy_Price"
-                                                onChange={handleChange2}
-                                                value={
-                                                  dataCustomization.Dummy_Price
-                                                }
-                                                placeholder={t("agreedPrice")}
-                                              />
-                                            </div>
-                                          </div>
-
-                                          <div className="form-group col-lg-12 ">
-                                            <h6>{t("brand")}</h6>
-                                            <div className="ceateTransport autoComplete">
-                                              <Autocomplete
-                                                options={brands || []} // List of brand options
-                                                getOptionLabel={(option) =>
-                                                  option.Name_EN || ""
-                                                } // Label to display
-                                                onChange={(event, newValue) => {
-                                                  handleChange2({
-                                                    target: {
-                                                      name: "brand",
-                                                      value: newValue
-                                                        ? newValue.ID
-                                                        : "",
-                                                    }, // Update selected brand_id
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectBrand"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  brands?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      dataCustomization.brand
-                                                  ) || null
-                                                } // Set value based on selected brand_id
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.ID === value.ID} // Option comparison
-                                              />
-                                            </div>
-                                          </div>
-
-                                          <div className="form-group col-lg-12 ">
-                                            <h6>{t("unit")}</h6>
-                                            <div className="ceateTransport autoComplete">
-                                              <Autocomplete
-                                                options={unitDropdown || []} // List of ITFs
-                                                getOptionLabel={(option) =>
-                                                  option.Name_EN || ""
-                                                } // Label to display (itf_name_en for each ITF)
-                                                onChange={(event, newValue) => {
-                                                  handleChange2({
-                                                    target: {
-                                                      name: "Unit",
-                                                      value: newValue
-                                                        ? newValue.ID
-                                                        : "",
-                                                    }, // Update ITF in state
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectUnit"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  unitDropdown?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      dataCustomization.Unit
-                                                  ) || null
-                                                } // Set selected value based on ITF
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.ID === value.ID} // Option comparison by itf_id
-                                              />
-                                            </div>
-                                            <div class="form-group col-lg-12 mt-2">
-                                              <h6>{t("barcode")}</h6>
-                                              <div className=" ">
+                                            <div class="form-group col-lg-12">
+                                              <h6>{t("customName")}</h6>
+                                              <div>
                                                 <input
                                                   type="text"
-                                                  name="Barcode"
+                                                  name="Custom_Name"
                                                   onChange={handleChange2}
                                                   value={
-                                                    dataCustomization.Barcode
+                                                    dataCustomization.Custom_Name
                                                   }
-                                                  placeholder={t("barcode")}
+                                                  placeholder={t("customName")}
+                                                  className="mb-2"
                                                 />
+                                              </div>
+                                            </div>
+                                            <div class="form-group col-lg-12">
+                                              <h6>{t("agreedPrice")}</h6>
+                                              <div>
+                                                <input
+                                                  type="number"
+                                                  name="Dummy_Price"
+                                                  onChange={handleChange2}
+                                                  value={
+                                                    dataCustomization.Dummy_Price
+                                                  }
+                                                  placeholder={t("agreedPrice")}
+                                                />
+                                              </div>
+                                            </div>
+
+                                            <div className="form-group col-lg-12 ">
+                                              <h6>{t("brand")}</h6>
+                                              <div className="ceateTransport autoComplete">
+                                                <Autocomplete
+                                                  options={brands || []} // List of brand options
+                                                  getOptionLabel={(option) =>
+                                                    option.Name_EN || ""
+                                                  } // Label to display
+                                                  onChange={(
+                                                    event,
+                                                    newValue
+                                                  ) => {
+                                                    handleChange2({
+                                                      target: {
+                                                        name: "brand",
+                                                        value: newValue
+                                                          ? newValue.ID
+                                                          : "",
+                                                      }, // Update selected brand_id
+                                                    });
+                                                  }}
+                                                  renderInput={(params) => (
+                                                    <TextField
+                                                      {...params}
+                                                      placeholder={t(
+                                                        "selectBrand"
+                                                      )}
+                                                      variant="outlined"
+                                                    />
+                                                  )}
+                                                  value={
+                                                    brands?.find(
+                                                      (item) =>
+                                                        item.ID ===
+                                                        dataCustomization.brand
+                                                    ) || null
+                                                  } // Set value based on selected brand_id
+                                                  isOptionEqualToValue={(
+                                                    option,
+                                                    value
+                                                  ) => option.ID === value.ID} // Option comparison
+                                                />
+                                              </div>
+                                            </div>
+
+                                            <div className="form-group col-lg-12 ">
+                                              <h6>{t("unit")}</h6>
+                                              <div className="ceateTransport autoComplete">
+                                                <Autocomplete
+                                                  options={unitDropdown || []} // List of ITFs
+                                                  getOptionLabel={(option) =>
+                                                    option.Name_EN || ""
+                                                  } // Label to display (itf_name_en for each ITF)
+                                                  onChange={(
+                                                    event,
+                                                    newValue
+                                                  ) => {
+                                                    handleChange2({
+                                                      target: {
+                                                        name: "Unit",
+                                                        value: newValue
+                                                          ? newValue.ID
+                                                          : "",
+                                                      }, // Update ITF in state
+                                                    });
+                                                  }}
+                                                  renderInput={(params) => (
+                                                    <TextField
+                                                      {...params}
+                                                      placeholder={t(
+                                                        "selectUnit"
+                                                      )}
+                                                      variant="outlined"
+                                                    />
+                                                  )}
+                                                  value={
+                                                    unitDropdown?.find(
+                                                      (item) =>
+                                                        item.ID ===
+                                                        dataCustomization.Unit
+                                                    ) || null
+                                                  } // Set selected value based on ITF
+                                                  isOptionEqualToValue={(
+                                                    option,
+                                                    value
+                                                  ) => option.ID === value.ID} // Option comparison by itf_id
+                                                />
+                                              </div>
+                                              <div class="form-group col-lg-12 mt-2">
+                                                <h6>{t("barcode")}</h6>
+                                                <div className=" ">
+                                                  <input
+                                                    type="text"
+                                                    name="Barcode"
+                                                    onChange={handleChange2}
+                                                    value={
+                                                      dataCustomization.Barcode
+                                                    }
+                                                    placeholder={t("barcode")}
+                                                  />
+                                                </div>
                                               </div>
                                             </div>
                                           </div>
                                         </div>
                                       </div>
-                                    </div>
-                                    <div className="modal-footer">
-                                      <button
-                                        type="button "
-                                        onClick={customizationDataSubmit}
-                                        className="btn mb-0 btn-primary"
-                                      >
-                                        {t("update")}
-                                      </button>
+                                      <div className="modal-footer">
+                                        <button
+                                          type="button "
+                                          onClick={customizationDataSubmit}
+                                          className="btn mb-0 btn-primary"
+                                        >
+                                          {t("update")}
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
 
-                              {/* customization modal end */}
-                              <button
-                                type="button"
-                                onClick={() => deleteOrder(item.Id)}
-                              >
-                                <i class="mdi mdi-delete "></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </table>
+                                {/* customization modal end */}
+                                <button
+                                  type="button"
+                                  onClick={() => deleteOrder(item.Id)}
+                                >
+                                  <i class="mdi mdi-delete "></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </table>
+                  </div>
+                  <Link
+                    style={{ width: "100px" }}
+                    className="btn btn-danger mb-4"
+                    to="/"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModalCustomization"
+                  >
+                    {t("add")}
+                  </Link>
+                  {/* customixation modal */}
+
+                  {/* customization modal end */}
                 </div>
-                <Link
-                  style={{ width: "100px" }}
-                  className="btn btn-danger mb-4"
-                  to="/"
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModalCustomization"
-                >
-                  {t("add")}
-                </Link>
-                {/* customixation modal */}
+                {/* notify Section */}
                 <div
-                  className="modal fade"
-                  id="exampleModalCustomization"
-                  tabIndex={-1}
-                  aria-labelledby="exampleModalLabel"
-                  aria-hidden="true"
+                  class="tab-pane fade"
+                  id="notifyNew-pane"
+                  role="tabpanel"
+                  aria-labelledby="notifyNew-tab"
+                  tabindex="0"
                 >
-                  <div className=" modal-dialog  modalShipTo">
-                    <div className="modal-content">
-                      <div className="modal-header">
-                        <h1 className="modal-title fs-5" id="exampleModalLabel">
-                          {t("addCustomization")}
-                        </h1>
-                        <button
-                          type="button"
-                          class="btn-close"
-                          data-bs-dismiss="modal"
-                          aria-label="Close"
-                          onClick={dataClear1}
-                        >
-                          <i class="mdi mdi-close"></i>
-                        </button>
-                      </div>
-                      <div className="modal-body">
-                        <div className="formCreate">
-                          <div className="row">
-                            <div className="form-group col-lg-12 mb-3">
-                              <h6>{t("itfName")}</h6>
-                              <div className="ceateTransport autoComplete">
-                                <Autocomplete
-                                  options={getItf || []}
-                                  getOptionLabel={(option) =>
-                                    option.ITF_Internal_Name_EN || ""
-                                  }
-                                  onChange={(event, newValue) => {
-                                    setDataCustomization((prevState) => ({
-                                      ...prevState,
-                                      ITF: newValue ? newValue.ID : "",
-                                    }));
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder={t("selectItf")}
-                                      variant="outlined"
-                                    />
-                                  )}
-                                  value={
-                                    getItf?.find(
-                                      (item) =>
-                                        item.ID === dataCustomization.ITF
-                                    ) || null
-                                  }
-                                  isOptionEqualToValue={(option, value) =>
-                                    option.ID === value.ID
-                                  }
-                                />
-                              </div>
-                            </div>
-                            <div class="form-group col-lg-12">
-                              <h6>{t("customName")}</h6>
-                              <div className=" ">
-                                <input
-                                  type="text"
-                                  name="Custom_Name"
-                                  onChange={handleChange2}
-                                  value={dataCustomization.Custom_Name}
-                                  placeholder={t("customName")}
-                                />
-                              </div>
-                            </div>
-                            <div class="form-group col-lg-12">
-                              <h6>{t("agreedPrice")}</h6>
-                              <div className=" ">
-                                <input
-                                  type="number"
-                                  name="Dummy_Price"
-                                  onChange={handleChange2}
-                                  value={dataCustomization.Dummy_Price}
-                                  placeholder={t("agreedPrice")}
-                                />
-                              </div>
-                            </div>
-                            <div className="form-group col-lg-12 ">
-                              <h6>{t("brand")}</h6>
-                              <div className="ceateTransport autoComplete">
-                                <Autocomplete
-                                  options={brands || []} // List of brand options
-                                  getOptionLabel={(option) =>
-                                    option.Name_EN || ""
-                                  } // Label to display
-                                  onChange={(event, newValue) => {
-                                    handleChange2({
-                                      target: {
-                                        name: "brand",
-                                        value: newValue ? newValue.ID : "",
-                                      }, // Update selected brand_id
-                                    });
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder={t("selectBrand")}
-                                      variant="outlined"
-                                    />
-                                  )}
-                                  value={
-                                    brands?.find(
-                                      (item) =>
-                                        item.ID === dataCustomization.brand
-                                    ) || null
-                                  } // Set value based on selected brand_id
-                                  isOptionEqualToValue={(option, value) =>
-                                    option.ID === value.ID
-                                  } // Option comparison
-                                />
-                              </div>
-                            </div>
+                  <div className="row formCreate my-3">
+                    <div className="form-group col-lg-6">
+                      <h6>{t("name")}</h6>
+                      <input
+                        type="text"
+                        id="name_en"
+                        className="form-control"
+                        placeholder={t("name")}
+                        value={state.notify_name}
+                        name="notify_name"
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="form-group col-lg-6">
+                      <h6>{t("taxNumber")}</h6>
+                      <input
+                        type="number"
+                        id="name_en"
+                        className="form-control"
+                        placeholder={t("taxNumber")}
+                        value={state.notify_tax_number}
+                        name="notify_tax_number"
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="form-group col-lg-6">
+                      <h6> {t("email")}</h6>
+                      <input
+                        onChange={handleChange}
+                        type="email"
+                        id="hs_name"
+                        className="form-control"
+                        placeholder={t("email")}
+                        value={state.notify_email}
+                        name="notify_email"
+                      />
+                    </div>
+                    <div className="form-group col-lg-6">
+                      <h6>{t("phoneNumber")}</h6>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={t("phoneNumber")}
+                        value={state.notify_phone}
+                        name="notify_phone"
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="form-group col-lg-12">
+                      <h6>{t("address")}</h6>
+                      <textarea
+                        className="col-lg-12 rounded h-20 w-full"
+                        style={{ border: "2px solid #245486" }}
+                        value={state.notify_address}
+                        name="notify_address"
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                </div>
 
-                            <div className="form-group col-lg-12 ">
-                              <h6>{t("unit")}</h6>
-                              <div className="ceateTransport autoComplete">
-                                <Autocomplete
-                                  options={unitDropdown || []} // List of ITFs
-                                  getOptionLabel={(option) =>
-                                    option.Name_EN || ""
-                                  } // Label to display (itf_name_en for each ITF)
-                                  onChange={(event, newValue) => {
-                                    handleChange2({
-                                      target: {
-                                        name: "Unit",
-                                        value: newValue ? newValue.ID : "",
-                                      }, // Update ITF in state
-                                    });
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder={t("selectUnit")}
-                                      variant="outlined"
-                                    />
-                                  )}
-                                  value={
-                                    unitDropdown?.find(
-                                      (item) =>
-                                        item.ID === dataCustomization.Unit
-                                    ) || null
-                                  } // Set selected value based on ITF
-                                  isOptionEqualToValue={(option, value) =>
-                                    option.ID === value.ID
-                                  } // Option comparison by itf_id
-                                />
-                              </div>
-                              <div class="form-group col-lg-12 mt-2">
-                                <h6>{t("barcode")}</h6>
-                                <div className=" ">
-                                  <input
-                                    type="text"
-                                    name="Barcode"
-                                    onChange={handleChange2}
-                                    value={dataCustomization.Barcode}
-                                    placeholder={t("barcode")}
-                                  />
-                                </div>
-                              </div>
-                            </div>
+                {/* accounting */}
+                <div
+                  class="tab-pane fade"
+                  id="contact-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="contact-tab"
+                  tabindex="0"
+                >
+                  <div className="card-footer text-center d-flex justify-content-center flex-wrap">
+                    {/* Button trigger modal */}
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalState"
+                    >
+                      {t("statement")}
+                    </button>
+                    {/* Modal */}
+                    <div
+                      className="modal fade "
+                      id="modalState"
+                      tabIndex={-1}
+                      aria-labelledby="exampleModalLabel"
+                      aria-hidden="true"
+                    >
+                      <div className="modal-dialog modalShipTo">
+                        <div className="modal-content">
+                          <div className="modal-header">
+                            <h1
+                              className="modal-title fs-5"
+                              id="exampleModalLabel"
+                            >
+                              {t("statement")}
+                            </h1>
+                            <button
+                              type="button"
+                              className="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                              onClick={dataClear2}
+                            >
+                              <i className="mdi mdi-close"></i>
+                            </button>
+                          </div>
+                          <div className="modal-body">
+                            <label htmlFor="fromDate">{t("fromDate")}</label>
+                            <input
+                              type="date"
+                              className="form-control"
+                              id="fromDate"
+                              value={fromDate}
+                              onChange={(e) => setFromDate(e.target.value)}
+                            />
+                            <label className="mt-2" htmlFor="toDate">
+                              {t("toDate")}
+                            </label>
+                            <input
+                              type="date"
+                              className="form-control"
+                              id="toDate"
+                              value={toDate}
+                              onChange={(e) => setToDate(e.target.value)}
+                            />
+                          </div>
+                          <div className="modal-footer">
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={handleSubmit}
+                            >
+                              {t("submit")}
+                            </button>
                           </div>
                         </div>
                       </div>
-                      <div className="modal-footer">
-                        <button
-                          type="button "
-                          onClick={submitCusomizationData}
-                          className="btn mb-0 btn-primary"
-                        >
-                          {t("add")}
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* customization modal end */}
-              </div>
-              {/* notify Section */}
-              <div
-                class="tab-pane fade"
-                id="notifyNew-pane"
-                role="tabpanel"
-                aria-labelledby="notifyNew-tab"
-                tabindex="0"
-              >
-                <div className="row formCreate my-3">
-                  <div className="form-group col-lg-6">
-                    <h6>{t("name")}</h6>
-                    <input
-                      type="text"
-                      id="name_en"
-                      className="form-control"
-                      placeholder={t("name")}
-                      value={state.notify_name}
-                      name="notify_name"
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="form-group col-lg-6">
-                    <h6>{t("taxNumber")}</h6>
-                    <input
-                      type="number"
-                      id="name_en"
-                      className="form-control"
-                      placeholder={t("taxNumber")}
-                      value={state.notify_tax_number}
-                      name="notify_tax_number"
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="form-group col-lg-6">
-                    <h6> {t("email")}</h6>
-                    <input
-                      onChange={handleChange}
-                      type="email"
-                      id="hs_name"
-                      className="form-control"
-                      placeholder={t("email")}
-                      value={state.notify_email}
-                      name="notify_email"
-                    />
-                  </div>
-                  <div className="form-group col-lg-6">
-                    <h6>{t("phoneNumber")}</h6>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder={t("phoneNumber")}
-                      value={state.notify_phone}
-                      name="notify_phone"
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="form-group col-lg-12">
-                    <h6>{t("address")}</h6>
-                    <textarea
-                      className="col-lg-12 rounded h-20 w-full"
-                      style={{ border: "2px solid #245486" }}
-                      value={state.notify_address}
-                      name="notify_address"
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* accounting */}
-              <div
-                class="tab-pane fade"
-                id="contact-tab-pane"
-                role="tabpanel"
-                aria-labelledby="contact-tab"
-                tabindex="0"
-              >
-                <div className="card-footer text-center d-flex justify-content-center flex-wrap">
-                  {/* Button trigger modal */}
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalState"
-                  >
-                    {t("statement")}
-                  </button>
-                  {/* Modal */}
-                  <div
-                    className="modal fade "
-                    id="modalState"
-                    tabIndex={-1}
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                  >
-                    <div className="modal-dialog modalShipTo">
-                      <div className="modal-content">
-                        <div className="modal-header">
-                          <h1
-                            className="modal-title fs-5"
-                            id="exampleModalLabel"
-                          >
-                            {t("statement")}
-                          </h1>
-                          <button
-                            type="button"
-                            className="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                            onClick={dataClear2}
-                          >
-                            <i className="mdi mdi-close"></i>
-                          </button>
-                        </div>
-                        <div className="modal-body">
-                          <label htmlFor="fromDate">{t("fromDate")}</label>
-                          <input
-                            type="date"
-                            className="form-control"
-                            id="fromDate"
-                            value={fromDate}
-                            onChange={(e) => setFromDate(e.target.value)}
-                          />
-                          <label className="mt-2" htmlFor="toDate">
-                            {t("toDate")}
-                          </label>
-                          <input
-                            type="date"
-                            className="form-control"
-                            id="toDate"
-                            value={toDate}
-                            onChange={(e) => setToDate(e.target.value)}
-                          />
-                        </div>
-                        <div className="modal-footer">
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={handleSubmit}
-                          >
-                            {t("submit")}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* <div className="paymentSec">
+                    {/* <div className="paymentSec">
                      <button
                        type="button"
                        className="btn btn-danger"
@@ -6611,147 +7186,149 @@ const CreateClient = () => {
                        </div>
                      </div>
                    </div> */}
-                  <div className="paymentSec">
-                    <>
-                      {/* Button trigger modal */}
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalPayment"
-                      >
-                        {t("payment")}
-                      </button>
-                      {/* Modal */}
-                      <div
-                        className="modal fade "
-                        id="modalPayment"
-                        tabIndex={-1}
-                        aria-labelledby="exampleModalLabel"
-                        aria-hidden="true"
-                      >
-                        <div className="modal-dialog modalShipTo  modal-xl">
-                          <div className="modal-content">
-                            <div class="modal-header">
-                              <h1
-                                class="modal-title fs-5"
-                                id="exampleModalLabel"
-                              >
-                                {t("payment")}
-                              </h1>
-                              <button
-                                type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"
-                                onClick={closeData}
-                              >
-                                <i class="mdi mdi-close"></i>
-                              </button>
-                            </div>
-                            <div className="modal-body">
-                              <div className="row">
-                                <div className="col-lg-4">
-                                  <div className="parentFormPayment autoComplete">
-                                    <p>{t("client")}</p>
-                                    <Autocomplete
-                                      options={clients || []}
-                                      getOptionLabel={(option) =>
-                                        option.client_name || ""
-                                      }
-                                      onChange={(event, newValue) =>
-                                        setClientId(
-                                          newValue ? newValue.client_id : ""
-                                        )
-                                      }
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          placeholder={t("selectClient")} // Use placeholder instead of label
-                                          variant="outlined"
-                                        />
-                                      )}
-                                      value={
-                                        Array.isArray(clients)
-                                          ? clients.find(
+                    <div className="paymentSec">
+                      <>
+                        {/* Button trigger modal */}
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalPayment"
+                        >
+                          {t("payment")}
+                        </button>
+                        {/* Modal */}
+                        <div
+                          className="modal fade "
+                          id="modalPayment"
+                          tabIndex={-1}
+                          aria-labelledby="exampleModalLabel"
+                          aria-hidden="true"
+                        >
+                          <div className="modal-dialog modalShipTo  modal-xl">
+                            <div className="modal-content">
+                              <div class="modal-header">
+                                <h1
+                                  class="modal-title fs-5"
+                                  id="exampleModalLabel"
+                                >
+                                  {t("payment")}
+                                </h1>
+                                <button
+                                  type="button"
+                                  class="btn-close"
+                                  data-bs-dismiss="modal"
+                                  aria-label="Close"
+                                  onClick={closeData}
+                                >
+                                  <i class="mdi mdi-close"></i>
+                                </button>
+                              </div>
+                              <div className="modal-body">
+                                <div className="row">
+                                  <div className="col-lg-4">
+                                    <div className="parentFormPayment autoComplete">
+                                      <p>{t("client")}</p>
+                                      <Autocomplete
+                                        options={clients || []}
+                                        getOptionLabel={(option) =>
+                                          option.client_name || ""
+                                        }
+                                        onChange={(event, newValue) =>
+                                          setClientId(
+                                            newValue ? newValue.client_id : ""
+                                          )
+                                        }
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            placeholder={t("selectClient")} // Use placeholder instead of label
+                                            variant="outlined"
+                                          />
+                                        )}
+                                        value={
+                                          Array.isArray(clients)
+                                            ? clients.find(
+                                                (item) =>
+                                                  item.client_id === clientId
+                                              ) || null
+                                            : null
+                                        }
+                                        isOptionEqualToValue={(option, value) =>
+                                          option.client_id === value.client_id
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-4">
+                                    <div className="parentFormPayment autoComplete">
+                                      <p>{t("consignee")}</p>
+                                      <Autocomplete
+                                        options={consignees || []}
+                                        getOptionLabel={(option) =>
+                                          option.consignee_name || ""
+                                        }
+                                        onChange={(event, newValue) =>
+                                          setConsigneeId(
+                                            newValue
+                                              ? newValue.consignee_id
+                                              : ""
+                                          )
+                                        }
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            placeholder={t("selectConsignee")}
+                                            variant="outlined"
+                                          />
+                                        )}
+                                        value={
+                                          consignees.find(
                                             (item) =>
-                                              item.client_id === clientId
+                                              item.consignee_id === consigneeId
                                           ) || null
-                                          : null
-                                      }
-                                      isOptionEqualToValue={(option, value) =>
-                                        option.client_id === value.client_id
-                                      }
-                                    />
+                                        }
+                                        isOptionEqualToValue={(option, value) =>
+                                          option.consignee_id ===
+                                          value.consignee_id
+                                        }
+                                      />
+                                    </div>
                                   </div>
-                                </div>
-                                <div className="col-lg-4">
-                                  <div className="parentFormPayment autoComplete">
-                                    <p>{t("consignee")}</p>
-                                    <Autocomplete
-                                      options={consignees || []}
-                                      getOptionLabel={(option) =>
-                                        option.consignee_name || ""
-                                      }
-                                      onChange={(event, newValue) =>
-                                        setConsigneeId(
-                                          newValue ? newValue.consignee_id : ""
-                                        )
-                                      }
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          placeholder={t("selectConsignee")}
-                                          variant="outlined"
+                                  <div className="col-lg-4">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        <p>{t("paymentDate")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="date"
+                                          value={paymentDate}
+                                          onChange={(e) =>
+                                            setPaymentDate(e.target.value)
+                                          }
                                         />
-                                      )}
-                                      value={
-                                        consignees.find(
-                                          (item) =>
-                                            item.consignee_id === consigneeId
-                                        ) || null
-                                      }
-                                      isOptionEqualToValue={(option, value) =>
-                                        option.consignee_id ===
-                                        value.consignee_id
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      <p>{t("paymentDate")}</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="date"
-                                        value={paymentDate}
-                                        onChange={(e) =>
-                                          setPaymentDate(e.target.value)
-                                        }
-                                      />
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      <p>{t("clientPaymentRef")}</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={clientPaymentRef}
-                                        onChange={(e) =>
-                                          setClientPaymentRef(e.target.value)
-                                        }
-                                      />
+                                  <div className="col-lg-4 mt-3">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        <p>{t("clientPaymentRef")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          value={clientPaymentRef}
+                                          onChange={(e) =>
+                                            setClientPaymentRef(e.target.value)
+                                          }
+                                        />
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  {/* <div className="parentFormPayment">
+                                  <div className="col-lg-4 mt-3">
+                                    {/* <div className="parentFormPayment">
                                      <div>
                                        <p>Payment Channel</p>
                                      </div>
@@ -6765,264 +7342,415 @@ const CreateClient = () => {
                                        />
                                      </div>
                                    </div> */}
-                                  <div className="parentFormPayment autoComplete">
-                                    <p>{t("paymentChannel")}</p>
-                                    <Autocomplete
-                                      options={paymentChannle || []}
-                                      getOptionLabel={(option) =>
-                                        option.bank_name || ""
-                                      }
-                                      onChange={(event, newValue) =>
-                                        setPaymentChannel(
-                                          newValue ? newValue.bank_id : ""
-                                        )
-                                      }
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          placeholder={t(
-                                            "selectPaymentChannel"
-                                          )}
-                                          variant="outlined"
-                                        />
-                                      )}
-                                      value={
-                                        Array.isArray(paymentChannle)
-                                          ? paymentChannle.find(
-                                            (item) =>
-                                              item.bank_id === paymentChannel
-                                          ) || null
-                                          : null
-                                      }
-                                      isOptionEqualToValue={(option, value) =>
-                                        option.bank_id === value.bank_id
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      <p>{t("bankRef")}</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={bankRef}
-                                        onChange={(e) =>
-                                          setBankRef(e.target.value)
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      <p>{t("fxPayment")}</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={fxPayment}
-                                        onChange={(e) =>
-                                          setFxPayment(e.target.value)
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment autoComplete">
-                                    <p>{t("fx")}</p>
-                                    <div>
+                                    <div className="parentFormPayment autoComplete">
+                                      <p>{t("paymentChannel")}</p>
                                       <Autocomplete
-                                        options={currency || []}
+                                        options={paymentChannle || []}
                                         getOptionLabel={(option) =>
-                                          option.currency || ""
+                                          option.bank_name || ""
                                         }
                                         onChange={(event, newValue) =>
-                                          handleCurrencyChange({
-                                            target: {
-                                              value: newValue
-                                                ? newValue.currency_id
-                                                : "",
-                                            },
-                                          })
+                                          setPaymentChannel(
+                                            newValue ? newValue.bank_id : ""
+                                          )
                                         }
                                         renderInput={(params) => (
                                           <TextField
                                             {...params}
-                                            placeholder={t("selectFx")}
+                                            placeholder={t(
+                                              "selectPaymentChannel"
+                                            )}
                                             variant="outlined"
                                           />
                                         )}
                                         value={
-                                          currency?.find(
-                                            (item) => item.currency_id === fxId
-                                          ) || null
+                                          Array.isArray(paymentChannle)
+                                            ? paymentChannle.find(
+                                                (item) =>
+                                                  item.bank_id ===
+                                                  paymentChannel
+                                              ) || null
+                                            : null
                                         }
                                         isOptionEqualToValue={(option, value) =>
-                                          option.currency_id ===
-                                          value.currency_id
+                                          option.bank_id === value.bank_id
                                         }
                                       />
                                     </div>
                                   </div>
-                                </div>
-                                <div className="col-lg-4 mt-3">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      <p>{t("fxRate")}</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={fxRate}
-                                        onChange={(e) =>
-                                          setFxRate(e.target.value)
-                                        }
-                                      />
+                                  <div className="col-lg-4 mt-3">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        <p>{t("bankRef")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          value={bankRef}
+                                          onChange={(e) =>
+                                            setBankRef(e.target.value)
+                                          }
+                                        />
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
+                                  <div className="col-lg-4 mt-3">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        <p>{t("fxPayment")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          value={fxPayment}
+                                          onChange={(e) =>
+                                            setFxPayment(e.target.value)
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-4 mt-3">
+                                    <div className="parentFormPayment autoComplete">
+                                      <p>{t("fx")}</p>
+                                      <div>
+                                        <Autocomplete
+                                          options={currency || []}
+                                          getOptionLabel={(option) =>
+                                            option.currency || ""
+                                          }
+                                          onChange={(event, newValue) =>
+                                            handleCurrencyChange({
+                                              target: {
+                                                value: newValue
+                                                  ? newValue.currency_id
+                                                  : "",
+                                              },
+                                            })
+                                          }
+                                          renderInput={(params) => (
+                                            <TextField
+                                              {...params}
+                                              placeholder={t("selectFx")}
+                                              variant="outlined"
+                                            />
+                                          )}
+                                          value={
+                                            currency?.find(
+                                              (item) =>
+                                                item.currency_id === fxId
+                                            ) || null
+                                          }
+                                          isOptionEqualToValue={(
+                                            option,
+                                            value
+                                          ) =>
+                                            option.currency_id ===
+                                            value.currency_id
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-4 mt-3">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        <p>{t("fxRate")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          value={fxRate}
+                                          onChange={(e) =>
+                                            setFxRate(e.target.value)
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
 
-                                <div className="col-lg-6 mt-3">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      <p>{t("interBankCharges")}</p>
+                                  <div className="col-lg-6 mt-3">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        <p>{t("interBankCharges")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          value={intermittentBankCharges}
+                                          onChange={(e) =>
+                                            setIntermittentBankCharges(
+                                              e.target.value
+                                            )
+                                          }
+                                        />
+                                      </div>
                                     </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={intermittentBankCharges}
-                                        onChange={(e) =>
-                                          setIntermittentBankCharges(
-                                            e.target.value
-                                          )
-                                        }
-                                      />
+                                  </div>
+                                  <div className="col-lg-6 mt-3">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        <p>{t("localBankCharges")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          value={localBankCharges}
+                                          onChange={(e) =>
+                                            setLocalBankCharges(e.target.value)
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6 mt-3">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        <p>{t("thbReceived")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          value={thbReceived}
+                                          onChange={(e) =>
+                                            setThbReceived(e.target.value)
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6 mt-3">
+                                    <div className="parentFormPayment">
+                                      <div>
+                                        {/* <p>Loss/Gain on Exchange Rate</p> */}
+                                        <p>{t("lossGainExchange")}</p>
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          value={lossGainOnExchangeRate}
+                                          onChange={(e) =>
+                                            setLossGainOnExchangeRate(
+                                              e.target.value
+                                            )
+                                          }
+                                        />
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                                <div className="col-lg-6 mt-3">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      <p>{t("localBankCharges")}</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={localBankCharges}
-                                        onChange={(e) =>
-                                          setLocalBankCharges(e.target.value)
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-lg-6 mt-3">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      <p>{t("thbReceived")}</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={thbReceived}
-                                        onChange={(e) =>
-                                          setThbReceived(e.target.value)
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-lg-6 mt-3">
-                                  <div className="parentFormPayment">
-                                    <div>
-                                      {/* <p>Loss/Gain on Exchange Rate</p> */}
-                                      <p>{t("lossGainExchange")}</p>
-                                    </div>
-                                    <div>
-                                      <input
-                                        type="text"
-                                        value={lossGainOnExchangeRate}
-                                        onChange={(e) =>
-                                          setLossGainOnExchangeRate(
-                                            e.target.value
-                                          )
-                                        }
-                                      />
-                                    </div>
+                                <div className="row mt-4">
+                                  <div className="tableCreateClient tablepayment">
+                                    <table>
+                                      <tr>
+                                        <th>{t("check")}</th>
+                                        <th>{t("documentNumber")}</th>
+                                        <th>{t("shipDate")}</th>
+                                        <th>{t("awbNumber")}</th>
+                                        <th>{t("netAmount")}</th>
+                                        <th>{t("amountToPay")}</th>
+                                        <th>{t("paidAmount")}</th>
+                                      </tr>
+                                      {paymentTable1?.map((item) => {
+                                        return (
+                                          <>
+                                            <tr>
+                                              <td>
+                                                <input
+                                                  type="checkbox"
+                                                  checked={
+                                                    !!checkedItems[
+                                                      item.transaction_ref
+                                                    ]
+                                                  }
+                                                  onChange={(e) =>
+                                                    handleCheckboxChange(
+                                                      item.transaction_ref,
+                                                      e.target.checked
+                                                    )
+                                                  }
+                                                />
+                                              </td>
+                                              <td> {item.transaction_ref}</td>
+                                              <td>{formatDate(item.date)}</td>
+                                              <td>{item.bl}</td>
+                                              <td> {item.invoice_amount}</td>
+                                              <td>{item.amount_to_pay}</td>
+                                              <td>
+                                                <input
+                                                  type="number"
+                                                  value={
+                                                    paidAmounts[
+                                                      item.transaction_ref
+                                                    ] || ""
+                                                  }
+                                                  onChange={(e) =>
+                                                    handlePaidAmountChange(
+                                                      item.transaction_ref,
+                                                      e.target.value
+                                                    )
+                                                  }
+                                                />
+                                              </td>
+                                            </tr>
+                                          </>
+                                        );
+                                      })}
+                                    </table>
                                   </div>
                                 </div>
                               </div>
-                              <div className="row mt-4">
-                                <div className="tableCreateClient tablepayment">
-                                  <table>
-                                    <tr>
-                                      <th>{t("check")}</th>
-                                      <th>{t("documentNumber")}</th>
-                                      <th>{t("shipDate")}</th>
-                                      <th>{t("awbNumber")}</th>
-                                      <th>{t("netAmount")}</th>
-                                      <th>{t("amountToPay")}</th>
-                                      <th>{t("paidAmount")}</th>
-                                    </tr>
-                                    {paymentTable1?.map((item) => {
-                                      return (
-                                        <>
-                                          <tr>
-                                            <td>
-                                              <input
-                                                type="checkbox"
-                                                checked={
-                                                  !!checkedItems[
-                                                  item.transaction_ref
-                                                  ]
-                                                }
-                                                onChange={(e) =>
-                                                  handleCheckboxChange(
-                                                    item.transaction_ref,
-                                                    e.target.checked
-                                                  )
-                                                }
-                                              />
-                                            </td>
-                                            <td> {item.transaction_ref}</td>
-                                            <td>{formatDate(item.date)}</td>
-                                            <td>{item.bl}</td>
-                                            <td> {item.invoice_amount}</td>
-                                            <td>{item.amount_to_pay}</td>
-                                            <td>
-                                              <input
-                                                type="number"
-                                                value={
-                                                  paidAmounts[
-                                                  item.transaction_ref
-                                                  ] || ""
-                                                }
-                                                onChange={(e) =>
-                                                  handlePaidAmountChange(
-                                                    item.transaction_ref,
-                                                    e.target.value
-                                                  )
-                                                }
-                                              />
-                                            </td>
-                                          </tr>
-                                        </>
-                                      );
-                                    })}
-                                  </table>
+                              <div className="modal-footer">
+                                <button
+                                  type="button"
+                                  onClick={handleSubmit1}
+                                  className="btn btn-primary"
+                                >
+                                  {t("submit")}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalClaim"
+                      >
+                        {t("claimList")}
+                      </button>
+
+                      <div
+                        className="modal fade"
+                        id="modalClaim"
+                        tabIndex={-1}
+                        aria-labelledby="exampleModalLabel"
+                        aria-hidden="true"
+                      >
+                        <div className="modal-dialog modalShipTo modal-xl">
+                          <div className="modal-content">
+                            <div className="modal-header">
+                              <h1
+                                className="modal-title fs-5"
+                                id="exampleModalLabel"
+                              >
+                                {t("claim")}
+                              </h1>
+                              <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                              >
+                                <i className="mdi mdi-close"></i>
+                              </button>
+                            </div>
+                            <div className="modal-body">
+                              <div className="claimParent">
+                                <div>
+                                  <strong>{t("invoiceNumber")} : </strong>
+                                  <span>INV-202407019</span>
                                 </div>
+                                <div>
+                                  <strong>{t("client")} :</strong>
+                                  <span>Finley DWC-LLC</span>
+                                </div>
+                                <div>
+                                  <strong>{t("shipTo")} :</strong>
+                                  <span> Cape Fresh Industries LLC</span>
+                                </div>
+                                <div>
+                                  <strong>{t("currency")} : </strong>{" "}
+                                  <span>USD</span>
+                                </div>
+                                <div>
+                                  <strong>{t("itemsInfo")} : </strong>{" "}
+                                  <span>USD</span>
+                                </div>
+                                <div>
+                                  <strong>{t("claimDate")}</strong>
+                                  <input type="date" />{" "}
+                                </div>
+                              </div>
+                              <div className="tableClaim">
+                                <table>
+                                  <tr>
+                                    <th className="text-start">{t("itf")}</th>
+                                    <th>{t("brandName")}</th>
+                                    <th>{t("quantity")}</th>
+                                    <th>{t("unit")}</th>
+                                    <th>{t("numberBox")}</th>
+                                    <th>{t("claimQuantity")}</th>
+                                    <th>{t("unit")}</th>
+                                    <th>{t("amount")}</th>
+                                  </tr>
+                                  <tr>
+                                    <td className="text-start">
+                                      {" "}
+                                      Papaya Holland - Kg x 3 (Frutulip)
+                                    </td>
+                                    <td>None</td>
+                                    <td>16.00</td>
+                                    <td>KG</td>
+                                    <td>32.000</td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="text-start">
+                                      Lemongrass - 500g (38cm) x 20 (F) 1,600.00
+                                    </td>
+                                    <td>None</td>
+                                    <td>16.00</td>
+                                    <td>KG</td>
+                                    <td>32.000</td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="text-start">
+                                      Lemongrass - 500g (38cm) x 20 (F) 1,600.00
+                                    </td>
+                                    <td>None</td>
+                                    <td>16.00</td>
+                                    <td>KG</td>
+                                    <td>32.000</td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                    <td>
+                                      <input type="number" />
+                                    </td>
+                                  </tr>
+                                </table>
                               </div>
                             </div>
                             <div className="modal-footer">
                               <button
                                 type="button"
-                                onClick={handleSubmit1}
                                 className="btn btn-primary"
+                                // onClick={handleSubmit}
                               >
                                 {t("submit")}
                               </button>
@@ -7030,390 +7758,421 @@ const CreateClient = () => {
                           </div>
                         </div>
                       </div>
-                    </>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      data-bs-toggle="modal"
-                      data-bs-target="#modalClaim"
-                    >
-                      {t("claimList")}
-                    </button>
-
-                    <div
-                      className="modal fade"
-                      id="modalClaim"
-                      tabIndex={-1}
-                      aria-labelledby="exampleModalLabel"
-                      aria-hidden="true"
-                    >
-                      <div className="modal-dialog modalShipTo modal-xl">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <h1
-                              className="modal-title fs-5"
-                              id="exampleModalLabel"
-                            >
-                              {t("claim")}
-                            </h1>
-                            <button
-                              type="button"
-                              className="btn-close"
-                              data-bs-dismiss="modal"
-                              aria-label="Close"
-                            >
-                              <i className="mdi mdi-close"></i>
-                            </button>
-                          </div>
-                          <div className="modal-body">
-                            <div className="claimParent">
-                              <div>
-                                <strong>{t("invoiceNumber")} : </strong>
-                                <span>INV-202407019</span>
-                              </div>
-                              <div>
-                                <strong>{t("client")} :</strong>
-                                <span>Finley DWC-LLC</span>
-                              </div>
-                              <div>
-                                <strong>{t("shipTo")} :</strong>
-                                <span> Cape Fresh Industries LLC</span>
-                              </div>
-                              <div>
-                                <strong>{t("currency")} : </strong>{" "}
-                                <span>USD</span>
-                              </div>
-                              <div>
-                                <strong>{t("itemsInfo")} : </strong>{" "}
-                                <span>USD</span>
-                              </div>
-                              <div>
-                                <strong>{t("claimDate")}</strong>
-                                <input type="date" />{" "}
-                              </div>
-                            </div>
-                            <div className="tableClaim">
-                              <table>
-                                <tr>
-                                  <th className="text-start">{t("itf")}</th>
-                                  <th>{t("brandName")}</th>
-                                  <th>{t("quantity")}</th>
-                                  <th>{t("unit")}</th>
-                                  <th>{t("numberBox")}</th>
-                                  <th>{t("claimQuantity")}</th>
-                                  <th>{t("unit")}</th>
-                                  <th>{t("amount")}</th>
-                                </tr>
-                                <tr>
-                                  <td className="text-start">
-                                    {" "}
-                                    Papaya Holland - Kg x 3 (Frutulip)
-                                  </td>
-                                  <td>None</td>
-                                  <td>16.00</td>
-                                  <td>KG</td>
-                                  <td>32.000</td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td className="text-start">
-                                    Lemongrass - 500g (38cm) x 20 (F) 1,600.00
-                                  </td>
-                                  <td>None</td>
-                                  <td>16.00</td>
-                                  <td>KG</td>
-                                  <td>32.000</td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td className="text-start">
-                                    Lemongrass - 500g (38cm) x 20 (F) 1,600.00
-                                  </td>
-                                  <td>None</td>
-                                  <td>16.00</td>
-                                  <td>KG</td>
-                                  <td>32.000</td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                  <td>
-                                    <input type="number" />
-                                  </td>
-                                </tr>
-                              </table>
-                            </div>
-                          </div>
-                          <div className="modal-footer">
-                            <button
-                              type="button"
-                              className="btn btn-primary"
-                            // onClick={handleSubmit}
-                            >
-                              {t("submit")}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="statisticsContent">
-                  <div className="row dashCard53 consigneeCard">
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                      <div className="card  ">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            {/* <i className=" material-icons  mdi mdi-package" /> */}
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {consigneeData?.Total_shipments}
+                  <div className="statisticsContent">
+                    <div className="row dashCard53 consigneeCard">
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                        <div className="card  ">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              {/* <i className=" material-icons  mdi mdi-package" /> */}
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {consigneeData?.Total_shipments}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalPayment")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(
+                                  consigneeData?.Total_invoiced_value
+                                )}
+                              </h4>
                             </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalPayment")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer p-3">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +55%
+                              </span>{" "}
+                              {t("totalShipments")}
                             </p>
-                            <h4 className="mb-0">
-                              {formatter.format(
-                                consigneeData?.Total_invoiced_value
-                              )}
-                            </h4>
                           </div>
                         </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer p-3">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +55%
-                            </span>{" "}
-                            {t("totalShipments")}
-                          </p>
-                        </div>
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            {/* <i className=" material-icons mdi mdi-weight-gram" /> */}
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {consigneeData?.Total_Claims}
+                      <div className="col-xl-3 col-sm-6">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              {/* <i className=" material-icons mdi mdi-weight-gram" /> */}
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {consigneeData?.Total_Claims}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalClaims")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(
+                                  consigneeData?.Total_Claims_value
+                                )}{" "}
+                              </h4>
                             </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalClaims")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer p-3">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%
+                              </span>{" "}
+                              {t("thanYesterday")}
                             </p>
-                            <h4 className="mb-0">
-                              {formatter.format(
-                                consigneeData?.Total_Claims_value
-                              )}{" "}
-                            </h4>
                           </div>
                         </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer p-3">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%
-                            </span>{" "}
-                            {t("thanYesterday")}
-                          </p>
-                        </div>
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            {/* <i className=" material-icons mdi mdi-cash" /> */}
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {parseInt(consigneeData?.Average_Payment)}{" "}
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              {/* <i className=" material-icons mdi mdi-cash" /> */}
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {parseInt(consigneeData?.Average_Payment)}{" "}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalPayment")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(
+                                  consigneeData?.Total_payments_value
+                                )}
+                              </h4>
                             </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalPayment")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer p-3">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                -2%
+                              </span>{" "}
+                              {t("thanYesterday")}
                             </p>
-                            <h4 className="mb-0">
-                              {formatter.format(
-                                consigneeData?.Total_payments_value
-                              )}
-                            </h4>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer p-3">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              -2%
-                            </span>{" "}
-                            {t("thanYesterday")}
-                          </p>
                         </div>
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-credit-card-outline" />
+                      <div className="col-xl-3 col-sm-6">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-credit-card-outline" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("pendingPayment")}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(consigneeData?.Balance)}
+                              </h4>
+                            </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("pendingPayment")}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer p-3">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%
+                              </span>{" "}
+                              {t("thanYesterday")}
                             </p>
-                            <h4 className="mb-0">
-                              {formatter.format(consigneeData?.Balance)}
-                            </h4>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer p-3">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%
-                            </span>{" "}
-                            {t("thanYesterday")}
-                          </p>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons mdi mdi-invoice" />
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {/* Total Invoices */}
-                            </p>
-                            <h4 className="mb-0">
-                              {/* {" "}
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons mdi mdi-invoice" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {/* Total Invoices */}
+                              </p>
+                              <h4 className="mb-0">
+                                {/* {" "}
                                {formatter.format(
                                  consigneeData?.Total_invoiced_value
                                )} */}
-                              0
-                            </h4>
+                                0
+                              </h4>
+                            </div>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer p-3">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +3%{" "}
-                            </span>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer p-3">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +3%{" "}
+                              </span>
 
-                            {t("thanLastMonth")}
-                          </p>
+                              {t("thanLastMonth")}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-checkbox-multiple-blank-outline" />
+                      <div className="col-xl-3 col-sm-6">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-checkbox-multiple-blank-outline" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {/* Total Profits */}
+                              </p>
+                              <h4 className="mb-0">0</h4>
+                            </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {/* Total Profits */}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer p-3">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%{" "}
+                              </span>
+                              {t("thanYesterday")}
                             </p>
-                            <h4 className="mb-0">0</h4>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer p-3">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%{" "}
-                            </span>
-                            {t("thanYesterday")}
-                          </p>
                         </div>
                       </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons mdi mdi-air-humidifier" />
+                      <div className="col-xl-3 col-sm-6">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons mdi mdi-air-humidifier" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {/* average Time of Payment{" "} */}
+                              </p>
+                              <h4 className="mb-0">
+                                {formatter.format(
+                                  consigneeData?.Average_Payment
+                                )}{" "}
+                              </h4>
+                            </div>
                           </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {/* average Time of Payment{" "} */}
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer p-3">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                +5%{" "}
+                              </span>
+                              {t("thanYesterday")}
                             </p>
-                            <h4 className="mb-0">
-                              {formatter.format(consigneeData?.Average_Payment)}{" "}
-                            </h4>
                           </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer p-3">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              +5%{" "}
-                            </span>
-                            {t("thanYesterday")}
-                          </p>
                         </div>
                       </div>
                     </div>
                   </div>
+                  <div className="card-footer text-center">
+                    <Link className="btn btn-danger" to="/shipToNew">
+                      {t("close")}
+                    </Link>
+                  </div>
                 </div>
-                <div className="card-footer text-center">
-                  <Link className="btn btn-danger" to="/shipToNew">
-                    {t("close")}
-                  </Link>
+
+                {/* accounting end */}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+      <div
+        className="modal fade"
+        id="exampleModalCustomization"
+        tabIndex={-1}
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className=" modal-dialog  modalShipTo">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">
+                {t("addCustomization")}
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={dataClear1}
+              >
+                <i class="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="formCreate">
+                <div className="row">
+                  <div className="form-group col-lg-12 mb-3">
+                    <h6>{t("itfName")}</h6>
+                    <div className="ceateTransport autoComplete">
+                      <Autocomplete
+                        options={getItf || []}
+                        getOptionLabel={(option) =>
+                          option.ITF_Internal_Name_EN || ""
+                        }
+                        onChange={(event, newValue) => {
+                          setDataCustomization((prevState) => ({
+                            ...prevState,
+                            ITF: newValue ? newValue.ID : "",
+                          }));
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("selectItf")}
+                            variant="outlined"
+                          />
+                        )}
+                        value={
+                          getItf?.find(
+                            (item) => item.ID === dataCustomization.ITF
+                          ) || null
+                        }
+                        isOptionEqualToValue={(option, value) =>
+                          option.ID === value.ID
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <h6>{t("customName")}</h6>
+                    <div className=" ">
+                      <input
+                        type="text"
+                        name="Custom_Name"
+                        onChange={handleChange2}
+                        value={dataCustomization.Custom_Name}
+                        placeholder={t("customName")}
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <h6>{t("agreedPrice")}</h6>
+                    <div className=" ">
+                      <input
+                        type="number"
+                        name="Dummy_Price"
+                        onChange={handleChange2}
+                        value={dataCustomization.Dummy_Price}
+                        placeholder={t("agreedPrice")}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group col-lg-12 ">
+                    <h6>{t("brand")}</h6>
+                    <div className="ceateTransport autoComplete">
+                      <Autocomplete
+                        options={brands || []} // List of brand options
+                        getOptionLabel={(option) => option.Name_EN || ""} // Label to display
+                        onChange={(event, newValue) => {
+                          handleChange2({
+                            target: {
+                              name: "brand",
+                              value: newValue ? newValue.ID : "",
+                            }, // Update selected brand_id
+                          });
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("selectBrand")}
+                            variant="outlined"
+                          />
+                        )}
+                        value={
+                          brands?.find(
+                            (item) => item.ID === dataCustomization.brand
+                          ) || null
+                        } // Set value based on selected brand_id
+                        isOptionEqualToValue={(option, value) =>
+                          option.ID === value.ID
+                        } // Option comparison
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group col-lg-12 ">
+                    <h6>{t("unit")}</h6>
+                    <div className="ceateTransport autoComplete">
+                      <Autocomplete
+                        options={unitDropdown || []} // List of ITFs
+                        getOptionLabel={(option) => option.Name_EN || ""} // Label to display (itf_name_en for each ITF)
+                        onChange={(event, newValue) => {
+                          handleChange2({
+                            target: {
+                              name: "Unit",
+                              value: newValue ? newValue.ID : "",
+                            }, // Update ITF in state
+                          });
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("selectUnit")}
+                            variant="outlined"
+                          />
+                        )}
+                        value={
+                          unitDropdown?.find(
+                            (item) => item.ID === dataCustomization.Unit
+                          ) || null
+                        } // Set selected value based on ITF
+                        isOptionEqualToValue={(option, value) =>
+                          option.ID === value.ID
+                        } // Option comparison by itf_id
+                      />
+                    </div>
+                    <div class="form-group col-lg-12 mt-2">
+                      <h6>{t("barcode")}</h6>
+                      <div className=" ">
+                        <input
+                          type="text"
+                          name="Barcode"
+                          onChange={handleChange2}
+                          value={dataCustomization.Barcode}
+                          placeholder={t("barcode")}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* accounting end */}
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button "
+                onClick={submitCusomizationData}
+                className="btn mb-0 btn-primary"      
+              >
+                {t("add")}
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </Card>
+    </>
   );
 };
 

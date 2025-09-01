@@ -353,14 +353,14 @@ const CombinePayment = () => {
                 </svg>
               </button>
             )}
-              <button
+            <button
               type="button"
               className="SvgAnchor"
               data-bs-toggle="modal"
               data-bs-target="#modalCombine"
               // onClick={() => everyDataSet(a)}
             >
-                <svg
+              <svg
                 className="SvgQuo"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 550.801 550.801"
@@ -395,7 +395,6 @@ const CombinePayment = () => {
                 </g>
               </svg>
             </button>
- 
           </div>
         ),
       },
@@ -474,7 +473,7 @@ const CombinePayment = () => {
   };
   useEffect(() => {
     paymentViewSection();
-  }, []);
+  }, [lastInseartId]);
   useEffect(() => {
     console.log("payableDATA:", payableDATA);
     console.log("roundingAmount:", roundingAmount);
@@ -636,13 +635,23 @@ const CombinePayment = () => {
       <Card
         title={t("combinedPaymentManagement")}
         endElement={
-          <button
-            type="button"
-            onClick={() => navigate("/combinePaymenEdit")}
-            className="btn button btn-info"
-          >
-            {t("create")} 2
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => navigate("/combinePaymenEdit")}
+              className="btn button btn-info"
+            >
+              {t("create")}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/reimburse")}
+              className="btn button btn-info"
+            >
+              {t("reimburse")}
+            </button>
+          </div>
         }
       >
         <TableView columns={columns} data={data} />
@@ -677,37 +686,34 @@ const CombinePayment = () => {
                 <div className="col-lg-9">
                   <div className="row">
                     <div className="col-lg-6">
-                       <div className="parentFormPayment">
-                            <p> {t("paymentDate")}dsd</p>
-                            <DatePicker
-                              selected={
-                                selectedPaymentDate &&
-                                !isNaN(new Date(selectedPaymentDate))
-                                  ? new Date(selectedPaymentDate)
-                                  : null
-                              }
-                              onChange={(date) => {
-                                  const formattedDate =  date
-                            ? `${date.getFullYear()}-${String(
-                                date.getMonth() + 1
-                              ).padStart(2, "0")}-${String(
-                                date.getDate()
-                              ).padStart(2, "0")}`
-                            : null;
- 
-                                setSelectedPaymentDate(formattedDate);
- 
-                                // ✅ trigger API call like before
-                                handlePaymentChange(
-                                  "Payment_Date",
-                                  formattedDate
-                                );
-                              }}
-                              dateFormat="dd/MM/yyyy"
-                              placeholderText="Click to select a date"
-                              customInput={<CustomInput />}
-                            />
-                          </div>
+                      <div className="parentFormPayment">
+                        <p> {t("paymentDate")}dsd</p>
+                        <DatePicker
+                          selected={
+                            selectedPaymentDate &&
+                            !isNaN(new Date(selectedPaymentDate))
+                              ? new Date(selectedPaymentDate)
+                              : null
+                          }
+                          onChange={(date) => {
+                            const formattedDate = date
+                              ? `${date.getFullYear()}-${String(
+                                  date.getMonth() + 1
+                                ).padStart(2, "0")}-${String(
+                                  date.getDate()
+                                ).padStart(2, "0")}`
+                              : null;
+
+                            setSelectedPaymentDate(formattedDate);
+
+                            // ✅ trigger API call like before
+                            handlePaymentChange("Payment_Date", formattedDate);
+                          }}
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="Click to select a date"
+                          customInput={<CustomInput />}
+                        />
+                      </div>
                     </div>
 
                     <div className="col-lg-6">
@@ -771,7 +777,8 @@ const CombinePayment = () => {
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
                         <p>
-                          {t("availableDeposit")} ({depositValue}){" "}
+                          {t("availableDeposit")} (
+                          {Number(depositValue).toFixed(2)})
                         </p>
                         <input
                           type="number"

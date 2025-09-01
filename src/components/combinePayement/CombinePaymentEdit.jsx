@@ -20,7 +20,6 @@ import { useTranslation } from "react-i18next";
 
 const CombinePaymentEdit = () => {
   const [t, i18n] = useTranslation("global");
-
   const [buttonClicked, setButtonClicked] = React.useState(false);
   const location = useLocation();
   const [dropdownItems, setDropdownItems] = useState([]);
@@ -1216,26 +1215,26 @@ const CombinePaymentEdit = () => {
                         <Autocomplete
                           options={
                             recieptDroupDown?.map((item) => ({
-                              id: item.VendorID,
-                              name: item.Payor,
+                              id: item.ID, // ✅ API gives ID
+                              name: item.Name, // ✅ API gives Name
                             })) || []
                           }
                           getOptionLabel={(option) => option.name || ""}
                           value={
                             recieptDroupDown
                               ?.map((item) => ({
-                                id: item.VendorID,
-                                name: item.Payor,
+                                id: item.ID,
+                                name: item.Name,
                               }))
                               .find(
                                 (option) => option.id === state.vendor_id
-                              ) || null
+                              ) || null // ✅ match by ID
                           }
                           onChange={(e, newValue) => {
                             setState({
                               ...state,
-                              vendor_id: newValue?.id || "",
-                              vendor_name: newValue?.name || "",
+                              vendor_id: newValue?.id || "", // ✅ store ID
+                              vendor_name: newValue?.name || "", // ✅ store Name (optional)
                             });
                           }}
                           sx={{ width: 300 }}

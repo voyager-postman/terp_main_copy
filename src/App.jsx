@@ -6,6 +6,7 @@ import "./App.css";
 import BillingNote from "./components/Orders/BillingNote";
 import { IsLoginAuthenticateContext } from "./Contexts/LoginContext";
 import PrivateRoute from "./PrivateRoute";
+import Reimburse from "./components/combinePayement/Reimburse";
 import Trends from "./components/Packing/Trends";
 import ConsigneeDashthree from "./components/ClientManageMent/ConsigneeDashthree";
 import Asll from "./components/Asl/Asll";
@@ -466,6 +467,7 @@ function App() {
                   path="/updatePurchaseOrder"
                   element={<CreatePurchaseOrder />}
                 />
+                <Route path="/reimburse" element={<Reimburse />} />
                 <Route path="/debitnote" element={<DebitNotes />} />
                 <Route path="/hplNew" element={<HplNew />} />
                 <Route path="/currencyex" element={<CurrencyExchange />} />
@@ -488,10 +490,7 @@ function App() {
                   path="/combinePaymentView"
                   element={<CombinePaymentView />}
                 />
-                <Route
-                  path="/billingNoteView"
-                  element={<BillingNoteView />}
-                />
+                <Route path="/billingNoteView" element={<BillingNoteView />} />
                 <Route
                   path="/combinePaymenEdit"
                   element={<CombinePaymentEdit />}

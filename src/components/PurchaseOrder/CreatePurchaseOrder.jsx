@@ -1975,37 +1975,34 @@ const CreatePurchaseOrder = () => {
                 <div className="col-lg-9">
                   <div className="row">
                     <div className="col-lg-6">
-                     <div className="parentFormPayment">
-                            <p> {t("paymentDate")}</p>
-                            <DatePicker
-                              selected={
-                                selectedPaymentDate &&
-                                !isNaN(new Date(selectedPaymentDate))
-                                  ? new Date(selectedPaymentDate)
-                                  : null
-                              }
-                              onChange={(date) => {
-                                  const formattedDate =  date
-                            ? `${date.getFullYear()}-${String(
-                                date.getMonth() + 1
-                              ).padStart(2, "0")}-${String(
-                                date.getDate()
-                              ).padStart(2, "0")}`
-                            : null;
- 
-                                setSelectedPaymentDate(formattedDate);
- 
-                                // ✅ trigger API call like before
-                                handlePaymentChange(
-                                  "Payment_Date",
-                                  formattedDate
-                                );
-                              }}
-                              dateFormat="dd/MM/yyyy"
-                              placeholderText="Click to select a date"
-                              customInput={<CustomInput />}
-                            />
-                          </div>
+                      <div className="parentFormPayment">
+                        <p> {t("paymentDate")}</p>
+                        <DatePicker
+                          selected={
+                            selectedPaymentDate &&
+                            !isNaN(new Date(selectedPaymentDate))
+                              ? new Date(selectedPaymentDate)
+                              : null
+                          }
+                          onChange={(date) => {
+                            const formattedDate = date
+                              ? `${date.getFullYear()}-${String(
+                                  date.getMonth() + 1
+                                ).padStart(2, "0")}-${String(
+                                  date.getDate()
+                                ).padStart(2, "0")}`
+                              : null;
+
+                            setSelectedPaymentDate(formattedDate);
+
+                            // ✅ trigger API call like before
+                            handlePaymentChange("Payment_Date", formattedDate);
+                          }}
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="Click to select a date"
+                          customInput={<CustomInput />}
+                        />
+                      </div>
                     </div>
 
                     <div className="col-lg-6">
@@ -2070,7 +2067,8 @@ const CreatePurchaseOrder = () => {
                       <div className="parentFormPayment">
                         <p>
                           {" "}
-                          {t("availableDeposit")} ({depositValue})
+                          {t("availableDeposit")} (
+                          {Number(depositValue).toFixed(2)})
                         </p>
                         <input
                           type="number"

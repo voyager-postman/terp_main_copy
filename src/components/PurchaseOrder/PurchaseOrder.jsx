@@ -925,182 +925,6 @@ const PurchaseOrder = () => {
     everyDataSet1();
   }, [responceId]);
 
-  // const everyDataSet = async (a) => {
-  //   console.log(a);
-  //   setHasUserChangedValues(false); // reset change flag
-  //   setSinglePodId(a);
-  //   if (a?.PO_ID) {
-  //     axios
-  //       .get(`${API_BASE_URL}/getPurchaseOrderDetails?po_id=${a?.PO_ID}`)
-  //       .then((response) => {
-  //         console.log(response);
-
-  //         setDepositAvailableNew(response?.data?.data1?.Available_deposit);
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //       });
-  //   }
-
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_BASE_URL}/GetRightTotalBeforTaxPOPayment`,
-  //       {
-  //         PO_ID: a?.PO_ID,
-  //       }
-  //     );
-  //     console.log(response);
-  //     setPaymentAmmountNew(response?.data?.left_pay - depositAvailableNew);
-  //     setProcesureResult(response?.data?.procedure_result);
-  //     setAmountToPayNew(response?.data?.procedure_result?.["Amount to Pay"]);
-  //     newDepositUsedNew(response?.data?.procedure_result?.Deposit);
-  //     setVatNew(response?.data?.procedure_result?.VAT);
-  //     setWhtNew(response?.data?.procedure_result?.WHT);
-  //     setLeftRoundingNew(response?.data?.procedure_result?.Rounding);
-  //   } catch (error) {
-  //     console.error("Error fetching orders:", error);
-  //   }
-  // };
-  // const everyDataSet = async (a) => {
-  //   console.log(a);
-  //   setHasUserChangedValues(false); // reset change flag
-  //   setSinglePodId(a);
-
-  //   let deposit = 0;
-
-  //   if (a?.PO_ID) {
-  //     try {
-  //       const accessResponse = await axios.post(
-  //         `${API_BASE_URL}/Checkeaccessfile`,
-  //         {
-  //           id: a.PO_ID,
-  //           accesstype: 1, // Mark as in use
-  //         }
-  //       );
-  //       console.log(accessResponse);
-  //       if (accessResponse?.data?.success) {
-  //         const res1 = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, {
-  //           PO_ID: a?.PO_ID,
-  //           CPN: a?.CPN,
-  //           User_ID: localStorage.getItem("id"),
-  //         });
-  //         console.log(res1);
-  //         setLastInseartId(res1?.data?.data?.last_insert_id);
-
-  //         const modal = new bootstrap.Modal(
-  //           document.getElementById("modalCombine")
-  //         );
-  //         modal.show();
-  //       } else {
-  //         toast.warning(accessResponse?.data?.message);
-  //       }
-  //     } catch (error) {
-  //       console.log("Error fetching deposit:", error);
-  //     }
-  //   }
-  // };
-  // const everyDataSet = async (a) => {
-  //   console.log(a);
-  //   setHasUserChangedValues(false);
-  //   setSinglePodId(a);
-
-  //   if (a?.PO_ID) {
-  //     try {
-  //       const accessResponse = await axios.post(
-  //         `${API_BASE_URL}/Checkeaccessfile`,
-  //         {
-  //           id: a.PO_ID,
-  //           accesstype: 1, // lock immediately
-  //         }
-  //       );
-
-  //       if (accessResponse?.data?.success) {
-  //         // ✅ show modal immediately after access is granted
-  //         const modal = new bootstrap.Modal(
-  //           document.getElementById("modalCombine")
-  //         );
-  //         modal.show();
-
-  //         // 🔄 run EXPPaymentStep1 in background
-  //         axios
-  //           .post(`${API_BASE_URL}/EXPPaymentStep1`, {
-  //             PO_ID: a?.PO_ID,
-  //             CPN: a?.CPN,
-  //             User_ID: localStorage.getItem("id"),
-  //           })
-  //           .then((res1) => {
-  //             console.log(res1);
-  //             setLastInseartId(res1?.data?.data?.last_insert_id);
-  //             paymentViewSection();
-  //           })
-  //           .catch((err) => {
-  //             console.error("Error in EXPPaymentStep1:", err);
-  //             toast.error("Failed to initialize payment step");
-  //           });
-  //       } else {
-  //         toast.warning(accessResponse?.data?.message);
-  //       }
-  //     } catch (error) {
-  //       console.log("Error fetching deposit:", error);
-  //     }
-  //   }
-  // };
-  // const everyDataSet = async (a) => {
-  //   console.log(a);
-  //   setHasUserChangedValues(false);
-  //   setSinglePodId(a);
-
-  //   if (a?.PO_ID) {
-  //     try {
-  //       const accessResponse = await axios.post(
-  //         `${API_BASE_URL}/Checkeaccessfile`,
-  //         {
-  //           id: a.PO_ID,
-  //           accesstype: 1, // lock immediately
-  //         }
-  //       );
-
-  //       if (accessResponse?.data?.success) {
-  //         // ✅ fetch order details
-  //         const res1 = await axios.get(
-  //           `${API_BASE_URL}/getPurchaseOrderDetails?po_id=${a?.PO_ID}`
-  //         );
-  //         console.log(res1);
-
-  //         const deposit = res1?.data?.data1?.Available_deposit || 0;
-  //         setDepositAvailableNew(deposit);
-
-  //         // ✅ show modal immediately after access is granted
-  //         const modal = new bootstrap.Modal(
-  //           document.getElementById("modalCombine")
-  //         );
-  //         modal.show();
-
-  //         // 🔄 run EXPPaymentStep1 in background
-  //         axios
-  //           .post(`${API_BASE_URL}/EXPPaymentStep1`, {
-  //             PO_ID: a?.PO_ID,
-  //             CPN: a?.CPN,
-  //             User_ID: localStorage.getItem("id"),
-  //           })
-  //           .then((res1) => {
-  //             console.log(res1);
-  //             setLastInseartId(res1?.data?.data?.last_insert_id);
-  //             paymentViewSection();
-  //           })
-  //           .catch((err) => {
-  //             console.error("Error in EXPPaymentStep1:", err);
-  //             toast.error("Failed to initialize payment step");
-  //           });
-  //       } else {
-  //         toast.warning(accessResponse?.data?.message);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching deposit:", error);
-  //       toast.error("Something went wrong while fetching data");
-  //     }
-  //   }
-  // };
   const everyDataSet = async (a) => {
     if (loadingAccess) return; // ✅ prevent double call
     setLoadingAccess(true);
@@ -1260,7 +1084,7 @@ const PurchaseOrder = () => {
 
   useEffect(() => {
     paymentViewSection();
-  }, []);
+  }, [lastInseartId]);
   const claimDetails = async (po_id, a) => {
     console.log(a);
     setClaimPageData(a);
@@ -3527,40 +3351,6 @@ const PurchaseOrder = () => {
 
               {a.Payment_Status === 1 &&
                 (a.Receiving_Status === 1 || a.Receiving_Status === 2) && (
-                  // <button
-                  //   onClick={async () => {
-                  //     try {
-                  //       const res = await axios.post(
-                  //         `${API_BASE_URL}/Checkeaccessfile`,
-                  //         {
-                  //           id: a.PO_ID,
-                  //           accesstype: 1, // Mark as in use
-                  //           edit: 1,
-                  //         }
-                  //       );
-
-                  //       if (res?.data?.success) {
-                  //         navigate("/updatePurchaseOrder", {
-                  //           state: { from: a },
-                  //         });
-                  //       } else {
-                  //         toast.warning(res?.data?.message);
-                  //       }
-                  //     } catch (error) {
-                  //       console.error("Access API error:", error);
-                  //       toast.error(
-                  //         "Something went wrong while checking file access."
-                  //       );
-                  //     }
-                  //   }}
-                  //   style={{
-                  //     background: "none",
-                  //     border: "none",
-                  //     cursor: "pointer",
-                  //   }}
-                  // >
-                  //   <i className="mdi mdi-pencil pl-2" />
-                  // </button>
                   <button
                     onClick={async () => {
                       try {
@@ -3665,8 +3455,6 @@ const PurchaseOrder = () => {
                 <button
                   type="button"
                   className="SvgAnchor"
-                  // data-bs-toggle="modal"
-                  // data-bs-target="#modalCombine"
                   onClick={() => {
                     everyDataSet(a);
                   }}
@@ -4433,7 +4221,7 @@ const PurchaseOrder = () => {
                     <div className="col-lg-9">
                       <div className="row">
                         <div className="col-lg-6">
-                           <div className="parentFormPayment">
+                          <div className="parentFormPayment">
                             <p> {t("paymentDate")}</p>
                             <DatePicker
                               selected={
@@ -4443,16 +4231,16 @@ const PurchaseOrder = () => {
                                   : null
                               }
                               onChange={(date) => {
-                                  const formattedDate =  date
-                            ? `${date.getFullYear()}-${String(
-                                date.getMonth() + 1
-                              ).padStart(2, "0")}-${String(
-                                date.getDate()
-                              ).padStart(2, "0")}`
-                            : null;
- 
+                                const formattedDate = date
+                                  ? `${date.getFullYear()}-${String(
+                                      date.getMonth() + 1
+                                    ).padStart(2, "0")}-${String(
+                                      date.getDate()
+                                    ).padStart(2, "0")}`
+                                  : null;
+
                                 setSelectedPaymentDate(formattedDate);
- 
+
                                 // ✅ trigger API call like before
                                 handlePaymentChange(
                                   "Payment_Date",
@@ -4528,7 +4316,8 @@ const PurchaseOrder = () => {
                           <div className="parentFormPayment">
                             <p>
                               {" "}
-                              {t("availableDeposit")} ({depositValue})
+                              {t("availableDeposit")}(
+                              {Number(depositValue).toFixed(2)})
                             </p>
                             <input
                               type="number"

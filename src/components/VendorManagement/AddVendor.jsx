@@ -491,7 +491,7 @@ const AddVendor = () => {
                           <div className="formCreate">
                             <form action="">
                               <div className="row">
-                                <div class="form-group col-lg-4">
+                                <div class="form-group col-lg-2">
                                   <h6>First Name</h6>
                                   <div class=" ">
                                     <input
@@ -503,7 +503,7 @@ const AddVendor = () => {
                                     />
                                   </div>
                                 </div>
-                                <div class="form-group col-lg-4">
+                                <div class="form-group col-lg-2">
                                   <h6>Last Name</h6>
                                   <div class=" ">
                                     <input
@@ -515,7 +515,7 @@ const AddVendor = () => {
                                     />
                                   </div>
                                 </div>
-                                <div class="form-group col-lg-4">
+                                <div class="form-group col-lg-3">
                                   <h6>Email</h6>
                                   <div class=" ">
                                     <input
@@ -527,7 +527,7 @@ const AddVendor = () => {
                                     />
                                   </div>
                                 </div>
-                                <div class="form-group col-lg-3">
+                                <div class="form-group col-lg-2">
                                   <h6>Mobile</h6>
                                   <div class=" ">
                                     <input
@@ -585,6 +585,30 @@ const AddVendor = () => {
                                 </div>
                                 <div class="form-group col-lg-3">
                                   <h6>Messenger Id</h6>
+                                  <div class=" ">
+                                    <input
+                                      type="number"
+                                      name="Messenger_ID"
+                                      value={state1.Messenger_ID}
+                                      onChange={handleChange1}
+                                      placeholder="messenger id"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="form-group col-lg-3">
+                                   <h6> Position </h6>
+                                  <div class=" ">
+                                    <input
+                                      type="number"
+                                      name="Messenger_ID"
+                                      value={state1.Messenger_ID}
+                                      onChange={handleChange1}
+                                      placeholder="messenger id"
+                                    />
+                                  </div>
+                                </div>
+                                 <div class="form-group col-lg-3">
+                                  <h6>Title</h6>  
                                   <div class=" ">
                                     <input
                                       type="number"
