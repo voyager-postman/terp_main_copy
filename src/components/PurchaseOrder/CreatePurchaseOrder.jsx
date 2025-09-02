@@ -214,7 +214,7 @@ const CreatePurchaseOrder = () => {
         if (res?.data?.success) {
           toast.success(res?.data?.message || "Field updated successfully ✅");
         }
-
+        refreshDepositValue(singleDataSet1);
         paymentViewSection();
       })
       .catch((err) => {
@@ -753,6 +753,7 @@ const CreatePurchaseOrder = () => {
     // ✅ Otherwise proceed (both filled)
     setModalOne(true);
   };
+
   const updateDataPayNow = async () => {
     try {
       const response = await axios.post(
@@ -823,6 +824,20 @@ const CreatePurchaseOrder = () => {
       });
     }
   };
+  const refreshDepositValue = async (poId) => {
+    try {
+      const res1 = await axios.get(
+        `${API_BASE_URL}/getPurchaseOrderDetails?po_id=${poId}`
+      );
+      console.log("🔄 Refreshed Deposit:", res1);
+
+      const deposit = res1?.data?.data1?.Available_deposit || 0;
+      setDepositValue(deposit);
+    } catch (error) {
+      console.error("❌ Failed to refresh deposit:", error);
+    }
+  };
+
   const deleteOrderWithPayment = async () => {
     if (!singleDataSet) {
       toast.error(t("deleteError"));
@@ -2066,10 +2081,10 @@ const CreatePurchaseOrder = () => {
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
                         <p>
-                          {" "}
                           {t("availableDeposit")} (
-                          {Number(depositValue).toFixed(2)})
+                          {formatterTwo.format(Number(depositValue))})
                         </p>
+
                         <input
                           type="number"
                           value={depositAvailableNew}

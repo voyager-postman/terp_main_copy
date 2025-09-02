@@ -1110,5 +1110,6 @@
   "BankDetails": "รายละเอียดธนาคาร",
   "Entity": "นิติบุคคล",
   "SelectEntity": "เลือกนิติบุคคล",
-  "add_consignee": "เพิ่มผู้รับสินค้า"
+  "add_consignee": "เพิ่มผู้รับสินค้า",
+  "updateConsignee": "อัปเดตผู้รับสินค้า"
 }

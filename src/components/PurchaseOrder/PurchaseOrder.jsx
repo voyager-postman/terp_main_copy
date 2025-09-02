@@ -1040,7 +1040,7 @@ const PurchaseOrder = () => {
         if (res?.data?.success) {
           toast.success(res?.data?.message || "Field updated successfully ✅");
         }
-
+        refreshDepositValue(singlePodId?.PO_ID);
         paymentViewSection();
       })
       .catch((err) => {
@@ -1079,6 +1079,19 @@ const PurchaseOrder = () => {
         });
     } catch (err) {
       console.error("Unexpected error ❌", err);
+    }
+  };
+  const refreshDepositValue = async (poId) => {
+    try {
+      const res1 = await axios.get(
+        `${API_BASE_URL}/getPurchaseOrderDetails?po_id=${poId}`
+      );
+      console.log("🔄 Refreshed Deposit:", res1);
+
+      const deposit = res1?.data?.data1?.Available_deposit || 0;
+      setDepositValue(deposit);
+    } catch (error) {
+      console.error("❌ Failed to refresh deposit:", error);
     }
   };
 
@@ -1786,71 +1799,76 @@ const PurchaseOrder = () => {
         );
         doc.text(
           `${response?.data.section4_Values?.Col1 || ""}`,
-          22,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Labels?.Col2 || ""}`,
-          54,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Values?.Col2 || ""}`,
-          67,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Labels?.Col3 || ""}`,
-          96,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Values?.Col3 || ""}`,
-          115,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Labels?.Col4 || ""}`,
-          146,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Values?.Col4 || ""}`,
-          158,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Labels?.Col5 || ""}`,
-          188,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Values?.Col5 || ""}`,
-          206,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Labels?.Col6 || ""}`,
-          238,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Values?.Col6 || ""}`,
-          258,
-          startY + 5
-        );
-        doc.text(
-          `${response?.data.section4_Labels?.Col7 || ""}`,
           7,
           startY + 10
         );
         doc.text(
+          `${response?.data.section4_Labels?.Col2 || ""}`,
+          55,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col2 || ""}`,
+          55,
+          startY + 10
+        );
+
+        doc.text(
+          `${response?.data.section4_Labels?.Col3 || ""}`,
+          98,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col3 || ""}`,
+          98,
+          startY + 10
+        );
+
+        doc.text(
+          `${response?.data.section4_Labels?.Col4 || ""}`,
+          141,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col4 || ""}`,
+          141,
+          startY + 10
+        );
+
+        doc.text(
+          `${response?.data.section4_Labels?.Col5 || ""}`,
+          184,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col5 || ""}`,
+          184,
+          startY + 10
+        );
+
+        doc.text(
+          `${response?.data.section4_Labels?.Col6 || ""}`,
+          227,
+          startY + 5
+        );
+        doc.text(
+          `${response?.data.section4_Values?.Col6 || ""}`,
+          227,
+          startY + 10
+        );
+
+        doc.text(
+          `${response?.data.section4_Labels?.Col7 || ""}`,
+          270,
+          startY + 5
+        );
+        doc.text(
           `${response?.data.section4_Values?.Col7 || ""}`,
-          22,
+          270,
           startY + 10
         );
         await addLogoWithDetails();
-        let yTop = startY + 13;
+        let yTop = startY + 15;
 
         doc.autoTable({
           head: [headers],
@@ -1993,69 +2011,69 @@ const PurchaseOrder = () => {
         );
         doc.text(
           `${response?.data.section8_Values.Col1 || ""}`,
-          24,
-          finalY + 36
-        );
-        doc.text(
-          `${response?.data.section8_Labels.Col2 || ""}`,
-          58,
-          finalY + 36
-        );
-        doc.text(
-          `${response?.data.section8_Values.Col2 || ""}`,
-          71,
-          finalY + 36
-        );
-        doc.text(
-          `${response?.data.section8_Labels.Col3 || ""}`,
-          100,
-          finalY + 36
-        );
-        doc.text(
-          `${response?.data.section8_Values.Col3 || ""}`,
-          119,
-          finalY + 36
-        );
-        doc.text(
-          `${response?.data.section8_Labels.Col4 || ""}`,
-          150,
-          finalY + 36
-        );
-        doc.text(
-          `${response?.data.section8_Values.Col4 || ""}`,
-          162,
-          finalY + 36
-        );
-        doc.text(
-          `${response?.data.section8_Labels.Col5 || ""}`,
           7,
           finalY + 41
         );
         doc.text(
+          `${response?.data.section8_Labels.Col2 || ""}`,
+          55,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col2 || ""}`,
+          55,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section8_Labels.Col3 || ""}`,
+          98,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col3 || ""}`,
+          98,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section8_Labels.Col4 || ""}`,
+          141,
+          finalY + 36
+        );
+        doc.text(
+          `${response?.data.section8_Values.Col4 || ""}`,
+          141,
+          finalY + 41
+        );
+        doc.text(
+          `${response?.data.section8_Labels.Col5 || ""}`,
+          184,
+          finalY + 36
+        );
+        doc.text(
           `${response?.data.section8_Values.Col5 || ""}`,
-          24,
+          184,
           finalY + 41
         );
         doc.text(
           `${response?.data.section8_Labels.Col6 || ""}`,
-          58,
-          finalY + 41
+          227,
+          finalY + 36
         );
         doc.text(
           `${response?.data.section8_Values.Col6 || ""}`,
-          75,
+          227,
           finalY + 41
         );
 
         // Row7 key is mismatched with value Col7, but we’ll assume Col7 is correct
         doc.text(
           `${response?.data.section8_Labels.Row7 || ""}`,
-          100,
-          finalY + 41
+          270,
+          finalY + 36
         );
         doc.text(
           `${response?.data.section8_Values.Col7 || ""}`,
-          119,
+          270,
           finalY + 41
         );
         // page number
@@ -4316,8 +4334,8 @@ const PurchaseOrder = () => {
                           <div className="parentFormPayment">
                             <p>
                               {" "}
-                              {t("availableDeposit")}(
-                              {Number(depositValue).toFixed(2)})
+                              {t("availableDeposit")} (
+                              {formatterTwo.format(Number(depositValue))})
                             </p>
                             <input
                               type="number"

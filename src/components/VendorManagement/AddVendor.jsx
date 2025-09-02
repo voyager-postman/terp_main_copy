@@ -603,7 +603,7 @@ const AddVendor = () => {
                                       name="Messenger_ID"
                                       value={state1.Messenger_ID}
                                       onChange={handleChange1}
-                                      placeholder="messenger id"
+                                      placeholder="position"
                                     />
                                   </div>
                                 </div>
@@ -615,7 +615,7 @@ const AddVendor = () => {
                                       name="Messenger_ID"
                                       value={state1.Messenger_ID}
                                       onChange={handleChange1}
-                                      placeholder="messenger id"
+                                      placeholder="Title"
                                     />
                                   </div>
                                 </div>

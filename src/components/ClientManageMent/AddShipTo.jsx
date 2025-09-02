@@ -4149,7 +4149,7 @@ const AddShipTo = () => {
                                       name="Messenger_ID"
                                       value={state1.Messenger_ID}
                                       onChange={handleChange1}
-                                      placeholder="messenger id"
+                                      placeholder="Position"
                                     />
                                   </div>
                                 </div>
@@ -4161,7 +4161,7 @@ const AddShipTo = () => {
                                       name="Messenger_ID"
                                       value={state1.Messenger_ID}
                                       onChange={handleChange1}
-                                      placeholder="messenger id"
+                                      placeholder="Title"
                                     />
                                   </div>
                                 </div>

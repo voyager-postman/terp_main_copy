@@ -446,12 +446,27 @@ const CombinePayment = () => {
         if (res?.data?.success) {
           toast.success(res?.data?.message || "Field updated successfully ✅");
         }
-
+        refreshDepositValue(singlePodId?.ID);
         paymentViewSection();
       })
       .catch((err) => {
         console.error(`❌ Failed to update ${field}:`, err);
       });
+  };
+  const refreshDepositValue = async (poId) => {
+    try {
+      const detailsRes = await axios.get(
+        `${API_BASE_URL}/GetCombinedPaymentByID`,
+        {
+          params: { cpn_id: poId },
+        }
+      );
+      console.log("Order details:", detailsRes);
+      const deposit = detailsRes.data.cpn_data?.Available_deposit || 0;
+      setDepositValue(deposit);
+    } catch (error) {
+      console.error("❌ Failed to refresh deposit:", error);
+    }
   };
   const paymentViewSection = () => {
     axios
@@ -483,36 +498,80 @@ const CombinePayment = () => {
       (Number(payableDATA) || 0) - (Number(depositAvailable) || 0)
     );
   }, [payableDATA, depositAvailable]);
+  // const everyDataSet = async (a) => {
+  //   // setDepositAvailableNew(a?.Available_deposit);
+  //   setDepositValue(a?.Available_deposit);
+  //   console.log("everyDataSet called with:", a);
+
+  //   try {
+  //     setHasUserChangedValues(false);
+  //     setSinglePodId(a);
+
+  //     const payload = {
+  //       PO_ID: a?.PO_ID,
+  //       CPN: a?.ID, // ✅ use correct field
+  //       User_ID: localStorage.getItem("id"),
+  //     };
+
+  //     console.log("Payload sent:", payload);
+
+  //     const res1 = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, payload);
+
+  //     console.log("EXPPaymentStep1 response:", res1.data);
+
+  //     if (res1?.data?.success) {
+  //       const newId = res1?.data?.data?.last_insert_id;
+
+  //       setLastInseartId(newId);
+
+  //       paymentViewSection();
+  //     }
+  //   } catch (err) {
+  //     console.error("Error in EXPPaymentStep1:", err);
+  //   }
+  // };
   const everyDataSet = async (a) => {
-    // setDepositAvailableNew(a?.Available_deposit);
-    setDepositValue(a?.Available_deposit);
     console.log("everyDataSet called with:", a);
 
     try {
+      const detailsRes = await axios.get(
+        `${API_BASE_URL}/GetCombinedPaymentByID`,
+        {
+          params: { cpn_id: a.ID },
+        }
+      );
+      console.log("Order details:", detailsRes);
+      const deposit = detailsRes.data.cpn_data?.Available_deposit || 0;
+      setDepositValue(deposit); // ✅ only set from API
+
+      // Reset flags and state
       setHasUserChangedValues(false);
       setSinglePodId(a);
 
+      // 🔄 Prepare payload
       const payload = {
         PO_ID: a?.PO_ID,
-        CPN: a?.ID, // ✅ use correct field
+        CPN: a?.ID, // ✅ double-check if "a?.ID" is correct
         User_ID: localStorage.getItem("id"),
       };
-
       console.log("Payload sent:", payload);
 
-      const res1 = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, payload);
+      // 🔄 Initialize payment step
+      const step1Res = await axios.post(
+        `${API_BASE_URL}/EXPPaymentStep1`,
+        payload
+      );
+      console.log("EXPPaymentStep1 response:", step1Res.data);
 
-      console.log("EXPPaymentStep1 response:", res1.data);
-
-      if (res1?.data?.success) {
-        const newId = res1?.data?.data?.last_insert_id;
-
+      if (step1Res?.data?.success) {
+        const newId = step1Res?.data?.data?.last_insert_id;
         setLastInseartId(newId);
 
+        // Refresh payment section
         paymentViewSection();
       }
     } catch (err) {
-      console.error("Error in EXPPaymentStep1:", err);
+      console.error("Error in everyDataSet:", err);
     }
   };
 
@@ -778,8 +837,9 @@ const CombinePayment = () => {
                       <div className="parentFormPayment">
                         <p>
                           {t("availableDeposit")} (
-                          {Number(depositValue).toFixed(2)})
+                          {formatterTwo.format(Number(depositValue))})
                         </p>
+
                         <input
                           type="number"
                           value={depositAvailableNew}

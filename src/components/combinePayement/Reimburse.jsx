@@ -1207,7 +1207,7 @@ const CombinePaymentEdit = () => {
                     </div>
                   ) : (
                     <div className="row cratePurchase">
-                      <div className="col-lg-3 form-group autoComplete">
+                      <div className="col-lg-4 form-group autoComplete">
                         <div className="d-flex">
                           <h6 className="me-2">{t("client")}</h6>
                         </div>
@@ -1248,11 +1248,11 @@ const CombinePaymentEdit = () => {
                           )}
                         />
                       </div>
-                      <div className="col-lg-3">
+                      {/* <div className="col-lg-3">
                         <h6 className="me-2">{t("combinePaymentNumber")}</h6>
                         <input type="number" />
-                      </div>
-                      <div className="col-lg-3 form-group">
+                      </div> */}
+                      <div className="col-lg-4 form-group">
                         <h6>{t("combinedPaymentDate")}</h6>
                         <DatePicker
                           selected={
@@ -1280,7 +1280,7 @@ const CombinePaymentEdit = () => {
                           customInput={<CustomInput />}
                         />
                       </div>
-                      <div className="col-lg-3 form-group">
+                      <div className="col-lg-4 form-group">
                         <h6>Due Date</h6>
                         <DatePicker
                           selected={

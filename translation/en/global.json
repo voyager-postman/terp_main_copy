@@ -1110,5 +1110,6 @@
   "BankDetails": "Bank Details",
   "Entity": "Entity",
   "SelectEntity": "Select Entity",
-  "add_consignee": "Add Consignee"
+  "add_consignee": "Add Consignee",
+  "updateConsignee": "Update Consignee"
 }
