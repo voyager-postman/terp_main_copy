@@ -1,4 +1,4 @@
-import axios from "../../Url/Api";
+ import axios from "../../Url/Api";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
@@ -9,6 +9,145 @@ import { Card } from "../../card";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 const AddVendor = () => {
+  const [data, setData] = useState([]);
+  const dataClear = () => {
+    setState1({
+      client_id: "",
+      contact_type_id: "",
+      contact_id: "",
+      consignee_id: from?.consignee_id || "",
+      first_name: "",
+      last_name: "",
+      position: "",
+      Email: "",
+      mobile: "",
+      landline: "",
+      birthday: "",
+      Notes: "",
+      Nick_name: "",
+    });
+  };
+  const { data: contactType } = useQuery("DropdownContactType ");
+  const contactDataSubmit = (e) => {
+    e.preventDefault();
+
+    // Check for required fields
+    const { contact_type_id, first_name, last_name, Email, mobile } = state1;
+
+    if (!contact_type_id) {
+      toast.error(t("contactTypeRequired"), {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!first_name) {
+      toast.error(t("firstNameRequired"), {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!last_name) {
+      toast.error(t("lastNameRequired"), {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!Email) {
+      toast.error(t("emailRequired"), {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!mobile) {
+      toast.error(t("mobileRequired"), {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(Email)) {
+      toast.error(t("invalidEmail"), {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return;
+    }
+
+    // Make the API call if validation passes
+    axios
+      .post(`${API_BASE_URL}/addContactDetails`, state1)
+      .then((response) => {
+        console.log(response);
+        getAllContact();
+        toast.success(t("contactAddSuccess"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+
+        // Close the modal
+        let modalElement = document.getElementById("exampleModalContact1");
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+        // let modalElement1 = document.getElementById("exampleModalContactAdd");
+        // let modalInstance1 = bootstrap.Modal.getInstance(modalElement1);
+        // if (modalInstance1) {
+        //   modalInstance1.hide();
+        // }
+        // Clear the form fields
+        setState1({
+          client_id: "",
+          contact_type_id: "",
+          contact_id: "",
+          consignee_id: from?.consignee_id || "",
+          first_name: "",
+          last_name: "",
+          position: "",
+          Email: "",
+          mobile: "",
+          landline: "",
+          birthday: "",
+          Notes: "",
+          Nick_name: "",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error(t("networkError"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+        return false;
+      });
+  };
+  const getAllContact = () => {
+    axios
+      .post(`${API_BASE_URL}/clientConsigneeTableEN`, {
+        client_id: from?.ID,
+      })
+      .then((res) => {
+        const { head, data } = res.data;
+        setHeaders(head || {});
+        setData(data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching data", err);
+      });
+  };
+
+  // contact above part
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const location = useLocation();
   const { from } = location.state || {};
@@ -30,6 +169,8 @@ const AddVendor = () => {
     Mobile: "",
     Messenger_Type: "",
     Messenger_ID: "",
+    Title: "",
+    Position: "",
     Notes: "",
     Accounting: false,
     Invoice: false,
@@ -108,6 +249,8 @@ const AddVendor = () => {
         Mobile: "",
         Messenger_Type: "",
         Messenger_ID: "",
+        Title: "",
+        Position: "",
         Notes: "",
         Accounting: false,
         Invoice: false,
@@ -145,6 +288,8 @@ const AddVendor = () => {
       Mobile: "",
       Messenger_Type: "",
       Messenger_ID: "",
+      Title: "",
+      Position: "",
       Notes: "",
       Accounting: false,
       Invoice: false,
@@ -388,327 +533,368 @@ const AddVendor = () => {
       } ${t("form")}`}
     >
       <div className="top-space-search-reslute">
-        <div className="tab-content px-2 md:!px-4">
-          <div className="vc_form formCreate ">
-            <div className="row">
-              <div className="row justify-content-between">
-                <div className="col-lg-8">
-                  <div className="row">
-                    <div className="col-lg-4 form-group">
-                      <h6>{t("name")}</h6>
-                      <input
-                        type="text"
-                        id="name"
-                        onChange={handleChange}
-                        name="name"
-                        className="form-control"
-                        placeholder="Name"
-                        defaultValue={state.name}
-                      />
-                    </div>
+        <div className="row px-2 md:!px-4">
+          <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+              <button
+                class="nav-link active"
+                id="nav-vendor-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#nav-vendor"
+                type="button"
+                role="tab"
+                aria-controls="nav-vendor"
+                aria-selected="true"
+              >
+                Details
+              </button>
+              <button
+                class="nav-link"
+                id="nav-details-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#nav-details"
+                type="button"
+                role="tab"
+                aria-controls="nav-details"
+                aria-selected="false"
+              >
+                Contact
+              </button>
+            </div>
+          </nav>
+        </div>
 
-                    <div className="col-lg-4 form-group">
-                      <h6>{t("taxId")}</h6>
-                      <input
-                        type="text"
-                        id="taxId"
-                        value={state.taxId || ""}
-                        onChange={handleChange}
-                        name="taxId"
-                        className="form-control"
-                        placeholder="Tax"
-                      />
-                    </div>
-                    <div className="form-group col-lg-4 autoComplete">
-                      <h6>{t("Entity")}</h6>
+        <div class="tab-content" id="nav-tabContent">
+          <div
+            class="tab-pane fade show active"
+            id="nav-vendor"
+            role="tabpanel"
+            aria-labelledby="nav-vendor-tab"
+            tabindex="0"
+          >
+            <div className="tab-content px-2 md:!px-4">
+              <div className="vc_form formCreate ">
+                <div className="row">
+                  <div className="col-lg-4 form-group">
+                    <h6>{t("name")}</h6>
+                    <input
+                      type="text"
+                      id="name"
+                      onChange={handleChange}
+                      name="name"
+                      className="form-control"
+                      placeholder="Name"
+                      defaultValue={state.name}
+                    />
+                  </div>
 
-                      <Autocomplete
-                        options={dropdownVendor || []} // Populate with the list of vendors
-                        getOptionLabel={(option) => option.entity_name_en || ""} // Display the English name of the entity
-                        value={
-                          dropdownVendor?.find(
-                            (vendor) => vendor.id === state.Entity
-                          ) || null
-                        } // Match the current entity ID in state with the options
-                        onChange={(e, newValue) => {
-                          handleChange({
-                            target: {
-                              name: "Entity",
-                              value: newValue?.id || "",
-                            },
-                          }); // Trigger handleChange with the selected entity's ID
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder={t("SelectEntity")} // Adds a placeholder
-                            InputLabelProps={{ shrink: false }} // Prevents floating label
-                          />
-                        )}
-                        isOptionEqualToValue={(option, value) =>
-                          option.id === value.id
-                        } // Ensure proper matching
-                        sx={{ width: 300 }}
-                      />
-                    </div>
+                  <div className="col-lg-4 form-group">
+                    <h6>{t("taxId")}</h6>
+                    <input
+                      type="text"
+                      id="taxId"
+                      value={state.taxId || ""}
+                      onChange={handleChange}
+                      name="taxId"
+                      className="form-control"
+                      placeholder="Tax"
+                    />
                   </div>
-                </div>
-                <div className="col-lg-4">
-                  <div className="text-end">
-                    <button
-                      className="btn btn-danger"
-                      data-bs-toggle="modal"
-                      data-bs-target="#exampleModal"
-                    >
-                      Add Contact
-                    </button>
+                  <div className="form-group col-lg-4 autoComplete">
+                    <h6>{t("Entity")}</h6>
+
+                    <Autocomplete
+                      options={dropdownVendor || []} // Populate with the list of vendors
+                      getOptionLabel={(option) => option.entity_name_en || ""} // Display the English name of the entity
+                      value={
+                        dropdownVendor?.find(
+                          (vendor) => vendor.id === state.Entity
+                        ) || null
+                      } // Match the current entity ID in state with the options
+                      onChange={(e, newValue) => {
+                        handleChange({
+                          target: {
+                            name: "Entity",
+                            value: newValue?.id || "",
+                          },
+                        }); // Trigger handleChange with the selected entity's ID
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder={t("SelectEntity")} // Adds a placeholder
+                          InputLabelProps={{ shrink: false }} // Prevents floating label
+                        />
+                      )}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value.id
+                      } // Ensure proper matching
+                      sx={{ width: 300 }}
+                    />
                   </div>
-                  {/* add-contact-modal */}
-                  <div
-                    class="modal fade"
-                    id="exampleModal"
-                    tabindex="-1"
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                  >
-                    <div class="modal-dialog modalShipTo modal-xl">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h1 class="modal-title fs-5" id="exampleModalLabel">
-                            Add Contact
-                          </h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            onClick={clearAllData}
-                            aria-label="Close"
-                          >
-                            <i class="mdi mdi-close"></i>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <div className="formCreate">
-                            <form action="">
-                              <div className="row">
-                                <div class="form-group col-lg-2">
-                                  <h6>First Name</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="text"
-                                      name="Name_First"
-                                      value={state1.Name_First}
-                                      onChange={handleChange1}
-                                      placeholder="first name"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-2">
-                                  <h6>Last Name</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="text"
-                                      name="Name_Last"
-                                      value={state1.Name_Last}
-                                      onChange={handleChange1}
-                                      placeholder="last name"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>Email</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="email"
-                                      name="Email"
-                                      value={state1.Email}
-                                      onChange={handleChange1}
-                                      placeholder="email"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-2">
-                                  <h6>Mobile</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="Mobile"
-                                      value={state1.Mobile}
-                                      onChange={handleChange1}
-                                      placeholder="mobile"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>Phone</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="Phone"
-                                      value={state1.Phone}
-                                      onChange={handleChange1}
-                                      placeholder="phone"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>Messenger type</h6>
-                                  <div class="ceateTransport autoComplete">
-                                   
-                                    <Autocomplete
-                                      options={messengerOptions}
-                                      getOptionLabel={(option) => option.label} // what to display in dropdown
-                                      value={
-                                        messengerOptions.find(
-                                          (opt) =>
-                                            opt.value ===
-                                            Number(state1.Messenger_Type)
-                                        ) || null
-                                      }
-                                      onChange={(event, newValue) =>
-                                        setState1({
-                                          ...state1,
-                                          Messenger_Type: newValue
-                                            ? newValue.value
-                                            : "",
-                                        })
-                                      }
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          placeholder={t("messengerType")}
-                                          variant="outlined"
+
+                  {/* <div className="col-lg-4">
+                      <div className="text-end">
+                        <button
+                          className="btn btn-danger"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                        >
+                          Add Contact
+                        </button>
+                      </div>
+                     
+                      <div
+                        class="modal fade"
+                        id="exampleModal"
+                        tabindex="-1"
+                        aria-labelledby="exampleModalLabel"
+                        aria-hidden="true"
+                      >
+                        <div class="modal-dialog modalShipTo modal-xl">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h1
+                                class="modal-title fs-5"
+                                id="exampleModalLabel"
+                              >
+                                Add Contact
+                              </h1>
+                              <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                onClick={clearAllData}
+                                aria-label="Close"
+                              >
+                                <i class="mdi mdi-close"></i>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <div className="formCreate">
+                                <form action="">
+                                  <div className="row">
+                                    <div class="form-group col-lg-2">
+                                      <h6>First Name</h6>
+                                      <div class=" ">
+                                        <input
+                                          type="text"
+                                          name="Name_First"
+                                          value={state1.Name_First}
+                                          onChange={handleChange1}
+                                          placeholder="first name"
                                         />
-                                      )}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>Messenger Id</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="Messenger_ID"
-                                      value={state1.Messenger_ID}
-                                      onChange={handleChange1}
-                                      placeholder="messenger id"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                   <h6> Position </h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="Messenger_ID"
-                                      value={state1.Messenger_ID}
-                                      onChange={handleChange1}
-                                      placeholder="position"
-                                    />
-                                  </div>
-                                </div>
-                                 <div class="form-group col-lg-3">
-                                  <h6>Title</h6>  
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="Messenger_ID"
-                                      value={state1.Messenger_ID}
-                                      onChange={handleChange1}
-                                      placeholder="Title"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-12">
-                                  <h6>Notes</h6>
-                                  <div>
-                                    <textarea
-                                      name="Notes"
-                                      value={state1.Notes}
-                                      onChange={handleChange1}
-                                      cols="30"
-                                      rows="4"
-                                    ></textarea>
-                                  </div>
-                                </div>
-                                <div className="form-group col-lg-12">
-                                  <div className="invoiceModal">
-                                    <div>
-                                      <input
-                                        type="checkbox"
-                                        id="dap"
-                                        name="Accounting"
-                                        checked={state1.Accounting}
-                                        onChange={handleChange1}
-                                      />
-                                      <label htmlFor="dap">Accounting</label>
+                                      </div>
                                     </div>
-                                    <div>
-                                      <input
-                                        type="checkbox"
-                                        id="cnf"
-                                        name="Invoice"
-                                        checked={state1.Invoice}
-                                        onChange={handleChange1}
-                                      />
-                                      <label htmlFor="cnf">Invoice</label>
+                                    <div class="form-group col-lg-2">
+                                      <h6>Last Name</h6>
+                                      <div class=" ">
+                                        <input
+                                          type="text"
+                                          name="Name_Last"
+                                          value={state1.Name_Last}
+                                          onChange={handleChange1}
+                                          placeholder="last name"
+                                        />
+                                      </div>
                                     </div>
-                                    <input
-                                      type="checkbox"
-                                      id="cif"
-                                      name="Logitics"
-                                      checked={state1.Logitics}
-                                      onChange={handleChange1}
-                                    />
-                                    <label htmlFor="cif">Logitics</label>
+                                    <div class="form-group col-lg-3">
+                                      <h6>Email</h6>
+                                      <div class=" ">
+                                        <input
+                                          type="email"
+                                          name="Email"
+                                          value={state1.Email}
+                                          onChange={handleChange1}
+                                          placeholder="email"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="form-group col-lg-2">
+                                      <h6>Mobile</h6>
+                                      <div class=" ">
+                                        <input
+                                          type="number"
+                                          name="Mobile"
+                                          value={state1.Mobile}
+                                          onChange={handleChange1}
+                                          placeholder="mobile"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                      <h6>Phone</h6>
+                                      <div class=" ">
+                                        <input
+                                          type="number"
+                                          name="Phone"
+                                          value={state1.Phone}
+                                          onChange={handleChange1}
+                                          placeholder="phone"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                      <h6>Messenger type</h6>
+                                      <div class="ceateTransport autoComplete">
+                                        <Autocomplete
+                                          options={messengerOptions}
+                                          getOptionLabel={(option) =>
+                                            option.label
+                                          } // what to display in dropdown
+                                          value={
+                                            messengerOptions.find(
+                                              (opt) =>
+                                                opt.value ===
+                                                Number(state1.Messenger_Type)
+                                            ) || null
+                                          }
+                                          onChange={(event, newValue) =>
+                                            setState1({
+                                              ...state1,
+                                              Messenger_Type: newValue
+                                                ? newValue.value
+                                                : "",
+                                            })
+                                          }
+                                          renderInput={(params) => (
+                                            <TextField
+                                              {...params}
+                                              placeholder={t("messengerType")}
+                                              variant="outlined"
+                                            />
+                                          )}
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                      <h6>Messenger Id</h6>
+                                      <div class=" ">
+                                        <input
+                                          type="number"
+                                          name="Messenger_ID"
+                                          value={state1.Messenger_ID}
+                                          onChange={handleChange1}
+                                          placeholder="messenger id"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                      <h6> Position </h6>
+                                      <div class=" ">
+                                        <input
+                                          type="text"
+                                          name="Position"
+                                          value={state1.Position}
+                                          onChange={handleChange1}
+                                          placeholder="position"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                      <h6>Title</h6>
+                                      <div class=" ">
+                                        <input
+                                          type="text"
+                                          name="Title"
+                                          value={state1.Title}
+                                          onChange={handleChange1}
+                                          placeholder="title"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="form-group col-lg-12">
+                                      <h6>Notes</h6>
+                                      <div>
+                                        <textarea
+                                          name="Notes"
+                                          value={state1.Notes}
+                                          onChange={handleChange1}
+                                          cols="30"
+                                          rows="4"
+                                        ></textarea>
+                                      </div>
+                                    </div>
+                                    <div className="form-group col-lg-12">
+                                      <div className="invoiceModal">
+                                        <div>
+                                          <input
+                                            type="checkbox"
+                                            id="dap"
+                                            name="Accounting"
+                                            checked={state1.Accounting}
+                                            onChange={handleChange1}
+                                          />
+                                          <label htmlFor="dap">
+                                            Accounting
+                                          </label>
+                                        </div>
+                                        <div>
+                                          <input
+                                            type="checkbox"
+                                            id="cnf"
+                                            name="Invoice"
+                                            checked={state1.Invoice}
+                                            onChange={handleChange1}
+                                          />
+                                          <label htmlFor="cnf">Invoice</label>
+                                        </div>
+                                        <input
+                                          type="checkbox"
+                                          id="cif"
+                                          name="Logitics"
+                                          checked={state1.Logitics}
+                                          onChange={handleChange1}
+                                        />
+                                        <label htmlFor="cif">Logitics</label>
+                                      </div>
+                                    </div>
                                   </div>
-                                </div>
+                                </form>
                               </div>
-                            </form>
+                            </div>
+                            <div class="modal-footer">
+                              <button
+                                type="button"
+                                class="btn btn-primary mb-0"
+                                onClick={handleSubmit}
+                              >
+                                submit
+                              </button>
+                            </div>
                           </div>
                         </div>
-                        <div class="modal-footer">
-                          <button
-                            type="button"
-                            class="btn btn-primary mb-0"
-                            onClick={handleSubmit}
-                          >
-                            submit
-                          </button>
-                        </div>
                       </div>
-                    </div>
+                    </div> */}
+
+                  <div className="col-lg-3 form-group">
+                    <h6>{t("phone")}</h6>
+                    <input
+                      type="text"
+                      id="phone"
+                      value={state.phone || ""}
+                      onChange={handleChange}
+                      name="phone"
+                      className="form-control"
+                      placeholder="Phone"
+                    />
                   </div>
-                </div>
-              </div>
-              <div className="col-lg-3 form-group">
-                <h6>{t("phone")}</h6>
-                <input
-                  type="text"
-                  id="phone"
-                  value={state.phone || ""}
-                  onChange={handleChange}
-                  name="phone"
-                  className="form-control"
-                  placeholder="Phone"
-                />
-              </div>
-              <div className="col-lg-3 form-group">
-                <h6>{t("email")}</h6>
-                <input
-                  type="text"
-                  id="phone"
-                  value={state.email || ""}
-                  onChange={handleChange}
-                  name="email"
-                  className="form-control"
-                  placeholder="Email"
-                />
-              </div>
-              <div className="col-lg-3 form-group autoComplete">
-                <h6>{t("messengerType")}</h6>
-                <div>
-                  {/* <Autocomplete
+                  <div className="col-lg-3 form-group">
+                    <h6>{t("email")}</h6>
+                    <input
+                      type="text"
+                      id="phone"
+                      value={state.email || ""}
+                      onChange={handleChange}
+                      name="email"
+                      className="form-control"
+                      placeholder="Email"
+                    />
+                  </div>
+                  <div className="col-lg-3 form-group autoComplete">
+                    <h6>{t("messengerType")}</h6>
+                    <div>
+                      {/* <Autocomplete
                     options={countries}
                     value={state.Messenger_Type || ""}
                     onChange={(event, newValue) =>
@@ -723,277 +909,978 @@ const AddVendor = () => {
                     )}
 
                   /> */}
-                  <Autocomplete
-                    options={messengerOptions}
-                    getOptionLabel={(option) => option.label} // what to display in dropdown
-                    value={
-                      messengerOptions.find(
-                        (opt) => opt.value === Number(state.Messenger_Type)
-                      ) || null
-                    }
-                    onChange={(event, newValue) =>
-                      setState({
-                        ...state,
-                        Messenger_Type: newValue ? newValue.value : "",
-                      })
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder={t("messengerType")}
-                        variant="outlined"
+                      <Autocomplete
+                        options={messengerOptions}
+                        getOptionLabel={(option) => option.label} // what to display in dropdown
+                        value={
+                          messengerOptions.find(
+                            (opt) => opt.value === Number(state.Messenger_Type)
+                          ) || null
+                        }
+                        onChange={(event, newValue) =>
+                          setState({
+                            ...state,
+                            Messenger_Type: newValue ? newValue.value : "",
+                          })
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("messengerType")}
+                            variant="outlined"
+                          />
+                        )}
                       />
-                    )}
-                  />
-                </div>
-              </div>
-              <div className="col-lg-3 form-group">
-                <h6>{t("messangerId")}</h6>
-                <div>
-                  <input
-                    type="text"
-                    id="messangerId"
-                    value={state.messangerId || ""}
-                    onChange={handleChange}
-                    name="messangerId"
-                    className="form-control"
-                    placeholder="Messanger ID"
-                  />
-                </div>
-              </div>
-
-              <div className="col-lg-3 form-group autoComplete mb-3">
-                <h6>{t("country")}</h6>
-                <div>
-                  <Autocomplete
-                    options={countryList}
-                    getOptionLabel={(option) => option.name || ""}
-                    isOptionEqualToValue={(option, value) =>
-                      option.id === value?.id
-                    }
-                    value={selectedCountry}
-                    onChange={(event, newValue) => setSelectedCountry(newValue)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder={t("country")}
-                        variant="outlined"
+                    </div>
+                  </div>
+                  <div className="col-lg-3 form-group">
+                    <h6>{t("messangerId")}</h6>
+                    <div>
+                      <input
+                        type="text"
+                        id="messangerId"
+                        value={state.messangerId || ""}
+                        onChange={handleChange}
+                        name="messangerId"
+                        className="form-control"
+                        placeholder="Messanger ID"
                       />
-                    )}
-                  />
+                    </div>
+                  </div>
+
+                  <div className="col-lg-3 form-group autoComplete mb-3">
+                    <h6>{t("country")}</h6>
+                    <div>
+                      <Autocomplete
+                        options={countryList}
+                        getOptionLabel={(option) => option.name || ""}
+                        isOptionEqualToValue={(option, value) =>
+                          option.id === value?.id
+                        }
+                        value={selectedCountry}
+                        onChange={(event, newValue) =>
+                          setSelectedCountry(newValue)
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("country")}
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group col-lg-3 autoComplete mb-3">
+                    <h6>{t("province")}</h6>
+                    <Autocomplete
+                      options={provinceList}
+                      getOptionLabel={(opt) => opt.name ?? ""}
+                      isOptionEqualToValue={(opt, val) => opt.id === val?.id}
+                      value={selectedProvince}
+                      onChange={(e, newProv) => setSelectedProvince(newProv)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder={t("province")}
+                          variant="outlined"
+                        />
+                      )}
+                      style={{ marginTop: 16 }}
+                    />
+                  </div>
+                  <div className="form-group col-lg-3 autoComplete mb-3">
+                    <h6>{t("district")}</h6>
+                    <Autocomplete
+                      options={districtList}
+                      getOptionLabel={(opt) => opt.name ?? ""}
+                      isOptionEqualToValue={(opt, val) => opt.id === val?.id}
+                      value={selectedDistrict}
+                      onChange={(e, dis) => setSelectedDistrict(dis)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder={t("district")}
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </div>
+                  <div className="col-lg-3 form-group autoComplete">
+                    <h6>{t("subDistrict")}</h6>
+                    <Autocomplete
+                      options={subdistrictList || []}
+                      getOptionLabel={(opt) => opt?.name ?? ""}
+                      isOptionEqualToValue={(opt, val) => opt?.id === val?.id}
+                      value={selectedSubdistrict || null}
+                      onChange={(e, sub) => setSelectedSubdistrict(sub)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select Subdistrict"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </div>
+
+                  <div className="col-lg-3 form-group">
+                    <h6>{t("postCode")}</h6>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={postalCode || ""}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="col-lg-3 form-group">
+                    <h6>{t("address")} 1</h6>
+                    <input
+                      type="text"
+                      id="address1"
+                      value={state.address1 || ""}
+                      onChange={handleChange}
+                      name="address1"
+                      className="form-control"
+                      placeholder="Address1"
+                    />
+                  </div>
+                  <div className="col-lg-3 form-group">
+                    <h6>{t("address")} 2</h6>
+                    <input
+                      type="text"
+                      id="address2"
+                      value={state.address2 || ""}
+                      onChange={handleChange}
+                      name="address2"
+                      className="form-control"
+                      placeholder="Address2"
+                    />
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-lg-12 form-group autoComplete">
+                    <h6 style={{ fontWeight: "bold" }}> {t("BankDetails")}:</h6>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-lg-4 form-group">
+                    <h6>{t("bankName")}</h6>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={state.Bank_Name || ""}
+                      onChange={(e) =>
+                        setState({ ...state, Bank_Name: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-lg-4 form-group">
+                    <h6>{t("bankBranch")}</h6>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={state.Bank_Branch || ""}
+                      onChange={(e) =>
+                        setState({ ...state, Bank_Branch: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-lg-4 form-group">
+                    <h6>{t("bankAccount")}</h6>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={state.Bank_Account || ""}
+                      onChange={(e) =>
+                        setState({ ...state, Bank_Account: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-lg-4 form-group">
+                    <h6>{t("bankIbon")}</h6>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={state.Bank_IBAN || ""}
+                      onChange={(e) =>
+                        setState({ ...state, Bank_IBAN: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-lg-4 form-group">
+                    <h6>{t("bankSwift")}</h6>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={state.Bank_Swift || ""}
+                      onChange={(e) =>
+                        setState({ ...state, Bank_Swift: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-lg-4 form-group autoComplete">
+                    <h6>{t("bankCountry")}</h6>
+                    <Autocomplete
+                      options={countryList}
+                      getOptionLabel={(option) => option.name || ""}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value?.id
+                      }
+                      value={
+                        countryList.find(
+                          (c) => String(c.id) === String(state.Bank_Country)
+                        ) || null
+                      }
+                      onChange={(event, newValue) =>
+                        setState({
+                          ...state,
+                          Bank_Country: newValue ? newValue.id : "",
+                        })
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder={t("bankCountry")}
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </div>
+
+                  <div className="col-lg-12 form-group">
+                    <h6>{t("bankAddress")}</h6>
+                    <textarea
+                      className="form-control p-2"
+                      placeholder={t("bankAddress")}
+                      value={state.Bank_Address || ""}
+                      onChange={(e) =>
+                        setState({ ...state, Bank_Address: e.target.value })
+                      }
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="form-group col-lg-3 autoComplete mb-3">
-                <h6>{t("province")}</h6>
-                <Autocomplete
-                  options={provinceList}
-                  getOptionLabel={(opt) => opt.name ?? ""}
-                  isOptionEqualToValue={(opt, val) => opt.id === val?.id}
-                  value={selectedProvince}
-                  onChange={(e, newProv) => setSelectedProvince(newProv)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder={t("province")}
-                      variant="outlined"
-                    />
-                  )}
-                  style={{ marginTop: 16 }}
-                />
-              </div>
-              <div className="form-group col-lg-3 autoComplete mb-3">
-                <h6>{t("district")}</h6>
-                <Autocomplete
-                  options={districtList}
-                  getOptionLabel={(opt) => opt.name ?? ""}
-                  isOptionEqualToValue={(opt, val) => opt.id === val?.id}
-                  value={selectedDistrict}
-                  onChange={(e, dis) => setSelectedDistrict(dis)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder={t("district")}
-                      variant="outlined"
-                    />
-                  )}
-                />
-              </div>
-              <div className="col-lg-3 form-group autoComplete">
-                <h6>{t("subDistrict")}</h6>
-                <Autocomplete
-                  options={subdistrictList || []}
-                  getOptionLabel={(opt) => opt?.name ?? ""}
-                  isOptionEqualToValue={(opt, val) => opt?.id === val?.id}
-                  value={selectedSubdistrict || null}
-                  onChange={(e, sub) => setSelectedSubdistrict(sub)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Select Subdistrict"
-                      variant="outlined"
-                    />
-                  )}
-                />
-              </div>
-
-              <div className="col-lg-3 form-group">
-                <h6>{t("postCode")}</h6>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={postalCode || ""}
-                  onChange={(e) => setPostalCode(e.target.value)}
-                />
-              </div>
-
-              <div className="col-lg-3 form-group">
-                <h6>{t("address")} 1</h6>
-                <input
-                  type="text"
-                  id="address1"
-                  value={state.address1 || ""}
-                  onChange={handleChange}
-                  name="address1"
-                  className="form-control"
-                  placeholder="Address1"
-                />
-              </div>
-              <div className="col-lg-3 form-group">
-                <h6>{t("address")} 2</h6>
-                <input
-                  type="text"
-                  id="address2"
-                  value={state.address2 || ""}
-                  onChange={handleChange}
-                  name="address2"
-                  className="form-control"
-                  placeholder="Address2"
-                />
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-12 form-group autoComplete">
-                <h6 style={{ fontWeight: "bold" }}> {t("BankDetails")}:</h6>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-4 form-group">
-                <h6>{t("bankName")}</h6>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={state.Bank_Name || ""}
-                  onChange={(e) =>
-                    setState({ ...state, Bank_Name: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="col-lg-4 form-group">
-                <h6>{t("bankBranch")}</h6>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={state.Bank_Branch || ""}
-                  onChange={(e) =>
-                    setState({ ...state, Bank_Branch: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="col-lg-4 form-group">
-                <h6>{t("bankAccount")}</h6>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={state.Bank_Account || ""}
-                  onChange={(e) =>
-                    setState({ ...state, Bank_Account: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="col-lg-4 form-group">
-                <h6>{t("bankIbon")}</h6>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={state.Bank_IBAN || ""}
-                  onChange={(e) =>
-                    setState({ ...state, Bank_IBAN: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="col-lg-4 form-group">
-                <h6>{t("bankSwift")}</h6>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={state.Bank_Swift || ""}
-                  onChange={(e) =>
-                    setState({ ...state, Bank_Swift: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="col-lg-4 form-group autoComplete">
-                <h6>{t("bankCountry")}</h6>
-                <Autocomplete
-                  options={countryList}
-                  getOptionLabel={(option) => option.name || ""}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value?.id
-                  }
-                  value={
-                    countryList.find(
-                      (c) => String(c.id) === String(state.Bank_Country)
-                    ) || null
-                  }
-                  onChange={(event, newValue) =>
-                    setState({
-                      ...state,
-                      Bank_Country: newValue ? newValue.id : "",
-                    })
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder={t("bankCountry")}
-                      variant="outlined"
-                    />
-                  )}
-                />
-              </div>
-
-              <div className="col-lg-12 form-group">
-                <h6>{t("bankAddress")}</h6>
-                <textarea
-                  className="form-control p-2"
-                  placeholder={t("bankAddress")}
-                  value={state.Bank_Address || ""}
-                  onChange={(e) =>
-                    setState({ ...state, Bank_Address: e.target.value })
-                  }
-                />
+              <div className="card-footer">
+                <button
+                  className="btn btn-primary"
+                  type="submit"
+                  name="signup"
+                  onClick={updateVendor}
+                  disabled={isButtonClicked}
+                >
+                  {typeof state.vendor_id !== "undefined"
+                    ? t("update")
+                    : t("create")}
+                </button>
+                <Link className="btn btn-danger" to={"/vendor"}>
+                  {t("cancel")}
+                </Link>
               </div>
             </div>
           </div>
-          <div className="card-footer">
-            <button
-              className="btn btn-primary"
-              type="submit"
-              name="signup"
-              onClick={updateVendor}
-              disabled={isButtonClicked}
-            >
-              {typeof state.vendor_id !== "undefined"
-                ? t("update")
-                : t("create")}
-            </button>
-            <Link className="btn btn-danger" to={"/vendor"}>
-              {t("cancel")}
-            </Link>
+          <div
+            class="tab-pane fade px-2 md:!px-4"
+            id="nav-details"
+            role="tabpanel"
+            aria-labelledby="nav-details-tab"
+            tabindex="0"
+          >
+            <div className="table-responsive">
+              <table className="  tableContact striped  table borderTerpProduce">
+                <tr className="">
+                  <th>{t("firstName")} </th>
+                  <th>{t("lastName")}</th>
+                  <th>{t("nickName")}</th>
+                  <th>{t("position")}</th>
+                  <th>{t("type")}</th>
+                  <th>{t("email")}</th>
+                  <th>{t("mobile")}</th>
+                  <th>{t("action")}</th>
+                </tr>
+
+                {data?.map((item) => {
+                  return (
+                    <tr>
+                      <td>{item.first_name}</td>
+                      <td>{item.last_name}</td>
+                      <td>{item.Nick_name}</td>
+                      <td>{item.position}</td>
+                      <td>{item.type}</td>
+                      <td>{item.Email}</td>
+                      <td>{item.mobile}</td>
+                      <td>
+                        <div>
+                          {/* edit popup */}
+                          <button
+                            type="button"
+                            onClick={() => handleEditClick(item.contact_id)}
+                            data-bs-toggle="modal"
+                            data-bs-target="#exampleModalEdit"
+                          >
+                            <i class="mdi mdi-pencil"></i>
+                            {/* edit popup */}
+                          </button>
+                          <div
+                            class="modal fade"
+                            id="exampleModalEdit"
+                            tabindex="-1"
+                            aria-labelledby="exampleModalLabel"
+                            aria-hidden="true"
+                          >
+                            <div class="modal-dialog modalShipTo modal-xl">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h1
+                                    class="modal-title fs-5"
+                                    id="exampleModalLabel"
+                                  >
+                                    {t("contactUp")}
+                                  </h1>
+                                  <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                  >
+                                    <i class="mdi mdi-close"></i>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                  <div className="formCreate">
+                                    <form action="">
+                                      <div className="row">
+                                        {/* <div className="col-lg-12">
+                                               <div class="form-group col-lg-3">
+                                                 <h6>Client </h6>
+                                                 <div class="ceateTransport">
+                                                   <select
+                                                     name="client_id"
+                                                     onChange={handleChange1}
+                                                     value={state1.client_id}
+                                                   >
+                                                     <option value="">
+                                                       Select Client
+                                                     </option>
+                                                     {client?.map((item) => (
+                                                       <option
+                                                         key={item.client_id}
+                                                         value={item.client_id}
+                                                       >
+                                                         {item.client_name}
+                                                       </option>
+                                                     ))}
+                                                   </select>
+                                                 </div>
+                                               </div>
+                                             </div> */}
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("contactType")}</h6>
+                                          <div class="ceateTransport autoComplete">
+                                            <Autocomplete
+                                              disablePortal
+                                              options={contactType || []} // Use your contactType array as options
+                                              getOptionLabel={(option) =>
+                                                option.type_en || ""
+                                              }
+                                              onChange={(e, newValue) =>
+                                                setState1((prevState) => ({
+                                                  ...prevState,
+                                                  contact_type_id:
+                                                    newValue?.contact_type_id ||
+                                                    "",
+                                                }))
+                                              }
+                                              value={
+                                                (contactType || []).find(
+                                                  (item) =>
+                                                    item.contact_type_id ===
+                                                    state1.contact_type_id
+                                                ) || null
+                                              }
+                                              sx={{ width: 300 }} // Customize the width as needed
+                                              renderInput={(params) => (
+                                                <TextField
+                                                  {...params}
+                                                  placeholder={t("selectType")}
+                                                  InputLabelProps={{
+                                                    shrink: false,
+                                                  }} // Prevents floating label
+                                                />
+                                              )}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("firstName")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="text"
+                                              name="first_name"
+                                              onChange={handleChange1}
+                                              value={state1.first_name}
+                                              placeholder={t("firstName")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("lastName")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="text"
+                                              name="last_name"
+                                              onChange={handleChange1}
+                                              value={state1.last_name}
+                                              placeholder={t("lastName")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("nickName")}</h6>
+                                          <div>
+                                            <input
+                                              type="text"
+                                              name="Nick_name"
+                                              onChange={handleChange1}
+                                              value={state1.Nick_name}
+                                              placeholder={t("nickName")}
+                                            />
+                                          </div>
+                                        </div>
+
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("position")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="text"
+                                              name="position"
+                                              onChange={handleChange1}
+                                              value={state1.position}
+                                              placeholder={t("position")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("email")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="email"
+                                              name="Email"
+                                              onChange={handleChange1}
+                                              value={state1.Email}
+                                              placeholder={t("email")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("mobile")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="number"
+                                              name="mobile"
+                                              onChange={handleChange1}
+                                              value={state1.mobile}
+                                              placeholder={t("mobile")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("landline")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="number"
+                                              name="landline"
+                                              onChange={handleChange1}
+                                              value={state1.landline}
+                                              placeholder={t("landline")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-4">
+                                          <h6>{t("birthday")}</h6>
+                                          <div>
+                                            <input
+                                              type="date"
+                                              name="birthday"
+                                              onChange={handleChange1}
+                                              value={state1.birthday}
+                                              placeholder={t("birthday")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-8">
+                                          <h6>{t("notes")}</h6>
+                                          <div>
+                                            <textarea
+                                              name="Notes"
+                                              onChange={handleChange1}
+                                              value={state1.Notes}
+                                              cols="30"
+                                              rows="5"
+                                            ></textarea>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                                <div class="modal-footer justify-center">
+                                  <button
+                                    onClick={contactDetailsEdit}
+                                    type="button"
+                                    class="btn btn-primary mb-0"
+                                  >
+                                    {t("update")}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          {/* edit popup end */}
+
+                          <button
+                            type="button"
+                            onClick={() => deleteOrder1(item.contact_id)}
+                          >
+                            <i class="mdi mdi-delete "></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </table>
+            </div>
+            <div className="row">
+              <button
+              style={{width:"unset"}}
+                className="btn btn-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+              >
+                {t("addContact")}
+              </button>
+              {/* new  contact*/}
+
+              <div
+                class="modal fade"
+                id="exampleModal"
+                tabindex="-1"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog modalShipTo modal-xl">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="exampleModalLabel">
+                        {t("addContact")}
+                      </h1>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        onClick={clearAllData}
+                        aria-label="Close"
+                      >
+                        <i class="mdi mdi-close"></i>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div className="formCreate">
+                        <form action="">
+                          <div className="row">
+                            <div class="form-group col-lg-2">
+                              <h6>Title</h6>
+                              <div class=" ">
+                                <input
+                                  type="text"
+                                  name="Title"
+                                  value={state1.Title}
+                                  onChange={handleChange1}
+                                  placeholder="title"
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-2">
+                              <h6>First Name</h6>
+                              <div class=" ">
+                                <input
+                                  type="text"
+                                  name="Name_First"
+                                  value={state1.Name_First}
+                                  onChange={handleChange1}
+                                  placeholder="first name"
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-2">
+                              <h6>Last Name</h6>
+                              <div class=" ">
+                                <input
+                                  type="text"
+                                  name="Name_Last"
+                                  value={state1.Name_Last}
+                                  onChange={handleChange1}
+                                  placeholder="last name"
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6> Position </h6>
+                              <div class=" ">
+                                <input
+                                  type="text"
+                                  name="Position"
+                                  value={state1.Position}
+                                  onChange={handleChange1}
+                                  placeholder="position"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="form-group col-lg-3 d-flex align-items-center">
+                              <div className="invoiceModal d-flex">
+                                <div className="d-flex">
+                                  <input
+                                    type="checkbox"
+                                    id="dap"
+                                    name="Accounting"
+                                    checked={state1.Accounting}
+                                    onChange={handleChange1}
+                                  />
+                                  <label htmlFor="dap">Accounting</label>
+                                </div>
+                                <div className="d-flex">
+                                  <input
+                                    type="checkbox"
+                                    id="cnf"
+                                    name="Invoice"
+                                    checked={state1.Invoice}
+                                    onChange={handleChange1}
+                                  />
+                                  <label htmlFor="cnf">Invoice</label>
+                                </div>
+                                <div className="d-flex">
+                                  <input
+                                    type="checkbox"
+                                    id="cif"
+                                    name="Logitics"
+                                    checked={state1.Logitics}
+                                    onChange={handleChange1}
+                                  />
+                                  <label htmlFor="cif">Logitics</label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6>Email</h6>
+                              <div class=" ">
+                                <input
+                                  type="email"
+                                  name="Email"
+                                  value={state1.Email}
+                                  onChange={handleChange1}
+                                  placeholder="email"
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-2">
+                              <h6>Mobile</h6>
+                              <div class=" ">
+                                <input
+                                  type="number"
+                                  name="Mobile"
+                                  value={state1.Mobile}
+                                  onChange={handleChange1}
+                                  placeholder="mobile"
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-2">
+                              <h6>Phone</h6>
+                              <div class=" ">
+                                <input
+                                  type="number"
+                                  name="Phone"
+                                  value={state1.Phone}
+                                  onChange={handleChange1}
+                                  placeholder="phone"
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6>Messenger type</h6>
+                              <div class="ceateTransport autoComplete">
+                                <Autocomplete
+                                  options={messengerOptions}
+                                  getOptionLabel={(option) => option.label} // what to display in dropdown
+                                  value={
+                                    messengerOptions.find(
+                                      (opt) =>
+                                        opt.value ===
+                                        Number(state1.Messenger_Type)
+                                    ) || null
+                                  }
+                                  onChange={(event, newValue) =>
+                                    setState1({
+                                      ...state1,
+                                      Messenger_Type: newValue
+                                        ? newValue.value
+                                        : "",
+                                    })
+                                  }
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("messengerType")}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-2">
+                              <h6>Messenger Id</h6>
+                              <div class=" ">
+                                <input
+                                  type="number"
+                                  name="Messenger_ID"
+                                  value={state1.Messenger_ID}
+                                  onChange={handleChange1}
+                                  placeholder="messenger id"
+                                />
+                              </div>
+                            </div>
+
+                            <div class="form-group col-lg-12">
+                              <h6>Notes</h6>
+                              <div>
+                                <textarea
+                                  name="Notes"
+                                  value={state1.Notes}
+                                  onChange={handleChange1}
+                                  cols="30"
+                                  rows="4"
+                                ></textarea>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-primary mb-0"
+                        onClick={handleSubmit}
+                      >
+                        submit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* new contact */}
+              {/* modal */}
+              {/* <div
+                class="modal fade"
+                id="exampleModalContact"
+                tabindex="-1"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog modalShipTo modal-xl ">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="exampleModalLabel">
+                        {t("contact")} 
+                      </h1>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                        onClick={dataClear}
+                      >
+                        <i class="mdi mdi-close"></i>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div className="formCreate">
+                        <form action="">
+                          <div className="row">
+                            <div class="form-group col-lg-3">
+                              <h6>{t("contactType")}</h6>
+                              <div class="ceateTransport autoComplete">
+                                <Autocomplete
+                                  disablePortal
+                                  options={contactType}
+                                  getOptionLabel={(option) => option.type_en}
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.contact_type_id ===
+                                    value.contact_type_id
+                                  }
+                                  onChange={(e, newValue) =>
+                                    handleChange1({
+                                      target: {
+                                        name: "contact_type_id",
+                                        value: newValue?.contact_type_id || "",
+                                      },
+                                    })
+                                  }
+                                  value={
+                                    contactType?.find(
+                                      (item) =>
+                                        item.contact_type_id ===
+                                        state1?.contact_type_id
+                                    ) || null
+                                  }
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      // label="Select Type"
+                                      placeholder={t("selectType")}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6>{t("firstName")}</h6>
+                              <div class=" ">
+                                <input
+                                  type="text"
+                                  name="first_name"
+                                  onChange={handleChange1}
+                                  value={state1.first_name}
+                                  placeholder={t("firstName")}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6>{t("lastName")}</h6>
+                              <div class=" ">
+                                <input
+                                  type="text"
+                                  name="last_name"
+                                  onChange={handleChange1}
+                                  value={state1.last_name}
+                                  placeholder={t("lastName")}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6>{t("nickName")}</h6>
+                              <div>
+                                <input
+                                  type="text"
+                                  name="Nick_name"
+                                  onChange={handleChange1}
+                                  value={state1.Nick_name}
+                                  placeholder={t("nickName")}
+                                />
+                              </div>
+                            </div>
+
+                            <div class="form-group col-lg-3">
+                              <h6>{t("position")}</h6>
+
+                              <div class=" ">
+                                <input
+                                  type="text"
+                                  name="position"
+                                  onChange={handleChange1}
+                                  value={state1.position}
+                                  placeholder={t("position")}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6>{t("email")}</h6>
+                              <div class=" ">
+                                <input
+                                  type="email"
+                                  name="Email"
+                                  onChange={handleChange1}
+                                  value={state1.Email}
+                                  placeholder={t("email")}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6>{t("mobile")}</h6>
+                              <div class=" ">
+                                <input
+                                  type="number"
+                                  name="mobile"
+                                  onChange={handleChange1}
+                                  value={state1.mobile}
+                                  placeholder={t("mobile")}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-3">
+                              <h6>{t("landline")}</h6>
+                              <div class=" ">
+                                <input
+                                  type="number"
+                                  name="landline"
+                                  onChange={handleChange1}
+                                  value={state1.landline}
+                                  placeholder={t("landline")}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-4">
+                              <h6>{t("birthday")}</h6>
+                              <div>
+                                <input
+                                  type="date"
+                                  name="birthday"
+                                  onChange={handleChange1}
+                                  value={state1.birthday}
+                                  placeholder={t("birthday")}
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group col-lg-8">
+                              <h6>{t("notes")}</h6>
+                              <div>
+                                <textarea
+                                  name="Notes"
+                                  onChange={handleChange1}
+                                  value={state1.Notes}
+                                  cols="30"
+                                  rows="5"
+                                ></textarea>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-primary mb-0"
+                        onClick={contactDataSubmit}
+                      >
+                        {t("submit")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div> */}
+              {/* modal end */}
+            </div>
           </div>
         </div>
       </div>

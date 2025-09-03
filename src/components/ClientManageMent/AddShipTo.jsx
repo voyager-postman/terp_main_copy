@@ -125,6 +125,8 @@ const AddShipTo = () => {
     Mobile: "",
     Messenger_Type: "",
     Messenger_ID: "",
+    Title: "",
+    Position: "",
     Notes: "",
     Accounting: false,
     Invoice: false,
@@ -157,6 +159,10 @@ const AddShipTo = () => {
         Mobile: "",
         Messenger_Type: "",
         Messenger_ID: "",
+        Title: "",
+        Position: "",
+        Title: "",
+        Position: "",
         Notes: "",
         Accounting: false,
         Invoice: false,
@@ -192,6 +198,8 @@ const AddShipTo = () => {
       Email: "",
       Phone: "",
       Mobile: "",
+      Title: "",
+      Position: "",
       Messenger_Type: "",
       Messenger_ID: "",
       Notes: "",
@@ -1780,7 +1788,7 @@ const AddShipTo = () => {
         {
           ...dataCustomization,
           Client_ID: from?.client_id,
-          Consignee_id: from?.consignee_id,
+          Consignee_id: from?.Consignee,
         }
         // Use the updated state directly
       )
@@ -2188,6 +2196,7 @@ const AddShipTo = () => {
   }, [t]); // run again if t() changes due to language switch
 
   return (
+    <>
     <Card
       title={`${t("consignee")} / ${
         from?.consignee_id ? t("update") : t("create")
@@ -2223,7 +2232,7 @@ const AddShipTo = () => {
                   {t("contact")}
                 </button>
               </li>
-              <li class="nav-item" role="presentation">
+              {/* <li class="nav-item" role="presentation">
                 <button
                   class="nav-link"
                   id="profile-tab"
@@ -2236,8 +2245,8 @@ const AddShipTo = () => {
                 >
                   {t("customization")}
                 </button>
-              </li>
-              <li class="nav-item" role="presentation">
+              </li> */}
+              {/* <li class="nav-item" role="presentation">
                 <button
                   class="nav-link "
                   id="notify-tab"
@@ -2249,7 +2258,7 @@ const AddShipTo = () => {
                 >
                   {t("notify")}
                 </button>
-              </li>
+              </li> */}
               {localStorage.getItem("level") !== "Level 5" && (
                 <>
                   <li class="nav-item" role="presentation">
@@ -2266,7 +2275,7 @@ const AddShipTo = () => {
                       {t("portfolio")}
                     </button>
                   </li>
-                  <li class="nav-item" role="presentation">
+                  {/* <li class="nav-item" role="presentation">
                     <button
                       class="nav-link"
                       id="margins-tab"
@@ -2279,10 +2288,10 @@ const AddShipTo = () => {
                     >
                       {t("marginsAndPayments")}
                     </button>
-                  </li>
+                  </li> */}
                 </>
               )}
-              <li class="nav-item" role="presentation">
+              {/* <li class="nav-item" role="presentation">
                 <button
                   class="nav-link"
                   id="invoiceSetup-tab"
@@ -2295,7 +2304,7 @@ const AddShipTo = () => {
                 >
                   {t("invoiceSetup")}
                 </button>
-              </li>
+              </li> */}
             </ul>
             <div class="tab-content" id="myTabContent">
               {/* invoiceSetup */}
@@ -3998,239 +4007,11 @@ const AddShipTo = () => {
                               data-bs-toggle="modal"
                               data-bs-target="#exampleModal"
                             >
-                              Add Contact
+                              {t("addContact")}{" "}
                             </button>
                           </div>
                           {/* add-contact-modal */}
-                          <div
-                            class="modal fade"
-                            id="exampleModal"
-                            tabindex="-1"
-                            aria-labelledby="exampleModalLabel"
-                            aria-hidden="true"
-                          >
-                            <div class="modal-dialog modalShipTo modal-xl">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h1
-                                    class="modal-title fs-5"
-                                    id="exampleModalLabel"
-                                  >
-                                    Add Contact
-                                  </h1>
-                                  <button
-                                    type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    onClick={clearAllData8}
-                                    aria-label="Close"
-                                  >
-                                    <i class="mdi mdi-close"></i>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <div className="formCreate">
-                                    <form action="">
-                                      <div className="row">
-                                        <div class="form-group col-lg-2">
-                                          <h6>First Name</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="Name_First"
-                                              value={state8.Name_First}
-                                              onChange={handleChange10}
-                                              placeholder="first name"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-2">
-                                          <h6>Last Name</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="Name_Last"
-                                              value={state8.Name_Last}
-                                              onChange={handleChange10}
-                                              placeholder="last name"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>Email</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="email"
-                                              name="Email"
-                                              value={state8.Email}
-                                              onChange={handleChange10}
-                                              placeholder="email"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-2">
-                                          <h6>Mobile</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Mobile"
-                                              value={state8.Mobile}
-                                              onChange={handleChange10}
-                                              placeholder="mobile"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>Phone</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Phone"
-                                              value={state8.Phone}
-                                              onChange={handleChange10}
-                                              placeholder="phone"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>Messenger type</h6>
-                                          <div class="ceateTransport autoComplete">
-                                            <Autocomplete
-                                              options={messengerOptions}
-                                              getOptionLabel={(option) =>
-                                                option.label
-                                              } // what to display in dropdown
-                                              value={
-                                                messengerOptions.find(
-                                                  (opt) =>
-                                                    opt.value ===
-                                                    Number(
-                                                      state1.Messenger_Type
-                                                    )
-                                                ) || null
-                                              }
-                                              onChange={(event, newValue) =>
-                                                setState8({
-                                                  ...state8,
-                                                  Messenger_Type: newValue
-                                                    ? newValue.value
-                                                    : "",
-                                                })
-                                              }
-                                              renderInput={(params) => (
-                                                <TextField
-                                                  {...params}
-                                                  placeholder={t(
-                                                    "messengerType"
-                                                  )}
-                                                  variant="outlined"
-                                                />
-                                              )}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>Messenger Id</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Messenger_ID"
-                                              value={state8.Messenger_ID}
-                                              onChange={handleChange10}
-                                              placeholder="messenger id"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                  <h6> Position </h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="Messenger_ID"
-                                      value={state1.Messenger_ID}
-                                      onChange={handleChange1}
-                                      placeholder="Position"
-                                    />
-                                  </div>
-                                </div>
-                                 <div class="form-group col-lg-3">
-                                  <h6>Title</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="Messenger_ID"
-                                      value={state1.Messenger_ID}
-                                      onChange={handleChange1}
-                                      placeholder="Title"
-                                    />
-                                  </div>
-                                </div>
-                                        <div class="form-group col-lg-12">
-                                          <h6>Notes</h6>
-                                          <div>
-                                            <textarea
-                                              name="Notes"
-                                              value={state8.Notes}
-                                              onChange={handleChange10}
-                                              cols="30"
-                                              rows="4"
-                                            ></textarea>
-                                          </div>
-                                        </div>
-                                        <div className="form-group col-lg-12">
-                                          <div className="invoiceModal">
-                                            <div>
-                                              <input
-                                                type="checkbox"
-                                                id="dap"
-                                                name="Accounting"
-                                                checked={state8.Accounting}
-                                                onChange={handleChange10}
-                                              />
-                                              <label htmlFor="dap">
-                                                Accounting
-                                              </label>
-                                            </div>
-                                            <div>
-                                              <input
-                                                type="checkbox"
-                                                id="cnf"
-                                                name="Invoice"
-                                                checked={state8.Invoice}
-                                                onChange={handleChange10}
-                                              />
-                                              <label htmlFor="cnf">
-                                                Invoice
-                                              </label>
-                                            </div>
-                                            <input
-                                              type="checkbox"
-                                              id="cif"
-                                              name="Logitics"
-                                              checked={state8.Logitics}
-                                              onChange={handleChange10}
-                                            />
-                                            <label htmlFor="cif">
-                                              Logitics
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </form>
-                                  </div>
-                                </div>
-                                <div class="modal-footer">
-                                  <button
-                                    type="button"
-                                    class="btn btn-primary mb-0"
-                                    onClick={handleSubmit8}
-                                  >
-                                    submit
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                         
                         </div>
                       </div>
                       <div className="col-lg-3 form-group">
@@ -4843,16 +4624,15 @@ const AddShipTo = () => {
                   </table>
                 </div>
                 <div className="row">
-                  <Link
-                    style={{ width: "170px" }}
+               
+                   <button
+                             style={{ width: "170px" }}
                     className="btn btn-danger mb-4"
-                    to="/"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModalContact"
-                  >
-                    {t("addContact")}
-                  </Link>
+                              data-bs-toggle="modal"
+                              data-bs-target="#exampleModal"
+                            >
+                              {t("addContact")}{" "}
+                            </button>
                   {/* modal */}
                   <div
                     class="modal fade"
@@ -6528,6 +6308,240 @@ const AddShipTo = () => {
         </div>
       </div>
     </Card>
+
+ <div
+                            class="modal fade"
+                            id="exampleModal"
+                            tabindex="-1"
+                            aria-labelledby="exampleModalLabel"
+                            aria-hidden="true"
+                          >
+                            <div class="modal-dialog modalShipTo modal-xl">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h1
+                                    class="modal-title fs-5"
+                                    id="exampleModalLabel"
+                                  >
+                                    {t("addContact")}{" "}
+                                  </h1>
+                                  <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    onClick={clearAllData8}
+                                    aria-label="Close"
+                                  >
+                                    <i class="mdi mdi-close"></i>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                  <div className="formCreate">
+                                    <form action="">
+                                      <div className="row">
+                                        <div class="form-group col-lg-2">
+                                          <h6>{t("title")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="text"
+                                              name="Title"
+                                              value={state8.Title}
+                                              onChange={handleChange10}
+                                              placeholder={t("title")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                          <h6>{t("firstName")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="text"
+                                              name="Name_First"
+                                              value={state8.Name_First}
+                                              onChange={handleChange10}
+                                              placeholder={t("firstName")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                          <h6>{t("lastName")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="text"
+                                              name="Name_Last"
+                                              value={state8.Name_Last}
+                                              onChange={handleChange10}
+                                              placeholder={t("lastName")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6> {t("position")} </h6>
+                                          <div class=" ">
+                                            <input
+                                              type="text"
+                                              name="Position"
+                                              value={state8.Position}
+                                              onChange={handleChange10}
+                                              placeholder={t("position")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-lg-3 d-flex align-items-center">
+                                          <div className="invoiceModal d-flex">
+                                            <div className="d-flex">
+                                              <input
+                                                type="checkbox"
+                                                id="dap"
+                                                name="Accounting"
+                                                checked={state8.Accounting}
+                                                onChange={handleChange10}
+                                              />
+                                              <label htmlFor="dap">
+                                                {t("accounting")}
+                                              </label>
+                                            </div>
+                                            <div className="d-flex">
+                                              <input
+                                                type="checkbox"
+                                                id="cnf"
+                                                name="Invoice"
+                                                checked={state8.Invoice}
+                                                onChange={handleChange10}
+                                              />
+                                              <label htmlFor="cnf">
+                                                {t("invoice")}
+                                              </label>
+                                            </div>
+                                            <div className="d-flex">
+                                              <input
+                                                type="checkbox"
+                                                id="cif"
+                                                name="Logitics"
+                                                checked={state8.Logitics}
+                                                onChange={handleChange10}
+                                              />
+                                              <label htmlFor="cif">
+                                                {t("logistics")}
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("email")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="email"
+                                              name="Email"
+                                              value={state8.Email}
+                                              onChange={handleChange10}
+                                              placeholder={t("email")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                          <h6>{t("mobile")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="number"
+                                              name="Mobile"
+                                              value={state8.Mobile}
+                                              onChange={handleChange10}
+                                              placeholder={t("mobile")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                          <h6>{t("phone")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="number"
+                                              name="Phone"
+                                              value={state8.Phone}
+                                              onChange={handleChange10}
+                                              placeholder={t("phone")}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                          <h6>{t("messengerType")}</h6>
+                                          <div class="ceateTransport autoComplete">
+                                            <Autocomplete
+                                              options={messengerOptions}
+                                              getOptionLabel={(option) =>
+                                                option.label
+                                              } // what to display in dropdown
+                                              value={
+                                                messengerOptions.find(
+                                                  (opt) =>
+                                                    opt.value ===
+                                                    Number(
+                                                      state8.Messenger_Type
+                                                    )
+                                                ) || null
+                                              }
+                                              onChange={(event, newValue) =>
+                                                setState8({
+                                                  ...state8,
+                                                  Messenger_Type: newValue
+                                                    ? newValue.value
+                                                    : "",
+                                                })
+                                              }
+                                              renderInput={(params) => (
+                                                <TextField
+                                                  {...params}
+                                                  placeholder={t(
+                                                    "messengerType"
+                                                  )}
+                                                  variant="outlined"
+                                                />
+                                              )}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                          <h6>{t("messengerId")}</h6>
+                                          <div class=" ">
+                                            <input
+                                              type="number"
+                                              name="Messenger_ID"
+                                              value={state8.Messenger_ID}
+                                              onChange={handleChange10}
+                                              placeholder="messenger id"
+                                            />
+                                          </div>
+                                        </div>
+
+                                        <div class="form-group col-lg-12">
+                                          <h6>{t("notes")}</h6>
+                                          <div>
+                                            <textarea
+                                              name="Notes"
+                                              value={state8.Notes}
+                                              onChange={handleChange10}
+                                              cols="30"
+                                              rows="4"
+                                            ></textarea>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button
+                                    type="button"
+                                    class="btn btn-primary mb-0"
+                                    onClick={handleSubmit8}
+                                  >
+                                    {t("submit")}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+</>
   );
 };
 

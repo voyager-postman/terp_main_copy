@@ -27,6 +27,7 @@ const CreateClient = () => {
       label: item.Name_EN,
       value: item.ID,
     })) || [];
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const { data: clients } = useQuery("getClientDataAsOptions");
 
@@ -147,6 +148,8 @@ const CreateClient = () => {
     Mobile: "",
     Messenger_Type: "",
     Messenger_ID: "",
+    Title: "",
+    Position: "",
     Notes: "",
     Accounting: false,
     Invoice: false,
@@ -191,7 +194,7 @@ const CreateClient = () => {
       if (modalInstance) {
         modalInstance.hide();
       }
-
+      getAllContact();
       // Success toast (using message from API if available)
       toast.success(res.data?.message, {
         autoClose: 1000,
@@ -285,6 +288,12 @@ const CreateClient = () => {
       }));
     }
   };
+  const handleOpenAddModal = () => setShowAddModal(true);
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+    dataClear1(); // clear form on close
+  };
+
   const updateVendor = async () => {
     try {
       setIsButtonClicked(true); // Set button clicked state to true
@@ -1094,9 +1103,10 @@ const CreateClient = () => {
       [name]: name === "Commission_Currency" && value === "" ? "FX" : newValue,
     }));
   };
+  console.log(from);
   const [dataCustomization, setDataCustomization] = useState({
-    Client_ID: from?.client_id || "",
-    Consignee_id: from?.consignee_id || null,
+    Client_ID: from?.Client || "",
+    Consignee_id: "",
     ITF: "",
     brand: "",
     Custom_Name: "",
@@ -1379,7 +1389,7 @@ const CreateClient = () => {
       liner_Drop: "",
     });
   };
- const clearAllFields2 = () => {
+  const clearAllFields2 = () => {
     setState6({
       clientId: "",
       consigneeType: "",
@@ -1442,11 +1452,13 @@ const CreateClient = () => {
   const { data: currency } = useQuery("getCurrency");
   const [data, setData] = useState([]);
   const [customization, setCustomization] = useState([]);
+  const [customization1, setCustomization1] = useState([]);
+
   const [headers, setHeaders] = useState({});
   const getAllContact = () => {
     axios
-      .post(`${API_BASE_URL}/clientConsigneeTableEN`, {
-        client_id: from?.ID,
+      .post(`${API_BASE_URL}/getVCConstact`, {
+        VCID: from?.ID,
       })
       .then((res) => {
         const { head, data } = res.data;
@@ -1457,6 +1469,22 @@ const CreateClient = () => {
         console.error("Error fetching data", err);
       });
   };
+
+  // const getAllContact = () => {
+  //   axios
+  //     .post(`${API_BASE_URL}/clientConsigneeTableEN`, {
+  //       client_id: from?.ID,
+  //     })
+  //     .then((res) => {
+  //       const { head, data } = res.data;
+  //       setHeaders(head || {});
+  //       setData(data || []);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching data", err);
+  //     });
+  // };
+
   const getAllCustomization = () => {
     axios
       .post(`${API_BASE_URL}/getConsigneeCustomization`, {
@@ -1466,6 +1494,17 @@ const CreateClient = () => {
       .then((res) => {
         console.log(res);
         setCustomization(res.data.data || []);
+      });
+  };
+
+  const getAllCustomization1 = () => {
+    axios
+      .post(`${API_BASE_URL}/getVCConstact`, {
+        VCID: from?.ID,
+      })
+      .then((res) => {
+        console.log(res);
+        setCustomization1(res.data.data || []);
       });
   };
   const deleteOrder = (id) => {
@@ -1526,6 +1565,33 @@ const CreateClient = () => {
       }
     });
   };
+
+  const deleteOrder3 = (id) => {
+    console.log(id);
+    MySwal.fire({
+      title: t("areYouSure"),
+      text: t("irreversible"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Delete",
+    }).then(async (result) => {
+      console.log(result);
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(`${API_BASE_URL}/deleteVCContact`, {
+            ID: id,
+          });
+          console.log(response);
+          getAllContact();
+          toast.success("Contact delete successfully");
+        } catch (e) {
+          toast.error(t("genericError"));
+        }
+      }
+    });
+  };
   const deleteOrder2 = (id) => {
     console.log(id);
     MySwal.fire({
@@ -1558,6 +1624,7 @@ const CreateClient = () => {
   useEffect(() => {
     getAllContact();
     getAllCustomization();
+    getAllCustomization1();
   }, []);
   const handlePaidAmountChange = (invoiceNumber, value) => {
     setPaidAmounts((prev) => {
@@ -1612,10 +1679,10 @@ const CreateClient = () => {
     }
     console.log(dataCustomization);
     axios
-      .post(
-        `${API_BASE_URL}/createConsigneeCustomize`,
-        dataCustomization // Use the updated state directly
-      )
+      .post(`${API_BASE_URL}/createConsigneeCustomize`, {
+        ...dataCustomization, // keep all existing fields
+        Consignee_id: updateId, // add your new field
+      })
       .then((response) => {
         console.log(response);
         toast.success(t("customizationAdd"), {
@@ -1810,7 +1877,7 @@ const CreateClient = () => {
         });
 
         // Close the modal
-        let modalElement = document.getElementById("exampleModalContact");
+        let modalElement = document.getElementById("exampleModalContact1");
         let modalInstance = bootstrap.Modal.getInstance(modalElement);
         if (modalInstance) {
           modalInstance.hide();
@@ -1986,7 +2053,7 @@ const CreateClient = () => {
   const handleEditClick = (id) => {
     const contactId = id;
     console.log(contactId);
-    const selectedUser = data?.find((item) => item.contact_id === id);
+    const selectedUser = data?.find((item) => item.ID === id);
 
     setState1((prevData) => ({
       ...prevData,
@@ -2011,6 +2078,7 @@ const CreateClient = () => {
     console.log(selectedUser);
     // Open the modal using jQuery or another method here
   };
+  console.log(updateId);
   const handleEditClick1 = (rowData) => {
     console.log(rowData);
     setUpdateId(rowData.ID);
@@ -2258,7 +2326,6 @@ const CreateClient = () => {
                     >
                       {t("add_consignee")}
                     </Link>
-                   
                   </div>
                 </div>
                 <div
@@ -2523,239 +2590,10 @@ const CreateClient = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#exampleModal"
                               >
-                                Add Contact
+                                {t("addContact")}
                               </button>
                             </div>
                             {/* add-contact-modal */}
-                            <div
-                              class="modal fade"
-                              id="exampleModal"
-                              tabindex="-1"
-                              aria-labelledby="exampleModalLabel"
-                              aria-hidden="true"
-                            >
-                              <div class="modal-dialog modalShipTo modal-xl">
-                                <div class="modal-content">
-                                  <div class="modal-header">
-                                    <h1
-                                      class="modal-title fs-5"
-                                      id="exampleModalLabel"
-                                    >
-                                      Add Contact
-                                    </h1>
-                                    <button
-                                      type="button"
-                                      class="btn-close"
-                                      data-bs-dismiss="modal"
-                                      onClick={clearAllData8}
-                                      aria-label="Close"
-                                    >
-                                      <i class="mdi mdi-close"></i>
-                                    </button>
-                                  </div>
-                                  <div class="modal-body">
-                                    <div className="formCreate">
-                                      <form action="">
-                                        <div className="row">
-                                          <div class="form-group col-lg-2">
-                                            <h6>First Name</h6>
-                                            <div class=" ">
-                                              <input
-                                                type="text"
-                                                name="Name_First"
-                                                value={state8.Name_First}
-                                                onChange={handleChange8}
-                                                placeholder="first name"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-2">
-                                            <h6>Last Name</h6>
-                                            <div class=" ">
-                                              <input
-                                                type="text"
-                                                name="Name_Last"
-                                                value={state8.Name_Last}
-                                                onChange={handleChange8}
-                                                placeholder="last name"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-3">
-                                            <h6>Email</h6>
-                                            <div class=" ">
-                                              <input
-                                                type="email"
-                                                name="Email"
-                                                value={state8.Email}
-                                                onChange={handleChange8}
-                                                placeholder="email"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-2">
-                                            <h6>Mobile</h6>
-                                            <div class=" ">
-                                              <input
-                                                type="number"
-                                                name="Mobile"
-                                                value={state8.Mobile}
-                                                onChange={handleChange8}
-                                                placeholder="mobile"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-3">
-                                            <h6>Phone</h6>
-                                            <div class=" ">
-                                              <input
-                                                type="number"
-                                                name="Phone"
-                                                value={state8.Phone}
-                                                onChange={handleChange8}
-                                                placeholder="phone"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-3">
-                                            <h6>Messenger type</h6>
-                                            <div class="ceateTransport autoComplete">
-                                              <Autocomplete
-                                                options={messengerOptions}
-                                                getOptionLabel={(option) =>
-                                                  option.label
-                                                } // what to display in dropdown
-                                                value={
-                                                  messengerOptions.find(
-                                                    (opt) =>
-                                                      opt.value ===
-                                                      Number(
-                                                        state1.Messenger_Type
-                                                      )
-                                                  ) || null
-                                                }
-                                                onChange={(event, newValue) =>
-                                                  setState8({
-                                                    ...state8,
-                                                    Messenger_Type: newValue
-                                                      ? newValue.value
-                                                      : "",
-                                                  })
-                                                }
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "messengerType"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-3">
-                                            <h6>Messenger Id</h6>
-                                            <div class=" ">
-                                              <input
-                                                type="number"
-                                                name="Messenger_ID"
-                                                value={state8.Messenger_ID}
-                                                onChange={handleChange8}
-                                                placeholder="messenger id"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-3">
-                                            <h6> Position </h6>
-                                            <div class=" ">
-                                              <input
-                                                type="number"
-                                                name="Messenger_ID"
-                                                value={state1.Messenger_ID}
-                                                onChange={handleChange1}
-                                                placeholder="position"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-3">
-                                            <h6>Title</h6>
-                                            <div class=" ">
-                                              <input
-                                                type="number"
-                                                name="Messenger_ID"
-                                                value={state1.Messenger_ID}
-                                                onChange={handleChange1}
-                                                placeholder="title"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-12">
-                                            <h6>{t("notes")}</h6>
-                                            <div>
-                                              <textarea
-                                                name="Notes"
-                                                value={state8.Notes}
-                                                onChange={handleChange8}
-                                                cols="30"
-                                                rows="4"
-                                              ></textarea>
-                                            </div>
-                                          </div>
-                                          <div className="form-group col-lg-12">
-                                            <div className="invoiceModal">
-                                              <div>
-                                                <input
-                                                  type="checkbox"
-                                                  id="dap"
-                                                  name="Accounting"
-                                                  checked={state8.Accounting}
-                                                  onChange={handleChange8}
-                                                />
-                                                <label htmlFor="dap">
-                                                  Accounting
-                                                </label>
-                                              </div>
-                                              <div>
-                                                <input
-                                                  type="checkbox"
-                                                  id="cnf"
-                                                  name="Invoice"
-                                                  checked={state8.Invoice}
-                                                  onChange={handleChange8}
-                                                />
-                                                <label htmlFor="cnf">
-                                                  Invoice
-                                                </label>
-                                              </div>
-                                              <input
-                                                type="checkbox"
-                                                id="cif"
-                                                name="Logitics"
-                                                checked={state8.Logitics}
-                                                onChange={handleChange8}
-                                              />
-                                              <label htmlFor="cif">
-                                                Logitics
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </form>
-                                    </div>
-                                  </div>
-                                  <div class="modal-footer">
-                                    <button
-                                      type="button"
-                                      class="btn btn-primary mb-0"
-                                      onClick={handleSubmit8}
-                                    >
-                                      submit
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
                           </div>
                         </div>
                         <div className="col-lg-3 form-group">
@@ -3118,20 +2956,20 @@ const CreateClient = () => {
                       {data?.map((item) => {
                         return (
                           <tr>
-                            <td>{item.first_name}</td>
-                            <td>{item.last_name}</td>
+                            <td>{item.Name_First}</td>
+                            <td>{item.Name_Last}</td>
                             <td>{item.Nick_name}</td>
-                            <td>{item.position}</td>
+                            <td>{item.Position}</td>
                             <td>{item.type}</td>
                             <td>{item.Email}</td>
-                            <td>{item.mobile}</td>
+                            <td>{item.Mobile}</td>
                             <td>
                               <div>
                                 {/* edit popup */}
                                 <button
                                   type="button"
                                   onClick={() =>
-                                    handleEditClick(item.contact_id)
+                                    handleEditClick(item.ID)
                                   }
                                   data-bs-toggle="modal"
                                   data-bs-target="#exampleModalEdit"
@@ -3362,7 +3200,7 @@ const CreateClient = () => {
 
                                 <button
                                   type="button"
-                                  onClick={() => deleteOrder1(item.contact_id)}
+                                  onClick={() => deleteOrder3(item.ID)}
                                 >
                                   <i class="mdi mdi-delete "></i>
                                 </button>
@@ -3374,17 +3212,14 @@ const CreateClient = () => {
                     </table>
                   </div>
                   <div className="row">
-                    <Link
+                    <button
                       style={{ width: "170px" }}
                       className="btn btn-danger mb-4"
-                      to="/"
-                      type="button"
                       data-bs-toggle="modal"
-                      data-bs-target="#exampleModalContact"
+                      data-bs-target="#exampleModal"
                     >
                       {t("addContact")}
-                    </Link>
-                   
+                    </button>
                   </div>
                 </div>
                 {/* statics */}
@@ -6136,7 +5971,7 @@ const CreateClient = () => {
                         onChange={handleChange6}
                       />
                     </div>
-                    <div className="col-lg-2 form-group">
+                    <div className="col-lg-3 form-group">
                       <h6>{t("markupValue")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
@@ -6155,7 +5990,7 @@ const CreateClient = () => {
                       </div>
                     </div>
 
-                    <div className="col-lg-2 form-group">
+                    <div className="col-lg-3 form-group">
                       <h6>{t("rebateValue")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
@@ -6174,7 +6009,7 @@ const CreateClient = () => {
                       </div>
                     </div>
 
-                    <div className="col-lg-2 form-group">
+                    <div className="col-lg-3 form-group">
                       <h6>{t("quotation")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
@@ -6193,7 +6028,7 @@ const CreateClient = () => {
                       </div>
                     </div>
 
-                    <div className="col-lg-2 form-group">
+                    {/* <div className="col-lg-2 form-group">
                       <h6>{t("claim")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
@@ -6210,9 +6045,9 @@ const CreateClient = () => {
                           <span>%</span>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
 
-                    <div className="col-lg-2 form-group">
+                    <div className="col-lg-3 form-group">
                       <h6>{t("other")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
@@ -6230,7 +6065,7 @@ const CreateClient = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="col-lg-2 form-group">
+                    {/* <div className="col-lg-2 form-group">
                       <h6>{t("final")}</h6>
                       <div className="parentShip">
                         <div className="markupShip">
@@ -6247,7 +6082,7 @@ const CreateClient = () => {
                           <span>%</span>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                   <hr className="border-line"></hr>
                   <div className="formCreate">
@@ -7280,662 +7115,314 @@ const CreateClient = () => {
         </div>
       </div>
       {/* modal end */}
-       {/* modal */}
-                    <div
-                      class="modal fade"
-                      id="exampleModalContactEdit"
-                      tabindex="-1"
-                      aria-labelledby="exampleModalLabel"
-                      aria-hidden="true"
-                    >
-                      <div class="modal-dialog modalShipTo modal-xl modal-dialog-scrollable">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">
-                              {t("updateConsignee")}
-                            </h1>
-                            <button
-                              type="button"
-                              class="btn-close"
-                              data-bs-dismiss="modal"
-                              aria-label="Close"
-                              onClick={clearAllFields1}
-                            >
-                              <i class="mdi mdi-close"></i>
-                            </button>
+      {/* modal */}
+      <div
+        class="modal fade"
+        id="exampleModalContactEdit"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modalShipTo modal-xl modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                {t("updateConsignee")}
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={clearAllFields1}
+              >
+                <i class="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div className="formCreate createPackage">
+                <form>
+                  <div className="row">
+                    <div className="consigneeEditTab">
+                      <ul
+                        className="nav nav-tabs"
+                        id="consigneeTabNew"
+                        role="tablist"
+                      >
+                        <li className="nav-item" role="presentation">
+                          <button
+                            className="nav-link active"
+                            id="consignee-customization-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#consignee-customization-pane"
+                            type="button"
+                            role="tab"
+                            aria-controls="consignee-customization-pane"
+                            aria-selected="true"
+                          >
+                            {t("customization")}
+                          </button>
+                        </li>
+
+                        <li className="nav-item" role="presentation">
+                          <button
+                            className="nav-link"
+                            id="consignee-notify-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#consignee-notify-pane"
+                            type="button"
+                            role="tab"
+                            aria-controls="consignee-notify-pane"
+                            aria-selected="false"
+                          >
+                            {t("notify")}
+                          </button>
+                        </li>
+
+                        <li className="nav-item" role="presentation">
+                          <button
+                            className="nav-link"
+                            id="consignee-margins-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#consignee-margins-pane"
+                            type="button"
+                            role="tab"
+                            aria-controls="consignee-margins-pane"
+                            aria-selected="false"
+                          >
+                            {t("marginsAndPayments")}
+                          </button>
+                        </li>
+
+                        <li className="nav-item" role="presentation">
+                          <button
+                            className="nav-link"
+                            id="consignee-invoice-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#consignee-invoice-pane"
+                            type="button"
+                            role="tab"
+                            aria-controls="consignee-invoice-pane"
+                            aria-selected="false"
+                          >
+                            {t("invoiceSetup")}
+                          </button>
+                        </li>
+                      </ul>
+
+                      <div className="tab-content" id="consigneeTabContentNew">
+                        <div
+                          className="tab-pane fade show active"
+                          id="consignee-customization-pane"
+                          role="tabpanel"
+                          aria-labelledby="consignee-customization-tab"
+                          tabIndex="0"
+                        >
+                          <div className="table-responsive">
+                            <table className="  tableContact striped  table borderTerpProduce">
+                              <tbody>
+                                <tr className="">
+                                  <th>{t("itfName")}</th>
+                                  <th>{t("customName")}</th>
+                                  <th>{t("dummyPrice")}</th>
+                                  <th>{t("customMargin")}</th>
+                                  <th>{t("maxPrice")}</th>
+                                  <th>{t("brand")}</th>
+                                  <th>{t("unit")}</th>
+                                  <th>{t("barcode")}</th>
+                                  <th>{t("action")}</th>
+                                </tr>
+                                {customization?.map((item) => {
+                                  return (
+                                    <tr>
+                                      <td>{item.Name_EN}rere</td>
+                                      <td>{item.Custom_Name}sadas</td>
+                                      <td>{item.Dummy_Price}</td>
+                                      <td>{item.brand_name}</td>
+                                      <td>{item.unit_name}</td>
+                                      <td>{item.Barcode}</td>
+                                      <td>
+                                        <div>
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              handleEditClickCustomization(
+                                                item.Id
+                                              )
+                                            }
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#exampleModalCustomizationEdit"
+                                          >
+                                            <i class="mdi mdi-pencil"></i>
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            onClick={() => deleteOrder(item.Id)}
+                                          >
+                                            <i class="mdi mdi-delete "></i>
+                                          </button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
                           </div>
-                          <div class="modal-body">
-                            <div className="formCreate createPackage">
-                              <form>
-                                <div className="row">
-                                  <div className="consigneeEditTab">
-                                    <ul
-                                      className="nav nav-tabs"
-                                      id="consigneeTabNew"
-                                      role="tablist"
-                                    >
-                                      <li
-                                        className="nav-item"
-                                        role="presentation"
-                                      >
-                                        <button
-                                          className="nav-link active"
-                                          id="consignee-customization-tab"
-                                          data-bs-toggle="tab"
-                                          data-bs-target="#consignee-customization-pane"
-                                          type="button"
-                                          role="tab"
-                                          aria-controls="consignee-customization-pane"
-                                          aria-selected="true"
-                                        >
-                                          {t("customization")}
-                                        </button>
-                                      </li>
 
-                                      <li
-                                        className="nav-item"
-                                        role="presentation"
-                                      >
-                                        <button
-                                          className="nav-link"
-                                          id="consignee-notify-tab"
-                                          data-bs-toggle="tab"
-                                          data-bs-target="#consignee-notify-pane"
-                                          type="button"
-                                          role="tab"
-                                          aria-controls="consignee-notify-pane"
-                                          aria-selected="false"
-                                        >
-                                          {t("notify")}
-                                        </button>
-                                      </li>
+                          <button
+                            style={{ width: "100px" }}
+                            className="btn btn-danger mb-4"
+                            type="button"
+                            onClick={handleOpenAddModal}
+                          >
+                            {t("add")}
+                          </button>
+                        </div>
+                        <div
+                          className="tab-pane fade"
+                          id="consignee-notify-pane"
+                          role="tabpanel"
+                          aria-labelledby="consignee-notify-tab"
+                          tabIndex="0"
+                        >
+                          <div className="row formCreate my-3">
+                            <div className="form-group col-lg-6">
+                              <h6>{t("name")}</h6>
+                              <input
+                                type="text"
+                                id="name_en"
+                                className="form-control"
+                                placeholder={t("name")}
+                                value={state.notify_name}
+                                name="notify_name"
+                                onChange={handleChange}
+                              />
+                            </div>
+                            <div className="form-group col-lg-6">
+                              <h6>{t("taxNumber")}</h6>
+                              <input
+                                type="number"
+                                id="name_en"
+                                className="form-control"
+                                placeholder={t("taxNumber")}
+                                value={state.notify_tax_number}
+                                name="notify_tax_number"
+                                onChange={handleChange}
+                              />
+                            </div>
+                            <div className="form-group col-lg-6">
+                              <h6> {t("email")}</h6>
+                              <input
+                                onChange={handleChange}
+                                type="email"
+                                id="hs_name"
+                                className="form-control"
+                                placeholder={t("email")}
+                                value={state.notify_email}
+                                name="notify_email"
+                              />
+                            </div>
+                            <div className="form-group col-lg-6">
+                              <h6>{t("phoneNumber")}</h6>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder={t("phoneNumber")}
+                                value={state.notify_phone}
+                                name="notify_phone"
+                                onChange={handleChange}
+                              />
+                            </div>
+                            <div className="form-group col-lg-12">
+                              <h6>{t("address")}</h6>
+                              <textarea
+                                className="col-lg-12 rounded h-20 w-full"
+                                style={{
+                                  border: "2px solid #245486",
+                                }}
+                                value={state.notify_address}
+                                name="notify_address"
+                                onChange={handleChange}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          className="tab-pane fade"
+                          id="consignee-margins-pane"
+                          role="tabpanel"
+                          aria-labelledby="consignee-margins-tab"
+                          tabIndex="0"
+                        >
+                          <div className="formCreate createPackage">
+                            <div className="row">
+                              <div className="col-lg-3 form-group autoComplete">
+                                <h6>{t("invoiceCurrency")}</h6>
+                                <Autocomplete
+                                  options={currency || []} // List of currencies
+                                  getOptionLabel={(option) => option.FX || ""} // Label to display (currency name for each item)
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "invoiceCurrency",
+                                        value: newValue ? newValue.ID : "",
+                                      },
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("selectCurrency")}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    currency?.find(
+                                      (item) =>
+                                        item.ID === state6.invoiceCurrency
+                                    ) || null
+                                  } // Set selected value based on invoiceCurrency
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  }
+                                />
+                              </div>
+                              <div className="col-lg-2 form-group autoComplete">
+                                <h6>{t("invoiceUnit")}</h6>
 
-                                      <li
-                                        className="nav-item"
-                                        role="presentation"
-                                      >
-                                        <button
-                                          className="nav-link"
-                                          id="consignee-margins-tab"
-                                          data-bs-toggle="tab"
-                                          data-bs-target="#consignee-margins-pane"
-                                          type="button"
-                                          role="tab"
-                                          aria-controls="consignee-margins-pane"
-                                          aria-selected="false"
-                                        >
-                                          {t("marginsAndPayments")}
-                                        </button>
-                                      </li>
-
-                                      <li
-                                        className="nav-item"
-                                        role="presentation"
-                                      >
-                                        <button
-                                          className="nav-link"
-                                          id="consignee-invoice-tab"
-                                          data-bs-toggle="tab"
-                                          data-bs-target="#consignee-invoice-pane"
-                                          type="button"
-                                          role="tab"
-                                          aria-controls="consignee-invoice-pane"
-                                          aria-selected="false"
-                                        >
-                                          {t("invoiceSetup")}
-                                        </button>
-                                      </li>
-                                    </ul>
-
-                                    <div
-                                      className="tab-content"
-                                      id="consigneeTabContentNew"
-                                    >
-                                      <div
-                                        className="tab-pane fade show active"
-                                        id="consignee-customization-pane"
-                                        role="tabpanel"
-                                        aria-labelledby="consignee-customization-tab"
-                                        tabIndex="0"
-                                      >
-                                        <div className="table-responsive">
-                                          <table className="  tableContact striped  table borderTerpProduce">
-                                            <tbody>
-                                              <tr className="">
-                                                <th>{t("itfName")}</th>
-                                                <th>{t("customName")}</th>
-                                                <th>{t("dummyPrice")}</th>
-                                                <th>{t("customMargin")}</th>
-                                                <th>{t("maxPrice")}</th>
-                                                <th>{t("brand")}</th>
-                                                <th>{t("unit")}</th>
-                                                <th>{t("barcode")}</th>
-                                                <th>{t("action")}</th>
-                                              </tr>
-                                              {customization?.map((item) => {
-                                                return (
-                                                  <tr>
-                                                    <td>{item.Name_EN}rere</td>
-                                                    <td>
-                                                      {item.Custom_Name}sadas
-                                                    </td>
-                                                    <td>{item.Dummy_Price}</td>
-                                                    <td>{item.brand_name}</td>
-                                                    <td>{item.unit_name}</td>
-                                                    <td>{item.Barcode}</td>
-                                                    <td>
-                                                      <div>
-                                                        <button
-                                                          type="button"
-                                                          onClick={() =>
-                                                            handleEditClickCustomization(
-                                                              item.Id
-                                                            )
-                                                          }
-                                                          data-bs-toggle="modal"
-                                                          data-bs-target="#exampleModalCustomizationEdit"
-                                                        >
-                                                          <i class="mdi mdi-pencil"></i>
-                                                        </button>
-                                                        {/* customixation modal */}
-                                                        <div
-                                                          className="modal fade"
-                                                          id="exampleModalCustomizationEdit"
-                                                          tabIndex={-1}
-                                                          aria-labelledby="exampleModalLabel"
-                                                          aria-hidden="true"
-                                                        >
-                                                          <div className=" modal-dialog modalShipTo">
-                                                            <div className="modal-content">
-                                                              <div className="modal-header">
-                                                                <h1
-                                                                  className="modal-title fs-5"
-                                                                  id="exampleModalLabel"
-                                                                >
-                                                                  {t(
-                                                                    "updateCustomization"
-                                                                  )}
-                                                                </h1>
-                                                                <button
-                                                                  type="button"
-                                                                  class="btn-close"
-                                                                  data-bs-dismiss="modal"
-                                                                  aria-label="Close"
-                                                                >
-                                                                  <i class="mdi mdi-close"></i>
-                                                                </button>
-                                                              </div>
-                                                              <div className="modal-body">
-                                                                <div className="formCreate">
-                                                                  <div className="row">
-                                                                    <div className="form-group col-lg-12 mb-2">
-                                                                      <h6>
-                                                                        {t(
-                                                                          "itfName"
-                                                                        )}
-                                                                      </h6>
-                                                                      <div className="ceateTransport autoComplete">
-                                                                        <Autocomplete
-                                                                          disablePortal
-                                                                          options={
-                                                                            getItf ||
-                                                                            []
-                                                                          }
-                                                                          getOptionLabel={(
-                                                                            option
-                                                                          ) =>
-                                                                            option.ITF_Internal_Name_EN ||
-                                                                            ""
-                                                                          }
-                                                                          onChange={(
-                                                                            e,
-                                                                            newValue
-                                                                          ) =>
-                                                                            setDataCustomization(
-                                                                              (
-                                                                                prevState
-                                                                              ) => ({
-                                                                                ...prevState,
-                                                                                ITF:
-                                                                                  newValue?.ID ||
-                                                                                  "",
-                                                                              })
-                                                                            )
-                                                                          }
-                                                                          value={
-                                                                            getItf?.find(
-                                                                              (
-                                                                                item
-                                                                              ) =>
-                                                                                item.ID ===
-                                                                                dataCustomization.ITF
-                                                                            ) ||
-                                                                            null
-                                                                          }
-                                                                          sx={{
-                                                                            width: 300,
-                                                                          }}
-                                                                          renderInput={(
-                                                                            params
-                                                                          ) => (
-                                                                            <TextField
-                                                                              {...params}
-                                                                              placeholder={t(
-                                                                                "selectItf"
-                                                                              )}
-                                                                              InputLabelProps={{
-                                                                                shrink: false,
-                                                                              }}
-                                                                            />
-                                                                          )}
-                                                                        />
-                                                                      </div>
-                                                                    </div>
-                                                                    <div class="form-group col-lg-12">
-                                                                      <h6>
-                                                                        {t(
-                                                                          "customName"
-                                                                        )}
-                                                                      </h6>
-                                                                      <div>
-                                                                        <input
-                                                                          type="text"
-                                                                          name="Custom_Name"
-                                                                          onChange={
-                                                                            handleChange2
-                                                                          }
-                                                                          value={
-                                                                            dataCustomization.Custom_Name
-                                                                          }
-                                                                          placeholder={t(
-                                                                            "customName"
-                                                                          )}
-                                                                          className="mb-2"
-                                                                        />
-                                                                      </div>
-                                                                    </div>
-                                                                    <div class="form-group col-lg-12">
-                                                                      <h6>
-                                                                        {t(
-                                                                          "agreedPrice"
-                                                                        )}
-                                                                      </h6>
-                                                                      <div>
-                                                                        <input
-                                                                          type="number"
-                                                                          name="Dummy_Price"
-                                                                          onChange={
-                                                                            handleChange2
-                                                                          }
-                                                                          value={
-                                                                            dataCustomization.Dummy_Price
-                                                                          }
-                                                                          placeholder={t(
-                                                                            "agreedPrice"
-                                                                          )}
-                                                                        />
-                                                                      </div>
-                                                                    </div>
-
-                                                                    <div className="form-group col-lg-12 ">
-                                                                      <h6>
-                                                                        {t(
-                                                                          "brand"
-                                                                        )}
-                                                                      </h6>
-                                                                      <div className="ceateTransport autoComplete">
-                                                                        <Autocomplete
-                                                                          options={
-                                                                            brands ||
-                                                                            []
-                                                                          } // List of brand options
-                                                                          getOptionLabel={(
-                                                                            option
-                                                                          ) =>
-                                                                            option.Name_EN ||
-                                                                            ""
-                                                                          } // Label to display
-                                                                          onChange={(
-                                                                            event,
-                                                                            newValue
-                                                                          ) => {
-                                                                            handleChange2(
-                                                                              {
-                                                                                target:
-                                                                                  {
-                                                                                    name: "brand",
-                                                                                    value:
-                                                                                      newValue
-                                                                                        ? newValue.ID
-                                                                                        : "",
-                                                                                  }, // Update selected brand_id
-                                                                              }
-                                                                            );
-                                                                          }}
-                                                                          renderInput={(
-                                                                            params
-                                                                          ) => (
-                                                                            <TextField
-                                                                              {...params}
-                                                                              placeholder={t(
-                                                                                "selectBrand"
-                                                                              )}
-                                                                              variant="outlined"
-                                                                            />
-                                                                          )}
-                                                                          value={
-                                                                            brands?.find(
-                                                                              (
-                                                                                item
-                                                                              ) =>
-                                                                                item.ID ===
-                                                                                dataCustomization.brand
-                                                                            ) ||
-                                                                            null
-                                                                          } // Set value based on selected brand_id
-                                                                          isOptionEqualToValue={(
-                                                                            option,
-                                                                            value
-                                                                          ) =>
-                                                                            option.ID ===
-                                                                            value.ID
-                                                                          } // Option comparison
-                                                                        />
-                                                                      </div>
-                                                                    </div>
-
-                                                                    <div className="form-group col-lg-12 ">
-                                                                      <h6>
-                                                                        {t(
-                                                                          "unit"
-                                                                        )}
-                                                                      </h6>
-                                                                      <div className="ceateTransport autoComplete">
-                                                                        <Autocomplete
-                                                                          options={
-                                                                            unitDropdown ||
-                                                                            []
-                                                                          } // List of ITFs
-                                                                          getOptionLabel={(
-                                                                            option
-                                                                          ) =>
-                                                                            option.Name_EN ||
-                                                                            ""
-                                                                          } // Label to display (itf_name_en for each ITF)
-                                                                          onChange={(
-                                                                            event,
-                                                                            newValue
-                                                                          ) => {
-                                                                            handleChange2(
-                                                                              {
-                                                                                target:
-                                                                                  {
-                                                                                    name: "Unit",
-                                                                                    value:
-                                                                                      newValue
-                                                                                        ? newValue.ID
-                                                                                        : "",
-                                                                                  }, // Update ITF in state
-                                                                              }
-                                                                            );
-                                                                          }}
-                                                                          renderInput={(
-                                                                            params
-                                                                          ) => (
-                                                                            <TextField
-                                                                              {...params}
-                                                                              placeholder={t(
-                                                                                "selectUnit"
-                                                                              )}
-                                                                              variant="outlined"
-                                                                            />
-                                                                          )}
-                                                                          value={
-                                                                            unitDropdown?.find(
-                                                                              (
-                                                                                item
-                                                                              ) =>
-                                                                                item.ID ===
-                                                                                dataCustomization.Unit
-                                                                            ) ||
-                                                                            null
-                                                                          } // Set selected value based on ITF
-                                                                          isOptionEqualToValue={(
-                                                                            option,
-                                                                            value
-                                                                          ) =>
-                                                                            option.ID ===
-                                                                            value.ID
-                                                                          } // Option comparison by itf_id
-                                                                        />
-                                                                      </div>
-                                                                      <div class="form-group col-lg-12 mt-2">
-                                                                        <h6>
-                                                                          {t(
-                                                                            "barcode"
-                                                                          )}
-                                                                        </h6>
-                                                                        <div className=" ">
-                                                                          <input
-                                                                            type="text"
-                                                                            name="Barcode"
-                                                                            onChange={
-                                                                              handleChange2
-                                                                            }
-                                                                            value={
-                                                                              dataCustomization.Barcode
-                                                                            }
-                                                                            placeholder={t(
-                                                                              "barcode"
-                                                                            )}
-                                                                          />
-                                                                        </div>
-                                                                      </div>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>
-                                                              </div>
-                                                              <div className="modal-footer">
-                                                                <button
-                                                                  type="button "
-                                                                  onClick={
-                                                                    customizationDataSubmit
-                                                                  }
-                                                                  className="btn mb-0 btn-primary"
-                                                                >
-                                                                  {t("update")}
-                                                                </button>
-                                                              </div>
-                                                            </div>
-                                                          </div>
-                                                        </div>
-
-                                                        {/* customization modal end */}
-                                                        <button
-                                                          type="button"
-                                                          onClick={() =>
-                                                            deleteOrder(item.Id)
-                                                          }
-                                                        >
-                                                          <i class="mdi mdi-delete "></i>
-                                                        </button>
-                                                      </div>
-                                                    </td>
-                                                  </tr>
-                                                );
-                                              })}
-                                            </tbody>
-                                          </table>
-                                        </div>
-
-                                        <button
-                                          style={{ width: "100px" }}
-                                          className="btn btn-danger mb-4"
-                                          type="button"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#exampleModalCustomization"
-                                        >
-                                          {t("add")}
-                                        </button>
-                                      </div>
-                                      <div
-                                        className="tab-pane fade"
-                                        id="consignee-notify-pane"
-                                        role="tabpanel"
-                                        aria-labelledby="consignee-notify-tab"
-                                        tabIndex="0"
-                                      >
-                                        <div className="row formCreate my-3">
-                                          <div className="form-group col-lg-6">
-                                            <h6>{t("name")}</h6>
-                                            <input
-                                              type="text"
-                                              id="name_en"
-                                              className="form-control"
-                                              placeholder={t("name")}
-                                              value={state.notify_name}
-                                              name="notify_name"
-                                              onChange={handleChange}
-                                            />
-                                          </div>
-                                          <div className="form-group col-lg-6">
-                                            <h6>{t("taxNumber")}</h6>
-                                            <input
-                                              type="number"
-                                              id="name_en"
-                                              className="form-control"
-                                              placeholder={t("taxNumber")}
-                                              value={state.notify_tax_number}
-                                              name="notify_tax_number"
-                                              onChange={handleChange}
-                                            />
-                                          </div>
-                                          <div className="form-group col-lg-6">
-                                            <h6> {t("email")}</h6>
-                                            <input
-                                              onChange={handleChange}
-                                              type="email"
-                                              id="hs_name"
-                                              className="form-control"
-                                              placeholder={t("email")}
-                                              value={state.notify_email}
-                                              name="notify_email"
-                                            />
-                                          </div>
-                                          <div className="form-group col-lg-6">
-                                            <h6>{t("phoneNumber")}</h6>
-                                            <input
-                                              type="text"
-                                              className="form-control"
-                                              placeholder={t("phoneNumber")}
-                                              value={state.notify_phone}
-                                              name="notify_phone"
-                                              onChange={handleChange}
-                                            />
-                                          </div>
-                                          <div className="form-group col-lg-12">
-                                            <h6>{t("address")}</h6>
-                                            <textarea
-                                              className="col-lg-12 rounded h-20 w-full"
-                                              style={{
-                                                border: "2px solid #245486",
-                                              }}
-                                              value={state.notify_address}
-                                              name="notify_address"
-                                              onChange={handleChange}
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div
-                                        className="tab-pane fade"
-                                        id="consignee-margins-pane"
-                                        role="tabpanel"
-                                        aria-labelledby="consignee-margins-tab"
-                                        tabIndex="0"
-                                      >
-                                        <div className="formCreate createPackage">
-                                          <div className="row">
-                                            <div className="col-lg-3 form-group autoComplete">
-                                              <h6>{t("invoiceCurrency")}</h6>
-                                              <Autocomplete
-                                                options={currency || []} // List of currencies
-                                                getOptionLabel={(option) =>
-                                                  option.FX || ""
-                                                } // Label to display (currency name for each item)
-                                                onChange={(event, newValue) => {
-                                                  handleChange6({
-                                                    target: {
-                                                      name: "invoiceCurrency",
-                                                      value: newValue
-                                                        ? newValue.ID
-                                                        : "",
-                                                    },
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectCurrency"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  currency?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      state6.invoiceCurrency
-                                                  ) || null
-                                                } // Set selected value based on invoiceCurrency
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.ID === value.ID}
-                                              />
-                                            </div>
-                                            <div className="col-lg-2 form-group autoComplete">
-                                              <h6>{t("invoiceUnit")}</h6>
-
-                                              <Autocomplete
-                                                options={unitDropdown || []}
-                                                getOptionLabel={(option) =>
-                                                  option.Name_EN || ""
-                                                } // Use Name_EN from API
-                                                onChange={(event, newValue) => {
-                                                  handleChange6({
-                                                    target: {
-                                                      name: "Invoice_Unit",
-                                                      value: newValue
-                                                        ? newValue.ID
-                                                        : "",
-                                                    },
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectUnit"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  unitDropdown?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      state6.Invoice_Unit
-                                                  ) || null
-                                                }
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.ID === value.ID}
-                                              />
-                                            </div>
-                                            {/* <div className="col-lg-3 form-group autoComplete">
+                                <Autocomplete
+                                  options={unitDropdown || []}
+                                  getOptionLabel={(option) =>
+                                    option.Name_EN || ""
+                                  } // Use Name_EN from API
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "Invoice_Unit",
+                                        value: newValue ? newValue.ID : "",
+                                      },
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("selectUnit")}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    unitDropdown?.find(
+                                      (item) => item.ID === state6.Invoice_Unit
+                                    ) || null
+                                  }
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  }
+                                />
+                              </div>
+                              {/* <div className="col-lg-3 form-group autoComplete">
                                           <h6>{t("selectConsignee")}</h6>
 
                                           <Autocomplete
@@ -7991,1497 +7478,1402 @@ const CreateClient = () => {
                                             </div>
                                           </div>
                                         </div> */}
-                                            <div className="col-lg-2 form-group autoComplete">
-                                              <h6>{t("commission")}</h6>
+                              <div className="col-lg-2 form-group autoComplete">
+                                <h6>{t("commission")}</h6>
 
-                                              <Autocomplete
-                                                options={commission || []}
-                                                getOptionLabel={(option) =>
-                                                  option.commission_name_en ||
-                                                  ""
-                                                }
-                                                onChange={(event, newValue) => {
-                                                  handleChange6({
-                                                    target: {
-                                                      name: "commissionType",
-                                                      value: newValue
-                                                        ? newValue.id
-                                                        : "",
-                                                    },
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectCommission"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  commission?.find(
-                                                    (item) =>
-                                                      item.id ===
-                                                      state6.commissionType
-                                                  ) || null
-                                                } // Set selected value based on commissionType
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.id === value.id} // Option comparison by id
-                                              />
-                                            </div>
-                                            <div className="col-lg-2 form-group">
-                                              <h6>{t("commissionValue")}</h6>
-                                              <div className="parentthb packParent">
-                                                <div className="childThb">
-                                                  <input
-                                                    type="text"
-                                                    name="commissionValue"
-                                                    placeholder={t(
-                                                      "commissionValue"
-                                                    )}
-                                                    value={
-                                                      state6.commissionValue
-                                                    }
-                                                    onChange={handleChange6}
-                                                  />
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div className="col-lg-1 shipToToggle">
-                                              <h6>{t("commission")}</h6>
-                                              <label
-                                                style={{
-                                                  display: "flex",
-                                                  justifyContent: "center",
-                                                  alignItems: "center",
-                                                  padding: "10px",
-                                                }}
-                                                className="toggleSwitch large"
-                                              >
-                                                <input
-                                                  type="checkbox"
-                                                  checked={
-                                                    state6.commissionCurrency ===
-                                                    "THB"
-                                                  }
-                                                  onChange={handleChange6}
-                                                  name="commissionCurrency"
-                                                />
-                                                <span>
-                                                  <span>{t("fx")}</span>
-                                                  <span> {t("thb")}</span>
-                                                </span>
-                                                <a> </a>
-                                              </label>
-                                            </div>
-                                            <div className="col-lg-2 shipToToggle">
-                                              <h6>{t("chargeVolume")}</h6>
-                                              <label
-                                                style={{
-                                                  display: "flex",
-                                                  justifyContent: "center",
-                                                  alignItems: "center",
-                                                  padding: "10px",
-                                                }}
-                                                className="toggleSwitch large"
-                                              >
-                                                <input
-                                                  type="checkbox"
-                                                  checked={
-                                                    state6.chargeVolume == 1
-                                                  }
-                                                  onChange={handleChange6}
-                                                  name="chargeVolume"
-                                                />
-                                                <span>
-                                                  <span>{t("no")}</span>
-                                                  <span>{t("yes")}</span>
-                                                </span>
-                                                <a> </a>
-                                              </label>
-                                            </div>
+                                <Autocomplete
+                                  options={commission || []}
+                                  getOptionLabel={(option) =>
+                                    option.commission_name_en || ""
+                                  }
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "commissionType",
+                                        value: newValue ? newValue.id : "",
+                                      },
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("selectCommission")}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    commission?.find(
+                                      (item) =>
+                                        item.id === state6.commissionType
+                                    ) || null
+                                  } // Set selected value based on commissionType
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.id === value.id
+                                  } // Option comparison by id
+                                />
+                              </div>
+                              <div className="col-lg-2 form-group">
+                                <h6>{t("commissionValue")}</h6>
+                                <div className="parentthb packParent">
+                                  <div className="childThb">
+                                    <input
+                                      type="text"
+                                      name="commissionValue"
+                                      placeholder={t("commissionValue")}
+                                      value={state6.commissionValue}
+                                      onChange={handleChange6}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="col-lg-1 shipToToggle">
+                                <h6>{t("commission")}</h6>
+                                <label
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    padding: "10px",
+                                  }}
+                                  className="toggleSwitch large"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={
+                                      state6.commissionCurrency === "THB"
+                                    }
+                                    onChange={handleChange6}
+                                    name="commissionCurrency"
+                                  />
+                                  <span>
+                                    <span>{t("fx")}</span>
+                                    <span> {t("thb")}</span>
+                                  </span>
+                                  <a> </a>
+                                </label>
+                              </div>
+                              <div className="col-lg-2 shipToToggle">
+                                <h6>{t("chargeVolume")}</h6>
+                                <label
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    padding: "10px",
+                                  }}
+                                  className="toggleSwitch large"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={state6.chargeVolume == 1}
+                                    onChange={handleChange6}
+                                    name="chargeVolume"
+                                  />
+                                  <span>
+                                    <span>{t("no")}</span>
+                                    <span>{t("yes")}</span>
+                                  </span>
+                                  <a> </a>
+                                </label>
+                              </div>
 
-                                            <div className="col-lg-2 form-group autoComplete">
-                                              <h6>
-                                                {t("deliveryTermsIncoterms")}
-                                              </h6>
-                                              <Autocomplete
-                                                options={DropdownDelivery || []} // List of delivery terms and incoterms
-                                                getOptionLabel={(option) =>
-                                                  option.Incoterms || ""
-                                                } // Label to display (Incoterms)
-                                                onChange={(event, newValue) => {
-                                                  handleChange6({
-                                                    target: {
-                                                      name: "deliveryTerms",
-                                                      value: newValue
-                                                        ? newValue.id
-                                                        : "",
-                                                    }, // Update deliveryTerms in state
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectDeliveryTermsIncoterms"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  DropdownDelivery?.find(
-                                                    (item) =>
-                                                      item.id ===
-                                                      state6.deliveryTerms
-                                                  ) || null
-                                                } // Set selected value based on deliveryTerms
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.id === value.id} // Option comparison by id
-                                              />
-                                            </div>
+                              <div className="col-lg-2 form-group autoComplete">
+                                <h6>{t("deliveryTermsIncoterms")}</h6>
+                                <Autocomplete
+                                  options={DropdownDelivery || []} // List of delivery terms and incoterms
+                                  getOptionLabel={(option) =>
+                                    option.Incoterms || ""
+                                  } // Label to display (Incoterms)
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "deliveryTerms",
+                                        value: newValue ? newValue.id : "",
+                                      }, // Update deliveryTerms in state
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t(
+                                        "selectDeliveryTermsIncoterms"
+                                      )}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    DropdownDelivery?.find(
+                                      (item) => item.id === state6.deliveryTerms
+                                    ) || null
+                                  } // Set selected value based on deliveryTerms
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.id === value.id
+                                  } // Option comparison by id
+                                />
+                              </div>
 
-                                            <div className="col-lg-2 form-group autoComplete">
-                                              <h6>{t("paymentTerms")}</h6>
-                                              <Autocomplete
-                                                options={FXCorrection || []} // List of payment terms
-                                                getOptionLabel={(option) =>
-                                                  `${option.DAYS} DAYS` || ""
-                                                } // Label to display (e.g., "30 DAYS")
-                                                onChange={(event, newValue) => {
-                                                  handleChange6({
-                                                    target: {
-                                                      name: "paymentTerms",
-                                                      value: newValue
-                                                        ? newValue.ID
-                                                        : "",
-                                                    }, // Update paymentTerms in state
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectPaymentTerms"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  FXCorrection?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      state6.paymentTerms
-                                                  ) || null
-                                                } // Set selected value based on paymentTerms
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.ID === value.ID} // Option comparison by ID
-                                              />
-                                            </div>
+                              <div className="col-lg-2 form-group autoComplete">
+                                <h6>{t("paymentTerms")}</h6>
+                                <Autocomplete
+                                  options={FXCorrection || []} // List of payment terms
+                                  getOptionLabel={(option) =>
+                                    `${option.DAYS} DAYS` || ""
+                                  } // Label to display (e.g., "30 DAYS")
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "paymentTerms",
+                                        value: newValue ? newValue.ID : "",
+                                      }, // Update paymentTerms in state
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("selectPaymentTerms")}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    FXCorrection?.find(
+                                      (item) => item.ID === state6.paymentTerms
+                                    ) || null
+                                  } // Set selected value based on paymentTerms
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  } // Option comparison by ID
+                                />
+                              </div>
 
-                                            <div className="col-lg-2 form-group autoComplete">
-                                              <h6>{t("statementDueDate")}</h6>
-                                              <Autocomplete
-                                                disablePortal
-                                                options={[
-                                                  {
-                                                    id: 1,
-                                                    label: "Pre Shipment",
-                                                  },
-                                                  { id: 2, label: "Seaport" },
-                                                ]} // Define the options array
-                                                getOptionLabel={(option) =>
-                                                  option.label
-                                                } // Display the `label` for each option
-                                                onChange={handleChange6} // Use the handleChange function
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectStatementDueDate"
-                                                    )}
-                                                    InputLabelProps={{
-                                                      shrink: false,
-                                                    }} // Prevents floating label
-                                                  />
-                                                )}
-                                                sx={{ width: 300 }}
-                                              />
-                                            </div>
+                              <div className="col-lg-2 form-group autoComplete">
+                                <h6>{t("statementDueDate")}</h6>
+                                <Autocomplete
+                                  disablePortal
+                                  options={[
+                                    {
+                                      id: 1,
+                                      label: "Pre Shipment",
+                                    },
+                                    { id: 2, label: "Seaport" },
+                                  ]} // Define the options array
+                                  getOptionLabel={(option) => option.label} // Display the `label` for each option
+                                  onChange={handleChange6} // Use the handleChange function
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("selectStatementDueDate")}
+                                      InputLabelProps={{
+                                        shrink: false,
+                                      }} // Prevents floating label
+                                    />
+                                  )}
+                                  sx={{ width: 300 }}
+                                />
+                              </div>
 
-                                            <div className="col-lg-2 form-group autoComplete">
-                                              <h6>{t("rounding")}</h6>
-                                              <Autocomplete
-                                                options={RoundingDataList || []} // List of delivery terms and incoterms
-                                                getOptionLabel={(option) =>
-                                                  option.DropDown || ""
-                                                } // Label to display (Incoterms)
-                                                onChange={(event, newValue) => {
-                                                  handleChange6({
-                                                    target: {
-                                                      name: "Rounding",
-                                                      value: newValue
-                                                        ? newValue.ID
-                                                        : "",
-                                                    }, // Update deliveryTerms in state
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectRounding"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  RoundingDataList?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      state6.Rounding
-                                                  ) || null
-                                                } // Set selected value based on deliveryTerms
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.ID === value.ID} // Option comparison by id
-                                              />
-                                            </div>
-                                            <div className="col-lg-2 form-group">
-                                              <h6>{t("extraCost")}</h6>
-                                              <input
-                                                type="text"
-                                                name="extraCost"
-                                                className="form-control"
-                                                placeholder={t("extraCost")}
-                                                value={state6.extraCost}
-                                                onChange={handleChange6}
-                                              />
-                                            </div>
-                                            <div className="col-lg-2 form-group  ">
-                                              <h6>{t("freightAdjustment")}</h6>
-                                              <input
-                                                type="text"
-                                                name="freightAdjust"
-                                                className="form-control"
-                                                placeholder={t(
-                                                  "freightAdjustment"
-                                                )}
-                                                value={state6.freightAdjust}
-                                                onChange={handleChange6}
-                                              />
-                                            </div>
-                                            <div className="col-lg-2 form-group">
-                                              <h6>{t("markupValue")}</h6>
-                                              <div className="parentShip">
-                                                <div className="markupShip">
-                                                  <input
-                                                    type="text"
-                                                    name="markupValue"
-                                                    className="form-control"
-                                                    placeholder={t(
-                                                      "markupValue"
-                                                    )}
-                                                    value={state6.markupValue}
-                                                    onChange={handleChange6}
-                                                  />
-                                                </div>
-                                                <div className="shipPercent">
-                                                  <span>%</span>
-                                                </div>
-                                              </div>
-                                            </div>
+                              <div className="col-lg-2 form-group autoComplete">
+                                <h6>{t("rounding")}</h6>
+                                <Autocomplete
+                                  options={RoundingDataList || []} // List of delivery terms and incoterms
+                                  getOptionLabel={(option) =>
+                                    option.DropDown || ""
+                                  } // Label to display (Incoterms)
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "Rounding",
+                                        value: newValue ? newValue.ID : "",
+                                      }, // Update deliveryTerms in state
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("selectRounding")}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    RoundingDataList?.find(
+                                      (item) => item.ID === state6.Rounding
+                                    ) || null
+                                  } // Set selected value based on deliveryTerms
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  } // Option comparison by id
+                                />
+                              </div>
+                              <div className="col-lg-2 form-group">
+                                <h6>{t("extraCost")}</h6>
+                                <input
+                                  type="text"
+                                  name="extraCost"
+                                  className="form-control"
+                                  placeholder={t("extraCost")}
+                                  value={state6.extraCost}
+                                  onChange={handleChange6}
+                                />
+                              </div>
+                              <div className="col-lg-2 form-group  ">
+                                <h6>{t("freightAdjustment")}</h6>
+                                <input
+                                  type="text"
+                                  name="freightAdjust"
+                                  className="form-control"
+                                  placeholder={t("freightAdjustment")}
+                                  value={state6.freightAdjust}
+                                  onChange={handleChange6}
+                                />
+                              </div>
+                              <div className="col-lg-3 form-group">
+                                <h6>{t("markupValue")}</h6>
+                                <div className="parentShip">
+                                  <div className="markupShip">
+                                    <input
+                                      type="text"
+                                      name="markupValue"
+                                      className="form-control"
+                                      placeholder={t("markupValue")}
+                                      value={state6.markupValue}
+                                      onChange={handleChange6}
+                                    />
+                                  </div>
+                                  <div className="shipPercent">
+                                    <span>%</span>
+                                  </div>
+                                </div>
+                              </div>
 
-                                            <div className="col-lg-2 form-group">
-                                              <h6>{t("rebateValue")}</h6>
-                                              <div className="parentShip">
-                                                <div className="markupShip">
-                                                  <input
-                                                    type="text"
-                                                    name="rebateValue"
-                                                    className="form-control"
-                                                    placeholder={t(
-                                                      "rebateValue"
-                                                    )}
-                                                    value={state6.rebateValue}
-                                                    onChange={handleChange6}
-                                                  />
-                                                </div>
-                                                <div className="shipPercent">
-                                                  <span>%</span>
-                                                </div>
-                                              </div>
-                                            </div>
+                              <div className="col-lg-3 form-group">
+                                <h6>{t("rebateValue")}</h6>
+                                <div className="parentShip">
+                                  <div className="markupShip">
+                                    <input
+                                      type="text"
+                                      name="rebateValue"
+                                      className="form-control"
+                                      placeholder={t("rebateValue")}
+                                      value={state6.rebateValue}
+                                      onChange={handleChange6}
+                                    />
+                                  </div>
+                                  <div className="shipPercent">
+                                    <span>%</span>
+                                  </div>
+                                </div>
+                              </div>
 
-                                            <div className="col-lg-2 form-group">
-                                              <h6>{t("quotation")}</h6>
-                                              <div className="parentShip">
-                                                <div className="markupShip">
-                                                  <input
-                                                    type="text"
-                                                    name="quotation"
-                                                    className="form-control"
-                                                    placeholder={t("quotation")}
-                                                    value={state6.quotation}
-                                                    onChange={handleChange6}
-                                                  />
-                                                </div>
-                                                <div className="shipPercent">
-                                                  <span>%</span>
-                                                </div>
-                                              </div>
-                                            </div>
+                              <div className="col-lg-3 form-group">
+                                <h6>{t("quotation")}</h6>
+                                <div className="parentShip">
+                                  <div className="markupShip">
+                                    <input
+                                      type="text"
+                                      name="quotation"
+                                      className="form-control"
+                                      placeholder={t("quotation")}
+                                      value={state6.quotation}
+                                      onChange={handleChange6}
+                                    />
+                                  </div>
+                                  <div className="shipPercent">
+                                    <span>%</span>
+                                  </div>
+                                </div>
+                              </div>
 
-                                            <div className="col-lg-2 form-group">
-                                              <h6>{t("claim")}</h6>
-                                              <div className="parentShip">
-                                                <div className="markupShip">
-                                                  <input
-                                                    type="text"
-                                                    name="claim"
-                                                    className="form-control"
-                                                    placeholder={t("claim")}
-                                                    value={claimValue1}
-                                                    onChange={handleChange6}
-                                                  />
-                                                </div>
-                                                <div className="shipPercent">
-                                                  <span>%</span>
-                                                </div>
-                                              </div>
-                                            </div>
+                              {/* <div className="col-lg-2 form-group">
+                                <h6>{t("claim")}</h6>
+                                <div className="parentShip">
+                                  <div className="markupShip">
+                                    <input
+                                      type="text"
+                                      name="claim"
+                                      className="form-control"
+                                      placeholder={t("claim")}
+                                      value={claimValue1}
+                                      onChange={handleChange6}
+                                    />
+                                  </div>
+                                  <div className="shipPercent">
+                                    <span>%</span>
+                                  </div>
+                                </div>
+                              </div> */}
 
-                                            <div className="col-lg-2 form-group">
-                                              <h6>{t("other")}</h6>
-                                              <div className="parentShip">
-                                                <div className="markupShip">
-                                                  <input
-                                                    type="text"
-                                                    name="other"
-                                                    className="form-control"
-                                                    placeholder={t("other")}
-                                                    value={state6.other}
-                                                    onChange={handleChange6}
-                                                  />
-                                                </div>
-                                                <div className="shipPercent">
-                                                  <span>%</span>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div className="col-lg-2 form-group">
-                                              <h6>{t("final")}</h6>
-                                              <div className="parentShip">
-                                                <div className="markupShip">
-                                                  <input
-                                                    type="text"
-                                                    name="final"
-                                                    className="form-control"
-                                                    placeholder={t("final")}
-                                                    value={claimValue}
-                                                    onChange={handleChange6}
-                                                  />
-                                                </div>
-                                                <div className="shipPercent">
-                                                  <span>%</span>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div
-                                        className="tab-pane fade"
-                                        id="consignee-invoice-pane"
-                                        role="tabpanel"
-                                        aria-labelledby="consignee-invoice-tab"
-                                        tabIndex="0"
+                              <div className="col-lg-3 form-group">
+                                <h6>{t("other")}</h6>
+                                <div className="parentShip">
+                                  <div className="markupShip">
+                                    <input
+                                      type="text"
+                                      name="other"
+                                      className="form-control"
+                                      placeholder={t("other")}
+                                      value={state6.other}
+                                      onChange={handleChange6}
+                                    />
+                                  </div>
+                                  <div className="shipPercent">
+                                    <span>%</span>
+                                  </div>
+                                </div>
+                              </div>
+                              {/* <div className="col-lg-2 form-group">
+                                <h6>{t("final")}</h6>
+                                <div className="parentShip">
+                                  <div className="markupShip">
+                                    <input
+                                      type="text"
+                                      name="final"
+                                      className="form-control"
+                                      placeholder={t("final")}
+                                      value={claimValue}
+                                      onChange={handleChange6}
+                                    />
+                                  </div>
+                                  <div className="shipPercent">
+                                    <span>%</span>
+                                  </div>
+                                </div>
+                              </div> */}
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          className="tab-pane fade"
+                          id="consignee-invoice-pane"
+                          role="tabpanel"
+                          aria-labelledby="consignee-invoice-tab"
+                          tabIndex="0"
+                        >
+                          <div className="formCreate">
+                            <div className="d-flex flex-wrap invAutoGen">
+                              <div>
+                                <h6>{t("clientAutoGenerate")}</h6>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>Invoice only</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>{t("packingListOnly")}</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>{t("statement")}</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="d-flex flex-wrap invAutoGen">
+                              <div>
+                                <h6>{t("consigneeAutoGenerate")}</h6>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>Invoice only</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>{t("packingListOnly")}</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>{t("statement")}</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="d-flex flex-wrap invAutoGen">
+                              <div>
+                                <h6>{t("shippingDocumentsAutoGenerate")}</h6>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>Invoice only</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>{t("packingListOnly")}</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="d-flex">
+                                  <p>{t("statement")}</p>
+                                  <div className="ms-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="row mt-4">
+                              <div className="form-group col-lg-6 invOptionSetup">
+                                <div className="row">
+                                  <div className="col-lg-6">
+                                    <h6>Invoice Options</h6>
+                                  </div>
+
+                                  <div className="col-lg-2">
+                                    <h6>{t("clients")}</h6>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <h6>{t("consignee")}</h6>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <h6>{t("shipping")}</h6>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <p>{t("useAgreedPricing")}</p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
                                       >
-                                        <div className="formCreate">
-                                          <div className="d-flex flex-wrap invAutoGen">
-                                            <div>
-                                              <h6>{t("clientAutoGenerate")}</h6>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>Invoice only</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>{t("packingListOnly")}</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>{t("statement")}</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <div className="d-flex flex-wrap invAutoGen">
-                                            <div>
-                                              <h6>
-                                                {t("consigneeAutoGenerate")}
-                                              </h6>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>Invoice only</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>{t("packingListOnly")}</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>{t("statement")}</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <div className="d-flex flex-wrap invAutoGen">
-                                            <div>
-                                              <h6>
-                                                {t(
-                                                  "shippingDocumentsAutoGenerate"
-                                                )}
-                                              </h6>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>Invoice only</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>{t("packingListOnly")}</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div>
-                                              <div className="d-flex">
-                                                <p>{t("statement")}</p>
-                                                <div className="ms-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <div className="row mt-4">
-                                            <div className="form-group col-lg-6 invOptionSetup">
-                                              <div className="row">
-                                                <div className="col-lg-6">
-                                                  <h6>Invoice Options</h6>
-                                                </div>
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <p>{t("useCustomName")}</p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <p>{t("showGrossWeightAndCBM")}</p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-12">
+                                    <div className="invoiceModal">
+                                      <p>{t("invoiceNameCanBe")} -</p>
+                                      <input
+                                        type="radio"
+                                        id="html1"
+                                        name="fav_language"
+                                        value="Client"
+                                      />
+                                      <label htmlFor="html1">
+                                        {t("client")}
+                                      </label>
 
-                                                <div className="col-lg-2">
-                                                  <h6>{t("clients")}</h6>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <h6>{t("consignee")}</h6>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <h6>{t("shipping")}</h6>
-                                                </div>
-                                                <div className="col-lg-6">
-                                                  <p>{t("useAgreedPricing")}</p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-6">
-                                                  <p>{t("useCustomName")}</p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-6">
-                                                  <p>
-                                                    {t("showGrossWeightAndCBM")}
-                                                  </p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-12">
-                                                  <div className="invoiceModal">
-                                                    <p>
-                                                      {t("invoiceNameCanBe")} -
-                                                    </p>
-                                                    <input
-                                                      type="radio"
-                                                      id="html1"
-                                                      name="fav_language"
-                                                      value="Client"
-                                                    />
-                                                    <label htmlFor="html1">
-                                                      {t("client")}
-                                                    </label>
-
-                                                    <input
-                                                      type="radio"
-                                                      id="css1"
-                                                      name="fav_language"
-                                                      value="Consignee"
-                                                    />
-                                                    <label htmlFor="css1">
-                                                      {t("consignee")}
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-6">
-                                                  <p>
-                                                    {t("showExchangeRate")}{" "}
-                                                  </p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <label
-                                                    className="toggleSwitch large"
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent: "center",
-                                                      alignItems: "center",
-                                                      padding: 10,
-                                                    }}
-                                                  >
-                                                    <input
-                                                      type="checkbox"
-                                                      name="Commission_Currency"
-                                                    />
-                                                    <span>
-                                                      <span>{t("no")}</span>
-                                                      <span>{t("yes")}</span>
-                                                    </span>
-                                                    <a> </a>
-                                                  </label>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <div className="col-lg-12">
-                                                <div className="invoiceModal">
-                                                  <p>{t("deliveryTerms")} -</p>
-                                                  <div>
-                                                    <input
-                                                      type="radio"
-                                                      id="dap"
-                                                      name="delivery_term"
-                                                      value="DAP"
-                                                    />
-                                                    <label htmlFor="dap">
-                                                      {t("dap")}
-                                                    </label>
-                                                  </div>
-                                                  <div>
-                                                    <input
-                                                      type="radio"
-                                                      id="cnf"
-                                                      name="delivery_term"
-                                                      value="CNF"
-                                                    />
-                                                    <label htmlFor="cnf">
-                                                      {t("cnf")}
-                                                    </label>
-                                                  </div>
-                                                  <input
-                                                    type="radio"
-                                                    id="cif"
-                                                    name="delivery_term"
-                                                    value="CIF"
-                                                  />
-                                                  <label htmlFor="cif">
-                                                    {t("cif")}
-                                                  </label>
-
-                                                  <div>
-                                                    <input
-                                                      type="radio"
-                                                      id="fob"
-                                                      name="delivery_term"
-                                                      value="FOB"
-                                                    />
-                                                    <label htmlFor="fob">
-                                                      {t("fob")}
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div className="form-group col-lg-6">
-                                              <div className="row">
-                                                <div className="col-lg-6">
-                                                  <h6>Packing List Options</h6>
-                                                </div>
-
-                                                <div className="col-lg-2">
-                                                  <h6>{t("clients")}</h6>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <h6>{t("consignee")}</h6>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <h6>{t("shipping")}</h6>
-                                                </div>
-
-                                                <div className="col-lg-6">
-                                                  <p>{t("useCustomName")}</p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-6">
-                                                  <p>
-                                                    {t("showGrossWeightAndCBM")}
-                                                  </p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-12">
-                                                  <div className="invoiceModal">
-                                                    <p>
-                                                      {t("invoiceNameCanBe")} -
-                                                    </p>
-                                                    <input
-                                                      type="radio"
-                                                      id="html1"
-                                                      name="fav_language"
-                                                      value="Client"
-                                                    />
-                                                    <label htmlFor="html1">
-                                                      {t("client")}
-                                                    </label>
-
-                                                    <input
-                                                      type="radio"
-                                                      id="css1"
-                                                      name="fav_language"
-                                                      value="Consignee"
-                                                    />
-                                                    <label htmlFor="css1">
-                                                      {t("consignee")}
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-6">
-                                                  <p>{t("bardcode")} </p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-6">
-                                                  <p>{t("customBarcode")}</p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-6">
-                                                  <p>{t("notes")} </p>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                                <div className="col-lg-2">
-                                                  <div>
-                                                    <label
-                                                      className="toggleSwitch large"
-                                                      style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                          "center",
-                                                        alignItems: "center",
-                                                        padding: 10,
-                                                      }}
-                                                    >
-                                                      <input
-                                                        type="checkbox"
-                                                        name="Commission_Currency"
-                                                      />
-                                                      <span>
-                                                        <span>{t("no")}</span>
-                                                        <span>{t("yes")}</span>
-                                                      </span>
-                                                      <a> </a>
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
+                                      <input
+                                        type="radio"
+                                        id="css1"
+                                        name="fav_language"
+                                        value="Consignee"
+                                      />
+                                      <label htmlFor="css1">
+                                        {t("consignee")}
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <p>{t("showExchangeRate")} </p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <label
+                                      className="toggleSwitch large"
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: 10,
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="Commission_Currency"
+                                      />
+                                      <span>
+                                        <span>{t("no")}</span>
+                                        <span>{t("yes")}</span>
+                                      </span>
+                                      <a> </a>
+                                    </label>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
                                     </div>
                                   </div>
                                 </div>
-                                {/* <div className="row justify-content-center">
+                                <div className="col-lg-12">
+                                  <div className="invoiceModal">
+                                    <p>{t("deliveryTerms")} -</p>
+                                    <div>
+                                      <input
+                                        type="radio"
+                                        id="dap"
+                                        name="delivery_term"
+                                        value="DAP"
+                                      />
+                                      <label htmlFor="dap">{t("dap")}</label>
+                                    </div>
+                                    <div>
+                                      <input
+                                        type="radio"
+                                        id="cnf"
+                                        name="delivery_term"
+                                        value="CNF"
+                                      />
+                                      <label htmlFor="cnf">{t("cnf")}</label>
+                                    </div>
+                                    <input
+                                      type="radio"
+                                      id="cif"
+                                      name="delivery_term"
+                                      value="CIF"
+                                    />
+                                    <label htmlFor="cif">{t("cif")}</label>
+
+                                    <div>
+                                      <input
+                                        type="radio"
+                                        id="fob"
+                                        name="delivery_term"
+                                        value="FOB"
+                                      />
+                                      <label htmlFor="fob">{t("fob")}</label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="form-group col-lg-6">
+                                <div className="row">
+                                  <div className="col-lg-6">
+                                    <h6>Packing List Options</h6>
+                                  </div>
+
+                                  <div className="col-lg-2">
+                                    <h6>{t("clients")}</h6>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <h6>{t("consignee")}</h6>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <h6>{t("shipping")}</h6>
+                                  </div>
+
+                                  <div className="col-lg-6">
+                                    <p>{t("useCustomName")}</p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <p>{t("showGrossWeightAndCBM")}</p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-12">
+                                    <div className="invoiceModal">
+                                      <p>{t("invoiceNameCanBe")} -</p>
+                                      <input
+                                        type="radio"
+                                        id="html1"
+                                        name="fav_language"
+                                        value="Client"
+                                      />
+                                      <label htmlFor="html1">
+                                        {t("client")}
+                                      </label>
+
+                                      <input
+                                        type="radio"
+                                        id="css1"
+                                        name="fav_language"
+                                        value="Consignee"
+                                      />
+                                      <label htmlFor="css1">
+                                        {t("consignee")}
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <p>{t("bardcode")} </p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <p>{t("customBarcode")}</p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <p>{t("notes")} </p>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-2">
+                                    <div>
+                                      <label
+                                        className="toggleSwitch large"
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          padding: 10,
+                                        }}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="Commission_Currency"
+                                        />
+                                        <span>
+                                          <span>{t("no")}</span>
+                                          <span>{t("yes")}</span>
+                                        </span>
+                                        <a> </a>
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* <div className="row justify-content-center">
                                 <div className="col-lg-4 form-group autoComplete">
                                   <h6>{t("brand")}</h6>
                                   <Autocomplete
@@ -9660,22 +9052,607 @@ const CreateClient = () => {
                                   />
                                 </div>
                               </div> */}
-                              </form>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button
-                              type="button"
-                              class="btn btn-primary mb-0"
-                              onClick={updatePaymentValue}
-                            >
-                              {t("submit")}{" "}
-                            </button>
-                          </div>
+                </form>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary mb-0"
+                onClick={updatePaymentValue}
+              >
+                {t("submit")}{" "}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* modal end */}
+      <div
+        class="modal fade"
+        id="exampleModalContact1"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modalShipTo modal-xl ">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                {t("contact")}
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={dataClear}
+              >
+                <i class="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div className="formCreate">
+                <form action="">
+                  <div className="row">
+                    <div class="form-group col-lg-3">
+                      <h6>{t("contactType")}</h6>
+                      <div class="ceateTransport autoComplete">
+                        <Autocomplete
+                          disablePortal
+                          options={contactType}
+                          getOptionLabel={(option) => option.type_en}
+                          isOptionEqualToValue={(option, value) =>
+                            option.contact_type_id === value.contact_type_id
+                          }
+                          onChange={(e, newValue) =>
+                            handleChange1({
+                              target: {
+                                name: "contact_type_id",
+                                value: newValue?.contact_type_id || "",
+                              },
+                            })
+                          }
+                          value={
+                            contactType?.find(
+                              (item) =>
+                                item.contact_type_id === state1?.contact_type_id
+                            ) || null
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              // label="Select Type"
+                              placeholder={t("selectType")}
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("firstName")}</h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="first_name"
+                          onChange={handleChange1}
+                          value={state1.first_name}
+                          placeholder={t("firstName")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("lastName")}</h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="last_name"
+                          onChange={handleChange1}
+                          value={state1.last_name}
+                          placeholder={t("lastName")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("nickName")}</h6>
+                      <div>
+                        <input
+                          type="text"
+                          name="Nick_name"
+                          onChange={handleChange1}
+                          value={state1.Nick_name}
+                          placeholder={t("nickName")}
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-group col-lg-3">
+                      <h6>{t("position")}</h6>
+
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="position"
+                          onChange={handleChange1}
+                          value={state1.position}
+                          placeholder={t("position")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("email")}</h6>
+                      <div class=" ">
+                        <input
+                          type="email"
+                          name="Email"
+                          onChange={handleChange1}
+                          value={state1.Email}
+                          placeholder={t("email")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("mobile")}</h6>
+                      <div class=" ">
+                        <input
+                          type="number"
+                          name="mobile"
+                          onChange={handleChange1}
+                          value={state1.mobile}
+                          placeholder={t("mobile")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("landline")}</h6>
+                      <div class=" ">
+                        <input
+                          type="number"
+                          name="landline"
+                          onChange={handleChange1}
+                          value={state1.landline}
+                          placeholder={t("landline")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-4">
+                      <h6>{t("birthday")}</h6>
+                      <div>
+                        <input
+                          type="date"
+                          name="birthday"
+                          onChange={handleChange1}
+                          value={state1.birthday}
+                          placeholder={t("birthday")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-8">
+                      <h6>{t("notes")}</h6>
+                      <div>
+                        <textarea
+                          name="Notes"
+                          onChange={handleChange1}
+                          value={state1.Notes}
+                          cols="30"
+                          rows="5"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary mb-0"
+                onClick={contactDataSubmit}
+              >
+                {t("submit")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="modal fade"
+        id="exampleModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modalShipTo modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                {t("addContact")}{" "}
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                onClick={clearAllData8}
+                aria-label="Close"
+              >
+                <i class="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div className="formCreate">
+                <form action="">
+                  <div className="row">
+                    <div class="form-group col-lg-2">
+                      <h6>{t("title")}</h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="Title"
+                          value={state8.Title}
+                          onChange={handleChange8}
+                          placeholder={t("title")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("firstName")}</h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="Name_First"
+                          value={state8.Name_First}
+                          onChange={handleChange8}
+                          placeholder={t("firstName")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("lastName")}</h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="Name_Last"
+                          value={state8.Name_Last}
+                          onChange={handleChange8}
+                          placeholder={t("lastName")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6> {t("position")} </h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="Position"
+                          value={state8.Position}
+                          onChange={handleChange8}
+                          placeholder={t("position")}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-lg-3 d-flex align-items-center">
+                      <div className="invoiceModal d-flex">
+                        <div className="d-flex">
+                          <input
+                            type="checkbox"
+                            id="dap"
+                            name="Accounting"
+                            checked={state8.Accounting}
+                            onChange={handleChange8}
+                          />
+                          <label htmlFor="dap">{t("accounting")}</label>
+                        </div>
+                        <div className="d-flex">
+                          <input
+                            type="checkbox"
+                            id="cnf"
+                            name="Invoice"
+                            checked={state8.Invoice}
+                            onChange={handleChange8}
+                          />
+                          <label htmlFor="cnf">{t("invoice")}</label>
+                        </div>
+                        <div className="d-flex">
+                          <input
+                            type="checkbox"
+                            id="cif"
+                            name="Logitics"
+                            checked={state8.Logitics}
+                            onChange={handleChange8}
+                          />
+                          <label htmlFor="cif">{t("logistics")}</label>
                         </div>
                       </div>
                     </div>
-                    {/* modal end */}
+                    <div class="form-group col-lg-3">
+                      <h6>{t("email")}</h6>
+                      <div class=" ">
+                        <input
+                          type="email"
+                          name="Email"
+                          value={state8.Email}
+                          onChange={handleChange8}
+                          placeholder={t("email")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("mobile")}</h6>
+                      <div class=" ">
+                        <input
+                          type="number"
+                          name="Mobile"
+                          value={state8.Mobile}
+                          onChange={handleChange8}
+                          placeholder={t("mobile")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("phone")}</h6>
+                      <div class=" ">
+                        <input
+                          type="number"
+                          name="Phone"
+                          value={state8.Phone}
+                          onChange={handleChange8}
+                          placeholder={t("phone")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("messengerType")}</h6>
+                      <div class="ceateTransport autoComplete">
+                        <Autocomplete
+                          options={messengerOptions}
+                          getOptionLabel={(option) => option.label} // what to display in dropdown
+                          value={
+                            messengerOptions.find(
+                              (opt) =>
+                                opt.value === Number(state8.Messenger_Type)
+                            ) || null
+                          }
+                          onChange={(event, newValue) =>
+                            setState8({
+                              ...state8,
+                              Messenger_Type: newValue ? newValue.value : "",
+                            })
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("messengerType")}
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("messengerId")}</h6>
+                      <div class=" ">
+                        <input
+                          type="number"
+                          name="Messenger_ID"
+                          value={state8.Messenger_ID}
+                          onChange={handleChange8}
+                          placeholder="messenger id"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-group col-lg-12">
+                      <h6>{t("notes")}</h6>
+                      <div>
+                        <textarea
+                          name="Notes"
+                          value={state8.Notes}
+                          onChange={handleChange8}
+                          cols="30"
+                          rows="4"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary mb-0"
+                onClick={handleSubmit8}
+              >
+                {t("submit")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* customixation modal */}
+
+      {showAddModal && (
+        <div
+          className={`modal fade show`}
+          style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+          tabIndex={-1}
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div className=" modal-dialog modalShipTo">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h1 className="modal-title fs-5" id="exampleModalLabel">
+                  {t("updateCustomization")}
+                </h1>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={handleCloseAddModal}
+                  aria-label="Close"
+                >
+                  <i class="mdi mdi-close"></i>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="formCreate">
+                  <div className="row">
+                    <div className="form-group col-lg-12 mb-2">
+                      <h6>{t("itfName")}</h6>
+                      <div className="ceateTransport autoComplete">
+                        <Autocomplete
+                          disablePortal
+                          options={getItf || []}
+                          getOptionLabel={(option) =>
+                            option.ITF_Internal_Name_EN || ""
+                          }
+                          onChange={(e, newValue) =>
+                            setDataCustomization((prevState) => ({
+                              ...prevState,
+                              ITF: newValue?.ID || "",
+                            }))
+                          }
+                          value={
+                            getItf?.find(
+                              (item) => item.ID === dataCustomization.ITF
+                            ) || null
+                          }
+                          sx={{
+                            width: 300,
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("selectItf")}
+                              InputLabelProps={{
+                                shrink: false,
+                              }}
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-12">
+                      <h6>{t("customName")}</h6>
+                      <div>
+                        <input
+                          type="text"
+                          name="Custom_Name"
+                          onChange={handleChange2}
+                          value={dataCustomization.Custom_Name}
+                          placeholder={t("customName")}
+                          className="mb-2"
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-12">
+                      <h6>{t("agreedPrice")}</h6>
+                      <div>
+                        <input
+                          type="number"
+                          name="Dummy_Price"
+                          onChange={handleChange2}
+                          value={dataCustomization.Dummy_Price}
+                          placeholder={t("agreedPrice")}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group col-lg-12 ">
+                      <h6>{t("brand")}</h6>
+                      <div className="ceateTransport autoComplete">
+                        <Autocomplete
+                          options={brands || []} // List of brand options
+                          getOptionLabel={(option) => option.Name_EN || ""} // Label to display
+                          onChange={(event, newValue) => {
+                            handleChange2({
+                              target: {
+                                name: "brand",
+                                value: newValue ? newValue.ID : "",
+                              }, // Update selected brand_id
+                            });
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("selectBrand")}
+                              variant="outlined"
+                            />
+                          )}
+                          value={
+                            brands?.find(
+                              (item) => item.ID === dataCustomization.brand
+                            ) || null
+                          } // Set value based on selected brand_id
+                          isOptionEqualToValue={(option, value) =>
+                            option.ID === value.ID
+                          } // Option comparison
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group col-lg-12 ">
+                      <h6>{t("unit")}</h6>
+                      <div className="ceateTransport autoComplete">
+                        <Autocomplete
+                          options={unitDropdown || []} // List of ITFs
+                          getOptionLabel={(option) => option.Name_EN || ""} // Label to display (itf_name_en for each ITF)
+                          onChange={(event, newValue) => {
+                            handleChange2({
+                              target: {
+                                name: "Unit",
+                                value: newValue ? newValue.ID : "",
+                              }, // Update ITF in state
+                            });
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("selectUnit")}
+                              variant="outlined"
+                            />
+                          )}
+                          value={
+                            unitDropdown?.find(
+                              (item) => item.ID === dataCustomization.Unit
+                            ) || null
+                          } // Set selected value based on ITF
+                          isOptionEqualToValue={(option, value) =>
+                            option.ID === value.ID
+                          } // Option comparison by itf_id
+                        />
+                      </div>
+                      <div class="form-group col-lg-12 mt-2">
+                        <h6>{t("barcode")}</h6>
+                        <div className=" ">
+                          <input
+                            type="text"
+                            name="Barcode"
+                            onChange={handleChange2}
+                            value={dataCustomization.Barcode}
+                            placeholder={t("barcode")}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button "
+                  onClick={customizationDataSubmit}
+                  className="btn mb-0 btn-primary"
+                >
+                  {t("update")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* customization modal end */}
     </>
   );
 };

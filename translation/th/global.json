@@ -1111,5 +1111,8 @@
   "Entity": "นิติบุคคล",
   "SelectEntity": "เลือกนิติบุคคล",
   "add_consignee": "เพิ่มผู้รับสินค้า",
-  "updateConsignee": "อัปเดตผู้รับสินค้า"
+  "updateConsignee": "อัปเดตผู้รับสินค้า",
+    "title": "หัวข้อ",
+  "logistics": "โลจิสติกส์",
+  "messengerId": "รหัสผู้ส่งสาร"
 }

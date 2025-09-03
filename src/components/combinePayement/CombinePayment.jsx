@@ -703,13 +703,13 @@ const CombinePayment = () => {
               {t("create")}
             </button>
 
-            <button
+            {/* <button
               type="button"
               onClick={() => navigate("/reimburse")}
               className="btn button btn-info"
             >
               {t("reimburse")}
-            </button>
+            </button> */}
           </div>
         }
       >
