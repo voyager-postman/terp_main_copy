@@ -38,6 +38,7 @@ const AddShipTo = () => {
   //
   const location = useLocation();
   const { from } = location.state || {};
+  const [isEdit, setIsEdit] = useState(false);
   console.log(from);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const { data: massengerTypeList } = useQuery("getMessengerType");
@@ -117,7 +118,7 @@ const AddShipTo = () => {
     Bank_Address: from?.Bank_Address ?? "",
   });
   const [state8, setState8] = useState({
-    VCID: from?.ID || "",
+    VCID: "",
     Name_First: "",
     Name_Last: "",
     Email: "",
@@ -143,6 +144,7 @@ const AddShipTo = () => {
     try {
       const payload = {
         ...state8, // assuming your state variable is `state`
+        VCID: from?.ID || state8.VCID, // ✅ ensure VCID is sent
         User_ID: localStorage.getItem("id"), // Get from localStorage
       };
 
@@ -159,10 +161,6 @@ const AddShipTo = () => {
         Mobile: "",
         Messenger_Type: "",
         Messenger_ID: "",
-        Title: "",
-        Position: "",
-        Title: "",
-        Position: "",
         Notes: "",
         Accounting: false,
         Invoice: false,
@@ -175,7 +173,7 @@ const AddShipTo = () => {
       if (modalInstance) {
         modalInstance.hide();
       }
-
+      getAllContact();
       // Success toast (using message from API if available)
       toast.success(res.data?.message, {
         autoClose: 1000,
@@ -198,8 +196,6 @@ const AddShipTo = () => {
       Email: "",
       Phone: "",
       Mobile: "",
-      Title: "",
-      Position: "",
       Messenger_Type: "",
       Messenger_ID: "",
       Notes: "",
@@ -208,7 +204,25 @@ const AddShipTo = () => {
       Logitics: false,
     });
   };
-
+  const handleAddClick = () => {
+    setIsEdit(false);
+    setState8({
+      Title: "",
+      Name_First: "",
+      Name_Last: "",
+      Position: "",
+      Accounting: false,
+      Invoice: false,
+      Logitics: false,
+      Email: "",
+      Mobile: "",
+      Phone: "",
+      Messenger_Type: "",
+      Messenger_ID: "",
+      Notes: "",
+      Nick_name: "",
+    });
+  };
   const { data: dropdownVendor } = useQuery("getDropdownVendor");
   const { data: dropdownDistrict } = useQuery("getDropdownAddressDistrict");
   const { data: dropdownSubDistrict } = useQuery(
@@ -511,10 +525,22 @@ const AddShipTo = () => {
   const handleChange7 = (event) => {
     setSelectedDeliveryTerm(event.target.value);
   };
-  const handleChange8 = (event) => {
-    setSelectedInvoiceOrder(event.target.value);
+  const handleChange8 = (e) => {
+    const { name, value, type, checked } = e.target;
+    setState8((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
-
+  useEffect(() => {
+    if (from?.ID) {
+      console.log(from?.ID);
+      setState8((prev) => ({
+        ...prev,
+        VCID: from.ID,
+      }));
+    }
+  }, [from]);
   const getData2 = () => {
     if (selectedId) {
       axios
@@ -542,7 +568,32 @@ const AddShipTo = () => {
       console.log(res);
     });
   };
-
+  const deleteOrder3 = (id) => {
+    console.log(id);
+    MySwal.fire({
+      title: t("areYouSure"),
+      text: t("irreversible"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Delete",
+    }).then(async (result) => {
+      console.log(result);
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(`${API_BASE_URL}/deleteVCContact`, {
+            ID: id,
+          });
+          console.log(response);
+          getAllContact();
+          toast.success("Contact delete successfully");
+        } catch (e) {
+          toast.error(t("genericError"));
+        }
+      }
+    });
+  };
   // Fetch data from API and map to options for dropdown
   const orderData1 = () => {
     axios
@@ -1681,14 +1732,19 @@ const AddShipTo = () => {
 
   const getAllContact = () => {
     axios
-      .post(`${API_BASE_URL}/getContactList`, {
-        consignee_id: from?.consignee_id,
+      .post(`${API_BASE_URL}/getVCConstact`, {
+        VCID: from?.ID,
       })
       .then((res) => {
-        console.log(res);
-        setData(res.data.data || []);
+        const { head, data } = res.data;
+
+        setData(data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching data", err);
       });
   };
+  console.log(data);
   const getAllCustomization = () => {
     axios
       .post(`${API_BASE_URL}/getConsigneeCustomization`, {
@@ -1700,6 +1756,7 @@ const AddShipTo = () => {
       });
   };
   useEffect(() => {
+    getAllContact();
     getAllContact();
     getAllCustomization();
   }, []);
@@ -2047,31 +2104,28 @@ const AddShipTo = () => {
   };
 
   const handleEditClick = (id) => {
-    const contactId = id;
-    console.log(contactId);
-    const selectedUser = data?.find((item) => item.contact_id === id);
+    const selectedUser = data?.find((item) => item.ID === id);
+    if (!selectedUser) return;
 
-    setState1((prevData) => ({
-      ...prevData,
-      client_id: selectedUser?.client_id || "",
-      contact_type_id: selectedUser?.contact_type_id || "",
-      consignee_id: selectedUser?.consignee_id || "",
-      contact_id: contactId,
-      first_name: selectedUser?.first_name || "",
-      last_name: selectedUser?.last_name || "",
-      position: selectedUser?.position || "",
+    setIsEdit(true);
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", selectedUser);
+    setState8({
+      ID: selectedUser?.ID || "", // keep ID for update
+      Title: selectedUser?.Title || "",
+      Name_First: selectedUser?.Name_First || "",
+      Name_Last: selectedUser?.Name_Last || "",
+      Position: selectedUser?.Position || "",
+      Accounting: selectedUser?.Accounting === 1,
+      Invoice: selectedUser?.Invoice === 1,
+      Logitics: selectedUser?.Logitics === 1,
       Email: selectedUser?.Email || "",
-      mobile: selectedUser?.mobile || "",
-      landline: selectedUser?.landline || "",
-      birthday: selectedUser
-        ? new Date(selectedUser.birthday).toISOString().split("T")[0]
-        : "",
+      Mobile: selectedUser?.Mobile || "",
+      Phone: selectedUser?.Phone || "",
+      Messenger_Type: selectedUser?.Messenger_Type || "",
+      Messenger_ID: selectedUser?.Messenger_ID || "",
       Notes: selectedUser?.Notes || "",
       Nick_name: selectedUser?.Nick_name || "",
-    }));
-
-    console.log(selectedUser);
-    // Open the modal using jQuery or another method here
+    });
   };
   const handleEditClickCustomization = (id) => {
     const contactId = id;
@@ -2197,42 +2251,42 @@ const AddShipTo = () => {
 
   return (
     <>
-    <Card
-      title={`${t("consignee")} / ${
-        from?.consignee_id ? t("update") : t("create")
-      } ${t("form")}`}
-    >
-      <div className="top-space-search-reslute">
-        <div className="tab-content px-2 md:!px-4">
-          <div className="tab-pane active" id="header" role="tabpanel">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link active"
-                  id="first-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#first-tab-pane"
-                  type="button"
-                  role="tab"
-                  aria-controls="first-tab-pane"
-                >
-                  {t("details")}
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link "
-                  id="home-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#home-tab-pane"
-                  type="button"
-                  role="tab"
-                  aria-controls="home-tab-pane"
-                >
-                  {t("contact")}
-                </button>
-              </li>
-              {/* <li class="nav-item" role="presentation">
+      <Card
+        title={`${t("consignee")} / ${
+          from?.consignee_id ? t("update") : t("create")
+        } ${t("form")}`}
+      >
+        <div className="top-space-search-reslute">
+          <div className="tab-content px-2 md:!px-4">
+            <div className="tab-pane active" id="header" role="tabpanel">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link active"
+                    id="first-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#first-tab-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="first-tab-pane"
+                  >
+                    {t("details")}
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link "
+                    id="home-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#home-tab-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="home-tab-pane"
+                  >
+                    {t("contact")}
+                  </button>
+                </li>
+                {/* <li class="nav-item" role="presentation">
                 <button
                   class="nav-link"
                   id="profile-tab"
@@ -2246,7 +2300,7 @@ const AddShipTo = () => {
                   {t("customization")}
                 </button>
               </li> */}
-              {/* <li class="nav-item" role="presentation">
+                {/* <li class="nav-item" role="presentation">
                 <button
                   class="nav-link "
                   id="notify-tab"
@@ -2259,23 +2313,23 @@ const AddShipTo = () => {
                   {t("notify")}
                 </button>
               </li> */}
-              {localStorage.getItem("level") !== "Level 5" && (
-                <>
-                  <li class="nav-item" role="presentation">
-                    <button
-                      class="nav-link"
-                      id="contact-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#contact-tab-pane"
-                      type="button"
-                      role="tab"
-                      aria-controls="contact-tab-pane"
-                      aria-selected="false"
-                    >
-                      {t("portfolio")}
-                    </button>
-                  </li>
-                  {/* <li class="nav-item" role="presentation">
+                {localStorage.getItem("level") !== "Level 5" && (
+                  <>
+                    <li class="nav-item" role="presentation">
+                      <button
+                        class="nav-link"
+                        id="contact-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#contact-tab-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="contact-tab-pane"
+                        aria-selected="false"
+                      >
+                        {t("portfolio")}
+                      </button>
+                    </li>
+                    {/* <li class="nav-item" role="presentation">
                     <button
                       class="nav-link"
                       id="margins-tab"
@@ -2289,9 +2343,9 @@ const AddShipTo = () => {
                       {t("marginsAndPayments")}
                     </button>
                   </li> */}
-                </>
-              )}
-              {/* <li class="nav-item" role="presentation">
+                  </>
+                )}
+                {/* <li class="nav-item" role="presentation">
                 <button
                   class="nav-link"
                   id="invoiceSetup-tab"
@@ -2305,260 +2359,526 @@ const AddShipTo = () => {
                   {t("invoiceSetup")}
                 </button>
               </li> */}
-            </ul>
-            <div class="tab-content" id="myTabContent">
-              {/* invoiceSetup */}
-              <div
-                class="tab-pane fade"
-                id="invoiceSetup-tab-pane"
-                role="tabpanel"
-                aria-labelledby="invoiceSetup-tab"
-                tabindex="0"
-              >
-                <div className="formCreate pt-3">
-                  <div className="d-flex flex-wrap invAutoGen">
-                    <div>
-                      <h6>{t("clientAutoGenerate")}</h6>
-                    </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>Invoice only</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                {/* invoiceSetup */}
+                <div
+                  class="tab-pane fade"
+                  id="invoiceSetup-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="invoiceSetup-tab"
+                  tabindex="0"
+                >
+                  <div className="formCreate pt-3">
+                    <div className="d-flex flex-wrap invAutoGen">
+                      <div>
+                        <h6>{t("clientAutoGenerate")}</h6>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>Invoice only</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>{t("packingListOnly")}</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>{t("statement")}</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>{t("packingListOnly")}</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
+                    <div className="d-flex flex-wrap invAutoGen">
+                      <div>
+                        <h6>{t("consigneeAutoGenerate")}</h6>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>Invoice only</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>{t("packingListOnly")}</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>{t("statement")}</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>{t("statement")}</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
+                    <div className="d-flex flex-wrap invAutoGen">
+                      <div>
+                        <h6>{t("shippingDocumentsAutoGenerate")}</h6>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>Invoice only</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>{t("packingListOnly")}</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="d-flex">
+                          <p>{t("statement")}</p>
+                          <div className="ms-2">
+                            <label
+                              className="toggleSwitch large"
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 10,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                name="Commission_Currency"
+                              />
+                              <span>
+                                <span>{t("no")}</span>
+                                <span>{t("yes")}</span>
+                              </span>
+                              <a> </a>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="d-flex flex-wrap invAutoGen">
-                    <div>
-                      <h6>{t("consigneeAutoGenerate")}</h6>
-                    </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>Invoice only</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>{t("packingListOnly")}</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>{t("statement")}</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="d-flex flex-wrap invAutoGen">
-                    <div>
-                      <h6>{t("shippingDocumentsAutoGenerate")}</h6>
-                    </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>Invoice only</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>{t("packingListOnly")}</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="d-flex">
-                        <p>{t("statement")}</p>
-                        <div className="ms-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input type="checkbox" name="Commission_Currency" />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row mt-4">
-                    <div className="form-group col-lg-6 invOptionSetup">
-                      <div className="row">
-                        <div className="col-lg-6">
-                          <h6>Invoice Options</h6>
-                        </div>
+                    <div className="row mt-4">
+                      <div className="form-group col-lg-6 invOptionSetup">
+                        <div className="row">
+                          <div className="col-lg-6">
+                            <h6>Invoice Options</h6>
+                          </div>
 
-                        <div className="col-lg-2">
-                          <h6>{t("clients")}</h6>
-                        </div>
-                        <div className="col-lg-2">
-                          <h6>{t("consignee")}</h6>
-                        </div>
-                        <div className="col-lg-2">
-                          <h6>{t("shipping")}</h6>
-                        </div>
-                        <div className="col-lg-6">
-                          <p>{t("useAgreedPricing")}</p>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
+                          <div className="col-lg-2">
+                            <h6>{t("clients")}</h6>
+                          </div>
+                          <div className="col-lg-2">
+                            <h6>{t("consignee")}</h6>
+                          </div>
+                          <div className="col-lg-2">
+                            <h6>{t("shipping")}</h6>
+                          </div>
+                          <div className="col-lg-6">
+                            <p>{t("useAgreedPricing")}</p>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-6">
+                            <p>{t("useCustomName")}</p>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-6">
+                            <p>{t("showGrossWeightAndCBM")}</p>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-12">
+                            <div className="invoiceModal">
+                              <p>{t("invoiceNameCanBe")} -</p>
+                              <input
+                                type="radio"
+                                id="html1"
+                                name="fav_language"
+                                value="Client"
+                                checked={selectedInvoice === "Client"}
+                                onChange={handleRadioChange}
+                              />
+                              <label htmlFor="html1">{t("client")}</label>
+
+                              <input
+                                type="radio"
+                                id="css1"
+                                name="fav_language"
+                                value="Consignee"
+                                checked={selectedInvoice === "Consignee"}
+                                onChange={handleRadioChange}
+                              />
+                              <label htmlFor="css1">{t("consignee")}</label>
+                            </div>
+                          </div>
+                          <div className="col-lg-6">
+                            <p>{t("showExchangeRate")} </p>
+                          </div>
+                          <div className="col-lg-2">
                             <label
                               className="toggleSwitch large"
                               style={{
@@ -2571,6 +2891,8 @@ const AddShipTo = () => {
                               <input
                                 type="checkbox"
                                 name="Commission_Currency"
+                                checked={exchangeRate}
+                                onChange={handleAgreedPricingChange3}
                               />
                               <span>
                                 <span>{t("no")}</span>
@@ -2579,343 +2901,102 @@ const AddShipTo = () => {
                               <a> </a>
                             </label>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-lg-6">
-                          <p>{t("useCustomName")}</p>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-lg-6">
-                          <p>{t("showGrossWeightAndCBM")}</p>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
                         </div>
                         <div className="col-lg-12">
                           <div className="invoiceModal">
-                            <p>{t("invoiceNameCanBe")} -</p>
-                            <input
-                              type="radio"
-                              id="html1"
-                              name="fav_language"
-                              value="Client"
-                              checked={selectedInvoice === "Client"}
-                              onChange={handleRadioChange}
-                            />
-                            <label htmlFor="html1">{t("client")}</label>
-
-                            <input
-                              type="radio"
-                              id="css1"
-                              name="fav_language"
-                              value="Consignee"
-                              checked={selectedInvoice === "Consignee"}
-                              onChange={handleRadioChange}
-                            />
-                            <label htmlFor="css1">{t("consignee")}</label>
-                          </div>
-                        </div>
-                        <div className="col-lg-6">
-                          <p>{t("showExchangeRate")} </p>
-                        </div>
-                        <div className="col-lg-2">
-                          <label
-                            className="toggleSwitch large"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              padding: 10,
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              name="Commission_Currency"
-                              checked={exchangeRate}
-                              onChange={handleAgreedPricingChange3}
-                            />
-                            <span>
-                              <span>{t("no")}</span>
-                              <span>{t("yes")}</span>
-                            </span>
-                            <a> </a>
-                          </label>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
+                            <p>{t("deliveryTerms")} -</p>
+                            <div>
                               <input
-                                type="checkbox"
-                                name="Commission_Currency"
+                                type="radio"
+                                id="dap"
+                                name="delivery_term"
+                                value="DAP"
+                                checked={selectedDeliveryTerm === "DAP"}
+                                onChange={handleChange7}
                               />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
+                              <label htmlFor="dap">{t("dap")}</label>
+                            </div>
+                            <div>
                               <input
-                                type="checkbox"
-                                name="Commission_Currency"
+                                type="radio"
+                                id="cnf"
+                                name="delivery_term"
+                                value="CNF"
+                                checked={selectedDeliveryTerm === "CNF"}
+                                onChange={handleChange7}
                               />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-lg-12">
-                        <div className="invoiceModal">
-                          <p>{t("deliveryTerms")} -</p>
-                          <div>
+                              <label htmlFor="cnf">{t("cnf")}</label>
+                            </div>
                             <input
                               type="radio"
-                              id="dap"
+                              id="cif"
                               name="delivery_term"
-                              value="DAP"
-                              checked={selectedDeliveryTerm === "DAP"}
+                              value="CIF"
+                              checked={selectedDeliveryTerm === "CIF"}
                               onChange={handleChange7}
                             />
-                            <label htmlFor="dap">{t("dap")}</label>
-                          </div>
-                          <div>
-                            <input
-                              type="radio"
-                              id="cnf"
-                              name="delivery_term"
-                              value="CNF"
-                              checked={selectedDeliveryTerm === "CNF"}
-                              onChange={handleChange7}
-                            />
-                            <label htmlFor="cnf">{t("cnf")}</label>
-                          </div>
-                          <input
-                            type="radio"
-                            id="cif"
-                            name="delivery_term"
-                            value="CIF"
-                            checked={selectedDeliveryTerm === "CIF"}
-                            onChange={handleChange7}
-                          />
-                          <label htmlFor="cif">{t("cif")}</label>
+                            <label htmlFor="cif">{t("cif")}</label>
 
-                          <div>
-                            <input
-                              type="radio"
-                              id="fob"
-                              name="delivery_term"
-                              value="FOB"
-                              checked={selectedDeliveryTerm === "FOB"}
-                              onChange={handleChange7}
-                            />
-                            <label htmlFor="fob">{t("fob")}</label>
+                            <div>
+                              <input
+                                type="radio"
+                                id="fob"
+                                name="delivery_term"
+                                value="FOB"
+                                checked={selectedDeliveryTerm === "FOB"}
+                                onChange={handleChange7}
+                              />
+                              <label htmlFor="fob">{t("fob")}</label>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      {/* <div className="invoiceModal d-flex justify-content-between invoiceShip">
+                        {/* <div className="invoiceModal d-flex justify-content-between invoiceShip">
                         <h6>  {t("useAgreedPricing")}</h6>
                         <div>
                            <label
@@ -3154,421 +3235,421 @@ const AddShipTo = () => {
                           {t("update")}
                         </button>
                       </div> */}
-                    </div>
-                    <div className="form-group col-lg-6">
-                      <div className="row">
-                        <div className="col-lg-6">
-                          <h6>Packing List Options</h6>
-                        </div>
+                      </div>
+                      <div className="form-group col-lg-6">
+                        <div className="row">
+                          <div className="col-lg-6">
+                            <h6>Packing List Options</h6>
+                          </div>
 
-                        <div className="col-lg-2">
-                          <h6>{t("clients")}</h6>
-                        </div>
-                        <div className="col-lg-2">
-                          <h6>{t("consignee")}</h6>
-                        </div>
-                        <div className="col-lg-2">
-                          <h6>{t("shipping")}</h6>
-                        </div>
+                          <div className="col-lg-2">
+                            <h6>{t("clients")}</h6>
+                          </div>
+                          <div className="col-lg-2">
+                            <h6>{t("consignee")}</h6>
+                          </div>
+                          <div className="col-lg-2">
+                            <h6>{t("shipping")}</h6>
+                          </div>
 
-                        <div className="col-lg-6">
-                          <p>{t("useCustomName")}</p>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-6">
+                            <p>{t("useCustomName")}</p>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-6">
-                          <p>{t("showGrossWeightAndCBM")}</p>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-6">
+                            <p>{t("showGrossWeightAndCBM")}</p>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-12">
-                          <div className="invoiceModal">
-                            <p>{t("invoiceNameCanBe")} -</p>
-                            <input
-                              type="radio"
-                              id="html1"
-                              name="fav_language"
-                              value="Client"
-                              checked={selectedInvoice === "Client"}
-                              onChange={handleRadioChange}
-                            />
-                            <label htmlFor="html1">{t("client")}</label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-12">
+                            <div className="invoiceModal">
+                              <p>{t("invoiceNameCanBe")} -</p>
+                              <input
+                                type="radio"
+                                id="html1"
+                                name="fav_language"
+                                value="Client"
+                                checked={selectedInvoice === "Client"}
+                                onChange={handleRadioChange}
+                              />
+                              <label htmlFor="html1">{t("client")}</label>
 
-                            <input
-                              type="radio"
-                              id="css1"
-                              name="fav_language"
-                              value="Consignee"
-                              checked={selectedInvoice === "Consignee"}
-                              onChange={handleRadioChange}
-                            />
-                            <label htmlFor="css1">{t("consignee")}</label>
-                          </div>
-                        </div>
-                        <div className="col-lg-6">
-                          <p>{t("bardcode")} </p>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
                               <input
-                                type="checkbox"
-                                name="Commission_Currency"
+                                type="radio"
+                                id="css1"
+                                name="fav_language"
+                                value="Consignee"
+                                checked={selectedInvoice === "Consignee"}
+                                onChange={handleRadioChange}
                               />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                              <label htmlFor="css1">{t("consignee")}</label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-6">
+                            <p>{t("bardcode")} </p>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-6">
-                          <p>{t("customBarcode")}</p>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-6">
+                            <p>{t("customBarcode")}</p>
                           </div>
-                        </div>
-                        <div className="col-lg-6">
-                          <p>{t("notes")} </p>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-lg-2">
-                          <div>
-                            <label
-                              className="toggleSwitch large"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                name="Commission_Currency"
-                              />
-                              <span>
-                                <span>{t("no")}</span>
-                                <span>{t("yes")}</span>
-                              </span>
-                              <a> </a>
-                            </label>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-6">
+                            <p>{t("notes")} </p>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="col-lg-2">
+                            <div>
+                              <label
+                                className="toggleSwitch large"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 10,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="Commission_Currency"
+                                />
+                                <span>
+                                  <span>{t("no")}</span>
+                                  <span>{t("yes")}</span>
+                                </span>
+                                <a> </a>
+                              </label>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              {/* invoiceSetup end */}
-              <div
-                class="tab-pane fade show active"
-                id="first-tab-pane"
-                role="tabpanel"
-                aria-labelledby="first-tab"
-                tabindex="0"
-              >
-                {/* <div
+                {/* invoiceSetup end */}
+                <div
+                  class="tab-pane fade show active"
+                  id="first-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="first-tab"
+                  tabindex="0"
+                >
+                  {/* <div
                   id="datatable_wrapper"
                   className="information_dataTables dataTables_wrapper dt-bootstrap4 "
                 >
@@ -3933,115 +4014,116 @@ const AddShipTo = () => {
                     </Link>
                   </div>
                 </div> */}
-                <div className="tab-content px-2 md:!px-4">
-                  <div className="vc_form formCreate ">
-                    <div className="row">
-                      <div className="row justify-content-between">
-                        <div className="col-lg-8">
-                          <div className="row">
-                            <div className="col-lg-4 form-group">
-                              <h6>{t("name")}</h6>
-                              <input
-                                type="text"
-                                id="name"
-                                onChange={handleChange9}
-                                name="name"
-                                className="form-control"
-                                placeholder="Name"
-                                defaultValue={state7.name}
-                              />
-                            </div>
+                  <div className="tab-content px-2 md:!px-4">
+                    <div className="vc_form formCreate ">
+                      <div className="row">
+                        <div className="row justify-content-between">
+                          <div className="col-lg-8">
+                            <div className="row">
+                              <div className="col-lg-4 form-group">
+                                <h6>{t("name")}</h6>
+                                <input
+                                  type="text"
+                                  id="name"
+                                  onChange={handleChange9}
+                                  name="name"
+                                  className="form-control"
+                                  placeholder="Name"
+                                  defaultValue={state7.name}
+                                />
+                              </div>
 
-                            <div className="col-lg-4 form-group">
-                              <h6>{t("taxId")}</h6>
-                              <input
-                                type="text"
-                                id="taxId"
-                                value={state7.taxId || ""}
-                                onChange={handleChange9}
-                                name="taxId"
-                                className="form-control"
-                                placeholder="Tax"
-                              />
-                            </div>
-                            <div className="form-group col-lg-4 autoComplete">
-                              <h6>{t("Entity")}</h6>
+                              <div className="col-lg-4 form-group">
+                                <h6>{t("taxId")}</h6>
+                                <input
+                                  type="text"
+                                  id="taxId"
+                                  value={state7.taxId || ""}
+                                  onChange={handleChange9}
+                                  name="taxId"
+                                  className="form-control"
+                                  placeholder="Tax"
+                                />
+                              </div>
+                              <div className="form-group col-lg-4 autoComplete">
+                                <h6>{t("Entity")}</h6>
 
-                              <Autocomplete
-                                options={dropdownVendor || []} // Populate with the list of vendors
-                                getOptionLabel={(option) =>
-                                  option.entity_name_en || ""
-                                } // Display the English name of the entity
-                                value={
-                                  dropdownVendor?.find(
-                                    (vendor) => vendor.id === state7.Entity
-                                  ) || null
-                                } // Match the current entity ID in state with the options
-                                onChange={(e, newValue) => {
-                                  handleChange9({
-                                    target: {
-                                      name: "Entity",
-                                      value: newValue?.id || "",
-                                    },
-                                  }); // Trigger handleChange with the selected entity's ID
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder={t("SelectEntity")} // Adds a placeholder
-                                    InputLabelProps={{ shrink: false }} // Prevents floating label
-                                  />
-                                )}
-                                isOptionEqualToValue={(option, value) =>
-                                  option.id === value.id
-                                } // Ensure proper matching
-                                sx={{ width: 300 }}
-                              />
+                                <Autocomplete
+                                  options={dropdownVendor || []} // Populate with the list of vendors
+                                  getOptionLabel={(option) =>
+                                    option.entity_name_en || ""
+                                  } // Display the English name of the entity
+                                  value={
+                                    dropdownVendor?.find(
+                                      (vendor) => vendor.id === state7.Entity
+                                    ) || null
+                                  } // Match the current entity ID in state with the options
+                                  onChange={(e, newValue) => {
+                                    handleChange9({
+                                      target: {
+                                        name: "Entity",
+                                        value: newValue?.id || "",
+                                      },
+                                    }); // Trigger handleChange with the selected entity's ID
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("SelectEntity")} // Adds a placeholder
+                                      InputLabelProps={{ shrink: false }} // Prevents floating label
+                                    />
+                                  )}
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.id === value.id
+                                  } // Ensure proper matching
+                                  sx={{ width: 300 }}
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="col-lg-4">
-                          <div className="text-end">
-                            <button
-                              className="btn btn-danger"
-                              data-bs-toggle="modal"
-                              data-bs-target="#exampleModal"
-                            >
-                              {t("addContact")}{" "}
-                            </button>
+                          <div className="col-lg-4">
+                            <div className="text-end">
+                              <button
+                                style={{ width: "170px" }}
+                                className="btn btn-danger mb-4"
+                                data-bs-toggle="modal"
+                                data-bs-target="#exampleModal"
+                                onClick={handleAddClick}
+                              >
+                                {t("addContact")}
+                              </button>
+                            </div>
+                            {/* add-contact-modal */}
                           </div>
-                          {/* add-contact-modal */}
-                         
                         </div>
-                      </div>
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("phone")}</h6>
-                        <input
-                          type="text"
-                          id="phone"
-                          value={state7.phone || ""}
-                          onChange={handleChange9}
-                          name="phone"
-                          className="form-control"
-                          placeholder="Phone"
-                        />
-                      </div>
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("email")}</h6>
-                        <input
-                          type="text"
-                          id="phone"
-                          value={state7.email || ""}
-                          onChange={handleChange9}
-                          name="email"
-                          className="form-control"
-                          placeholder="Email"
-                        />
-                      </div>
-                      <div className="col-lg-3 form-group autoComplete">
-                        <h6>{t("messengerType")}</h6>
-                        <div>
-                          {/* <Autocomplete
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("phone")}</h6>
+                          <input
+                            type="text"
+                            id="phone"
+                            value={state7.phone || ""}
+                            onChange={handleChange9}
+                            name="phone"
+                            className="form-control"
+                            placeholder="Phone"
+                          />
+                        </div>
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("email")}</h6>
+                          <input
+                            type="text"
+                            id="phone"
+                            value={state7.email || ""}
+                            onChange={handleChange9}
+                            name="email"
+                            className="form-control"
+                            placeholder="Email"
+                          />
+                        </div>
+                        <div className="col-lg-3 form-group autoComplete">
+                          <h6>{t("messengerType")}</h6>
+                          <div>
+                            {/* <Autocomplete
                             options={countries}
                             value={state7.Messenger_Type || ""}
                             onChange={(event, newValue) =>
@@ -4055,928 +4137,945 @@ const AddShipTo = () => {
                               />
                             )}
                           /> */}
+                            <Autocomplete
+                              options={messengerOptions}
+                              getOptionLabel={(option) => option.label} // what to display in dropdown
+                              value={
+                                messengerOptions.find(
+                                  (opt) =>
+                                    opt.value === Number(state7.Messenger_Type)
+                                ) || null
+                              }
+                              onChange={(event, newValue) =>
+                                setState7({
+                                  ...state7,
+                                  Messenger_Type: newValue
+                                    ? newValue.value
+                                    : "",
+                                })
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("messengerType")}
+                                  variant="outlined"
+                                />
+                              )}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("messangerId")}</h6>
+                          <div>
+                            <input
+                              type="text"
+                              id="messangerId"
+                              value={state7.messangerId || ""}
+                              onChange={handleChange9}
+                              name="messangerId"
+                              className="form-control"
+                              placeholder="Messanger ID"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="col-lg-3 form-group autoComplete mb-3">
+                          <h6>{t("country")}</h6>
+                          <div>
+                            <Autocomplete
+                              options={countryList}
+                              getOptionLabel={(option) => option.name || ""}
+                              isOptionEqualToValue={(option, value) =>
+                                option.id === value?.id
+                              }
+                              value={selectedCountry}
+                              onChange={(event, newValue) =>
+                                setSelectedCountry(newValue)
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("country")}
+                                  variant="outlined"
+                                />
+                              )}
+                            />
+                          </div>
+                        </div>
+                        <div className="form-group col-lg-3 autoComplete mb-3">
+                          <h6>{t("province")}</h6>
                           <Autocomplete
-                            options={messengerOptions}
-                            getOptionLabel={(option) => option.label} // what to display in dropdown
-                            value={
-                              messengerOptions.find(
-                                (opt) =>
-                                  opt.value === Number(state7.Messenger_Type)
-                              ) || null
+                            options={provinceList}
+                            getOptionLabel={(opt) => opt.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt.id === val?.id
                             }
-                            onChange={(event, newValue) =>
-                              setState7({
-                                ...state7,
-                                Messenger_Type: newValue ? newValue.value : "",
-                              })
+                            value={selectedProvince}
+                            onChange={(e, newProv) =>
+                              setSelectedProvince(newProv)
                             }
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder={t("messengerType")}
+                                placeholder={t("province")}
+                                variant="outlined"
+                              />
+                            )}
+                            style={{ marginTop: 16 }}
+                          />
+                        </div>
+                        <div className="form-group col-lg-3 autoComplete mb-3">
+                          <h6>{t("district")}</h6>
+                          <Autocomplete
+                            options={districtList}
+                            getOptionLabel={(opt) => opt.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt.id === val?.id
+                            }
+                            value={selectedDistrict}
+                            onChange={(e, dis) => setSelectedDistrict(dis)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("district")}
                                 variant="outlined"
                               />
                             )}
                           />
                         </div>
-                      </div>
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("messangerId")}</h6>
-                        <div>
+                        <div className="col-lg-3 form-group autoComplete">
+                          <h6>{t("subDistrict")}</h6>
+                          <Autocomplete
+                            options={subdistrictList || []}
+                            getOptionLabel={(opt) => opt?.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt?.id === val?.id
+                            }
+                            value={selectedSubdistrict || null}
+                            onChange={(e, sub) => setSelectedSubdistrict(sub)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder="Select Subdistrict"
+                                variant="outlined"
+                              />
+                            )}
+                          />
+                        </div>
+
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("postCode")}</h6>
                           <input
                             type="text"
-                            id="messangerId"
-                            value={state7.messangerId || ""}
-                            onChange={handleChange9}
-                            name="messangerId"
                             className="form-control"
-                            placeholder="Messanger ID"
+                            value={postalCode || ""}
+                            onChange={(e) => setPostalCode(e.target.value)}
+                          />
+                        </div>
+
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("address")} 1</h6>
+                          <input
+                            type="text"
+                            id="address1"
+                            value={state7.address1 || ""}
+                            onChange={handleChange9}
+                            name="address1"
+                            className="form-control"
+                            placeholder="Address1"
+                          />
+                        </div>
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("address")} 2</h6>
+                          <input
+                            type="text"
+                            id="address2"
+                            value={state7.address2 || ""}
+                            onChange={handleChange9}
+                            name="address2"
+                            className="form-control"
+                            placeholder="Address2"
                           />
                         </div>
                       </div>
+                      <div className="row">
+                        <div className="col-lg-12 form-group autoComplete">
+                          <h6 style={{ fontWeight: "bold" }}>
+                            {" "}
+                            {t("BankDetails")}:
+                          </h6>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankName")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state7.Bank_Name || ""}
+                            onChange={(e) =>
+                              setState7({
+                                ...state7,
+                                Bank_Name: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
 
-                      <div className="col-lg-3 form-group autoComplete mb-3">
-                        <h6>{t("country")}</h6>
-                        <div>
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankBranch")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state7.Bank_Branch || ""}
+                            onChange={(e) =>
+                              setState7({
+                                ...state7,
+                                Bank_Branch: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankAccount")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state7.Bank_Account || ""}
+                            onChange={(e) =>
+                              setState7({
+                                ...state7,
+                                Bank_Account: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankIbon")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state7.Bank_IBAN || ""}
+                            onChange={(e) =>
+                              setState7({
+                                ...state7,
+                                Bank_IBAN: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="col-lg-4 form-group">
+                          <h6>{t("bankSwift")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={state7.Bank_Swift || ""}
+                            onChange={(e) =>
+                              setState7({
+                                ...state7,
+                                Bank_Swift: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="col-lg-4 form-group autoComplete">
+                          <h6>{t("bankCountry")}</h6>
                           <Autocomplete
                             options={countryList}
                             getOptionLabel={(option) => option.name || ""}
                             isOptionEqualToValue={(option, value) =>
                               option.id === value?.id
                             }
-                            value={selectedCountry}
+                            value={
+                              countryList.find(
+                                (c) =>
+                                  String(c.id) === String(state7.Bank_Country)
+                              ) || null
+                            }
                             onChange={(event, newValue) =>
-                              setSelectedCountry(newValue)
+                              setState7({
+                                ...state7,
+                                Bank_Country: newValue ? newValue.id : "",
+                              })
                             }
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder={t("country")}
+                                placeholder={t("bankCountry")}
                                 variant="outlined"
                               />
                             )}
                           />
                         </div>
-                      </div>
-                      <div className="form-group col-lg-3 autoComplete mb-3">
-                        <h6>{t("province")}</h6>
-                        <Autocomplete
-                          options={provinceList}
-                          getOptionLabel={(opt) => opt.name ?? ""}
-                          isOptionEqualToValue={(opt, val) =>
-                            opt.id === val?.id
-                          }
-                          value={selectedProvince}
-                          onChange={(e, newProv) =>
-                            setSelectedProvince(newProv)
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("province")}
-                              variant="outlined"
-                            />
-                          )}
-                          style={{ marginTop: 16 }}
-                        />
-                      </div>
-                      <div className="form-group col-lg-3 autoComplete mb-3">
-                        <h6>{t("district")}</h6>
-                        <Autocomplete
-                          options={districtList}
-                          getOptionLabel={(opt) => opt.name ?? ""}
-                          isOptionEqualToValue={(opt, val) =>
-                            opt.id === val?.id
-                          }
-                          value={selectedDistrict}
-                          onChange={(e, dis) => setSelectedDistrict(dis)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("district")}
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </div>
-                      <div className="col-lg-3 form-group autoComplete">
-                        <h6>{t("subDistrict")}</h6>
-                        <Autocomplete
-                          options={subdistrictList || []}
-                          getOptionLabel={(opt) => opt?.name ?? ""}
-                          isOptionEqualToValue={(opt, val) =>
-                            opt?.id === val?.id
-                          }
-                          value={selectedSubdistrict || null}
-                          onChange={(e, sub) => setSelectedSubdistrict(sub)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select Subdistrict"
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </div>
 
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("postCode")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={postalCode || ""}
-                          onChange={(e) => setPostalCode(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("address")} 1</h6>
-                        <input
-                          type="text"
-                          id="address1"
-                          value={state7.address1 || ""}
-                          onChange={handleChange9}
-                          name="address1"
-                          className="form-control"
-                          placeholder="Address1"
-                        />
-                      </div>
-                      <div className="col-lg-3 form-group">
-                        <h6>{t("address")} 2</h6>
-                        <input
-                          type="text"
-                          id="address2"
-                          value={state7.address2 || ""}
-                          onChange={handleChange9}
-                          name="address2"
-                          className="form-control"
-                          placeholder="Address2"
-                        />
+                        <div className="col-lg-12 form-group">
+                          <h6>{t("bankAddress")}</h6>
+                          <textarea
+                            className="form-control p-2"
+                            placeholder={t("bankAddress")}
+                            value={state7.Bank_Address || ""}
+                            onChange={(e) =>
+                              setState7({
+                                ...state7,
+                                Bank_Address: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="row">
-                      <div className="col-lg-12 form-group autoComplete">
-                        <h6 style={{ fontWeight: "bold" }}>
-                          {" "}
-                          {t("BankDetails")}:
-                        </h6>
+                    <div className="card-footer">
+                      <button
+                        className="btn btn-primary"
+                        type="submit"
+                        name="signup"
+                        onClick={updateVendor}
+                        disabled={isButtonClicked}
+                      >
+                        {typeof state7.vendor_id !== "undefined"
+                          ? t("update")
+                          : t("create")}
+                      </button>
+                      <Link className="btn btn-danger" to={"/shipToNew"}>
+                        {t("cancel")}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="home-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="home-tab"
+                  tabindex="0"
+                >
+                  <div className="table-responsive">
+                    <table className="  tableContact striped  table borderTerpProduce">
+                      <tr className="">
+                        <th>{t("firstName")}</th>
+                        <th>{t("lastName")}</th>
+                        <th>{t("nickName")}</th>
+                        <th>{t("position")}</th>
+                        <th>{t("type")}</th>
+                        <th>{t("email")}</th>
+                        <th>{t("mobile")}</th>
+                        <th>{t("action")}</th>
+                      </tr>
+
+                      {data?.map((item) => {
+                        return (
+                          <tr>
+                            <td>{item.Name_First}</td>
+                            <td>{item.Name_Last}</td>
+                            <td>{item.Nick_name}</td>
+                            <td>{item.Position}</td>
+                            <td>{item.type}</td>
+                            <td>{item.Email}</td>
+                            <td>{item.Mobile}</td>
+                            <td>
+                              <div>
+                                {/* edit popup */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditClick(item.ID)}
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#exampleModal"
+                                >
+                                  <i className="mdi mdi-pencil"></i>
+                                </button>
+
+                                <div
+                                  class="modal fade"
+                                  id="exampleModalEdit"
+                                  tabindex="-1"
+                                  aria-labelledby="exampleModalLabel"
+                                  aria-hidden="true"
+                                >
+                                  <div class="modal-dialog modalShipTo modal-xl">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h1
+                                          class="modal-title fs-5"
+                                          id="exampleModalLabel"
+                                        >
+                                          {t("contactUp")}
+                                        </h1>
+                                        <button
+                                          type="button"
+                                          class="btn-close"
+                                          data-bs-dismiss="modal"
+                                          aria-label="Close"
+                                        >
+                                          <i class="mdi mdi-close"></i>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <div className="formCreate">
+                                          <form action="">
+                                            <div className="row">
+                                              {/* <div className="col-lg-12">
+                                                                  <div class="form-group col-lg-3">
+                                                                    <h6>Client </h6>
+                                                                    <div class="ceateTransport">
+                                                                      <select
+                                                                        name="client_id"
+                                                                        onChange={handleChange1}
+                                                                        value={state1.client_id}
+                                                                      >
+                                                                        <option value="">
+                                                                          Select Client
+                                                                        </option>
+                                                                        {client?.map((item) => (
+                                                                          <option
+                                                                            key={item.client_id}
+                                                                            value={item.client_id}
+                                                                          >
+                                                                            {item.client_name}
+                                                                          </option>
+                                                                        ))}
+                                                                      </select>
+                                                                    </div>
+                                                                  </div>
+                                                                </div> */}
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("contactType")}</h6>
+                                                <div class="ceateTransport autoComplete">
+                                                  <Autocomplete
+                                                    disablePortal
+                                                    options={contactType || []} // Use your contactType array as options
+                                                    getOptionLabel={(option) =>
+                                                      option.type_en || ""
+                                                    }
+                                                    onChange={(e, newValue) =>
+                                                      setState1(
+                                                        (prevState) => ({
+                                                          ...prevState,
+                                                          contact_type_id:
+                                                            newValue?.contact_type_id ||
+                                                            "",
+                                                        })
+                                                      )
+                                                    }
+                                                    value={
+                                                      (contactType || []).find(
+                                                        (item) =>
+                                                          item.contact_type_id ===
+                                                          state1.contact_type_id
+                                                      ) || null
+                                                    }
+                                                    sx={{ width: 300 }} // Customize the width as needed
+                                                    renderInput={(params) => (
+                                                      <TextField
+                                                        {...params}
+                                                        placeholder={t(
+                                                          "selectType"
+                                                        )}
+                                                        InputLabelProps={{
+                                                          shrink: false,
+                                                        }} // Prevents floating label
+                                                      />
+                                                    )}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("firstName")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="text"
+                                                    name="first_name"
+                                                    onChange={handleChange1}
+                                                    value={state1.first_name}
+                                                    placeholder={t("firstName")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("lastName")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="text"
+                                                    name="last_name"
+                                                    onChange={handleChange1}
+                                                    value={state1.last_name}
+                                                    placeholder={t("lastName")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("nickName")}</h6>
+                                                <div>
+                                                  <input
+                                                    type="text"
+                                                    name="Nick_name"
+                                                    onChange={handleChange1}
+                                                    value={state1.Nick_name}
+                                                    placeholder={t("nickName")}
+                                                  />
+                                                </div>
+                                              </div>
+
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("position")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="text"
+                                                    name="position"
+                                                    onChange={handleChange1}
+                                                    value={state1.position}
+                                                    placeholder={t("position")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("email")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="email"
+                                                    name="Email"
+                                                    onChange={handleChange1}
+                                                    value={state1.Email}
+                                                    placeholder={t("email")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("mobile")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="number"
+                                                    name="mobile"
+                                                    onChange={handleChange1}
+                                                    value={state1.mobile}
+                                                    placeholder={t("mobile")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-3">
+                                                <h6>{t("landline")}</h6>
+                                                <div class=" ">
+                                                  <input
+                                                    type="number"
+                                                    name="landline"
+                                                    onChange={handleChange1}
+                                                    value={state1.landline}
+                                                    placeholder={t("landline")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-4">
+                                                <h6>{t("birthday")}</h6>
+                                                <div>
+                                                  <input
+                                                    type="date"
+                                                    name="birthday"
+                                                    onChange={handleChange1}
+                                                    value={state1.birthday}
+                                                    placeholder={t("birthday")}
+                                                  />
+                                                </div>
+                                              </div>
+                                              <div class="form-group col-lg-8">
+                                                <h6>{t("notes")}</h6>
+                                                <div>
+                                                  <textarea
+                                                    name="Notes"
+                                                    onChange={handleChange1}
+                                                    value={state1.Notes}
+                                                    cols="30"
+                                                    rows="5"
+                                                  ></textarea>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </form>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer justify-center">
+                                        <button
+                                          onClick={contactDetailsEdit}
+                                          type="button"
+                                          class="btn btn-primary mb-0"
+                                        >
+                                          {t("update")}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                {/* edit popup end */}
+
+                                <button
+                                  type="button"
+                                  onClick={() => deleteOrder3(item.ID)}
+                                >
+                                  <i class="mdi mdi-delete "></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </table>
+                  </div>
+                  <div className="row">
+                    <button
+                      style={{ width: "170px" }}
+                      className="btn btn-danger mb-4"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                      onClick={handleAddClick}
+                    >
+                      {t("addContact")}{" "}
+                    </button>
+                    {/* modal */}
+                    <div
+                      class="modal fade"
+                      id="exampleModalContact"
+                      tabindex="-1"
+                      aria-labelledby="exampleModalLabel"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modalShipTo modal-xl">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                              {t("contact")}
+                            </h1>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            >
+                              <i class="mdi mdi-close"></i>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <div className="formCreate">
+                              <form action="">
+                                <div className="row">
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("contactType")}</h6>
+                                    <div class="ceateTransport autoComplete">
+                                      <Autocomplete
+                                        options={contactType || []} // List of contact types
+                                        getOptionLabel={(option) =>
+                                          option.type_en || ""
+                                        } // Label to display (type_en for each contact type)
+                                        onChange={(event, newValue) => {
+                                          handleChange1({
+                                            target: {
+                                              name: "contact_type_id",
+                                              value: newValue
+                                                ? newValue.contact_type_id
+                                                : "",
+                                            }, // Update contact_type_id in state
+                                          });
+                                        }}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            placeholder={t("selectType")}
+                                            variant="outlined"
+                                          />
+                                        )}
+                                        value={
+                                          contactType?.find(
+                                            (item) =>
+                                              item.contact_type_id ===
+                                              state1.contact_type_id
+                                          ) || null
+                                        } // Set selected value based on contact_type_id
+                                        isOptionEqualToValue={(option, value) =>
+                                          option.contact_type_id ===
+                                          value.contact_type_id
+                                        } // Option comparison by contact_type_id
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6> {t("firstName")} </h6>
+                                    <div class=" ">
+                                      <input
+                                        type="text"
+                                        name="first_name"
+                                        onChange={handleChange1}
+                                        value={state1.first_name}
+                                        placeholder={t("firstName")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("lastName")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="text"
+                                        name="last_name"
+                                        onChange={handleChange1}
+                                        value={state1.last_name}
+                                        placeholder={t("lastName")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("nickName")}</h6>
+                                    <div>
+                                      <input
+                                        type="text"
+                                        name="Nick_name"
+                                        onChange={handleChange1}
+                                        value={state1.Nick_name}
+                                        placeholder={t("nickName")}
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("position")} </h6>
+                                    <div class=" ">
+                                      <input
+                                        type="text"
+                                        name="position"
+                                        onChange={handleChange1}
+                                        value={state1.position}
+                                        placeholder={t("position")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("email")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="email"
+                                        name="Email"
+                                        onChange={handleChange1}
+                                        value={state1.Email}
+                                        placeholder={t("email")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("mobile")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="number"
+                                        name="mobile"
+                                        onChange={handleChange1}
+                                        value={state1.mobile}
+                                        placeholder={t("mobile")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-3">
+                                    <h6>{t("landline")}</h6>
+                                    <div class=" ">
+                                      <input
+                                        type="number"
+                                        name="landline"
+                                        onChange={handleChange1}
+                                        value={state1.landline}
+                                        placeholder={t("landline")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-4">
+                                    <h6>{t("birthday")}</h6>
+                                    <div>
+                                      <input
+                                        type="date"
+                                        name="birthday"
+                                        onChange={handleChange1}
+                                        value={state1.birthday}
+                                        placeholder={t("birthday")}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="form-group col-lg-8">
+                                    <h6>{t("notes")}</h6>
+                                    <div>
+                                      <textarea
+                                        name="Notes"
+                                        onChange={handleChange1}
+                                        value={state1.Notes}
+                                        cols="30"
+                                        rows="5"
+                                      ></textarea>
+                                    </div>
+                                  </div>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-primary mb-0"
+                              onClick={contactDataSubmit}
+                            >
+                              {t("submit")}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
+                    {/* modal end */}
+                  </div>
+                </div>
+                {/* statics */}
+                <div
+                  class="tab-pane fade"
+                  id="notify-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="notify-tab"
+                  tabindex="0"
+                >
+                  <div className="statisticsContent formCreate">
                     <div className="row">
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankName")}</h6>
+                      <div className="form-group col-lg-6">
+                        <h6>{t("name")}</h6>
                         <input
                           type="text"
                           className="form-control"
-                          value={state7.Bank_Name || ""}
-                          onChange={(e) =>
-                            setState7({ ...state7, Bank_Name: e.target.value })
-                          }
+                          value={formData.notify_name}
+                          name="notify_name"
+                          onChange={handleChange6}
                         />
                       </div>
-
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankBranch")}</h6>
+                      <div className="form-group col-lg-6">
+                        <h6>{t("taxNumber")}</h6>
                         <input
                           type="text"
                           className="form-control"
-                          value={state7.Bank_Branch || ""}
-                          onChange={(e) =>
-                            setState7({
-                              ...state7,
-                              Bank_Branch: e.target.value,
-                            })
-                          }
+                          value={formData.notify_tax_number}
+                          name="notify_tax_number"
+                          onChange={handleChange6}
                         />
                       </div>
-
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankAccount")}</h6>
+                      <div className="form-group col-lg-6">
+                        <h6>{t("email")}</h6>
+                        <input
+                          type="email"
+                          className="form-control"
+                          value={formData.notify_email}
+                          name="notify_email"
+                          onChange={handleChange6}
+                        />
+                      </div>
+                      <div className="form-group col-lg-6">
+                        <h6>{t("phoneNumber")}</h6>
                         <input
                           type="text"
                           className="form-control"
-                          value={state7.Bank_Account || ""}
-                          onChange={(e) =>
-                            setState7({
-                              ...state7,
-                              Bank_Account: e.target.value,
-                            })
-                          }
+                          value={formData.notify_phone}
+                          name="notify_phone"
+                          onChange={handleChange6}
                         />
                       </div>
-
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankIbon")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={state7.Bank_IBAN || ""}
-                          onChange={(e) =>
-                            setState7({ ...state7, Bank_IBAN: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="col-lg-4 form-group">
-                        <h6>{t("bankSwift")}</h6>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={state7.Bank_Swift || ""}
-                          onChange={(e) =>
-                            setState7({ ...state7, Bank_Swift: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="col-lg-4 form-group autoComplete">
-                        <h6>{t("bankCountry")}</h6>
-                        <Autocomplete
-                          options={countryList}
-                          getOptionLabel={(option) => option.name || ""}
-                          isOptionEqualToValue={(option, value) =>
-                            option.id === value?.id
-                          }
-                          value={
-                            countryList.find(
-                              (c) =>
-                                String(c.id) === String(state7.Bank_Country)
-                            ) || null
-                          }
-                          onChange={(event, newValue) =>
-                            setState7({
-                              ...state7,
-                              Bank_Country: newValue ? newValue.id : "",
-                            })
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("bankCountry")}
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </div>
-
-                      <div className="col-lg-12 form-group">
-                        <h6>{t("bankAddress")}</h6>
+                      <div className="form-group col-lg-12">
+                        <h6>{t("address")}</h6>
                         <textarea
-                          className="form-control p-2"
-                          placeholder={t("bankAddress")}
-                          value={state7.Bank_Address || ""}
-                          onChange={(e) =>
-                            setState7({
-                              ...state7,
-                              Bank_Address: e.target.value,
-                            })
-                          }
+                          className="border-2 rounded-md border-[#203764] w-full"
+                          value={formData.notify_address}
+                          name="notify_address"
+                          onChange={handleChange6}
                         />
                       </div>
                     </div>
                   </div>
-                  <div className="card-footer">
+                  <div className="card-footer text-center">
                     <button
                       className="btn btn-primary"
-                      type="submit"
-                      name="signup"
-                      onClick={updateVendor}
-                      disabled={isButtonClicked}
+                      onClick={handleSubmit6}
+                      type="button"
                     >
-                      {typeof state7.vendor_id !== "undefined"
-                        ? t("update")
-                        : t("create")}
+                      {from?.consignee_id ? t("update") : t("create")}
                     </button>
-                    <Link className="btn btn-danger" to={"/shipToNew"}>
+                    <Link className="btn btn-danger" to="/shipToNew">
                       {t("cancel")}
                     </Link>
                   </div>
                 </div>
-              </div>
-              <div
-                class="tab-pane fade"
-                id="home-tab-pane"
-                role="tabpanel"
-                aria-labelledby="home-tab"
-                tabindex="0"
-              >
-                <div className="table-responsive">
-                  <table className="  tableContact striped  table borderTerpProduce">
-                    <tr className="">
-                      <th>{t("firstName")}</th>
-                      <th>{t("lastName")}</th>
-                      <th>{t("nickName")}</th>
-                      <th>{t("position")}</th>
-                      <th>{t("type")}</th>
-                      <th>{t("email")}</th>
-                      <th>{t("mobile")}</th>
-                      <th>{t("action")}</th>
-                    </tr>
-
-                    {data?.map((item) => {
-                      return (
-                        <tr>
-                          <td>{item.first_name}</td>
-                          <td>{item.last_name}</td>
-                          <td>{item.Nick_name}</td>
-                          <td>{item.position}</td>
-                          <td>{item.type}</td>
-                          <td>{item.Email}</td>
-                          <td>{item.mobile}</td>
-                          <td>
-                            <div>
-                              {/* edit popup */}
-                              <button
-                                type="button"
-                                onClick={() => handleEditClick(item.contact_id)}
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModalEdit"
-                              >
-                                {" "}
-                                <i class="mdi mdi-pencil"></i>
-                                {/* edit popup */}
-                              </button>
-                              <div
-                                class="modal fade"
-                                id="exampleModalEdit"
-                                tabindex="-1"
-                                aria-labelledby="exampleModalLabel"
-                                aria-hidden="true"
-                              >
-                                <div class="modal-dialog modalShipTo modal-xl">
-                                  <div class="modal-content">
-                                    <div class="modal-header">
-                                      <h1
-                                        class="modal-title fs-5"
-                                        id="exampleModalLabel"
-                                      >
-                                        {t("contactUp")}
-                                      </h1>
-                                      <button
-                                        type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close"
-                                        onClick={dataClear}
-                                      >
-                                        <i class="mdi mdi-close"></i>
-                                      </button>
-                                    </div>
-                                    <div class="modal-body">
-                                      <div className="formCreate">
-                                        <form action="">
-                                          <div className="row">
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("contactType")}</h6>
-                                              <div class="ceateTransport autoComplete">
-                                                {/* <select
-                                                  name="contact_type_id"
-                                                  onChange={handleChange1}
-                                                  value={state1.contact_type_id}
-                                                >
-                                                  <option value="">
-                                                    Select Type
-                                                  </option>
-                                                  {contactType?.map((item) => (
-                                                    <option
-                                                      key={item.contact_type_id}
-                                                      value={
-                                                        item.contact_type_id
-                                                      }
-                                                    >
-                                                      {item.type_en}
-                                                    </option>
-                                                  ))}
-                                                </select> */}
-                                                <Autocomplete
-                                                  disablePortal
-                                                  options={contactType || []}
-                                                  getOptionLabel={(option) =>
-                                                    option.type_en || ""
-                                                  }
-                                                  onChange={(e, newValue) =>
-                                                    setState1((prevState) => ({
-                                                      ...prevState,
-                                                      contact_type_id:
-                                                        newValue?.contact_type_id ||
-                                                        "",
-                                                    }))
-                                                  }
-                                                  value={
-                                                    contactType?.find(
-                                                      (item) =>
-                                                        item.contact_type_id ===
-                                                        state1.contact_type_id
-                                                    ) || null
-                                                  }
-                                                  sx={{ width: 300 }}
-                                                  renderInput={(params) => (
-                                                    <TextField
-                                                      {...params}
-                                                      placeholder={t(
-                                                        "selectType"
-                                                      )}
-                                                      InputLabelProps={{
-                                                        shrink: false,
-                                                      }}
-                                                    />
-                                                  )}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("firstName")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="text"
-                                                  name="first_name"
-                                                  onChange={handleChange1}
-                                                  value={state1.first_name}
-                                                  placeholder={t("firstName")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("lastName")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="text"
-                                                  name="last_name"
-                                                  onChange={handleChange1}
-                                                  value={state1.last_name}
-                                                  placeholder={t("lastName")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("nickName")}</h6>
-                                              <div>
-                                                <input
-                                                  type="text"
-                                                  name="Nick_name"
-                                                  onChange={handleChange1}
-                                                  value={state1.Nick_name}
-                                                  placeholder={t("nickName")}
-                                                />
-                                              </div>
-                                            </div>
-
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("position")} </h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="text"
-                                                  name="position"
-                                                  onChange={handleChange1}
-                                                  value={state1.position}
-                                                  placeholder={t("position")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("email")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="email"
-                                                  name="Email"
-                                                  onChange={handleChange1}
-                                                  value={state1.Email}
-                                                  placeholder={t("email")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("mobile")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="number"
-                                                  name="mobile"
-                                                  onChange={handleChange1}
-                                                  value={state1.mobile}
-                                                  placeholder={t("mobile")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-3">
-                                              <h6>{t("landline")}</h6>
-                                              <div class=" ">
-                                                <input
-                                                  type="number"
-                                                  name="landline"
-                                                  onChange={handleChange1}
-                                                  value={state1.landline}
-                                                  placeholder={t("landline")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-4">
-                                              <h6>{t("birthday")}</h6>
-                                              <div>
-                                                <input
-                                                  type="date"
-                                                  name="birthday"
-                                                  onChange={handleChange1}
-                                                  value={state1.birthday}
-                                                  placeholder={t("birthday")}
-                                                />
-                                              </div>
-                                            </div>
-                                            <div class="form-group col-lg-8">
-                                              <h6>{t("notes")}</h6>
-                                              <div>
-                                                <textarea
-                                                  name="Notes"
-                                                  onChange={handleChange1}
-                                                  value={state1.Notes}
-                                                  cols="30"
-                                                  rows="5"
-                                                ></textarea>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </form>
+                <div
+                  class="tab-pane fade"
+                  id="profile-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="profile-tab"
+                  tabindex="0"
+                >
+                  <div className="table-responsive">
+                    <table className="  tableContact striped  table borderTerpProduce">
+                      <tr className="">
+                        <th>{t("itfName")}</th>
+                        <th>{t("customName")}</th>
+                        <th>{t("dummyPrice")}</th>
+                        <th>{t("customMargin")}</th>
+                        <th>{t("maxPrice")}</th>
+                        <th>{t("brand")}</th>
+                        <th>{t("unit")}</th>
+                        <th>{t("barcode")}</th>
+                        <th>{t("action")}</th>
+                      </tr>
+                      {customization?.map((item) => {
+                        return (
+                          <tr>
+                            <td>{item.Name_EN}</td>
+                            <td>{item.Custom_Name}</td>
+                            <td>{item.Dummy_Price}</td>
+                            <td>{item.Custom_Margin}</td>
+                            <td>{item.MAX_Price}</td>
+                            <td>{item.brand_name}</td>
+                            <td>{item.unit_name}</td>
+                            <td>{item.Barcode}</td>
+                            <td>
+                              <div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleEditClickCustomization(item.Id)
+                                  }
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#exampleModalCustomizationEdit"
+                                >
+                                  <i class="mdi mdi-pencil"></i>
+                                </button>
+                                <div
+                                  className="modal fade"
+                                  id="exampleModalCustomizationEdit"
+                                  tabIndex={-1}
+                                  aria-labelledby="exampleModalLabel"
+                                  aria-hidden="true"
+                                >
+                                  <div className=" modal-dialog modalShipTo">
+                                    <div className="modal-content">
+                                      <div className="modal-header">
+                                        <h1
+                                          className="modal-title fs-5"
+                                          id="exampleModalLabel"
+                                        >
+                                          {t("updateCustomization")}
+                                        </h1>
+                                        <button
+                                          type="button"
+                                          class="btn-close"
+                                          data-bs-dismiss="modal"
+                                          aria-label="Close"
+                                          onClick={dataClear1}
+                                        >
+                                          <i class="mdi mdi-close"></i>
+                                        </button>
                                       </div>
-                                    </div>
-                                    <div class="modal-footer justify-center">
-                                      <button
-                                        onClick={contactDetailsEdit}
-                                        type="button"
-                                        class="btn btn-primary mb-0"
-                                      >
-                                        {t("update")}
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              {/* edit popup end */}
-                              <button
-                                type="button"
-                                onClick={() => deleteOrder1(item.contact_id)}
-                              >
-                                <i class="mdi mdi-delete "></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </table>
-                </div>
-                <div className="row">
-               
-                   <button
-                             style={{ width: "170px" }}
-                    className="btn btn-danger mb-4"
-                              data-bs-toggle="modal"
-                              data-bs-target="#exampleModal"
-                            >
-                              {t("addContact")}{" "}
-                            </button>
-                  {/* modal */}
-                  <div
-                    class="modal fade"
-                    id="exampleModalContact"
-                    tabindex="-1"
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                  >
-                    <div class="modal-dialog modalShipTo modal-xl">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h1 class="modal-title fs-5" id="exampleModalLabel">
-                            {t("contact")}
-                          </h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                          >
-                            <i class="mdi mdi-close"></i>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <div className="formCreate">
-                            <form action="">
-                              <div className="row">
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("contactType")}</h6>
-                                  <div class="ceateTransport autoComplete">
-                                    <Autocomplete
-                                      options={contactType || []} // List of contact types
-                                      getOptionLabel={(option) =>
-                                        option.type_en || ""
-                                      } // Label to display (type_en for each contact type)
-                                      onChange={(event, newValue) => {
-                                        handleChange1({
-                                          target: {
-                                            name: "contact_type_id",
-                                            value: newValue
-                                              ? newValue.contact_type_id
-                                              : "",
-                                          }, // Update contact_type_id in state
-                                        });
-                                      }}
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          placeholder={t("selectType")}
-                                          variant="outlined"
-                                        />
-                                      )}
-                                      value={
-                                        contactType?.find(
-                                          (item) =>
-                                            item.contact_type_id ===
-                                            state1.contact_type_id
-                                        ) || null
-                                      } // Set selected value based on contact_type_id
-                                      isOptionEqualToValue={(option, value) =>
-                                        option.contact_type_id ===
-                                        value.contact_type_id
-                                      } // Option comparison by contact_type_id
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6> {t("firstName")} </h6>
-                                  <div class=" ">
-                                    <input
-                                      type="text"
-                                      name="first_name"
-                                      onChange={handleChange1}
-                                      value={state1.first_name}
-                                      placeholder={t("firstName")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("lastName")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="text"
-                                      name="last_name"
-                                      onChange={handleChange1}
-                                      value={state1.last_name}
-                                      placeholder={t("lastName")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("nickName")}</h6>
-                                  <div>
-                                    <input
-                                      type="text"
-                                      name="Nick_name"
-                                      onChange={handleChange1}
-                                      value={state1.Nick_name}
-                                      placeholder={t("nickName")}
-                                    />
-                                  </div>
-                                </div>
-
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("position")} </h6>
-                                  <div class=" ">
-                                    <input
-                                      type="text"
-                                      name="position"
-                                      onChange={handleChange1}
-                                      value={state1.position}
-                                      placeholder={t("position")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("email")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="email"
-                                      name="Email"
-                                      onChange={handleChange1}
-                                      value={state1.Email}
-                                      placeholder={t("email")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("mobile")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="mobile"
-                                      onChange={handleChange1}
-                                      value={state1.mobile}
-                                      placeholder={t("mobile")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                  <h6>{t("landline")}</h6>
-                                  <div class=" ">
-                                    <input
-                                      type="number"
-                                      name="landline"
-                                      onChange={handleChange1}
-                                      value={state1.landline}
-                                      placeholder={t("landline")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                  <h6>{t("birthday")}</h6>
-                                  <div>
-                                    <input
-                                      type="date"
-                                      name="birthday"
-                                      onChange={handleChange1}
-                                      value={state1.birthday}
-                                      placeholder={t("birthday")}
-                                    />
-                                  </div>
-                                </div>
-                                <div class="form-group col-lg-8">
-                                  <h6>{t("notes")}</h6>
-                                  <div>
-                                    <textarea
-                                      name="Notes"
-                                      onChange={handleChange1}
-                                      value={state1.Notes}
-                                      cols="30"
-                                      rows="5"
-                                    ></textarea>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button
-                            type="button"
-                            class="btn btn-primary mb-0"
-                            onClick={contactDataSubmit}
-                          >
-                            {t("submit")}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* modal end */}
-                </div>
-              </div>
-              {/* statics */}
-              <div
-                class="tab-pane fade"
-                id="notify-tab-pane"
-                role="tabpanel"
-                aria-labelledby="notify-tab"
-                tabindex="0"
-              >
-                <div className="statisticsContent formCreate">
-                  <div className="row">
-                    <div className="form-group col-lg-6">
-                      <h6>{t("name")}</h6>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.notify_name}
-                        name="notify_name"
-                        onChange={handleChange6}
-                      />
-                    </div>
-                    <div className="form-group col-lg-6">
-                      <h6>{t("taxNumber")}</h6>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.notify_tax_number}
-                        name="notify_tax_number"
-                        onChange={handleChange6}
-                      />
-                    </div>
-                    <div className="form-group col-lg-6">
-                      <h6>{t("email")}</h6>
-                      <input
-                        type="email"
-                        className="form-control"
-                        value={formData.notify_email}
-                        name="notify_email"
-                        onChange={handleChange6}
-                      />
-                    </div>
-                    <div className="form-group col-lg-6">
-                      <h6>{t("phoneNumber")}</h6>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.notify_phone}
-                        name="notify_phone"
-                        onChange={handleChange6}
-                      />
-                    </div>
-                    <div className="form-group col-lg-12">
-                      <h6>{t("address")}</h6>
-                      <textarea
-                        className="border-2 rounded-md border-[#203764] w-full"
-                        value={formData.notify_address}
-                        name="notify_address"
-                        onChange={handleChange6}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="card-footer text-center">
-                  <button
-                    className="btn btn-primary"
-                    onClick={handleSubmit6}
-                    type="button"
-                  >
-                    {from?.consignee_id ? t("update") : t("create")}
-                  </button>
-                  <Link className="btn btn-danger" to="/shipToNew">
-                    {t("cancel")}
-                  </Link>
-                </div>
-              </div>
-              <div
-                class="tab-pane fade"
-                id="profile-tab-pane"
-                role="tabpanel"
-                aria-labelledby="profile-tab"
-                tabindex="0"
-              >
-                <div className="table-responsive">
-                  <table className="  tableContact striped  table borderTerpProduce">
-                    <tr className="">
-                      <th>{t("itfName")}</th>
-                      <th>{t("customName")}</th>
-                      <th>{t("dummyPrice")}</th>
-                      <th>{t("customMargin")}</th>
-                      <th>{t("maxPrice")}</th>
-                      <th>{t("brand")}</th>
-                      <th>{t("unit")}</th>
-                      <th>{t("barcode")}</th>
-                      <th>{t("action")}</th>
-                    </tr>
-                    {customization?.map((item) => {
-                      return (
-                        <tr>
-                          <td>{item.Name_EN}</td>
-                          <td>{item.Custom_Name}</td>
-                          <td>{item.Dummy_Price}</td>
-                          <td>{item.Custom_Margin}</td>
-                          <td>{item.MAX_Price}</td>
-                          <td>{item.brand_name}</td>
-                          <td>{item.unit_name}</td>
-                          <td>{item.Barcode}</td>
-                          <td>
-                            <div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleEditClickCustomization(item.Id)
-                                }
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModalCustomizationEdit"
-                              >
-                                <i class="mdi mdi-pencil"></i>
-                              </button>
-                              <div
-                                className="modal fade"
-                                id="exampleModalCustomizationEdit"
-                                tabIndex={-1}
-                                aria-labelledby="exampleModalLabel"
-                                aria-hidden="true"
-                              >
-                                <div className=" modal-dialog modalShipTo">
-                                  <div className="modal-content">
-                                    <div className="modal-header">
-                                      <h1
-                                        className="modal-title fs-5"
-                                        id="exampleModalLabel"
-                                      >
-                                        {t("updateCustomization")}
-                                      </h1>
-                                      <button
-                                        type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close"
-                                        onClick={dataClear1}
-                                      >
-                                        <i class="mdi mdi-close"></i>
-                                      </button>
-                                    </div>
-                                    <div className="modal-body">
-                                      <div className="formCreate">
-                                        <div className="row">
-                                          <div className="form-group col-lg-12 mb-2">
-                                            <h6>{t("itfName")}</h6>
-                                            <div className="ceateTransport autoComplete">
-                                              {/* <select
+                                      <div className="modal-body">
+                                        <div className="formCreate">
+                                          <div className="row">
+                                            <div className="form-group col-lg-12 mb-2">
+                                              <h6>{t("itfName")}</h6>
+                                              <div className="ceateTransport autoComplete">
+                                                {/* <select
                                                 name="ITF"
                                                 onChange={handleChange2}
                                                 value={dataCustomization.ITF}
@@ -4993,656 +5092,667 @@ const AddShipTo = () => {
                                                   </option>
                                                 ))}
                                               </select> */}
-                                              <Autocomplete
-                                                disablePortal
-                                                options={getItf || []}
-                                                getOptionLabel={(option) =>
-                                                  option.ITF_Internal_Name_EN ||
-                                                  ""
-                                                }
-                                                onChange={(e, newValue) =>
-                                                  setDataCustomization(
-                                                    (prevState) => ({
-                                                      ...prevState,
-                                                      ITF: newValue?.ID || "",
-                                                    })
-                                                  )
-                                                }
-                                                value={
-                                                  getItf?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      dataCustomization.ITF
-                                                  ) || null
-                                                }
-                                                sx={{ width: 300 }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t("selectItf")}
-                                                    InputLabelProps={{
-                                                      shrink: false,
-                                                    }}
-                                                  />
-                                                )}
-                                              />
+                                                <Autocomplete
+                                                  disablePortal
+                                                  options={getItf || []}
+                                                  getOptionLabel={(option) =>
+                                                    option.ITF_Internal_Name_EN ||
+                                                    ""
+                                                  }
+                                                  onChange={(e, newValue) =>
+                                                    setDataCustomization(
+                                                      (prevState) => ({
+                                                        ...prevState,
+                                                        ITF: newValue?.ID || "",
+                                                      })
+                                                    )
+                                                  }
+                                                  value={
+                                                    getItf?.find(
+                                                      (item) =>
+                                                        item.ID ===
+                                                        dataCustomization.ITF
+                                                    ) || null
+                                                  }
+                                                  sx={{ width: 300 }}
+                                                  renderInput={(params) => (
+                                                    <TextField
+                                                      {...params}
+                                                      placeholder={t(
+                                                        "selectItf"
+                                                      )}
+                                                      InputLabelProps={{
+                                                        shrink: false,
+                                                      }}
+                                                    />
+                                                  )}
+                                                />
+                                              </div>
                                             </div>
-                                          </div>
-                                          <div class="form-group col-lg-12">
-                                            <h6>{t("customName")}</h6>
-                                            <div className=" ">
-                                              <input
-                                                type="text"
-                                                name="Custom_Name"
-                                                className="mb-2"
-                                                onChange={handleChange2}
-                                                value={
-                                                  dataCustomization.Custom_Name
-                                                }
-                                                placeholder={t("customName")}
-                                              />
-                                            </div>
-                                          </div>
-                                          <div class="form-group col-lg-12">
-                                            <h6>{t("agreedPrice")}</h6>
-                                            <div className=" ">
-                                              <input
-                                                type="number"
-                                                name="Dummy_Price"
-                                                onChange={handleChange2}
-                                                value={
-                                                  dataCustomization.Dummy_Price
-                                                }
-                                                placeholder={t("agreedPrice")}
-                                              />
-                                            </div>
-                                          </div>
-                                          <div className="form-group col-lg-12 ">
-                                            <h6>{t("brand")} </h6>
-                                            <div className="ceateTransport autoComplete">
-                                              <Autocomplete
-                                                options={brands || []} // List of brand options
-                                                getOptionLabel={(option) =>
-                                                  option.Name_EN || ""
-                                                } // Label to display
-                                                onChange={(event, newValue) => {
-                                                  handleChange2({
-                                                    target: {
-                                                      name: "brand",
-                                                      value: newValue
-                                                        ? newValue.ID
-                                                        : "",
-                                                    }, // Update selected brand_id
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectBrand"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  brands?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      dataCustomization.brand
-                                                  ) || null
-                                                } // Set value based on selected brand_id
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.ID === value.ID} // Option comparison
-                                              />
-                                            </div>
-                                          </div>
-
-                                          <div className="form-group col-lg-12 ">
-                                            <h6>{t("unit")}</h6>
-                                            <div className="ceateTransport autoComplete">
-                                              <Autocomplete
-                                                options={unitDropdown || []} // List of ITFs
-                                                getOptionLabel={(option) =>
-                                                  option.Name_EN || ""
-                                                } // Label to display (itf_name_en for each ITF)
-                                                onChange={(event, newValue) => {
-                                                  handleChange2({
-                                                    target: {
-                                                      name: "Unit",
-                                                      value: newValue
-                                                        ? newValue.ID
-                                                        : "",
-                                                    }, // Update ITF in state
-                                                  });
-                                                }}
-                                                renderInput={(params) => (
-                                                  <TextField
-                                                    {...params}
-                                                    placeholder={t(
-                                                      "selectUnit"
-                                                    )}
-                                                    variant="outlined"
-                                                  />
-                                                )}
-                                                value={
-                                                  unitDropdown?.find(
-                                                    (item) =>
-                                                      item.ID ===
-                                                      dataCustomization.Unit
-                                                  ) || null
-                                                } // Set selected value based on ITF
-                                                isOptionEqualToValue={(
-                                                  option,
-                                                  value
-                                                ) => option.ID === value.ID} // Option comparison by itf_id
-                                              />
-                                            </div>
-                                            <div class="form-group col-lg-12 mt-2">
-                                              <h6> {t("barcode")} </h6>
+                                            <div class="form-group col-lg-12">
+                                              <h6>{t("customName")}</h6>
                                               <div className=" ">
                                                 <input
                                                   type="text"
-                                                  name="Barcode"
+                                                  name="Custom_Name"
+                                                  className="mb-2"
                                                   onChange={handleChange2}
                                                   value={
-                                                    dataCustomization.Barcode
+                                                    dataCustomization.Custom_Name
                                                   }
-                                                  placeholder={t("barcode")}
+                                                  placeholder={t("customName")}
                                                 />
+                                              </div>
+                                            </div>
+                                            <div class="form-group col-lg-12">
+                                              <h6>{t("agreedPrice")}</h6>
+                                              <div className=" ">
+                                                <input
+                                                  type="number"
+                                                  name="Dummy_Price"
+                                                  onChange={handleChange2}
+                                                  value={
+                                                    dataCustomization.Dummy_Price
+                                                  }
+                                                  placeholder={t("agreedPrice")}
+                                                />
+                                              </div>
+                                            </div>
+                                            <div className="form-group col-lg-12 ">
+                                              <h6>{t("brand")} </h6>
+                                              <div className="ceateTransport autoComplete">
+                                                <Autocomplete
+                                                  options={brands || []} // List of brand options
+                                                  getOptionLabel={(option) =>
+                                                    option.Name_EN || ""
+                                                  } // Label to display
+                                                  onChange={(
+                                                    event,
+                                                    newValue
+                                                  ) => {
+                                                    handleChange2({
+                                                      target: {
+                                                        name: "brand",
+                                                        value: newValue
+                                                          ? newValue.ID
+                                                          : "",
+                                                      }, // Update selected brand_id
+                                                    });
+                                                  }}
+                                                  renderInput={(params) => (
+                                                    <TextField
+                                                      {...params}
+                                                      placeholder={t(
+                                                        "selectBrand"
+                                                      )}
+                                                      variant="outlined"
+                                                    />
+                                                  )}
+                                                  value={
+                                                    brands?.find(
+                                                      (item) =>
+                                                        item.ID ===
+                                                        dataCustomization.brand
+                                                    ) || null
+                                                  } // Set value based on selected brand_id
+                                                  isOptionEqualToValue={(
+                                                    option,
+                                                    value
+                                                  ) => option.ID === value.ID} // Option comparison
+                                                />
+                                              </div>
+                                            </div>
+
+                                            <div className="form-group col-lg-12 ">
+                                              <h6>{t("unit")}</h6>
+                                              <div className="ceateTransport autoComplete">
+                                                <Autocomplete
+                                                  options={unitDropdown || []} // List of ITFs
+                                                  getOptionLabel={(option) =>
+                                                    option.Name_EN || ""
+                                                  } // Label to display (itf_name_en for each ITF)
+                                                  onChange={(
+                                                    event,
+                                                    newValue
+                                                  ) => {
+                                                    handleChange2({
+                                                      target: {
+                                                        name: "Unit",
+                                                        value: newValue
+                                                          ? newValue.ID
+                                                          : "",
+                                                      }, // Update ITF in state
+                                                    });
+                                                  }}
+                                                  renderInput={(params) => (
+                                                    <TextField
+                                                      {...params}
+                                                      placeholder={t(
+                                                        "selectUnit"
+                                                      )}
+                                                      variant="outlined"
+                                                    />
+                                                  )}
+                                                  value={
+                                                    unitDropdown?.find(
+                                                      (item) =>
+                                                        item.ID ===
+                                                        dataCustomization.Unit
+                                                    ) || null
+                                                  } // Set selected value based on ITF
+                                                  isOptionEqualToValue={(
+                                                    option,
+                                                    value
+                                                  ) => option.ID === value.ID} // Option comparison by itf_id
+                                                />
+                                              </div>
+                                              <div class="form-group col-lg-12 mt-2">
+                                                <h6> {t("barcode")} </h6>
+                                                <div className=" ">
+                                                  <input
+                                                    type="text"
+                                                    name="Barcode"
+                                                    onChange={handleChange2}
+                                                    value={
+                                                      dataCustomization.Barcode
+                                                    }
+                                                    placeholder={t("barcode")}
+                                                  />
+                                                </div>
                                               </div>
                                             </div>
                                           </div>
                                         </div>
                                       </div>
-                                    </div>
-                                    <div className="modal-footer">
-                                      <button
-                                        type="button "
-                                        onClick={customizationDataSubmit}
-                                        className="btn mb-0 btn-primary"
-                                      >
-                                        {t("update")}{" "}
-                                      </button>
+                                      <div className="modal-footer">
+                                        <button
+                                          type="button "
+                                          onClick={customizationDataSubmit}
+                                          className="btn mb-0 btn-primary"
+                                        >
+                                          {t("update")}{" "}
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteOrder(item.Id)}
+                                >
+                                  <i class="mdi mdi-delete "></i>
+                                </button>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => deleteOrder(item.Id)}
-                              >
-                                <i class="mdi mdi-delete "></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </table>
-                </div>
-                <Link
-                  style={{ width: "100px" }}
-                  className="btn btn-danger mb-4"
-                  to="/"
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModalCustomization"
-                >
-                  {t("add")}
-                </Link>
-                {/* customixation modal */}
-                <div
-                  className="modal fade"
-                  id="exampleModalCustomization"
-                  tabIndex={-1}
-                  aria-labelledby="exampleModalLabel"
-                  aria-hidden="true"
-                >
-                  <div className=" modal-dialog  modalShipTo">
-                    <div className="modal-content">
-                      <div className="modal-header">
-                        <h1 className="modal-title fs-5" id="exampleModalLabel">
-                          {t("addCustomization")}
-                        </h1>
-                        <button
-                          type="button"
-                          class="btn-close"
-                          data-bs-dismiss="modal"
-                          aria-label="Close"
-                          onClick={dataClear1}
-                        >
-                          <i class="mdi mdi-close"></i>
-                        </button>
-                      </div>
-                      <div className="modal-body">
-                        <div className="formCreate">
-                          <div className="row">
-                            <div className="form-group col-lg-12 mb-3">
-                              <h6>{t("itfName")}</h6>
-                              <div className="ceateTransport autoComplete">
-                                <Autocomplete
-                                  options={getItf || []} // List of ITFs
-                                  getOptionLabel={(option) =>
-                                    option.ITF_Internal_Name_EN || ""
-                                  } // Label to display (itf_name_en for each ITF)
-                                  onChange={(event, newValue) => {
-                                    handleChange2({
-                                      target: {
-                                        name: "ITF",
-                                        value: newValue ? newValue.ID : "",
-                                      }, // Update ITF in state
-                                    });
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder={t("selectItf")}
-                                      variant="outlined"
-                                    />
-                                  )}
-                                  value={
-                                    getItf?.find(
-                                      (item) =>
-                                        item.ID === dataCustomization.ITF
-                                    ) || null
-                                  } // Set selected value based on ITF
-                                  isOptionEqualToValue={(option, value) =>
-                                    option.ID === value.ID
-                                  } // Option comparison by itf_id
-                                />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </table>
+                  </div>
+                  <Link
+                    style={{ width: "100px" }}
+                    className="btn btn-danger mb-4"
+                    to="/"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModalCustomization"
+                  >
+                    {t("add")}
+                  </Link>
+                  {/* customixation modal */}
+                  <div
+                    className="modal fade"
+                    id="exampleModalCustomization"
+                    tabIndex={-1}
+                    aria-labelledby="exampleModalLabel"
+                    aria-hidden="true"
+                  >
+                    <div className=" modal-dialog  modalShipTo">
+                      <div className="modal-content">
+                        <div className="modal-header">
+                          <h1
+                            className="modal-title fs-5"
+                            id="exampleModalLabel"
+                          >
+                            {t("addCustomization")}
+                          </h1>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                            onClick={dataClear1}
+                          >
+                            <i class="mdi mdi-close"></i>
+                          </button>
+                        </div>
+                        <div className="modal-body">
+                          <div className="formCreate">
+                            <div className="row">
+                              <div className="form-group col-lg-12 mb-3">
+                                <h6>{t("itfName")}</h6>
+                                <div className="ceateTransport autoComplete">
+                                  <Autocomplete
+                                    options={getItf || []} // List of ITFs
+                                    getOptionLabel={(option) =>
+                                      option.ITF_Internal_Name_EN || ""
+                                    } // Label to display (itf_name_en for each ITF)
+                                    onChange={(event, newValue) => {
+                                      handleChange2({
+                                        target: {
+                                          name: "ITF",
+                                          value: newValue ? newValue.ID : "",
+                                        }, // Update ITF in state
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectItf")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      getItf?.find(
+                                        (item) =>
+                                          item.ID === dataCustomization.ITF
+                                      ) || null
+                                    } // Set selected value based on ITF
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.ID === value.ID
+                                    } // Option comparison by itf_id
+                                  />
+                                </div>
                               </div>
-                            </div>
-                            <div class="form-group col-lg-12">
-                              <h6>{t("customName")}</h6>
-                              <div className=" ">
-                                <input
-                                  type="text"
-                                  name="Custom_Name"
-                                  onChange={handleChange2}
-                                  value={dataCustomization.Custom_Name}
-                                  placeholder={t("customName")}
-                                  className="mb-3"
-                                />
-                              </div>
-                            </div>
-                            <div class="form-group col-lg-12">
-                              <h6>{t("agreedPrice")}</h6>
-                              <div className=" ">
-                                <input
-                                  type="number"
-                                  name="Dummy_Price"
-                                  onChange={handleChange2}
-                                  value={dataCustomization.Dummy_Price}
-                                  placeholder={t("agreedPrice")}
-                                />
-                              </div>
-                            </div>
-                            <div className="form-group col-lg-12 ">
-                              <h6>{t("brand")}</h6>
-                              <div className="ceateTransport autoComplete">
-                                <Autocomplete
-                                  options={brands || []} // List of brand options
-                                  getOptionLabel={(option) =>
-                                    option.Name_EN || ""
-                                  } // Label to display
-                                  onChange={(event, newValue) => {
-                                    handleChange2({
-                                      target: {
-                                        name: "brand",
-                                        value: newValue ? newValue.ID : "",
-                                      }, // Update selected brand_id
-                                    });
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder={t("selectBrand")}
-                                      variant="outlined"
-                                    />
-                                  )}
-                                  value={
-                                    brands?.find(
-                                      (item) =>
-                                        item.ID === dataCustomization.brand
-                                    ) || null
-                                  } // Set value based on selected brand_id
-                                  isOptionEqualToValue={(option, value) =>
-                                    option.ID === value.ID
-                                  } // Option comparison
-                                />
-                              </div>
-                            </div>
-                            <div className="form-group col-lg-12 ">
-                              <h6>{t("unit")}</h6>
-                              <div className="ceateTransport autoComplete">
-                                <Autocomplete
-                                  options={unitDropdown || []} // List of ITFs
-                                  getOptionLabel={(option) =>
-                                    option.Name_EN || ""
-                                  } // Label to display (itf_name_en for each ITF)
-                                  onChange={(event, newValue) => {
-                                    handleChange2({
-                                      target: {
-                                        name: "Unit",
-                                        value: newValue ? newValue.ID : "",
-                                      }, // Update ITF in state
-                                    });
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder={t("selectUnit")}
-                                      variant="outlined"
-                                    />
-                                  )}
-                                  value={
-                                    unitDropdown?.find(
-                                      (item) =>
-                                        item.ID === dataCustomization.Unit
-                                    ) || null
-                                  } // Set selected value based on ITF
-                                  isOptionEqualToValue={(option, value) =>
-                                    option.ID === value.ID
-                                  } // Option comparison by itf_id
-                                />
-                              </div>
-                              <div class="form-group col-lg-12 mt-2">
-                                <h6> {t("barcode")} </h6>
+                              <div class="form-group col-lg-12">
+                                <h6>{t("customName")}</h6>
                                 <div className=" ">
                                   <input
                                     type="text"
-                                    name="Barcode"
+                                    name="Custom_Name"
                                     onChange={handleChange2}
-                                    value={dataCustomization.Barcode}
-                                    placeholder={t("barcode")}
+                                    value={dataCustomization.Custom_Name}
+                                    placeholder={t("customName")}
+                                    className="mb-3"
                                   />
+                                </div>
+                              </div>
+                              <div class="form-group col-lg-12">
+                                <h6>{t("agreedPrice")}</h6>
+                                <div className=" ">
+                                  <input
+                                    type="number"
+                                    name="Dummy_Price"
+                                    onChange={handleChange2}
+                                    value={dataCustomization.Dummy_Price}
+                                    placeholder={t("agreedPrice")}
+                                  />
+                                </div>
+                              </div>
+                              <div className="form-group col-lg-12 ">
+                                <h6>{t("brand")}</h6>
+                                <div className="ceateTransport autoComplete">
+                                  <Autocomplete
+                                    options={brands || []} // List of brand options
+                                    getOptionLabel={(option) =>
+                                      option.Name_EN || ""
+                                    } // Label to display
+                                    onChange={(event, newValue) => {
+                                      handleChange2({
+                                        target: {
+                                          name: "brand",
+                                          value: newValue ? newValue.ID : "",
+                                        }, // Update selected brand_id
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectBrand")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      brands?.find(
+                                        (item) =>
+                                          item.ID === dataCustomization.brand
+                                      ) || null
+                                    } // Set value based on selected brand_id
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.ID === value.ID
+                                    } // Option comparison
+                                  />
+                                </div>
+                              </div>
+                              <div className="form-group col-lg-12 ">
+                                <h6>{t("unit")}</h6>
+                                <div className="ceateTransport autoComplete">
+                                  <Autocomplete
+                                    options={unitDropdown || []} // List of ITFs
+                                    getOptionLabel={(option) =>
+                                      option.Name_EN || ""
+                                    } // Label to display (itf_name_en for each ITF)
+                                    onChange={(event, newValue) => {
+                                      handleChange2({
+                                        target: {
+                                          name: "Unit",
+                                          value: newValue ? newValue.ID : "",
+                                        }, // Update ITF in state
+                                      });
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        placeholder={t("selectUnit")}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                    value={
+                                      unitDropdown?.find(
+                                        (item) =>
+                                          item.ID === dataCustomization.Unit
+                                      ) || null
+                                    } // Set selected value based on ITF
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.ID === value.ID
+                                    } // Option comparison by itf_id
+                                  />
+                                </div>
+                                <div class="form-group col-lg-12 mt-2">
+                                  <h6> {t("barcode")} </h6>
+                                  <div className=" ">
+                                    <input
+                                      type="text"
+                                      name="Barcode"
+                                      onChange={handleChange2}
+                                      value={dataCustomization.Barcode}
+                                      placeholder={t("barcode")}
+                                    />
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="modal-footer">
-                        <button
-                          type="button "
-                          onClick={submitCustomizationData}
-                          className="btn mb-0 btn-primary"
-                        >
-                          {t("add")}
-                        </button>
+                        <div className="modal-footer">
+                          <button
+                            type="button "
+                            onClick={submitCustomizationData}
+                            className="btn mb-0 btn-primary"
+                          >
+                            {t("add")}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
+
+                  {/* customization modal end */}
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="invoiceSetup-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="invoiceSetup-tab"
+                  tabindex="0"
+                >
+                  <p cls>{t("invoiceSetup")}</p>
                 </div>
 
-                {/* customization modal end */}
-              </div>
-              <div
-                class="tab-pane fade"
-                id="invoiceSetup-tab-pane"
-                role="tabpanel"
-                aria-labelledby="invoiceSetup-tab"
-                tabindex="0"
-              >
-                <p cls>{t("invoiceSetup")}</p>
-              </div>
+                <div
+                  class="tab-pane fade"
+                  id="margins-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="margins-tab"
+                  tabindex="0"
+                >
+                  {/* payment and channel */}
+                  <div className="formCreate createPackage">
+                    <form>
+                      <div className="row justify-content-center">
+                        <div className="col-lg-3 form-group autoComplete">
+                          <h6>{t("invoiceCurrency")}</h6>
+                          <Autocomplete
+                            options={currency || []} // List of currencies
+                            getOptionLabel={(option) => option.FX || ""} // Label to display (currency name for each item)
+                            onChange={(event, newValue) => {
+                              handleChange5({
+                                target: {
+                                  name: "invoiceCurrency",
+                                  value: newValue ? newValue.ID : "",
+                                },
+                              });
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("selectCurrency")}
+                                variant="outlined"
+                              />
+                            )}
+                            value={
+                              currency?.find(
+                                (item) => item.ID === state5.invoiceCurrency
+                              ) || null
+                            } // Set selected value based on invoiceCurrency
+                            isOptionEqualToValue={(option, value) =>
+                              option.ID === value.ID
+                            }
+                          />
+                        </div>
+                        <div className="col-lg-2 form-group autoComplete">
+                          <h6>{t("invoiceUnit")}</h6>
 
-              <div
-                class="tab-pane fade"
-                id="margins-tab-pane"
-                role="tabpanel"
-                aria-labelledby="margins-tab"
-                tabindex="0"
-              >
-                {/* payment and channel */}
-                <div className="formCreate createPackage">
-                  <form>
-                    <div className="row justify-content-center">
-                      <div className="col-lg-3 form-group autoComplete">
-                        <h6>{t("invoiceCurrency")}</h6>
-                        <Autocomplete
-                          options={currency || []} // List of currencies
-                          getOptionLabel={(option) => option.FX || ""} // Label to display (currency name for each item)
-                          onChange={(event, newValue) => {
-                            handleChange5({
-                              target: {
-                                name: "invoiceCurrency",
-                                value: newValue ? newValue.ID : "",
-                              },
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectCurrency")}
-                              variant="outlined"
-                            />
-                          )}
-                          value={
-                            currency?.find(
-                              (item) => item.ID === state5.invoiceCurrency
-                            ) || null
-                          } // Set selected value based on invoiceCurrency
-                          isOptionEqualToValue={(option, value) =>
-                            option.ID === value.ID
-                          }
-                        />
-                      </div>
-                      <div className="col-lg-2 form-group autoComplete">
-                        <h6>{t("invoiceUnit")}</h6>
+                          <Autocomplete
+                            options={unitDropdown || []}
+                            getOptionLabel={(option) => option.Name_EN || ""} // Use Name_EN from API
+                            onChange={(event, newValue) => {
+                              handleChange5({
+                                target: {
+                                  name: "Invoice_Unit",
+                                  value: newValue ? newValue.ID : "",
+                                },
+                              });
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("selectUnit")}
+                                variant="outlined"
+                              />
+                            )}
+                            value={
+                              unitDropdown?.find(
+                                (item) => item.ID === state5.Invoice_Unit
+                              ) || null
+                            }
+                            isOptionEqualToValue={(option, value) =>
+                              option.ID === value.ID
+                            }
+                          />
+                        </div>
+                        <div className="col-lg-2 form-group autoComplete">
+                          <h6>{t("commission")}</h6>
 
-                        <Autocomplete
-                          options={unitDropdown || []}
-                          getOptionLabel={(option) => option.Name_EN || ""} // Use Name_EN from API
-                          onChange={(event, newValue) => {
-                            handleChange5({
-                              target: {
-                                name: "Invoice_Unit",
-                                value: newValue ? newValue.ID : "",
-                              },
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectUnit")}
-                              variant="outlined"
-                            />
-                          )}
-                          value={
-                            unitDropdown?.find(
-                              (item) => item.ID === state5.Invoice_Unit
-                            ) || null
-                          }
-                          isOptionEqualToValue={(option, value) =>
-                            option.ID === value.ID
-                          }
-                        />
-                      </div>
-                      <div className="col-lg-2 form-group autoComplete">
-                        <h6>{t("commission")}</h6>
-
-                        <Autocomplete
-                          options={commission || []}
-                          getOptionLabel={(option) =>
-                            option.commission_name_en || ""
-                          }
-                          onChange={(event, newValue) => {
-                            handleChange5({
-                              target: {
-                                name: "commissionType",
-                                value: newValue ? newValue.id : "",
-                              },
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectCommission")}
-                              variant="outlined"
-                            />
-                          )}
-                          value={
-                            commission?.find(
-                              (item) => item.id === state5.commissionType
-                            ) || null
-                          } // Set selected value based on commissionType
-                          isOptionEqualToValue={(option, value) =>
-                            option.id === value.id
-                          } // Option comparison by id
-                        />
-                      </div>
-                      <div className="col-lg-2 form-group">
-                        <h6>{t("commissionValue")}</h6>
-                        <div className="parentthb packParent">
-                          <div className="childThb">
-                            <input
-                              type="text"
-                              name="commissionValue"
-                              placeholder={t("commissionValue")}
-                              value={state5.commissionValue}
-                              onChange={handleChange5}
-                            />
+                          <Autocomplete
+                            options={commission || []}
+                            getOptionLabel={(option) =>
+                              option.commission_name_en || ""
+                            }
+                            onChange={(event, newValue) => {
+                              handleChange5({
+                                target: {
+                                  name: "commissionType",
+                                  value: newValue ? newValue.id : "",
+                                },
+                              });
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("selectCommission")}
+                                variant="outlined"
+                              />
+                            )}
+                            value={
+                              commission?.find(
+                                (item) => item.id === state5.commissionType
+                              ) || null
+                            } // Set selected value based on commissionType
+                            isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                            } // Option comparison by id
+                          />
+                        </div>
+                        <div className="col-lg-2 form-group">
+                          <h6>{t("commissionValue")}</h6>
+                          <div className="parentthb packParent">
+                            <div className="childThb">
+                              <input
+                                type="text"
+                                name="commissionValue"
+                                placeholder={t("commissionValue")}
+                                value={state5.commissionValue}
+                                onChange={handleChange5}
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="col-lg-1 shipToToggle">
-                        <h6>{t("commission")}</h6>
-                        <label
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            padding: "10px",
-                          }}
-                          className="toggleSwitch large"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={state5.commissionCurrency === "THB"}
-                            onChange={handleChange5}
-                            name="commissionCurrency"
+                        <div className="col-lg-1 shipToToggle">
+                          <h6>{t("commission")}</h6>
+                          <label
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              padding: "10px",
+                            }}
+                            className="toggleSwitch large"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={state5.commissionCurrency === "THB"}
+                              onChange={handleChange5}
+                              name="commissionCurrency"
+                            />
+                            <span>
+                              <span>{t("fx")}</span>
+                              <span> {t("thb")}</span>
+                            </span>
+                            <a> </a>
+                          </label>
+                        </div>
+                        <div className="col-lg-2 shipToToggle">
+                          <h6>{t("chargeVolume")}</h6>
+                          <label
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              padding: "10px",
+                            }}
+                            className="toggleSwitch large"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={state5.chargeVolume == 1}
+                              onChange={handleChange5}
+                              name="chargeVolume"
+                            />
+                            <span>
+                              <span>{t("no")}</span>
+                              <span>{t("yes")}</span>
+                            </span>
+                            <a> </a>
+                          </label>
+                        </div>
+
+                        <div className="col-lg-2 form-group autoComplete">
+                          <h6>{t("deliveryTermsIncoterms")}</h6>
+                          <Autocomplete
+                            options={DropdownDelivery || []} // List of delivery terms and incoterms
+                            getOptionLabel={(option) => option.Incoterms || ""} // Label to display (Incoterms)
+                            onChange={(event, newValue) => {
+                              handleChange5({
+                                target: {
+                                  name: "deliveryTerms",
+                                  value: newValue ? newValue.id : "",
+                                }, // Update deliveryTerms in state
+                              });
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("selectDeliveryTermsIncoterms")}
+                                variant="outlined"
+                              />
+                            )}
+                            value={
+                              DropdownDelivery?.find(
+                                (item) => item.id === state5.deliveryTerms
+                              ) || null
+                            } // Set selected value based on deliveryTerms
+                            isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                            } // Option comparison by id
                           />
-                          <span>
-                            <span>{t("fx")}</span>
-                            <span> {t("thb")}</span>
-                          </span>
-                          <a> </a>
-                        </label>
-                      </div>
-                      <div className="col-lg-2 shipToToggle">
-                        <h6>{t("chargeVolume")}</h6>
-                        <label
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            padding: "10px",
-                          }}
-                          className="toggleSwitch large"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={state5.chargeVolume == 1}
-                            onChange={handleChange5}
-                            name="chargeVolume"
+                        </div>
+
+                        <div className="col-lg-2 form-group autoComplete">
+                          <h6>{t("paymentTerms")}</h6>
+                          <Autocomplete
+                            options={FXCorrection || []} // List of payment terms
+                            getOptionLabel={(option) =>
+                              `${option.DAYS} DAYS` || ""
+                            } // Label to display (e.g., "30 DAYS")
+                            onChange={(event, newValue) => {
+                              handleChange5({
+                                target: {
+                                  name: "paymentTerms",
+                                  value: newValue ? newValue.ID : "",
+                                }, // Update paymentTerms in state
+                              });
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("selectPaymentTerms")}
+                                variant="outlined"
+                              />
+                            )}
+                            value={
+                              FXCorrection?.find(
+                                (item) => item.ID === state5.paymentTerms
+                              ) || null
+                            } // Set selected value based on paymentTerms
+                            isOptionEqualToValue={(option, value) =>
+                              option.ID === value.ID
+                            } // Option comparison by ID
                           />
-                          <span>
-                            <span>{t("no")}</span>
-                            <span>{t("yes")}</span>
-                          </span>
-                          <a> </a>
-                        </label>
-                      </div>
+                        </div>
 
-                      <div className="col-lg-2 form-group autoComplete">
-                        <h6>{t("deliveryTermsIncoterms")}</h6>
-                        <Autocomplete
-                          options={DropdownDelivery || []} // List of delivery terms and incoterms
-                          getOptionLabel={(option) => option.Incoterms || ""} // Label to display (Incoterms)
-                          onChange={(event, newValue) => {
-                            handleChange5({
-                              target: {
-                                name: "deliveryTerms",
-                                value: newValue ? newValue.id : "",
-                              }, // Update deliveryTerms in state
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectDeliveryTermsIncoterms")}
-                              variant="outlined"
-                            />
-                          )}
-                          value={
-                            DropdownDelivery?.find(
-                              (item) => item.id === state5.deliveryTerms
-                            ) || null
-                          } // Set selected value based on deliveryTerms
-                          isOptionEqualToValue={(option, value) =>
-                            option.id === value.id
-                          } // Option comparison by id
-                        />
-                      </div>
+                        <div className="col-lg-2 form-group autoComplete">
+                          <h6>{t("statementDueDate")}</h6>
+                          <Autocomplete
+                            disablePortal
+                            options={[
+                              { id: 1, label: "Pre Shipment" },
+                              { id: 2, label: "Seaport" },
+                            ]} // Define the options array
+                            getOptionLabel={(option) => option.label} // Display the `label` for each option
+                            onChange={handleChange5} // Use the handleChange function
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("selectStatementDueDate")}
+                                InputLabelProps={{ shrink: false }} // Prevents floating label
+                              />
+                            )}
+                            sx={{ width: 300 }}
+                          />
+                        </div>
 
-                      <div className="col-lg-2 form-group autoComplete">
-                        <h6>{t("paymentTerms")}</h6>
-                        <Autocomplete
-                          options={FXCorrection || []} // List of payment terms
-                          getOptionLabel={(option) =>
-                            `${option.DAYS} DAYS` || ""
-                          } // Label to display (e.g., "30 DAYS")
-                          onChange={(event, newValue) => {
-                            handleChange5({
-                              target: {
-                                name: "paymentTerms",
-                                value: newValue ? newValue.ID : "",
-                              }, // Update paymentTerms in state
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectPaymentTerms")}
-                              variant="outlined"
-                            />
-                          )}
-                          value={
-                            FXCorrection?.find(
-                              (item) => item.ID === state5.paymentTerms
-                            ) || null
-                          } // Set selected value based on paymentTerms
-                          isOptionEqualToValue={(option, value) =>
-                            option.ID === value.ID
-                          } // Option comparison by ID
-                        />
-                      </div>
-
-                      <div className="col-lg-2 form-group autoComplete">
-                        <h6>{t("statementDueDate")}</h6>
-                        <Autocomplete
-                          disablePortal
-                          options={[
-                            { id: 1, label: "Pre Shipment" },
-                            { id: 2, label: "Seaport" },
-                          ]} // Define the options array
-                          getOptionLabel={(option) => option.label} // Display the `label` for each option
-                          onChange={handleChange5} // Use the handleChange function
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectStatementDueDate")}
-                              InputLabelProps={{ shrink: false }} // Prevents floating label
-                            />
-                          )}
-                          sx={{ width: 300 }}
-                        />
-                      </div>
-
-                      {/* <div className="col-lg-2 form-group">
+                        {/* <div className="col-lg-2 form-group">
                         <h6>Rounding</h6>
                         <input
                           type="text"
@@ -5653,895 +5763,882 @@ const AddShipTo = () => {
                           onChange={handleChange5}
                         />
                       </div> */}
-                      <div className="col-lg-2 form-group autoComplete">
-                        <h6>{t("rounding")}</h6>
-                        <Autocomplete
-                          options={RoundingDataList || []} // List of delivery terms and incoterms
-                          getOptionLabel={(option) => option.DropDown || ""} // Label to display (Incoterms)
-                          onChange={(event, newValue) => {
-                            handleChange5({
-                              target: {
-                                name: "Rounding",
-                                value: newValue ? newValue.ID : "",
-                              }, // Update deliveryTerms in state
-                            });
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectRounding")}
-                              variant="outlined"
-                            />
-                          )}
-                          value={
-                            RoundingDataList?.find(
-                              (item) => item.ID === state5.Rounding
-                            ) || null
-                          } // Set selected value based on deliveryTerms
-                          isOptionEqualToValue={(option, value) =>
-                            option.ID === value.ID
-                          } // Option comparison by id
-                        />
-                      </div>
-                      <div className="col-lg-2 form-group">
-                        <h6>{t("extraCost")}</h6>
-                        <input
-                          type="text"
-                          name="extraCost"
-                          className="form-control"
-                          placeholder={t("extraCost")}
-                          value={state5.extraCost}
-                          onChange={handleChange5}
-                        />
-                      </div>
-                      <div className="col-lg-2 form-group  ">
-                        <h6>{t("freightAdjustment")}</h6>
-                        <input
-                          type="text"
-                          name="freightAdjust"
-                          className="form-control"
-                          placeholder={t("freightAdjustment")}
-                          value={state5.freightAdjust}
-                          onChange={handleChange5}
-                        />
-                      </div>
-                      <div className="col-lg-2 form-group">
-                        <h6>{t("markupValue")}</h6>
-                        <div className="parentShip">
-                          <div className="markupShip">
-                            <input
-                              type="text"
-                              name="markupValue"
-                              className="form-control"
-                              placeholder={t("markupValue")}
-                              value={state5.markupValue}
-                              onChange={handleChange5}
-                            />
-                          </div>
-                          <div className="shipPercent">
-                            <span>%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-2 form-group">
-                        <h6>{t("rebateValue")}</h6>
-                        <div className="parentShip">
-                          <div className="markupShip">
-                            <input
-                              type="text"
-                              name="rebateValue"
-                              className="form-control"
-                              placeholder={t("rebateValue")}
-                              value={state5.rebateValue}
-                              onChange={handleChange5}
-                            />
-                          </div>
-                          <div className="shipPercent">
-                            <span>%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-2 form-group">
-                        <h6>{t("quotation")}</h6>
-                        <div className="parentShip">
-                          <div className="markupShip">
-                            <input
-                              type="text"
-                              name="quotation"
-                              className="form-control"
-                              placeholder={t("quotation")}
-                              value={state5.quotation}
-                              onChange={handleChange5}
-                            />
-                          </div>
-                          <div className="shipPercent">
-                            <span>%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-2 form-group">
-                        <h6>{t("claim")}</h6>
-                        <div className="parentShip">
-                          <div className="markupShip">
-                            <input
-                              type="text"
-                              name="claim"
-                              className="form-control"
-                              placeholder={t("claim")}
-                              value={claimValue1}
-                              onChange={handleChange5}
-                            />
-                          </div>
-                          <div className="shipPercent">
-                            <span>%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-2 form-group">
-                        <h6>{t("other")}</h6>
-                        <div className="parentShip">
-                          <div className="markupShip">
-                            <input
-                              type="text"
-                              name="other"
-                              className="form-control"
-                              placeholder={t("other")}
-                              value={state5.other}
-                              onChange={handleChange5}
-                            />
-                          </div>
-                          <div className="shipPercent">
-                            <span>%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-2 form-group">
-                        <h6>{t("final")}</h6>
-                        <div className="parentShip">
-                          <div className="markupShip">
-                            <input
-                              type="text"
-                              name="final"
-                              className="form-control"
-                              placeholder={t("final")}
-                              value={claimValue}
-                              onChange={handleChange5}
-                            />
-                          </div>
-                          <div className="shipPercent">
-                            <span>%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="text-center">
-                        <button
-                          className="btn btn-primary"
-                          onClick={updatePaymentValue}
-                          type="button"
-                        >
-                          {from?.consignee_id ? t("update") : t("create")}
-                        </button>
-                        <Link className="btn btn-danger" to="/shipToNew">
-                          {t("cancel")}
-                        </Link>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-              <div
-                class="tab-pane fade"
-                id="contact-tab-pane"
-                role="tabpanel"
-                aria-labelledby="contact-tab"
-                tabindex="0"
-              >
-                <div className="py-3">
-                  <div className="row newSmallCard ">
-                    <div className="flex flex-wrap">
-                      <div>
-                        <div className="selectTimeHead">
-                          <h6>{t("selectTimePeriod")} :</h6>
-                        </div>
-                        <div className="selectTimeParent">
-                          {dataPeriod.map((item) => (
-                            <div
-                              key={item.ID}
-                              className="timeMonth timePeriod"
-                              onClick={() =>
-                                handlePeriodClick(item.Period, item.ID)
-                              }
-                            >
-                              <p>{item.Period}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="selectProduce comparisonNone mt-2">
-                        <h6 style={{ color: "#fff" }}>Comparison Period</h6>
-                        <Autocomplete
-                          disablePortal
-                          options={dataComparison}
-                          getOptionLabel={(option) => option.Name_EN || ""}
-                          sx={{ width: 300 }}
-                          onChange={(event, value) => {
-                            setSelectedComparison(value ? value.ID : null);
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("comparisonPeriod")}
-                            />
-                          )}
-                        />
-                      </div>
-                    </div>
-                    <div className="dateSelect row">
-                      <div className="col-lg-3">
-                        <input
-                          type="date"
-                          value={date1}
-                          onChange={(e) => setDate1(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-lg-3">
-                        <input
-                          type="date"
-                          value={date2}
-                          onChange={(e) => setDate2(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-lg-3">
-                        <input
-                          type="date"
-                          value={date3}
-                          onChange={(e) => setDate3(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-lg-3">
-                        <input
-                          type="date"
-                          value={date4}
-                          onChange={(e) => setDate4(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="dateSelect row">
-                      <div className="col-lg-3">
-                        <button
-                          className="btn btn-primary"
-                          type="submit"
-                          onClick={confirmData}
-                        >
-                          {t("confirm")}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row dashCard53 consigneeCard">
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
-                      <div className="card  ">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {/* {consigeeDetails?.Total_shipments} */}
-                              {boxsData?.CNF?.Count ? boxsData?.CNF?.Count : 0}
-                            </div>
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalShipments")}
-                            </p>
-                            <h4 className="mb-0">
-                              {boxsData?.CNF?.Total ? boxsData?.CNF?.Total : 0}
-                            </h4>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              {boxsData?.CNF?.Difference
-                                ? boxsData?.CNF?.Difference
-                                : 0}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {boxsData?.Claims?.Count
-                                ? boxsData?.Claims?.Count
-                                : 0}
-                            </div>
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalClaims")}
-                            </p>
-                            <h4 className="mb-0">
-                              {" "}
-                              {boxsData?.Claims?.Total
-                                ? boxsData?.Claims?.Total
-                                : 0}
-                            </h4>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              {boxsData?.Claims?.Difference
-                                ? boxsData?.Claims?.Difference
-                                : 0}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {boxsData?.Payments?.Count
-                                ? boxsData?.Payments?.Count
-                                : 0}
-                            </div>
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {" "}
-                              {t("totalPayment")}{" "}
-                            </p>
-                            <h4 className="mb-0">
-                              {" "}
-                              {boxsData?.Payments?.Total
-                                ? boxsData?.Payments?.Total
-                                : 0}
-                            </h4>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              {boxsData?.Payments?.Difference
-                                ? boxsData?.Payments?.Difference
-                                : 0}
-                            </span>{" "}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <div
-                              style={{
-                                fontSize: "25px",
-                                color: "#d2d7e0",
-                                paddingTop: "13px",
-                              }}
-                            >
-                              {boxsData?.Pending?.Count
-                                ? boxsData?.Pending?.Count
-                                : 0}
-                            </div>{" "}
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("pendingPayment")}
-                            </p>
-                            <h4 className="mb-0">
-                              {boxsData?.Pending?.Total
-                                ? boxsData?.Pending?.Total
-                                : 0}
-                            </h4>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              {boxsData?.Pending?.Difference
-                                ? boxsData?.Pending?.Difference
-                                : 0}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="row dashCard53 consigneeCard">
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-weight" />
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalNetWeightShipped")}
-                            </p>
-                            <h4 className="mb-0">
-                              {boxsData?.NetWeight?.Total_GW
-                                ? boxsData?.NetWeight?.Total_GW
-                                : 0}
-                            </h4>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              {boxsData?.NetWeight?.Total_GW_Difference
-                                ? boxsData?.NetWeight?.Total_GW_Difference
-                                : 0}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons mdi mdi-weight-gram" />
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalGrossWeightShipped")}
-                            </p>
-                            <h4 className="mb-0">
-                              {boxsData?.grossWeight?.Total_GW
-                                ? boxsData?.grossWeight?.Total_GW
-                                : 0}
-                            </h4>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              {boxsData?.grossWeight?.Total_GW_Difference
-                                ? boxsData?.grossWeight?.Total_GW_Difference
-                                : 0}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-checkbox-multiple-blank-outline" />
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalBoxesShipped")}
-                            </p>
-                            <h4 className="mb-0">
-                              {boxsData?.Box?.Total_GW
-                                ? boxsData?.Box?.Total_GW
-                                : 0}
-                            </h4>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                        <div className="card-footer ps-3 pe-3 pt-1 pb-1">
-                          <p className="mb-0">
-                            <span className="text-success text-sm font-weight-bolder">
-                              {boxsData?.Box?.Total_GW_Difference
-                                ? boxsData?.Box?.Total_GW_Difference
-                                : 0}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
-                      <div className="card">
-                        <div className="card-header p-3 pt-2">
-                          <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                            <i className=" material-icons  mdi mdi-pipe" />
-                          </div>
-                          <div className="text-end pt-1">
-                            <p className="text-sm mb-0 text-capitalize">
-                              {t("totalShipments")}
-                            </p>
-                            <div className="parentFirstShip mt-4">
-                              <p>{t("dateOfFirstShipment")}</p>
-                              <p>
-                                {" "}
-                                {boxsData?.Shipments?.First_Shipment
-                                  ? boxsData?.Shipments?.First_Shipment
-                                  : 0}{" "}
-                              </p>
-                            </div>
-                            <div className="parentFirstShip">
-                              <p>{t("dateOfLastShipment")}</p>
-                              <p>
-                                {" "}
-                                {boxsData?.Shipments?.Last_Shipment
-                                  ? boxsData?.Shipments?.Last_Shipment
-                                  : 0}{" "}
-                              </p>
-                            </div>
-                            <div className="parentFirstShip">
-                              <p>{t("shipmentsInPipeLine")}</p>
-                              <p>
-                                {boxsData?.Shipments?.Pipe_Line
-                                  ? boxsData?.Shipments?.Pipe_Line
-                                  : 0}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <hr className="dark horizontal my-0" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-lg-6 mb20">
-                      <div className="itemsOrderSearch">
-                        <h3 className="itemOrder">{t("topItems")}</h3>
-
-                        <div className="selectProduce">
+                        <div className="col-lg-2 form-group autoComplete">
+                          <h6>{t("rounding")}</h6>
                           <Autocomplete
-                            disablePortal
-                            options={value.slice(0, 3)} // Only the top three options
-                            value={
-                              value?.find(
-                                (item) => item.ID === selectedInvoiceId
-                              ) || null
-                            }
-                            getOptionLabel={(option) => option.Name || ""}
-                            sx={{ width: 200 }}
-                            onChange={(event, value) => {
-                              setSelectedInvoiceId(value ? value.ID : null);
-                              // setProduceImages(value ? value.images : null); // Update images state
+                            options={RoundingDataList || []} // List of delivery terms and incoterms
+                            getOptionLabel={(option) => option.DropDown || ""} // Label to display (Incoterms)
+                            onChange={(event, newValue) => {
+                              handleChange5({
+                                target: {
+                                  name: "Rounding",
+                                  value: newValue ? newValue.ID : "",
+                                }, // Update deliveryTerms in state
+                              });
                             }}
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder={t("invoiceValue")}
+                                placeholder={t("selectRounding")}
+                                variant="outlined"
+                              />
+                            )}
+                            value={
+                              RoundingDataList?.find(
+                                (item) => item.ID === state5.Rounding
+                              ) || null
+                            } // Set selected value based on deliveryTerms
+                            isOptionEqualToValue={(option, value) =>
+                              option.ID === value.ID
+                            } // Option comparison by id
+                          />
+                        </div>
+                        <div className="col-lg-2 form-group">
+                          <h6>{t("extraCost")}</h6>
+                          <input
+                            type="text"
+                            name="extraCost"
+                            className="form-control"
+                            placeholder={t("extraCost")}
+                            value={state5.extraCost}
+                            onChange={handleChange5}
+                          />
+                        </div>
+                        <div className="col-lg-2 form-group  ">
+                          <h6>{t("freightAdjustment")}</h6>
+                          <input
+                            type="text"
+                            name="freightAdjust"
+                            className="form-control"
+                            placeholder={t("freightAdjustment")}
+                            value={state5.freightAdjust}
+                            onChange={handleChange5}
+                          />
+                        </div>
+                        <div className="col-lg-2 form-group">
+                          <h6>{t("markupValue")}</h6>
+                          <div className="parentShip">
+                            <div className="markupShip">
+                              <input
+                                type="text"
+                                name="markupValue"
+                                className="form-control"
+                                placeholder={t("markupValue")}
+                                value={state5.markupValue}
+                                onChange={handleChange5}
+                              />
+                            </div>
+                            <div className="shipPercent">
+                              <span>%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-lg-2 form-group">
+                          <h6>{t("rebateValue")}</h6>
+                          <div className="parentShip">
+                            <div className="markupShip">
+                              <input
+                                type="text"
+                                name="rebateValue"
+                                className="form-control"
+                                placeholder={t("rebateValue")}
+                                value={state5.rebateValue}
+                                onChange={handleChange5}
+                              />
+                            </div>
+                            <div className="shipPercent">
+                              <span>%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-lg-2 form-group">
+                          <h6>{t("quotation")}</h6>
+                          <div className="parentShip">
+                            <div className="markupShip">
+                              <input
+                                type="text"
+                                name="quotation"
+                                className="form-control"
+                                placeholder={t("quotation")}
+                                value={state5.quotation}
+                                onChange={handleChange5}
+                              />
+                            </div>
+                            <div className="shipPercent">
+                              <span>%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-lg-2 form-group">
+                          <h6>{t("claim")}</h6>
+                          <div className="parentShip">
+                            <div className="markupShip">
+                              <input
+                                type="text"
+                                name="claim"
+                                className="form-control"
+                                placeholder={t("claim")}
+                                value={claimValue1}
+                                onChange={handleChange5}
+                              />
+                            </div>
+                            <div className="shipPercent">
+                              <span>%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-lg-2 form-group">
+                          <h6>{t("other")}</h6>
+                          <div className="parentShip">
+                            <div className="markupShip">
+                              <input
+                                type="text"
+                                name="other"
+                                className="form-control"
+                                placeholder={t("other")}
+                                value={state5.other}
+                                onChange={handleChange5}
+                              />
+                            </div>
+                            <div className="shipPercent">
+                              <span>%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-lg-2 form-group">
+                          <h6>{t("final")}</h6>
+                          <div className="parentShip">
+                            <div className="markupShip">
+                              <input
+                                type="text"
+                                name="final"
+                                className="form-control"
+                                placeholder={t("final")}
+                                value={claimValue}
+                                onChange={handleChange5}
+                              />
+                            </div>
+                            <div className="shipPercent">
+                              <span>%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-center">
+                          <button
+                            className="btn btn-primary"
+                            onClick={updatePaymentValue}
+                            type="button"
+                          >
+                            {from?.consignee_id ? t("update") : t("create")}
+                          </button>
+                          <Link className="btn btn-danger" to="/shipToNew">
+                            {t("cancel")}
+                          </Link>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="contact-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="contact-tab"
+                  tabindex="0"
+                >
+                  <div className="py-3">
+                    <div className="row newSmallCard ">
+                      <div className="flex flex-wrap">
+                        <div>
+                          <div className="selectTimeHead">
+                            <h6>{t("selectTimePeriod")} :</h6>
+                          </div>
+                          <div className="selectTimeParent">
+                            {dataPeriod.map((item) => (
+                              <div
+                                key={item.ID}
+                                className="timeMonth timePeriod"
+                                onClick={() =>
+                                  handlePeriodClick(item.Period, item.ID)
+                                }
+                              >
+                                <p>{item.Period}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="selectProduce comparisonNone mt-2">
+                          <h6 style={{ color: "#fff" }}>Comparison Period</h6>
+                          <Autocomplete
+                            disablePortal
+                            options={dataComparison}
+                            getOptionLabel={(option) => option.Name_EN || ""}
+                            sx={{ width: 300 }}
+                            onChange={(event, value) => {
+                              setSelectedComparison(value ? value.ID : null);
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("comparisonPeriod")}
                               />
                             )}
                           />
                         </div>
                       </div>
-
-                      <div className="tableCreateClient">
-                        <table>
-                          <tr>
-                            <th>{t("itfName")}</th>
-                            <th>{t("lastPeriodKg")}</th>
-                            <th>{t("currentPeriodKg")}</th>
-                            <th>{t("diff")}</th>
-                            <th>{t("percentChange")}</th>
-                          </tr>
-                          <tbody>
-                            {topFiveValue?.Top5Data?.map((item, index) => (
-                              <tr key={index}>
-                                <td>{item.itf_name}</td>
-                                <td>{item.Last_Period}</td>
-                                <td>{item.Current_Period}</td>
-                                <td>{item.DIFF}</td>
-                                <td>{item["% CHANGE"]}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                      <div className="dateSelect row">
+                        <div className="col-lg-3">
+                          <input
+                            type="date"
+                            value={date1}
+                            onChange={(e) => setDate1(e.target.value)}
+                          />
+                        </div>
+                        <div className="col-lg-3">
+                          <input
+                            type="date"
+                            value={date2}
+                            onChange={(e) => setDate2(e.target.value)}
+                          />
+                        </div>
+                        <div className="col-lg-3">
+                          <input
+                            type="date"
+                            value={date3}
+                            onChange={(e) => setDate3(e.target.value)}
+                          />
+                        </div>
+                        <div className="col-lg-3">
+                          <input
+                            type="date"
+                            value={date4}
+                            onChange={(e) => setDate4(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="dateSelect row">
+                        <div className="col-lg-3">
+                          <button
+                            className="btn btn-primary"
+                            type="submit"
+                            onClick={confirmData}
+                          >
+                            {t("confirm")}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                    <div className="col-lg-6 mb20 ">
-                      <div className="chartConsignee">
-                        <div className="searchGraph">
-                          <Select
-                            options={options}
-                            onChange={handleDropdownChange}
-                            value={options?.find(
-                              (option) => option.value === selectedDataset
-                            )}
-                            placeholder={t("select")}
-                            isSearchable
-                            styles={{
-                              container: (provided) => ({
-                                ...provided,
-                                marginBottom: "20px",
-                                maxWidth: "300px",
-                              }),
-                            }}
-                          />
-                          <ReactApexChart
-                            options={chartOptions.options}
-                            series={chartOptions.series}
-                            type="area"
-                            height={350}
-                          />
+                    <div className="row dashCard53 consigneeCard">
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
+                        <div className="card  ">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {/* {consigeeDetails?.Total_shipments} */}
+                                {boxsData?.CNF?.Count
+                                  ? boxsData?.CNF?.Count
+                                  : 0}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalShipments")}
+                              </p>
+                              <h4 className="mb-0">
+                                {boxsData?.CNF?.Total
+                                  ? boxsData?.CNF?.Total
+                                  : 0}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                {boxsData?.CNF?.Difference
+                                  ? boxsData?.CNF?.Difference
+                                  : 0}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {boxsData?.Claims?.Count
+                                  ? boxsData?.Claims?.Count
+                                  : 0}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalClaims")}
+                              </p>
+                              <h4 className="mb-0">
+                                {" "}
+                                {boxsData?.Claims?.Total
+                                  ? boxsData?.Claims?.Total
+                                  : 0}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                {boxsData?.Claims?.Difference
+                                  ? boxsData?.Claims?.Difference
+                                  : 0}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {boxsData?.Payments?.Count
+                                  ? boxsData?.Payments?.Count
+                                  : 0}
+                              </div>
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {" "}
+                                {t("totalPayment")}{" "}
+                              </p>
+                              <h4 className="mb-0">
+                                {" "}
+                                {boxsData?.Payments?.Total
+                                  ? boxsData?.Payments?.Total
+                                  : 0}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                {boxsData?.Payments?.Difference
+                                  ? boxsData?.Payments?.Difference
+                                  : 0}
+                              </span>{" "}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <div
+                                style={{
+                                  fontSize: "25px",
+                                  color: "#d2d7e0",
+                                  paddingTop: "13px",
+                                }}
+                              >
+                                {boxsData?.Pending?.Count
+                                  ? boxsData?.Pending?.Count
+                                  : 0}
+                              </div>{" "}
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("pendingPayment")}
+                              </p>
+                              <h4 className="mb-0">
+                                {boxsData?.Pending?.Total
+                                  ? boxsData?.Pending?.Total
+                                  : 0}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                {boxsData?.Pending?.Difference
+                                  ? boxsData?.Pending?.Difference
+                                  : 0}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row dashCard53 consigneeCard">
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-weight" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalNetWeightShipped")}
+                              </p>
+                              <h4 className="mb-0">
+                                {boxsData?.NetWeight?.Total_GW
+                                  ? boxsData?.NetWeight?.Total_GW
+                                  : 0}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                {boxsData?.NetWeight?.Total_GW_Difference
+                                  ? boxsData?.NetWeight?.Total_GW_Difference
+                                  : 0}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons mdi mdi-weight-gram" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalGrossWeightShipped")}
+                              </p>
+                              <h4 className="mb-0">
+                                {boxsData?.grossWeight?.Total_GW
+                                  ? boxsData?.grossWeight?.Total_GW
+                                  : 0}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                {boxsData?.grossWeight?.Total_GW_Difference
+                                  ? boxsData?.grossWeight?.Total_GW_Difference
+                                  : 0}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-xl-3 col-sm-6 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-checkbox-multiple-blank-outline" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalBoxesShipped")}
+                              </p>
+                              <h4 className="mb-0">
+                                {boxsData?.Box?.Total_GW
+                                  ? boxsData?.Box?.Total_GW
+                                  : 0}
+                              </h4>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                          <div className="card-footer ps-3 pe-3 pt-1 pb-1">
+                            <p className="mb-0">
+                              <span className="text-success text-sm font-weight-bolder">
+                                {boxsData?.Box?.Total_GW_Difference
+                                  ? boxsData?.Box?.Total_GW_Difference
+                                  : 0}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 mb20">
+                        <div className="card">
+                          <div className="card-header p-3 pt-2">
+                            <div className="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                              <i className=" material-icons  mdi mdi-pipe" />
+                            </div>
+                            <div className="text-end pt-1">
+                              <p className="text-sm mb-0 text-capitalize">
+                                {t("totalShipments")}
+                              </p>
+                              <div className="parentFirstShip mt-4">
+                                <p>{t("dateOfFirstShipment")}</p>
+                                <p>
+                                  {" "}
+                                  {boxsData?.Shipments?.First_Shipment
+                                    ? boxsData?.Shipments?.First_Shipment
+                                    : 0}{" "}
+                                </p>
+                              </div>
+                              <div className="parentFirstShip">
+                                <p>{t("dateOfLastShipment")}</p>
+                                <p>
+                                  {" "}
+                                  {boxsData?.Shipments?.Last_Shipment
+                                    ? boxsData?.Shipments?.Last_Shipment
+                                    : 0}{" "}
+                                </p>
+                              </div>
+                              <div className="parentFirstShip">
+                                <p>{t("shipmentsInPipeLine")}</p>
+                                <p>
+                                  {boxsData?.Shipments?.Pipe_Line
+                                    ? boxsData?.Shipments?.Pipe_Line
+                                    : 0}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <hr className="dark horizontal my-0" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-6 mb20">
+                        <div className="itemsOrderSearch">
+                          <h3 className="itemOrder">{t("topItems")}</h3>
+
+                          <div className="selectProduce">
+                            <Autocomplete
+                              disablePortal
+                              options={value.slice(0, 3)} // Only the top three options
+                              value={
+                                value?.find(
+                                  (item) => item.ID === selectedInvoiceId
+                                ) || null
+                              }
+                              getOptionLabel={(option) => option.Name || ""}
+                              sx={{ width: 200 }}
+                              onChange={(event, value) => {
+                                setSelectedInvoiceId(value ? value.ID : null);
+                                // setProduceImages(value ? value.images : null); // Update images state
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder={t("invoiceValue")}
+                                />
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="tableCreateClient">
+                          <table>
+                            <tr>
+                              <th>{t("itfName")}</th>
+                              <th>{t("lastPeriodKg")}</th>
+                              <th>{t("currentPeriodKg")}</th>
+                              <th>{t("diff")}</th>
+                              <th>{t("percentChange")}</th>
+                            </tr>
+                            <tbody>
+                              {topFiveValue?.Top5Data?.map((item, index) => (
+                                <tr key={index}>
+                                  <td>{item.itf_name}</td>
+                                  <td>{item.Last_Period}</td>
+                                  <td>{item.Current_Period}</td>
+                                  <td>{item.DIFF}</td>
+                                  <td>{item["% CHANGE"]}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                      <div className="col-lg-6 mb20 ">
+                        <div className="chartConsignee">
+                          <div className="searchGraph">
+                            <Select
+                              options={options}
+                              onChange={handleDropdownChange}
+                              value={options?.find(
+                                (option) => option.value === selectedDataset
+                              )}
+                              placeholder={t("select")}
+                              isSearchable
+                              styles={{
+                                container: (provided) => ({
+                                  ...provided,
+                                  marginBottom: "20px",
+                                  maxWidth: "300px",
+                                }),
+                              }}
+                            />
+                            <ReactApexChart
+                              options={chartOptions.options}
+                              series={chartOptions.series}
+                              type="area"
+                              height={350}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="card-footer text-center">
-                  <Link className="btn btn-danger" to="/shipToNew">
-                    {t("close")}
-                  </Link>
+                  <div className="card-footer text-center">
+                    <Link className="btn btn-danger" to="/shipToNew">
+                      {t("close")}
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </Card>
+
+      <div
+        class="modal fade"
+        id="exampleModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modalShipTo modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 className="modal-title fs-5">
+                {isEdit ? t("editContact") : t("addContact")}
+              </h1>
+
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                onClick={clearAllData8}
+                aria-label="Close"
+              >
+                <i class="mdi mdi-close"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div className="formCreate">
+                <form action="">
+                  <div className="row">
+                    <div class="form-group col-lg-2">
+                      <h6>{t("title")}</h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="Title"
+                          value={state8.Title}
+                          onChange={handleChange8}
+                          placeholder={t("title")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("firstName")}</h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="Name_First"
+                          value={state8.Name_First}
+                          onChange={handleChange8}
+                          placeholder={t("firstName")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("lastName")}</h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="Name_Last"
+                          value={state8.Name_Last}
+                          onChange={handleChange8}
+                          placeholder={t("lastName")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6> {t("position")} </h6>
+                      <div class=" ">
+                        <input
+                          type="text"
+                          name="Position"
+                          value={state8.Position}
+                          onChange={handleChange8}
+                          placeholder={t("position")}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-lg-3 d-flex align-items-center">
+                      <div className="invoiceModal d-flex">
+                        <div className="d-flex">
+                          <input
+                            type="checkbox"
+                            id="dap"
+                            name="Accounting"
+                            checked={state8.Accounting}
+                            onChange={handleChange8}
+                          />
+                          <label htmlFor="dap">{t("accounting")}</label>
+                        </div>
+                        <div className="d-flex">
+                          <input
+                            type="checkbox"
+                            id="cnf"
+                            name="Invoice"
+                            checked={state8.Invoice}
+                            onChange={handleChange8}
+                          />
+                          <label htmlFor="cnf">{t("invoice")}</label>
+                        </div>
+                        <div className="d-flex">
+                          <input
+                            type="checkbox"
+                            id="cif"
+                            name="Logitics"
+                            checked={state8.Logitics}
+                            onChange={handleChange8}
+                          />
+                          <label htmlFor="cif">{t("logistics")}</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("email")}</h6>
+                      <div class=" ">
+                        <input
+                          type="email"
+                          name="Email"
+                          value={state8.Email}
+                          onChange={handleChange8}
+                          placeholder={t("email")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("mobile")}</h6>
+                      <div class=" ">
+                        <input
+                          type="number"
+                          name="Mobile"
+                          value={state8.Mobile}
+                          onChange={handleChange8}
+                          placeholder={t("mobile")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("phone")}</h6>
+                      <div class=" ">
+                        <input
+                          type="number"
+                          name="Phone"
+                          value={state8.Phone}
+                          onChange={handleChange8}
+                          placeholder={t("phone")}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                      <h6>{t("messengerType")}</h6>
+                      <div class="ceateTransport autoComplete">
+                        <Autocomplete
+                          options={messengerOptions}
+                          getOptionLabel={(option) => option.label} // what to display in dropdown
+                          value={
+                            messengerOptions.find(
+                              (opt) =>
+                                opt.value === Number(state8.Messenger_Type)
+                            ) || null
+                          }
+                          onChange={(event, newValue) =>
+                            setState8({
+                              ...state8,
+                              Messenger_Type: newValue ? newValue.value : "",
+                            })
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("messengerType")}
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group col-lg-2">
+                      <h6>{t("messengerId")}</h6>
+                      <div class=" ">
+                        <input
+                          type="number"
+                          name="Messenger_ID"
+                          value={state8.Messenger_ID}
+                          onChange={handleChange8}
+                          placeholder="messenger id"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-group col-lg-12">
+                      <h6>{t("notes")}</h6>
+                      <div>
+                        <textarea
+                          name="Notes"
+                          value={state8.Notes}
+                          onChange={handleChange8}
+                          cols="30"
+                          rows="4"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                className="btn btn-primary mb-0"
+                onClick={handleSubmit8}
+              >
+                {isEdit ? t("update") : t("submit")}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </Card>
-
- <div
-                            class="modal fade"
-                            id="exampleModal"
-                            tabindex="-1"
-                            aria-labelledby="exampleModalLabel"
-                            aria-hidden="true"
-                          >
-                            <div class="modal-dialog modalShipTo modal-xl">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h1
-                                    class="modal-title fs-5"
-                                    id="exampleModalLabel"
-                                  >
-                                    {t("addContact")}{" "}
-                                  </h1>
-                                  <button
-                                    type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    onClick={clearAllData8}
-                                    aria-label="Close"
-                                  >
-                                    <i class="mdi mdi-close"></i>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <div className="formCreate">
-                                    <form action="">
-                                      <div className="row">
-                                        <div class="form-group col-lg-2">
-                                          <h6>{t("title")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="Title"
-                                              value={state8.Title}
-                                              onChange={handleChange10}
-                                              placeholder={t("title")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-2">
-                                          <h6>{t("firstName")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="Name_First"
-                                              value={state8.Name_First}
-                                              onChange={handleChange10}
-                                              placeholder={t("firstName")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-2">
-                                          <h6>{t("lastName")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="Name_Last"
-                                              value={state8.Name_Last}
-                                              onChange={handleChange10}
-                                              placeholder={t("lastName")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6> {t("position")} </h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="Position"
-                                              value={state8.Position}
-                                              onChange={handleChange10}
-                                              placeholder={t("position")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div className="col-lg-3 d-flex align-items-center">
-                                          <div className="invoiceModal d-flex">
-                                            <div className="d-flex">
-                                              <input
-                                                type="checkbox"
-                                                id="dap"
-                                                name="Accounting"
-                                                checked={state8.Accounting}
-                                                onChange={handleChange10}
-                                              />
-                                              <label htmlFor="dap">
-                                                {t("accounting")}
-                                              </label>
-                                            </div>
-                                            <div className="d-flex">
-                                              <input
-                                                type="checkbox"
-                                                id="cnf"
-                                                name="Invoice"
-                                                checked={state8.Invoice}
-                                                onChange={handleChange10}
-                                              />
-                                              <label htmlFor="cnf">
-                                                {t("invoice")}
-                                              </label>
-                                            </div>
-                                            <div className="d-flex">
-                                              <input
-                                                type="checkbox"
-                                                id="cif"
-                                                name="Logitics"
-                                                checked={state8.Logitics}
-                                                onChange={handleChange10}
-                                              />
-                                              <label htmlFor="cif">
-                                                {t("logistics")}
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("email")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="email"
-                                              name="Email"
-                                              value={state8.Email}
-                                              onChange={handleChange10}
-                                              placeholder={t("email")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-2">
-                                          <h6>{t("mobile")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Mobile"
-                                              value={state8.Mobile}
-                                              onChange={handleChange10}
-                                              placeholder={t("mobile")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-2">
-                                          <h6>{t("phone")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Phone"
-                                              value={state8.Phone}
-                                              onChange={handleChange10}
-                                              placeholder={t("phone")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("messengerType")}</h6>
-                                          <div class="ceateTransport autoComplete">
-                                            <Autocomplete
-                                              options={messengerOptions}
-                                              getOptionLabel={(option) =>
-                                                option.label
-                                              } // what to display in dropdown
-                                              value={
-                                                messengerOptions.find(
-                                                  (opt) =>
-                                                    opt.value ===
-                                                    Number(
-                                                      state8.Messenger_Type
-                                                    )
-                                                ) || null
-                                              }
-                                              onChange={(event, newValue) =>
-                                                setState8({
-                                                  ...state8,
-                                                  Messenger_Type: newValue
-                                                    ? newValue.value
-                                                    : "",
-                                                })
-                                              }
-                                              renderInput={(params) => (
-                                                <TextField
-                                                  {...params}
-                                                  placeholder={t(
-                                                    "messengerType"
-                                                  )}
-                                                  variant="outlined"
-                                                />
-                                              )}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-2">
-                                          <h6>{t("messengerId")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="Messenger_ID"
-                                              value={state8.Messenger_ID}
-                                              onChange={handleChange10}
-                                              placeholder="messenger id"
-                                            />
-                                          </div>
-                                        </div>
-
-                                        <div class="form-group col-lg-12">
-                                          <h6>{t("notes")}</h6>
-                                          <div>
-                                            <textarea
-                                              name="Notes"
-                                              value={state8.Notes}
-                                              onChange={handleChange10}
-                                              cols="30"
-                                              rows="4"
-                                            ></textarea>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </form>
-                                  </div>
-                                </div>
-                                <div class="modal-footer">
-                                  <button
-                                    type="button"
-                                    class="btn btn-primary mb-0"
-                                    onClick={handleSubmit8}
-                                  >
-                                    {t("submit")}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-</>
+    </>
   );
 };
 

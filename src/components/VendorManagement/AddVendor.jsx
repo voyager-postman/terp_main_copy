@@ -1,14 +1,18 @@
- import axios from "../../Url/Api";
+import axios from "../../Url/Api";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
+import MySwal from "../../swal";
+
 import { Card } from "../../card";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 const AddVendor = () => {
+  const location = useLocation();
+  const { from } = location.state || {};
   const [data, setData] = useState([]);
   const dataClear = () => {
     setState1({
@@ -25,6 +29,83 @@ const AddVendor = () => {
       birthday: "",
       Notes: "",
       Nick_name: "",
+    });
+  };
+  const [isEdit, setIsEdit] = useState(false); // false = add, true = edit
+  const [state8, setState8] = useState({
+    VCID: "",
+    Name_First: "",
+    Name_Last: "",
+    Email: "",
+    Phone: "",
+    Mobile: "",
+    Messenger_Type: "",
+    Messenger_ID: "",
+    Title: "",
+    Position: "",
+    Notes: "",
+    Accounting: false,
+    Invoice: false,
+    Logitics: false,
+  });
+  const handleChange8 = (e) => {
+    const { name, value, type, checked } = e.target;
+    setState8((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  useEffect(() => {
+    if (from?.ID) {
+      console.log(from?.ID);
+      setState8((prev) => ({
+        ...prev,
+        VCID: from.ID,
+      }));
+    }
+  }, [from]);
+  const handleAddClick = () => {
+    setIsEdit(false);
+    setState8({
+      Title: "",
+      Name_First: "",
+      Name_Last: "",
+      Position: "",
+      Accounting: false,
+      Invoice: false,
+      Logitics: false,
+      Email: "",
+      Mobile: "",
+      Phone: "",
+      Messenger_Type: "",
+      Messenger_ID: "",
+      Notes: "",
+      Nick_name: "",
+    });
+  };
+  const handleEditClick = (id) => {
+    const selectedUser = data?.find((item) => item.ID === id);
+    if (!selectedUser) return;
+
+    setIsEdit(true);
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", selectedUser);
+    setState8({
+      ID: selectedUser?.ID || "", // keep ID for update
+      Title: selectedUser?.Title || "",
+      Name_First: selectedUser?.Name_First || "",
+      Name_Last: selectedUser?.Name_Last || "",
+      Position: selectedUser?.Position || "",
+      Accounting: selectedUser?.Accounting === 1,
+      Invoice: selectedUser?.Invoice === 1,
+      Logitics: selectedUser?.Logitics === 1,
+      Email: selectedUser?.Email || "",
+      Mobile: selectedUser?.Mobile || "",
+      Phone: selectedUser?.Phone || "",
+      Messenger_Type: selectedUser?.Messenger_Type || "",
+      Messenger_ID: selectedUser?.Messenger_ID || "",
+      Notes: selectedUser?.Notes || "",
+      Nick_name: selectedUser?.Nick_name || "",
     });
   };
   const { data: contactType } = useQuery("DropdownContactType ");
@@ -132,14 +213,57 @@ const AddVendor = () => {
         return false;
       });
   };
+
+  const deleteOrder3 = (id) => {
+    console.log(id);
+    MySwal.fire({
+      title: t("areYouSure"),
+      text: t("irreversible"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Delete",
+    }).then(async (result) => {
+      console.log(result);
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(`${API_BASE_URL}/deleteVCContact`, {
+            ID: id,
+          });
+          console.log(response);
+          getAllContact();
+          toast.success("Contact delete successfully");
+        } catch (e) {
+          toast.error(t("genericError"));
+        }
+      }
+    });
+  };
+  const clearAllData8 = () => {
+    setState8({
+      VCID: "",
+      Name_First: "",
+      Name_Last: "",
+      Email: "",
+      Phone: "",
+      Mobile: "",
+      Messenger_Type: "",
+      Messenger_ID: "",
+      Notes: "",
+      Accounting: false,
+      Invoice: false,
+      Logitics: false,
+    });
+  };
   const getAllContact = () => {
     axios
-      .post(`${API_BASE_URL}/clientConsigneeTableEN`, {
-        client_id: from?.ID,
+      .post(`${API_BASE_URL}/getVCConstact`, {
+        VCID: from?.ID,
       })
       .then((res) => {
         const { head, data } = res.data;
-        setHeaders(head || {});
+     
         setData(data || []);
       })
       .catch((err) => {
@@ -149,8 +273,7 @@ const AddVendor = () => {
 
   // contact above part
   const [isButtonClicked, setIsButtonClicked] = useState(false);
-  const location = useLocation();
-  const { from } = location.state || {};
+
   console.log(from);
   const navigate = useNavigate();
   const { data: massengerTypeList } = useQuery("getMessengerType");
@@ -229,6 +352,9 @@ const AddVendor = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+  useEffect(() => {
+    getAllContact();
+  }, []);
   const handleSubmit = async () => {
     try {
       const payload = {
@@ -525,6 +651,54 @@ const AddVendor = () => {
         });
     }
   }, [from, countryList]);
+  const handleSubmit8 = async () => {
+    try {
+      const payload = {
+        ...state8, // assuming your state variable is `state`
+        VCID: from?.ID || state8.VCID, // ✅ ensure VCID is sent
+        User_ID: localStorage.getItem("id"), // Get from localStorage
+      };
+
+      const res = await axios.post(`${API_BASE_URL}/AddVcContact`, payload);
+      console.log("Response:", res.data);
+
+      // Reset form
+      setState8({
+        VCID: "",
+        Name_First: "",
+        Name_Last: "",
+        Email: "",
+        Phone: "",
+        Mobile: "",
+        Messenger_Type: "",
+        Messenger_ID: "",
+        Notes: "",
+        Accounting: false,
+        Invoice: false,
+        Logitics: false,
+      });
+
+      // Hide modal
+      const modalElement = document.getElementById("exampleModal");
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+      getAllContact();
+      // Success toast (using message from API if available)
+      toast.success(res.data?.message, {
+        autoClose: 1000,
+        theme: "colored",
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error(t("networkError"), {
+        autoClose: 1000,
+        theme: "colored",
+      });
+      return false;
+    }
+  };
 
   return (
     <Card
@@ -1195,7 +1369,7 @@ const AddVendor = () => {
             <div className="table-responsive">
               <table className="  tableContact striped  table borderTerpProduce">
                 <tr className="">
-                  <th>{t("firstName")} </th>
+                  <th>{t("firstName")}</th>
                   <th>{t("lastName")}</th>
                   <th>{t("nickName")}</th>
                   <th>{t("position")}</th>
@@ -1208,245 +1382,30 @@ const AddVendor = () => {
                 {data?.map((item) => {
                   return (
                     <tr>
-                      <td>{item.first_name}</td>
-                      <td>{item.last_name}</td>
+                      <td>{item.Name_First}</td>
+                      <td>{item.Name_Last}</td>
                       <td>{item.Nick_name}</td>
-                      <td>{item.position}</td>
+                      <td>{item.Position}</td>
                       <td>{item.type}</td>
                       <td>{item.Email}</td>
-                      <td>{item.mobile}</td>
+                      <td>{item.Mobile}</td>
                       <td>
                         <div>
                           {/* edit popup */}
                           <button
                             type="button"
-                            onClick={() => handleEditClick(item.contact_id)}
+                            onClick={() => handleEditClick(item.ID)}
                             data-bs-toggle="modal"
-                            data-bs-target="#exampleModalEdit"
+                            data-bs-target="#exampleModal"
                           >
-                            <i class="mdi mdi-pencil"></i>
-                            {/* edit popup */}
+                            <i className="mdi mdi-pencil"></i>
                           </button>
-                          <div
-                            class="modal fade"
-                            id="exampleModalEdit"
-                            tabindex="-1"
-                            aria-labelledby="exampleModalLabel"
-                            aria-hidden="true"
-                          >
-                            <div class="modal-dialog modalShipTo modal-xl">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h1
-                                    class="modal-title fs-5"
-                                    id="exampleModalLabel"
-                                  >
-                                    {t("contactUp")}
-                                  </h1>
-                                  <button
-                                    type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"
-                                  >
-                                    <i class="mdi mdi-close"></i>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <div className="formCreate">
-                                    <form action="">
-                                      <div className="row">
-                                        {/* <div className="col-lg-12">
-                                               <div class="form-group col-lg-3">
-                                                 <h6>Client </h6>
-                                                 <div class="ceateTransport">
-                                                   <select
-                                                     name="client_id"
-                                                     onChange={handleChange1}
-                                                     value={state1.client_id}
-                                                   >
-                                                     <option value="">
-                                                       Select Client
-                                                     </option>
-                                                     {client?.map((item) => (
-                                                       <option
-                                                         key={item.client_id}
-                                                         value={item.client_id}
-                                                       >
-                                                         {item.client_name}
-                                                       </option>
-                                                     ))}
-                                                   </select>
-                                                 </div>
-                                               </div>
-                                             </div> */}
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("contactType")}</h6>
-                                          <div class="ceateTransport autoComplete">
-                                            <Autocomplete
-                                              disablePortal
-                                              options={contactType || []} // Use your contactType array as options
-                                              getOptionLabel={(option) =>
-                                                option.type_en || ""
-                                              }
-                                              onChange={(e, newValue) =>
-                                                setState1((prevState) => ({
-                                                  ...prevState,
-                                                  contact_type_id:
-                                                    newValue?.contact_type_id ||
-                                                    "",
-                                                }))
-                                              }
-                                              value={
-                                                (contactType || []).find(
-                                                  (item) =>
-                                                    item.contact_type_id ===
-                                                    state1.contact_type_id
-                                                ) || null
-                                              }
-                                              sx={{ width: 300 }} // Customize the width as needed
-                                              renderInput={(params) => (
-                                                <TextField
-                                                  {...params}
-                                                  placeholder={t("selectType")}
-                                                  InputLabelProps={{
-                                                    shrink: false,
-                                                  }} // Prevents floating label
-                                                />
-                                              )}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("firstName")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="first_name"
-                                              onChange={handleChange1}
-                                              value={state1.first_name}
-                                              placeholder={t("firstName")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("lastName")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="last_name"
-                                              onChange={handleChange1}
-                                              value={state1.last_name}
-                                              placeholder={t("lastName")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("nickName")}</h6>
-                                          <div>
-                                            <input
-                                              type="text"
-                                              name="Nick_name"
-                                              onChange={handleChange1}
-                                              value={state1.Nick_name}
-                                              placeholder={t("nickName")}
-                                            />
-                                          </div>
-                                        </div>
 
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("position")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="text"
-                                              name="position"
-                                              onChange={handleChange1}
-                                              value={state1.position}
-                                              placeholder={t("position")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("email")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="email"
-                                              name="Email"
-                                              onChange={handleChange1}
-                                              value={state1.Email}
-                                              placeholder={t("email")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("mobile")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="mobile"
-                                              onChange={handleChange1}
-                                              value={state1.mobile}
-                                              placeholder={t("mobile")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                          <h6>{t("landline")}</h6>
-                                          <div class=" ">
-                                            <input
-                                              type="number"
-                                              name="landline"
-                                              onChange={handleChange1}
-                                              value={state1.landline}
-                                              placeholder={t("landline")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                          <h6>{t("birthday")}</h6>
-                                          <div>
-                                            <input
-                                              type="date"
-                                              name="birthday"
-                                              onChange={handleChange1}
-                                              value={state1.birthday}
-                                              placeholder={t("birthday")}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div class="form-group col-lg-8">
-                                          <h6>{t("notes")}</h6>
-                                          <div>
-                                            <textarea
-                                              name="Notes"
-                                              onChange={handleChange1}
-                                              value={state1.Notes}
-                                              cols="30"
-                                              rows="5"
-                                            ></textarea>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </form>
-                                  </div>
-                                </div>
-                                <div class="modal-footer justify-center">
-                                  <button
-                                    onClick={contactDetailsEdit}
-                                    type="button"
-                                    class="btn btn-primary mb-0"
-                                  >
-                                    {t("update")}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
                           {/* edit popup end */}
 
                           <button
                             type="button"
-                            onClick={() => deleteOrder1(item.contact_id)}
+                            onClick={() => deleteOrder3(item.ID)}
                           >
                             <i class="mdi mdi-delete "></i>
                           </button>
@@ -1459,10 +1418,11 @@ const AddVendor = () => {
             </div>
             <div className="row">
               <button
-              style={{width:"unset"}}
+                style={{ width: "unset" }}
                 className="btn btn-danger"
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModal"
+                onClick={handleAddClick}
               >
                 {t("addContact")}
               </button>
@@ -1478,14 +1438,15 @@ const AddVendor = () => {
                 <div class="modal-dialog modalShipTo modal-xl">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="exampleModalLabel">
-                        {t("addContact")}
+                      <h1 className="modal-title fs-5">
+                        {isEdit ? t("editContact") : t("addContact")}
                       </h1>
+
                       <button
                         type="button"
                         class="btn-close"
                         data-bs-dismiss="modal"
-                        onClick={clearAllData}
+                        onClick={clearAllData8}
                         aria-label="Close"
                       >
                         <i class="mdi mdi-close"></i>
@@ -1496,126 +1457,125 @@ const AddVendor = () => {
                         <form action="">
                           <div className="row">
                             <div class="form-group col-lg-2">
-                              <h6>Title</h6>
+                              <h6>{t("title")}</h6>
                               <div class=" ">
                                 <input
                                   type="text"
                                   name="Title"
-                                  value={state1.Title}
-                                  onChange={handleChange1}
-                                  placeholder="title"
+                                  value={state8.Title}
+                                  onChange={handleChange8}
+                                  placeholder={t("title")}
                                 />
                               </div>
                             </div>
                             <div class="form-group col-lg-2">
-                              <h6>First Name</h6>
+                              <h6>{t("firstName")}</h6>
                               <div class=" ">
                                 <input
                                   type="text"
                                   name="Name_First"
-                                  value={state1.Name_First}
-                                  onChange={handleChange1}
-                                  placeholder="first name"
+                                  value={state8.Name_First}
+                                  onChange={handleChange8}
+                                  placeholder={t("firstName")}
                                 />
                               </div>
                             </div>
                             <div class="form-group col-lg-2">
-                              <h6>Last Name</h6>
+                              <h6>{t("lastName")}</h6>
                               <div class=" ">
                                 <input
                                   type="text"
                                   name="Name_Last"
-                                  value={state1.Name_Last}
-                                  onChange={handleChange1}
-                                  placeholder="last name"
+                                  value={state8.Name_Last}
+                                  onChange={handleChange8}
+                                  placeholder={t("lastName")}
                                 />
                               </div>
                             </div>
                             <div class="form-group col-lg-3">
-                              <h6> Position </h6>
+                              <h6> {t("position")} </h6>
                               <div class=" ">
                                 <input
                                   type="text"
                                   name="Position"
-                                  value={state1.Position}
-                                  onChange={handleChange1}
-                                  placeholder="position"
+                                  value={state8.Position}
+                                  onChange={handleChange8}
+                                  placeholder={t("position")}
                                 />
                               </div>
                             </div>
-                            
-                            <div className="form-group col-lg-3 d-flex align-items-center">
+                            <div className="col-lg-3 d-flex align-items-center">
                               <div className="invoiceModal d-flex">
                                 <div className="d-flex">
                                   <input
                                     type="checkbox"
                                     id="dap"
                                     name="Accounting"
-                                    checked={state1.Accounting}
-                                    onChange={handleChange1}
+                                    checked={state8.Accounting}
+                                    onChange={handleChange8}
                                   />
-                                  <label htmlFor="dap">Accounting</label>
+                                  <label htmlFor="dap">{t("accounting")}</label>
                                 </div>
                                 <div className="d-flex">
                                   <input
                                     type="checkbox"
                                     id="cnf"
                                     name="Invoice"
-                                    checked={state1.Invoice}
-                                    onChange={handleChange1}
+                                    checked={state8.Invoice}
+                                    onChange={handleChange8}
                                   />
-                                  <label htmlFor="cnf">Invoice</label>
+                                  <label htmlFor="cnf">{t("invoice")}</label>
                                 </div>
                                 <div className="d-flex">
                                   <input
                                     type="checkbox"
                                     id="cif"
                                     name="Logitics"
-                                    checked={state1.Logitics}
-                                    onChange={handleChange1}
+                                    checked={state8.Logitics}
+                                    onChange={handleChange8}
                                   />
-                                  <label htmlFor="cif">Logitics</label>
+                                  <label htmlFor="cif">{t("logistics")}</label>
                                 </div>
                               </div>
                             </div>
                             <div class="form-group col-lg-3">
-                              <h6>Email</h6>
+                              <h6>{t("email")}</h6>
                               <div class=" ">
                                 <input
                                   type="email"
                                   name="Email"
-                                  value={state1.Email}
-                                  onChange={handleChange1}
-                                  placeholder="email"
+                                  value={state8.Email}
+                                  onChange={handleChange8}
+                                  placeholder={t("email")}
                                 />
                               </div>
                             </div>
                             <div class="form-group col-lg-2">
-                              <h6>Mobile</h6>
+                              <h6>{t("mobile")}</h6>
                               <div class=" ">
                                 <input
                                   type="number"
                                   name="Mobile"
-                                  value={state1.Mobile}
-                                  onChange={handleChange1}
-                                  placeholder="mobile"
+                                  value={state8.Mobile}
+                                  onChange={handleChange8}
+                                  placeholder={t("mobile")}
                                 />
                               </div>
                             </div>
                             <div class="form-group col-lg-2">
-                              <h6>Phone</h6>
+                              <h6>{t("phone")}</h6>
                               <div class=" ">
                                 <input
                                   type="number"
                                   name="Phone"
-                                  value={state1.Phone}
-                                  onChange={handleChange1}
-                                  placeholder="phone"
+                                  value={state8.Phone}
+                                  onChange={handleChange8}
+                                  placeholder={t("phone")}
                                 />
                               </div>
                             </div>
                             <div class="form-group col-lg-3">
-                              <h6>Messenger type</h6>
+                              <h6>{t("messengerType")}</h6>
                               <div class="ceateTransport autoComplete">
                                 <Autocomplete
                                   options={messengerOptions}
@@ -1624,12 +1584,12 @@ const AddVendor = () => {
                                     messengerOptions.find(
                                       (opt) =>
                                         opt.value ===
-                                        Number(state1.Messenger_Type)
+                                        Number(state8.Messenger_Type)
                                     ) || null
                                   }
                                   onChange={(event, newValue) =>
-                                    setState1({
-                                      ...state1,
+                                    setState8({
+                                      ...state8,
                                       Messenger_Type: newValue
                                         ? newValue.value
                                         : "",
@@ -1646,25 +1606,25 @@ const AddVendor = () => {
                               </div>
                             </div>
                             <div class="form-group col-lg-2">
-                              <h6>Messenger Id</h6>
+                              <h6>{t("messengerId")}</h6>
                               <div class=" ">
                                 <input
                                   type="number"
                                   name="Messenger_ID"
-                                  value={state1.Messenger_ID}
-                                  onChange={handleChange1}
+                                  value={state8.Messenger_ID}
+                                  onChange={handleChange8}
                                   placeholder="messenger id"
                                 />
                               </div>
                             </div>
 
                             <div class="form-group col-lg-12">
-                              <h6>Notes</h6>
+                              <h6>{t("notes")}</h6>
                               <div>
                                 <textarea
                                   name="Notes"
-                                  value={state1.Notes}
-                                  onChange={handleChange1}
+                                  value={state8.Notes}
+                                  onChange={handleChange8}
                                   cols="30"
                                   rows="4"
                                 ></textarea>
@@ -1677,10 +1637,10 @@ const AddVendor = () => {
                     <div class="modal-footer">
                       <button
                         type="button"
-                        class="btn btn-primary mb-0"
-                        onClick={handleSubmit}
+                        className="btn btn-primary mb-0"
+                        onClick={handleSubmit8}
                       >
-                        submit
+                        {isEdit ? t("update") : t("submit")}
                       </button>
                     </div>
                   </div>

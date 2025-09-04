@@ -1114,5 +1114,8 @@
   "updateConsignee": "Update Consignee",
   "title": "Title",
   "logistics": "Logistics",
-  "messengerId": "Messenger Id"
+  "messengerId": "Messenger Id",
+    "customCode": "Custom Code",
+    "reconcile": "Reconcile",
+  "reimburse": "Reimburse"
 }
