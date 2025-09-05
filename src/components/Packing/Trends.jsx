@@ -111,6 +111,106 @@ const ApexChart = () => {
   //       console.error("Error fetching data:", error); // Handle errors
   //     });
   // };
+  // const confirmData = () => {
+  //   // Validate required fields
+  //   if (!selectedProduceId) {
+  //     toast.error(t("produceRequired"));
+  //     return;
+  //   }
+  //   if (!date1) {
+  //     toast.error(t("startDateRequired"));
+  //     return;
+  //   }
+  //   if (!date2) {
+  //     toast.error(t("stopDateRequired"));
+  //     return;
+  //   }
+
+  //   // If all fields are valid, proceed with the API call
+  //   axios
+  //     .post(`${API_BASE_URL}/ProduceTrendGraph`, {
+  //       Produce_ID: selectedProduceId,
+  //       Start_Date: date1,
+  //       Stop_Date: date2,
+  //     })
+  //     .then((res) => {
+  //       console.log(res.data); // Log the response data
+
+  //       const { dataAll, prices, wastages, rawKgCosts, minPrice, maxPrice } =
+  //         res.data;
+
+  //       // Extract dates and ensure that they are formatted correctly
+  //       const formattedDates = [
+  //         ...dataAll[0].map((item) => new Date(item.Date1).getTime()), // For Price
+  //         ...dataAll[1].map((item) => new Date(item.Date2).getTime()), // For Wastage
+  //       ];
+
+  //       // Create series data based on the available prices, wastages, and rawKgCosts
+  //       const priceData = dataAll[0].map((item, index) => ({
+  //         x: new Date(item.Date1).getTime(),
+  //         y: parseFloat(prices[index]),
+  //       }));
+
+  //       const wastageData = dataAll[1].map((item, index) => ({
+  //         x: new Date(item.Date2).getTime(),
+  //         y: parseFloat(wastages[index]),
+  //       }));
+
+  //       const rawKgCostData = dataAll[1].map((item, index) => ({
+  //         x: new Date(item.Date2).getTime(),
+  //         y: parseFloat(rawKgCosts[index]),
+  //       }));
+
+  //       // Update the chart with three different series
+  //       setChartOptions((prevOptions) => ({
+  //         ...prevOptions,
+  //         series: [
+  //           {
+  //             name: t("price"),
+  //             data: priceData,
+  //             color: "#1E90FF", // Set color for Price series
+  //           },
+  //           {
+  //             name: t("wastage"),
+  //             data: wastageData,
+  //             color: "#32CD32", // Set color for Wastage series
+  //           },
+  //           {
+  //             name: t("rawKgCost"),
+  //             data: rawKgCostData,
+  //             color: "#FFA500", // Set color for Raw Kg Cost series
+  //           },
+  //         ],
+  //         yaxis: {
+  //           min: minPrice,
+  //           max: maxPrice,
+  //           title: {
+  //             text: "Values",
+  //           },
+  //         },
+  //         tooltip: {
+  //           custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+  //             const price = prices[dataPointIndex];
+  //             const wastage = wastages[dataPointIndex];
+  //             const rawKgCost = rawKgCosts[dataPointIndex];
+
+  //             return (
+  //               '<div class="apexcharts-tooltip-custom">' +
+  //               `<strong>${t("price")}:</strong> ${price}<br/>` +
+  //               `<strong>${t("wastage")}:</strong> ${wastage}<br/>` +
+  //               `<strong>${t("rawKgCost")}:</strong> ${rawKgCost}` +
+  //               "</div>"
+  //             );
+  //           },
+  //         },
+  //       }));
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data:", error);
+  //       toast.error("An error occurred while fetching data.");
+  //       toast.error(t("genericError"));
+  //     });
+  // };
   const confirmData = () => {
     // Validate required fields
     if (!selectedProduceId) {
@@ -134,71 +234,65 @@ const ApexChart = () => {
         Stop_Date: date2,
       })
       .then((res) => {
-        console.log(res.data); // Log the response data
+        const { data, minValue, maxValue } = res.data;
 
-        const { dataAll, prices, wastages, rawKgCosts, minPrice, maxPrice } =
-          res.data;
+        if (!data || data.length === 0) {
+          toast.error(t("noDataFound"));
+          return;
+        }
 
-        // Extract dates and ensure that they are formatted correctly
-        const formattedDates = [
-          ...dataAll[0].map((item) => new Date(item.Date1).getTime()), // For Price
-          ...dataAll[1].map((item) => new Date(item.Date2).getTime()), // For Wastage
-        ];
-
-        // Create series data based on the available prices, wastages, and rawKgCosts
-        const priceData = dataAll[0].map((item, index) => ({
-          x: new Date(item.Date1).getTime(),
-          y: parseFloat(prices[index]),
+        // Convert API data into chart-friendly series
+        const priceData = data.map((item) => ({
+          x: new Date(item.Date).getTime(),
+          y: parseFloat(item.Line1),
         }));
 
-        const wastageData = dataAll[1].map((item, index) => ({
-          x: new Date(item.Date2).getTime(),
-          y: parseFloat(wastages[index]),
+        const wastageData = data.map((item) => ({
+          x: new Date(item.Date).getTime(),
+          y: parseFloat(item.Line2),
         }));
 
-        const rawKgCostData = dataAll[1].map((item, index) => ({
-          x: new Date(item.Date2).getTime(),
-          y: parseFloat(rawKgCosts[index]),
+        const rawKgCostData = data.map((item) => ({
+          x: new Date(item.Date).getTime(),
+          y: parseFloat(item.Line3),
         }));
 
-        // Update the chart with three different series
+        // Update the chart
         setChartOptions((prevOptions) => ({
           ...prevOptions,
           series: [
             {
               name: t("price"),
               data: priceData,
-              color: "#1E90FF", // Set color for Price series
+              color: "#1E90FF",
             },
             {
               name: t("wastage"),
               data: wastageData,
-              color: "#32CD32", // Set color for Wastage series
+              color: "#32CD32",
             },
             {
               name: t("rawKgCost"),
               data: rawKgCostData,
-              color: "#FFA500", // Set color for Raw Kg Cost series
+              color: "#FFA500",
             },
           ],
           yaxis: {
-            min: minPrice,
-            max: maxPrice,
+            min: minValue,
+            max: maxValue,
             title: {
               text: "Values",
             },
           },
           tooltip: {
-            custom: function ({ series, seriesIndex, dataPointIndex, w }) {
-              const price = prices[dataPointIndex];
-              const wastage = wastages[dataPointIndex];
-              const rawKgCost = rawKgCosts[dataPointIndex];
+            custom: function ({ seriesIndex, dataPointIndex, w }) {
+              const point = data[dataPointIndex]; // reference original API data
 
               return (
                 '<div class="apexcharts-tooltip-custom">' +
-                `<strong>${t("price")}:</strong> ${price}<br/>` +
-                `<strong>${t("wastage")}:</strong> ${wastage}<br/>` +
-                `<strong>${t("rawKgCost")}:</strong> ${rawKgCost}` +
+                `<strong>${t("price")}:</strong> ${point.Line1}<br/>` +
+                `<strong>${t("wastage")}:</strong> ${point.Line2}<br/>` +
+                `<strong>${t("rawKgCost")}:</strong> ${point.Line3}` +
                 "</div>"
               );
             },
@@ -207,7 +301,6 @@ const ApexChart = () => {
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
-        toast.error("An error occurred while fetching data.");
         toast.error(t("genericError"));
       });
   };
@@ -324,8 +417,8 @@ const ApexChart = () => {
                 getOptionLabel={(option) => option.Name_EN || ""}
                 sx={{ width: 300 }}
                 onChange={(event, value) => {
-                  setSelectedProduceId(value ? value.produce_id : null);
-                  setProduceImages(value ? value.images : null); // Update images state
+                  setSelectedProduceId(value ? value.ID : null); // <-- fixed here
+                  setProduceImages(value ? value.images : null); // still fine
                 }}
                 renderInput={(params) => (
                   <TextField {...params} placeholder={t("selectProduce")} />

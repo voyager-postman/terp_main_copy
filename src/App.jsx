@@ -97,6 +97,7 @@ import UpdateTransport from "./components/Setup/TransportManagement/UpdateTransp
 import UnitCreate from "./components/Setup/UnitCount/CreateUnit";
 import EditUnit from "./components/Setup/UnitCount/EditUnit";
 import UnitCountNew from "./components/Setup/UnitCount/UnitCountNew";
+import AccountDetails from "./components/Accounting/AccountDetails";
 import Sorting from "./components/Sorting/Sorting";
 import NewSorting from "./components/Sorting/addSorting";
 import AddVendor from "./components/VendorManagement/AddVendor";
@@ -463,6 +464,8 @@ function App() {
                   path="/createPurchaseOrder"
                   element={<CreatePurchaseOrder />}
                 />
+                                <Route path="/accountDetails" element={<AccountDetails />} />
+
                 <Route
                   path="/updatePurchaseOrder"
                   element={<CreatePurchaseOrder />}

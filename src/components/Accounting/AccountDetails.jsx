@@ -21,8 +21,11 @@ import { FaCalendarAlt } from "react-icons/fa";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 
-const Accounts = () => {
+const AccountDetails = () => {
   const { t, i18n } = useTranslation("global");
+  const location = useLocation();
+  const accountData = location.state?.from; // this is your "item"
+  const bankId = accountData?.bank_id;
   const CustomInput = ({ value, onClick }) => (
     <div
       className="custom-input"
@@ -65,6 +68,114 @@ const Accounts = () => {
     showConfirmButton: false,
     allowOutsideClick: false,
   });
+  // assuming backend expects bank_id
+
+  useEffect(() => {
+    if (bankId) {
+      paymentTable3(bankId);
+    }
+  }, [bankId]);
+
+ const paymentTable3 = (id) => {
+  axios
+    .post(`${API_BASE_URL}/getWalletEN`, {
+      Wallet_ID: id,
+    })
+    .then((response) => {
+      const { tableHead = {}, tableData = [] } = response.data;
+
+      // ✅ Step 1: Create dynamic columns from tableHead
+      const generatedColumns = Object.entries(tableHead)
+        .filter(
+          ([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID"
+        )
+        .map(([key, label]) => ({
+          Header: t(label || key),
+          accessor: key,
+          Cell: ({ value }) => {
+            if (key === "Col1" && value) {
+              // Format Date
+              return new Date(value).toISOString().split("T")[0];
+            }
+            return value ?? ""; // fallback empty string
+          },
+        }));
+
+      // ✅ Step 2: Add actions column
+      // generatedColumns.push({
+      //   Header: t("actions"),
+      //   accessor: "actions",
+      //   Cell: ({ row }) => {
+      //     const a = row.original;
+      //     return (
+      //       <div className="editIcon">
+      //         {a.Reconcile_Status === 1 && (
+      //           <button
+      //             type="button"
+      //             data-bs-toggle="modal"
+      //             data-bs-target="#accountEdit"
+      //             onClick={() =>
+      //               editAccountdata(
+      //                 a.Expense_Payment_ID,
+      //                 a.Invoice_payment_Id,
+      //                 a
+      //               )
+      //             }
+      //           >
+      //             <i className="mdi mdi-pencil pl-2" />
+      //           </button>
+      //         )}
+
+      //         <button type="button" onClick={() => deleteOrder(a.PAY_ID, a.RID)}>
+      //           <i className="mdi mdi-delete " />
+      //         </button>
+
+      //         {a.Credit !== "0.00" ? (
+      //           <button
+      //             type="button"
+      //             className="accountSvg"
+      //             data-bs-toggle="modal"
+      //             data-bs-target="#exampleModalCustomization"
+      //             onClick={() => handleDownloadPDF(a.PAY_ID, a)}
+      //           >
+      //             <i className="mdi mdi-file-pdf" />
+      //           </button>
+      //         ) : a.Debit !== "0.00" ? (
+      //           <button
+      //             type="button"
+      //             className="svgIconPurchase"
+      //             onClick={() => handleDownloadPDFSlip(a.PAY_ID, a)}
+      //           >
+      //             <i className="mdi mdi-file-document" />
+      //           </button>
+      //         ) : null}
+
+      //         {+a.Commission === 1 && (
+      //           <button
+      //             className="svgIconPurchase"
+      //             onClick={() =>
+      //               handleDownloadCommission(a.Expense_Payment_ID, a)
+      //             }
+      //           >
+      //             <i className="mdi mdi-cash" />
+      //           </button>
+      //         )}
+      //       </div>
+      //     );
+      //   },
+      // });
+
+      // ✅ Step 3: Set table state
+      setColumns(generatedColumns);
+      setData(tableData); // use tableData directly
+    })
+    .catch((error) => {
+      console.error("Error fetching LedgerList:", error);
+      toast.error(t("genericError"));
+    });
+};
+
+
   const [quantity, setQuantity] = useState("");
   const [selectedUnitType, setSelectedUnitType] = useState("");
   const [selectedPodItem, setSelectedPodItem] = useState("");
@@ -111,7 +222,6 @@ const Accounts = () => {
   // new
   // const [data, setData] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
-  const location = useLocation();
   const { data: clients } = useQuery("getClientDataAsOptions");
   const { data: clients1 } = useQuery("getAllVendor");
 
@@ -591,25 +701,6 @@ const Accounts = () => {
   };
   const clearData = () => {
     setSelectedInvoice("Client");
-  };
-  useEffect(() => {
-    if (clientId1) {
-      paymentTable3();
-    }
-  }, [clientId1]);
-  const paymentTable3 = () => {
-    axios
-      .post(`${API_BASE_URL}/purchaseOrderListByVendor`, {
-        vendor_id: clientId1,
-      })
-      .then((res) => {
-        console.log(res);
-        setPaymentTable2(res.data.data);
-        // setData(res.data.data);
-      })
-      .catch((error) => {
-        console.log("There was an error fetching the data!", error);
-      });
   };
 
   useEffect(() => {
@@ -4221,207 +4312,6 @@ const Accounts = () => {
   // useEffect(() => {
   //   getInventoryList();
   // }, []);
-  const getInventoryList = () => {
-    axios
-      .get(`${API_BASE_URL}/LedgerList`)
-      .then((response) => {
-        const { header = {}, details = [] } = response.data;
-
-        // Step 1: Create dynamic columns from header
-        const generatedColumns = Object.entries(header)
-          .filter(
-            ([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID"
-          )
-          .map(([key, label]) => ({
-            Header: t(label || key),
-            accessor: key,
-            Cell: ({ value }) => {
-              if (key === "Col1" && value) {
-                return new Date(value).toISOString().split("T")[0]; // format date
-              }
-              return value ?? ""; // fallback
-            },
-          }));
-
-        // Step 2: Add actions column
-        generatedColumns.push({
-          Header: t("actions"),
-          accessor: "actions",
-          Cell: ({ row }) => {
-            const a = row.original;
-            return (
-              <div className="editIcon">
-                {a.Reconcile_Status === 1 && (
-                  <butto
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#accountEdit"
-                    onClick={() =>
-                      editAccountdata(
-                        a.Expense_Payment_ID,
-                        a.Invoice_payment_Id,
-                        a
-                      )
-                    }
-                  >
-                    <i className="mdi mdi-pencil pl-2" />
-                  </butto>
-                )}
-             
-                  <button
-                    type="button"
-                    onClick={() => deleteOrder(a.PAY_ID,a.RID)}
-                  >
-                    <i className="mdi mdi-delete " />
-                  </button>
-            
-                
-                {a.Credit !== "0.00" ? (
-                  <button
-                    type="button"
-                    className="accountSvg"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModalCustomization"
-                    onClick={() => handleDownloadPDF(a.PAY_ID, a)}
-                  >
-                    <div className="d-flex">
-                      <svg
-                        className="me-2"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        stroke="#000000"
-                      >
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g
-                          id="SVGRepo_tracerCarrier"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></g>
-                        <g id="SVGRepo_iconCarrier">
-                          <path
-                            d="M3.5 10H20.5"
-                            stroke="#203764"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                          ></path>
-                          <path
-                            d="M6 14H8"
-                            stroke="#203764"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                          ></path>
-                          <path
-                            d="M11 14H13"
-                            stroke="#203764"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                          ></path>{" "}
-                          <path
-                            d="M3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5H12H17C18.8856 5 19.8284 5 20.4142 5.58579C21 6.17157 21 7.11438 21 9V12V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H12H7C5.11438 19 4.17157 19 3.58579 18.4142C3 17.8284 3 16.8856 3 15V12V9Z"
-                            stroke="#203764"
-                            stroke-width="2"
-                            stroke-linejoin="round"
-                          ></path>{" "}
-                        </g>
-                      </svg>
-                    </div>
-                  </button>
-                ) : a.Debit !== "0.00" ? (
-                  <button
-                    type="button"
-                    className="svgIconPurchase"
-                    onClick={() =>
-                      handleDownloadPDFSlip(a.PAY_ID, a)
-                    }
-                  >
-                    <div>
-                      <svg
-                        fill="#203764"
-                        height="200px"
-                        width="200px"
-                        viewBox="0 0 512 512"
-                        stroke="#203764"
-                      >
-                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                        <g
-                          id="SVGRepo_tracerCarrier"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        ></g>
-                        <g id="SVGRepo_iconCarrier">
-                          <g>
-                            <g>
-                              <g>
-                                <path d="M502.747,160.381c-0.032,0-0.063,0.005-0.095,0.005H120.289c-5.11,0-9.253,4.142-9.253,9.253s4.143,9.253,9.253,9.253h373.205v55.518H18.506v-55.518h64.771c5.11,0,9.253-4.142,9.253-9.253s-4.143-9.253-9.253-9.253H18.506v-27.759c0-15.306,12.452-27.759,27.759-27.759h419.47c15.306,0,27.759,12.453,27.759,27.759c0,5.111,4.142,9.253,9.253,9.253s9.253-4.142,9.253-9.253c0-25.511-20.754-46.265-46.265-46.265H46.265C20.754,86.361,0,108.115,0,132.627v246.747c0,25.511,20.754,46.265,46.265,46.265h419.47c25.511,0,46.265-20.754,46.265-46.265V169.639v-0.005C512,164.523,507.858,160.381,502.747,160.381z M493.494,379.373c0,15.306-12.453,27.759-27.759,27.759H46.265c-15.307,0-27.759-12.453-27.759-27.759V252.916h474.988V379.373z"></path>
-                                <path d="M95.614,376.289c8.799,0,17.334-2.495,24.675-7.13c7.342,4.635,15.876,7.13,24.675,7.13c25.511,0,46.265-20.754,46.265-46.265s-20.754-46.265-46.265-46.265c-8.799,0-17.333,2.495-24.675,7.13c-7.341-4.635-15.876-7.13-24.675-7.13c-25.511,0-46.265,20.754-46.265,46.265S70.103,376.289,95.614,376.289z M95.614,302.265c6.837,0,13.409,2.512,18.502,7.072c3.514,3.144,8.83,3.144,12.344,0c5.094-4.56,11.666-7.072,18.504-7.072c15.307,0,27.759,12.453,27.759,27.759s-12.452,27.759-27.759,27.759c-6.837,0-13.408-2.512-18.504-7.072c-1.757-1.572-3.964-2.359-6.171-2.359s-4.416,0.787-6.172,2.359c-5.093,4.56-11.665,7.072-18.502,7.072c-15.307,0-27.759-12.453-27.759-27.759S80.307,302.265,95.614,302.265z"></path>
-                                <path d="M243.663,314.602H441.06c5.111,0,9.253-4.142,9.253-9.253c0-5.111-4.142-9.253-9.253-9.253H243.663c-5.11,0-9.253,4.142-9.253,9.253C234.41,310.461,238.553,314.602,243.663,314.602z"></path>
-                                <path d="M416.386,333.108h-74.024c-5.111,0-9.253,4.142-9.253,9.253s4.142,9.253,9.253,9.253h74.024c5.111,0,9.253-4.142,9.253-9.253S421.497,333.108,416.386,333.108z"></path>
-                                <path d="M243.663,351.614h61.687c5.111,0,9.253-4.142,9.253-9.253s-4.142-9.253-9.253-9.253h-61.687c-5.11,0-9.253,4.142-9.253,9.253S238.553,351.614,243.663,351.614z"></path>
-                              </g>
-                            </g>
-                          </g>
-                        </g>
-                      </svg>
-                    </div>
-                  </button>
-                ) : null}
-
-                {+a.Commission == 1 && (
-                  <button
-                    className="svgIconPurchase"
-                    onClick={() =>
-                      handleDownloadCommission(a.Expense_Payment_ID, a)
-                    }
-                  >
-                    {" "}
-                    <svg
-                      fill="#203764"
-                      version="1.1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      xmlnsXlink="http://www.w3.org/1999/xlink"
-                      viewBox="0 0 64 64"
-                      width="64px"
-                      height="64px"
-                      stroke="#203764"
-                    >
-                      <g id="SVGRepo_iconCarrier">
-                        <path d="M54.836,41.196c-0.741-0.624-1.72-0.883-2.664-0.719L32.34,43.926l-5.633-5.633C26.52,38.105,26.266,38,26,38H16 c0-0.552-0.447-1-1-1h-4H4v2h6v14H4v2h7h4c0.553,0,1-0.448,1-1h2.764l10.691,5.346c0.463,0.231,0.963,0.347,1.463,0.346 c0.568,0,1.137-0.149,1.646-0.446L54.38,46.52c0.999-0.584,1.62-1.666,1.62-2.823C56,42.73,55.575,41.818,54.836,41.196z M14,53h-2 V39h2V53z M53.371,44.793L31.556,57.518c-0.37,0.216-0.821,0.231-1.206,0.039l-10.902-5.451C19.309,52.036,19.155,52,19,52h-3V40 h9.586l7.879,7.878C33.81,48.224,34,48.683,34,49.171C34,50.18,33.18,51,32.172,51c-0.481,0-0.952-0.195-1.293-0.536l-5.172-5.171 l-1.414,1.414l5.172,5.171C30.188,52.602,31.148,53,32.172,53C34.282,53,36,51.283,36,49.171c0-1.022-0.398-1.983-1.121-2.707 l-0.809-0.809l18.444-3.208c0.372-0.065,0.747,0.038,1.034,0.279C53.835,42.968,54,43.322,54,43.697 C54,44.146,53.759,44.566,53.371,44.793z"></path>
-                        <rect
-                          x="26.567"
-                          y="19.5"
-                          transform="matrix(0.6727 -0.7399 0.7399 0.6727 -4.0396 31.8682)"
-                          width="10"
-                          height="10"
-                        ></rect>
-                        <path d="M30,20.5c1.654,0,3-1.346,3-3s-1.346-3-3-3s-3,1.346-3,3S28.346,20.5,30,20.5z M30,16.5c0.552,0,1,0.449,1,1s-0.448,1-1,1 s-1-0.449-1-1S29.448,16.5,30,16.5z"></path>
-                        <path d="M35,23.5c0,1.654,1.346,3,3,3s3-1.346,3-3s-1.346-3-3-3S35,21.846,35,23.5z M39,23.5c0,0.551-0.448,1-1,1s-1-0.449-1-1 s0.448-1,1-1S39,22.949,39,23.5z"></path>
-                        <path d="M33.274,41.688C33.464,41.887,33.726,42,34,42s0.536-0.113,0.726-0.312L50.584,24.98c4.542-4.786,4.542-12.573,0-17.358 C48.367,5.286,45.416,4,42.274,4C39.148,4,36.212,5.272,34,7.584C31.788,5.272,28.852,4,25.726,4c-3.142,0-6.093,1.286-8.31,3.622 c-4.542,4.786-4.542,12.573,0,17.358L33.274,41.688z"></path>
-                        <rect x="29" y="28" width="2" height="2"></rect>
-                        <rect x="33" y="28" width="2" height="2"></rect>
-                        <rect x="37" y="28" width="2" height="2"></rect>
-                      </g>
-                    </svg>
-                  </button>
-                )}
-              </div>
-            );
-          },
-        });
-
-        // ✅ set data correctly
-        setColumns(generatedColumns);
-        setData(details);
-      })
-      .catch((error) => {
-        console.error("Error fetching LedgerList:", error);
-        toast.error(t("genericError"));
-      });
-  };
-
-  useEffect(() => {
-    getInventoryList();
-  }, []);
 
   // const handleChange = (e) => {
   //   setQuantity(e.target.value);
@@ -4460,7 +4350,7 @@ const Accounts = () => {
     }
   };
 
-  const deleteOrder = (id,id1) => {
+  const deleteOrder = (id, id1) => {
     console.log(id);
     MySwal.fire({
       title: t("areYouSure"),
@@ -4478,7 +4368,7 @@ const Accounts = () => {
             `${API_BASE_URL}/DeleteInvoicePayment`,
             {
               PAY_ID: id,
-              RID:id1
+              RID: id1,
             }
           );
           console.log(response);
@@ -4922,11 +4812,11 @@ const Accounts = () => {
                 <div className="col-lg-3 mb-4">
                   <div className="parantEmpView">
                     {/* <div>
-                      <h6>
-                        <strong>{t("bankRef")}</strong>
-                      </h6>
-                      <p>{accountDataShow.Bank_Ref}</p>
-                    </div> */}
+                       <h6>
+                         <strong>{t("bankRef")}</strong>
+                       </h6>
+                       <p>{accountDataShow.Bank_Ref}</p>
+                     </div> */}
 
                     <div className="parantEmpView">
                       <h6>
@@ -5074,55 +4964,55 @@ const Accounts = () => {
                   </div>
                 </div>
                 {/* <div className="col-lg-3">
-                  <div className="parantEmpView">
-                    <div>
-                      <h6>
-                        <strong>FX Payment </strong>
-                      </h6>
-                      <p>{accountDataShow.FX_Payment}</p>
-                    </div>
-                    <div>
-                      <h6>
-                        <strong>FX</strong>
-                      </h6>
-                      <p>{accountDataShow.FX_name}</p>
-                    </div>
-                    <div>
-                      <h6>
-                        <strong>FX Rate</strong>
-                      </h6>
-                      <p>{accountDataShow.FX_Rate}</p>
-                    </div>
-                  </div>
-                  <div className="parantEmpView">
-                    <div>
-                      <h6>
-                        <strong>Loss/Gain on Exchange Rate </strong>
-                      </h6>
-                      <p>{accountDataShow.LOSS_GAIN_THB}</p>
-                    </div>
-                  </div>
-                  <div className="parantEmpView">
-                    <div>
-                      <h6>
-                        <strong> Intermittent Bank Charges</strong>
-                      </h6>
-                      <p>{accountDataShow.Intermittent_bank_charges}</p>
-                    </div>
-                    <div>
-                      <h6>
-                        <strong>Local Bank Charges</strong>
-                      </h6>
-                      <p>{accountDataShow.Local_bank_Charges}</p>
-                    </div>
-                    <div>
-                      <h6>
-                        <strong>THB Received </strong>
-                      </h6>
-                      <p>{accountDataShow.THB_Paid}</p>
-                    </div>
-                  </div>
-                </div> */}
+                   <div className="parantEmpView">
+                     <div>
+                       <h6>
+                         <strong>FX Payment </strong>
+                       </h6>
+                       <p>{accountDataShow.FX_Payment}</p>
+                     </div>
+                     <div>
+                       <h6>
+                         <strong>FX</strong>
+                       </h6>
+                       <p>{accountDataShow.FX_name}</p>
+                     </div>
+                     <div>
+                       <h6>
+                         <strong>FX Rate</strong>
+                       </h6>
+                       <p>{accountDataShow.FX_Rate}</p>
+                     </div>
+                   </div>
+                   <div className="parantEmpView">
+                     <div>
+                       <h6>
+                         <strong>Loss/Gain on Exchange Rate </strong>
+                       </h6>
+                       <p>{accountDataShow.LOSS_GAIN_THB}</p>
+                     </div>
+                   </div>
+                   <div className="parantEmpView">
+                     <div>
+                       <h6>
+                         <strong> Intermittent Bank Charges</strong>
+                       </h6>
+                       <p>{accountDataShow.Intermittent_bank_charges}</p>
+                     </div>
+                     <div>
+                       <h6>
+                         <strong>Local Bank Charges</strong>
+                       </h6>
+                       <p>{accountDataShow.Local_bank_Charges}</p>
+                     </div>
+                     <div>
+                       <h6>
+                         <strong>THB Received </strong>
+                       </h6>
+                       <p>{accountDataShow.THB_Paid}</p>
+                     </div>
+                   </div>
+                 </div> */}
               </div>
             </div>
             <div className="modal-footer">
@@ -5139,7 +5029,7 @@ const Accounts = () => {
       </div>
       {/* {/ edit modal end /} */}
       <Card
-        title={t("Account_Management")}
+        title={t("accountDetails")}
         endElement={
           <button
             type="button"
@@ -5158,7 +5048,7 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalState"
             >
-              {t("bankStatement")}
+              {t("statement")}
             </button>
             <button
               type="button"
@@ -5166,7 +5056,7 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalVendor"
             >
-              {t("vendorStatement")}
+              {t("reconcile")}
             </button>
             <button
               type="button"
@@ -5174,7 +5064,7 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalPayment1"
             >
-              {t("expensePayment")}
+              {t("transfer")}
             </button>
             <button
               type="button"
@@ -5182,7 +5072,7 @@ const Accounts = () => {
               data-bs-toggle="modal"
               data-bs-target="#modalConsignee"
             >
-              {t("consigneeStatement")}
+              {t("reimburse")}
             </button>
             {/* consignee modal */}
             <div
@@ -5242,13 +5132,13 @@ const Accounts = () => {
                         } // Ensure the option matches the selected value
                       />
                       {/* <ComboBox
-                        options={clients?.map((v) => ({
-                          id: v.client_id,
-                          name: v.client_name,
-                        }))}
-                        value={clientIdSet}
-                        onChange={(e) => setClientIdSet(e)} // No need for { clientIdSet: e }
-                      /> */}
+                         options={clients?.map((v) => ({
+                           id: v.client_id,
+                           name: v.client_name,
+                         }))}
+                         value={clientIdSet}
+                         onChange={(e) => setClientIdSet(e)} // No need for { clientIdSet: e }
+                       /> */}
                     </div>
                     <div className="mb-2 autoComplete">
                       <h6>{t("consignee")}</h6>
@@ -5409,21 +5299,21 @@ const Accounts = () => {
                         <div className="parentFormPayment autoComplete">
                           <p> {t("paymentChannel")} </p>
                           {/* <Autocomplete
-                            disablePortal
-                            options={paymentChannle} // Use your payment channel array as options
-                            getOptionLabel={(option) => option.Bank_nick_name} // Display the bank name
-                            onChange={(e, newValue) =>
-                              setPaymentChannel1(newValue?.bank_id || "")
-                            } // Set the selected bank id
-                            sx={{ width: 300 }}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Search Payment Channel" // Adds a placeholder
-                                InputLabelProps={{ shrink: false }} // Prevents floating label
-                              />
-                            )}
-                          /> */}
+                             disablePortal
+                             options={paymentChannle} // Use your payment channel array as options
+                             getOptionLabel={(option) => option.Bank_nick_name} // Display the bank name
+                             onChange={(e, newValue) =>
+                               setPaymentChannel1(newValue?.bank_id || "")
+                             } // Set the selected bank id
+                             sx={{ width: 300 }}
+                             renderInput={(params) => (
+                               <TextField
+                                 {...params}
+                                 placeholder="Search Payment Channel" // Adds a placeholder
+                                 InputLabelProps={{ shrink: false }} // Prevents floating label
+                               />
+                             )}
+                           /> */}
                           <Autocomplete
                             disablePortal
                             options={paymentChannle || []} // Ensure options is always an array
@@ -5643,21 +5533,21 @@ const Accounts = () => {
                         <h6> {t("vendor")}</h6>
                         <div className="ceateTransport">
                           {/* <Autocomplete
-                            disablePortal
-                            options={clientVendor} // Use your clients array as options
-                            getOptionLabel={(option) => option.name} // Display the client's name
-                            onChange={(e, newValue) =>
-                              setClientId(newValue?.vendor_id || "")
-                            }
-                            sx={{ width: 300 }}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Search Vendor" // Adds a placeholder
-                                InputLabelProps={{ shrink: false }} // Prevents floating label
-                              />
-                            )}
-                          /> */}
+                             disablePortal
+                             options={clientVendor} // Use your clients array as options
+                             getOptionLabel={(option) => option.name} // Display the client's name
+                             onChange={(e, newValue) =>
+                               setClientId(newValue?.vendor_id || "")
+                             }
+                             sx={{ width: 300 }}
+                             renderInput={(params) => (
+                               <TextField
+                                 {...params}
+                                 placeholder="Search Vendor" // Adds a placeholder
+                                 InputLabelProps={{ shrink: false }} // Prevents floating label
+                               />
+                             )}
+                           /> */}
                           <Autocomplete
                             disablePortal
                             options={clientVendor}
@@ -5802,14 +5692,14 @@ const Accounts = () => {
           </div>
           <div className="paymentSec">
             <>
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-toggle="modal"
-                data-bs-target="#modalPayment"
-              >
-                {t("receivePayment")}
-              </button>
+              {/* <button
+                 type="button"
+                 className="btn btn-danger"
+                 data-bs-toggle="modal"
+                 data-bs-target="#modalPayment"
+               >
+                 {t("receivePayment")}
+               </button> */}
               {/* Modal */}
               <div
                 className="modal fade "
@@ -5913,19 +5803,19 @@ const Accounts = () => {
                               } // Ensure the option matches the selected value
                             />
                             {/* <select
-                              value={consigneeId}
-                              onChange={(e) => setConsigneeId(e.target.value)}
-                            >
-                              <option value="">Select Consignee</option>
-                              {consignees?.map((item) => (
-                                <option
-                                  key={item.consignee_id}
-                                  value={item.consignee_id}
-                                >
-                                  {item.consignee_name}
-                                </option>
-                              ))}
-                            </select> */}
+                               value={consigneeId}
+                               onChange={(e) => setConsigneeId(e.target.value)}
+                             >
+                               <option value="">Select Consignee</option>
+                               {consignees?.map((item) => (
+                                 <option
+                                   key={item.consignee_id}
+                                   value={item.consignee_id}
+                                 >
+                                   {item.consignee_name}
+                                 </option>
+                               ))}
+                             </select> */}
                           </div>
                         </div>
                         <div className="col-lg-4">
@@ -5998,18 +5888,18 @@ const Accounts = () => {
                             />
 
                             {/* <select
-                              onChange={(e) =>
-                                setPaymentChannel(e.target.value)
-                              }
-                              value={paymentChannel}
-                            >
-                              <option value="">Select Payment Channel</option>
-                              {paymentChannle?.map((item) => (
-                                <option key={item.bank_id} value={item.bank_id}>
-                                  {item.Bank_nick_name}
-                                </option>
-                              ))}
-                            </select> */}
+                               onChange={(e) =>
+                                 setPaymentChannel(e.target.value)
+                               }
+                               value={paymentChannel}
+                             >
+                               <option value="">Select Payment Channel</option>
+                               {paymentChannle?.map((item) => (
+                                 <option key={item.bank_id} value={item.bank_id}>
+                                   {item.Bank_nick_name}
+                                 </option>
+                               ))}
+                             </select> */}
                           </div>
                         </div>
                         <div className="col-lg-4 mt-3">
@@ -6249,14 +6139,14 @@ const Accounts = () => {
           </div>
 
           <div>
-            <button
-              type="button"
-              className="btn btn-danger"
-              data-bs-toggle="modal"
-              data-bs-target="#modalClaim"
-            >
-              {t("transfer")}
-            </button>
+            {/* <button
+               type="button"
+               className="btn btn-danger"
+               data-bs-toggle="modal"
+               data-bs-target="#modalClaim"
+             >
+               {t("transfer")}
+             </button> */}
             {/* Modal */}
             <div
               className="modal fade"
@@ -6285,13 +6175,13 @@ const Accounts = () => {
                     <div className="client_filter autoComplete mb-3">
                       <h6> {t("from")}</h6>
                       {/* <ComboBox
-                        options={bankList?.map((v) => ({
-                          id: v.bank_id,
-                          name: v.Bank_nick_name,
-                        }))}
-                        value={fromBank}
-                        onChange={(selected) => setFromBank(selected)}
-                      /> */}
+                         options={bankList?.map((v) => ({
+                           id: v.bank_id,
+                           name: v.Bank_nick_name,
+                         }))}
+                         value={fromBank}
+                         onChange={(selected) => setFromBank(selected)}
+                       /> */}
                       <Autocomplete
                         options={
                           bankList?.map((v) => ({
@@ -6319,13 +6209,13 @@ const Accounts = () => {
                     <div className="client_filter autoComplete">
                       <h6> {t("to")}</h6>
                       {/* <ComboBox
-                        options={bankList?.map((v) => ({
-                          id: v.bank_id,
-                          name: v.Bank_nick_name,
-                        }))}
-                        value={toBank}
-                        onChange={(selected) => setToBank(selected)}
-                      /> */}
+                         options={bankList?.map((v) => ({
+                           id: v.bank_id,
+                           name: v.Bank_nick_name,
+                         }))}
+                         value={toBank}
+                         onChange={(selected) => setToBank(selected)}
+                       /> */}
                       <Autocomplete
                         options={
                           bankList?.map((v) => ({
@@ -6399,44 +6289,6 @@ const Accounts = () => {
           </div>
         </div>
 
-        <div className="row dashCard53 mt-5 accountCard">
-          {allAccontDetails?.map((item, index) => (
-            <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4" key={index}>
-              <Link to="/accountDetails" state={{ from: { ...item } }}>
-                <div className="card  ">
-                  <div className="card-header p-3 pt-2">
-                    <div className="icon  icon-lg icon-shape bg-gradient-primary  d-flex align-items-center text-white justify-center p-2  border-radius-xl mt-n4 position-absolute">
-                      {/* <i className=" material-icons  mdi mdi-account-multiple" /> */}
-                      {item.Bank_nick_name}
-                    </div>
-                    <div className="text-end pt-1">
-                      <p className="text-sm mb-0 text-capitalize">
-                        {t("accountDetails")}
-                      </p>
-                      <h4
-                        className="mb-0"
-                        dangerouslySetInnerHTML={{
-                          __html: item.Name_exp_2
-                            ? item.Name_exp_2.replace(/\r\n/g, "<br/>").replace(
-                                /\n/g,
-                                "<br/>"
-                              )
-                            : "",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <hr className="dark horizontal my-0" />
-                  <div className="card-footer p-3 text-right">
-                    <h4 className="mb-0 text-dark" style={{ fontWeight: 600 }}>
-                      {item.Name_exp_4}
-                    </h4>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
         <div className="tableviewAccount">
           <TableView columns={columns} data={data} />
         </div>
@@ -6512,4 +6364,4 @@ const Accounts = () => {
   );
 };
 
-export default Accounts;
+export default AccountDetails;
