@@ -1,4 +1,4 @@
-  import CodeIcon from "@mui/icons-material/Code";
+import CodeIcon from "@mui/icons-material/Code";
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -518,7 +518,8 @@ const DashboardNew = () => {
         payload
       );
       console.log("API Response:", response.data.data);
-      setBoxsData(response.data.data);
+      setBoxsData(response.data.data?.Income);
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", boxsData);
       // Handle success
       toast.success(t("dataFetchedSuccess"));
     } catch (error) {
@@ -2328,22 +2329,16 @@ const DashboardNew = () => {
                           }}
                         >
                           {/* {consigeeDetails?.Total_shipments} */}
-                          {boxsData?.Income?.Count_
-                            ? boxsData?.Income?.Count_
-                            : 0}{" "}
+                          {boxsData?.Square ? boxsData?.Square : 0}{" "}
                         </div>
                       </div>
                       <div className="text-end pt-1">
                         <p className="text-sm mb-0 text-capitalize">
                           {" "}
-                          {boxsData?.Income?.Title
-                            ? boxsData?.Income?.Title
-                            : ""}
+                          {boxsData?.Title ? boxsData?.Title : 0}
                         </p>
                         <h4 className="mb-0">
-                          {boxsData?.Income?.Total
-                            ? boxsData?.Income?.Total
-                            : 0}
+                          {boxsData?.Middle ? boxsData?.Middle : 0}
                         </h4>
                       </div>
                     </div>
@@ -2351,9 +2346,7 @@ const DashboardNew = () => {
                     <div className="card-footer p-3">
                       <p className="mb-0">
                         <span className="text-success text-sm font-weight-bolder">
-                          {boxsData?.Income?.Difference
-                            ? boxsData?.Income?.Difference
-                            : 0}
+                          {boxsData?.Bottom ? boxsData?.Bottom : 0}
                         </span>
                       </p>
                     </div>

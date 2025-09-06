@@ -2277,7 +2277,7 @@ const CreateClient = () => {
     console.log(item);
     // prefill form state with row data
     setDataCustomization({
-      Consignee_Customize_id: item.Id,// your table row primary key
+      Consignee_Customize_id: item.Id, // your table row primary key
       ITF: item.ITF || "",
       Custom_Name: item.Custom_Name || "",
       max_Price: item.MAX_Price || "", // agreed price
@@ -2423,7 +2423,9 @@ const CreateClient = () => {
                         <tr>
                           {/* Dynamic headers from API (excluding ID) */}
                           {Object.entries(headers)
-                            .filter(([key]) => key !== "ID") // exclude ID
+                            .filter(
+                              ([key]) => key !== "ID" && key !== "consignee_ID"
+                            ) // exclude ID
                             .map(([_, headerTitle], index) => (
                               <th key={index}>{headerTitle}</th>
                             ))}
@@ -2438,7 +2440,7 @@ const CreateClient = () => {
                           <tr key={rowIndex}>
                             {/* Dynamic row data (excluding ID) */}
                             {Object.keys(headers)
-                              .filter((key) => key !== "ID") // exclude ID
+                              .filter((key) => key !== "ID" && key !== "consignee_ID") // exclude ID
                               .map((key, colIndex) => (
                                 <td key={colIndex}>{item[key]}</td>
                               ))}
@@ -2454,8 +2456,8 @@ const CreateClient = () => {
                                   // data-bs-target="#exampleModalContactEdit"
 
                                   onClick={() => {
-                                    setUpdateId1(item.ID); // store the ID
-                                    getAllCustomization(item.ID); // call API with that ID
+                                    setUpdateId1(item.Consignee_ID); // store the ID
+                                    getAllCustomization(item.Consignee_ID); // call API with that ID
                                     setShowFirst(true); // open modal
                                   }}
                                 >
@@ -5459,7 +5461,7 @@ const CreateClient = () => {
                 <i class="mdi mdi-close"></i>
               </button>
             </div>
-            <div className="modal-body">
+            {/* <div className="modal-body">
               <div className="formCreate">
                 <div className="row">
                   <div className="form-group col-lg-12 mb-3">
@@ -5593,6 +5595,181 @@ const CreateClient = () => {
                           placeholder={t("barcode")}
                         />
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> */}
+            <div className="modal-body">
+              <div className="formCreate mt-0">
+                <div className="row">
+                  <div className="form-group col-lg-12">
+                    <h6>{t("itfName")}</h6>
+                    <div className="ceateTransport autoComplete">
+                      <Autocomplete
+                        options={getItf || []}
+                        getOptionLabel={(option) =>
+                          option.ITF_Internal_Name_EN || ""
+                        }
+                        onChange={(event, newValue) => {
+                          setDataCustomization((prevState) => ({
+                            ...prevState,
+                            ITF: newValue ? newValue.ID : "",
+                          }));
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("selectItf")}
+                            variant="outlined"
+                          />
+                        )}
+                        value={
+                          getItf?.find(
+                            (item) => item.ID === dataCustomization.ITF
+                          ) || null
+                        }
+                        isOptionEqualToValue={(option, value) =>
+                          option.ID === value.ID
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group col-lg-12 ">
+                    <h6>{t("unit")}</h6>
+                    <div className="ceateTransport autoComplete">
+                      <Autocomplete
+                        options={unitDropdown || []} // List of ITFs
+                        getOptionLabel={(option) => option.Name_EN || ""} // Label to display (itf_name_en for each ITF)
+                        onChange={(event, newValue) => {
+                          handleChange2({
+                            target: {
+                              name: "Unit",
+                              value: newValue ? newValue.ID : "",
+                            }, // Update ITF in state
+                          });
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("selectUnit")}
+                            variant="outlined"
+                          />
+                        )}
+                        value={
+                          unitDropdown?.find(
+                            (item) => item.ID === dataCustomization.Unit
+                          ) || null
+                        } // Set selected value based on ITF
+                        isOptionEqualToValue={(option, value) =>
+                          option.ID === value.ID
+                        } // Option comparison by itf_id
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group col-lg-12 ">
+                    <h6>{t("brand")}</h6>
+                    <div className="ceateTransport autoComplete">
+                      <Autocomplete
+                        options={brands || []} // List of brand options
+                        getOptionLabel={(option) => option.Name_EN || ""} // Label to display
+                        onChange={(event, newValue) => {
+                          handleChange2({
+                            target: {
+                              name: "brand",
+                              value: newValue ? newValue.ID : "",
+                            }, // Update selected brand_id
+                          });
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("selectBrand")}
+                            variant="outlined"
+                          />
+                        )}
+                        value={
+                          brands?.find(
+                            (item) => item.ID === dataCustomization.brand
+                          ) || null
+                        } // Set value based on selected brand_id
+                        isOptionEqualToValue={(option, value) =>
+                          option.ID === value.ID
+                        } // Option comparison
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <h6>{t("customName")}</h6>
+                    <div className=" ">
+                      <input
+                        type="text"
+                        name="Custom_Name"
+                        onChange={handleChange2}
+                        value={dataCustomization.Custom_Name}
+                        placeholder={t("customName")}
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <h6>{t("customCode")}</h6>
+                    <div className=" ">
+                      <input
+                        type="text"
+                        name="Custom_Name"
+                        onChange={handleChange2}
+                        value={dataCustomization.Custom_Name}
+                        placeholder={t("customCode")}
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <h6>{t("customMargin")}</h6>
+                    <div className=" ">
+                      <input
+                        type="text"
+                        name="Custom_Name"
+                        onChange={handleChange2}
+                        value={dataCustomization.Custom_Name}
+                        placeholder={t("customMargin")}
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <h6>{t("agreedPrice")}</h6>
+                    <div className=" ">
+                      <input
+                        type="number"
+                        name="Dummy_Price"
+                        onChange={handleChange2}
+                        value={dataCustomization.Dummy_Price}
+                        placeholder={t("agreedPrice")}
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group col-lg-12">
+                    <h6>{t("dummyPrice")}</h6>
+                    <div className=" ">
+                      <input
+                        type="text"
+                        name="Barcode"
+                        onChange={handleChange2}
+                        value={dataCustomization.Barcode}
+                        placeholder={t("dummyPrice")}
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <h6>{t("barcode")}</h6>
+                    <div className=" ">
+                      <input
+                        type="text"
+                        name="Barcode"
+                        onChange={handleChange2}
+                        value={dataCustomization.Barcode}
+                        placeholder={t("barcode")}
+                      />
                     </div>
                   </div>
                 </div>

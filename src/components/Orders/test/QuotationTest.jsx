@@ -536,15 +536,14 @@ const QuotationTest = () => {
       const lineHeight1 = 4.2;
       let currentY1 = commonStartY; // Use the common starting Y position
       const clientAddress = invoiceResponse.data?.section2_Values || {};
-      const longTexts = [
-        clientAddress.client_name,
-        clientAddress.client_tax_number,
-        clientAddress.Address1,
-        clientAddress.Address2,
-        clientAddress.Address3,
-        clientAddress.Address4,
-        clientAddress.client_phone,
-      ].filter((text) => text && text.toString().trim() !== "");
+
+      const longTexts = clientAddress.vc_address
+        ? clientAddress.vc_address
+            .split("\n") // split into lines
+            .map((line) => line.trim()) // remove spaces
+            .filter((line) => line !== "") // drop empty lines
+        : [];
+
       longTexts.forEach((line) => {
         currentY1 = renderWrappedText(
           doc,
@@ -564,15 +563,14 @@ const QuotationTest = () => {
       let currentY2 = commonStartY; // Use the same starting Y position for the second block
 
       doc.setFontSize(11);
-      const textBlock2 = [
-        invoiceResponse.data?.section3_Values.consignee_name,
-        invoiceResponse.data?.section3_Values.consignee_tax_number,
-        invoiceResponse.data?.section3_Values.Address1,
-        invoiceResponse.data?.section3_Values.Address2,
-        invoiceResponse.data?.section3_Values.Address3,
-        invoiceResponse.data?.section3_Values.Address4,
-        invoiceResponse.data?.section3_Values.consignee_email,
-      ].filter((text) => text && text.toString().trim() !== "");
+      const consigneeAddress = invoiceResponse.data?.section3_Values || {};
+
+      const textBlock2 = consigneeAddress.vc_address
+        ? consigneeAddress.vc_address
+            .split("\n") // split into lines
+            .map((line) => line.trim()) // trim spaces
+            .filter((line) => line !== "") // remove empty lines
+        : [];
 
       doc.setFontSize(11);
       textBlock2.forEach((text, index) => {
@@ -1047,15 +1045,16 @@ const QuotationTest = () => {
       const lineHeight1 = 4.2;
       doc.setFontSize(11);
       const clientAddress = invoiceResponse.data?.client_address || {};
-      const longTexts = [
-        clientAddress.client_name,
-        clientAddress.client_tax_number,
-        clientAddress.Address1,
-        clientAddress.Address2,
-        clientAddress.Address3,
-        clientAddress.Address4,
-        clientAddress.client_phone,
-      ].filter((text) => text && text.toString().trim() !== "");
+
+      // If vc_address exists, split it by line breaks
+      let longTexts = [];
+      if (clientAddress.vc_address) {
+        longTexts = clientAddress.vc_address
+          .split("\n") // split by newlines
+          .map((line) => line.trim()) // remove extra spaces
+          .filter((line) => line !== ""); // remove empty lines
+      }
+
       let currentY1 = commonStartY;
       doc.setFontSize(10); // Set font size once before rendering
 
@@ -1077,17 +1076,12 @@ const QuotationTest = () => {
 
       doc.setFontSize(11);
       const consigneeAddress = invoiceResponse.data?.consignee_address || {};
-
-      const longTexts2 = [
-        consigneeAddress.consignee_name,
-        consigneeAddress.consignee_tax_number,
-        consigneeAddress.Address1,
-        consigneeAddress.Address2,
-        consigneeAddress.Address3,
-        consigneeAddress.Address4,
-        consigneeAddress.consignee_email,
-      ].filter((text) => text && text.toString().trim() !== "");
-
+      const longTexts2 = consigneeAddress.vc_address
+        ? consigneeAddress.vc_address
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) => line !== "")
+        : [];
       // Render the second block of filtered text
       doc.setFontSize(10); // Set font size once
       longTexts2.forEach((line) => {
