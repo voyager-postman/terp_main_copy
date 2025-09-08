@@ -76,105 +76,104 @@ const AccountDetails = () => {
     }
   }, [bankId]);
 
- const paymentTable3 = (id) => {
-  axios
-    .post(`${API_BASE_URL}/getWalletEN`, {
-      Wallet_ID: id,
-    })
-    .then((response) => {
-      const { tableHead = {}, tableData = [] } = response.data;
+  const paymentTable3 = (id) => {
+    axios
+      .post(`${API_BASE_URL}/getWalletEN`, {
+        Wallet_ID: id,
+      })
+      .then((response) => {
+        const { tableHead = {}, tableData = [] } = response.data;
 
-      // ✅ Step 1: Create dynamic columns from tableHead
-      const generatedColumns = Object.entries(tableHead)
-        .filter(
-          ([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID"
-        )
-        .map(([key, label]) => ({
-          Header: t(label || key),
-          accessor: key,
-          Cell: ({ value }) => {
-            if (key === "Col1" && value) {
-              // Format Date
-              return new Date(value).toISOString().split("T")[0];
-            }
-            return value ?? ""; // fallback empty string
-          },
-        }));
+        // ✅ Step 1: Create dynamic columns from tableHead
+        const generatedColumns = Object.entries(tableHead)
+          .filter(
+            ([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID"
+          )
+          .map(([key, label]) => ({
+            Header: t(label || key),
+            accessor: key,
+            Cell: ({ value }) => {
+              if (key === "Col1" && value) {
+                // Format Date
+                return new Date(value).toISOString().split("T")[0];
+              }
+              return value ?? ""; // fallback empty string
+            },
+          }));
 
-      // ✅ Step 2: Add actions column
-      // generatedColumns.push({
-      //   Header: t("actions"),
-      //   accessor: "actions",
-      //   Cell: ({ row }) => {
-      //     const a = row.original;
-      //     return (
-      //       <div className="editIcon">
-      //         {a.Reconcile_Status === 1 && (
-      //           <button
-      //             type="button"
-      //             data-bs-toggle="modal"
-      //             data-bs-target="#accountEdit"
-      //             onClick={() =>
-      //               editAccountdata(
-      //                 a.Expense_Payment_ID,
-      //                 a.Invoice_payment_Id,
-      //                 a
-      //               )
-      //             }
-      //           >
-      //             <i className="mdi mdi-pencil pl-2" />
-      //           </button>
-      //         )}
+        // ✅ Step 2: Add actions column
+        // generatedColumns.push({
+        //   Header: t("actions"),
+        //   accessor: "actions",
+        //   Cell: ({ row }) => {
+        //     const a = row.original;
+        //     return (
+        //       <div className="editIcon">
+        //         {a.Reconcile_Status === 1 && (
+        //           <button
+        //             type="button"
+        //             data-bs-toggle="modal"
+        //             data-bs-target="#accountEdit"
+        //             onClick={() =>
+        //               editAccountdata(
+        //                 a.Expense_Payment_ID,
+        //                 a.Invoice_payment_Id,
+        //                 a
+        //               )
+        //             }
+        //           >
+        //             <i className="mdi mdi-pencil pl-2" />
+        //           </button>
+        //         )}
 
-      //         <button type="button" onClick={() => deleteOrder(a.PAY_ID, a.RID)}>
-      //           <i className="mdi mdi-delete " />
-      //         </button>
+        //         <button type="button" onClick={() => deleteOrder(a.PAY_ID, a.RID)}>
+        //           <i className="mdi mdi-delete " />
+        //         </button>
 
-      //         {a.Credit !== "0.00" ? (
-      //           <button
-      //             type="button"
-      //             className="accountSvg"
-      //             data-bs-toggle="modal"
-      //             data-bs-target="#exampleModalCustomization"
-      //             onClick={() => handleDownloadPDF(a.PAY_ID, a)}
-      //           >
-      //             <i className="mdi mdi-file-pdf" />
-      //           </button>
-      //         ) : a.Debit !== "0.00" ? (
-      //           <button
-      //             type="button"
-      //             className="svgIconPurchase"
-      //             onClick={() => handleDownloadPDFSlip(a.PAY_ID, a)}
-      //           >
-      //             <i className="mdi mdi-file-document" />
-      //           </button>
-      //         ) : null}
+        //         {a.Credit !== "0.00" ? (
+        //           <button
+        //             type="button"
+        //             className="accountSvg"
+        //             data-bs-toggle="modal"
+        //             data-bs-target="#exampleModalCustomization"
+        //             onClick={() => handleDownloadPDF(a.PAY_ID, a)}
+        //           >
+        //             <i className="mdi mdi-file-pdf" />
+        //           </button>
+        //         ) : a.Debit !== "0.00" ? (
+        //           <button
+        //             type="button"
+        //             className="svgIconPurchase"
+        //             onClick={() => handleDownloadPDFSlip(a.PAY_ID, a)}
+        //           >
+        //             <i className="mdi mdi-file-document" />
+        //           </button>
+        //         ) : null}
 
-      //         {+a.Commission === 1 && (
-      //           <button
-      //             className="svgIconPurchase"
-      //             onClick={() =>
-      //               handleDownloadCommission(a.Expense_Payment_ID, a)
-      //             }
-      //           >
-      //             <i className="mdi mdi-cash" />
-      //           </button>
-      //         )}
-      //       </div>
-      //     );
-      //   },
-      // });
+        //         {+a.Commission === 1 && (
+        //           <button
+        //             className="svgIconPurchase"
+        //             onClick={() =>
+        //               handleDownloadCommission(a.Expense_Payment_ID, a)
+        //             }
+        //           >
+        //             <i className="mdi mdi-cash" />
+        //           </button>
+        //         )}
+        //       </div>
+        //     );
+        //   },
+        // });
 
-      // ✅ Step 3: Set table state
-      setColumns(generatedColumns);
-      setData(tableData); // use tableData directly
-    })
-    .catch((error) => {
-      console.error("Error fetching LedgerList:", error);
-      toast.error(t("genericError"));
-    });
-};
-
+        // ✅ Step 3: Set table state
+        setColumns(generatedColumns);
+        setData(tableData); // use tableData directly
+      })
+      .catch((error) => {
+        console.error("Error fetching LedgerList:", error);
+        toast.error(t("genericError"));
+      });
+  };
 
   const [quantity, setQuantity] = useState("");
   const [selectedUnitType, setSelectedUnitType] = useState("");
@@ -1355,20 +1354,21 @@ const AccountDetails = () => {
         data
       );
       console.log("Response:", response.data);
-      getInventoryList();
-      // Close the modal
-      let modalElement = document.getElementById("modalClaim");
-      let modalInstance = bootstrap.Modal.getInstance(modalElement);
-      if (modalInstance) {
-        clearAllFields();
-        modalInstance.hide();
+
+      if (response.data.success) {
+        paymentTable3(bankId);
+        let modalElement = document.getElementById("modalClaim");
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          clearAllFields();
+          modalInstance.hide();
+        }
+
+        toast.success("Amount Transfer Successful");
       }
-      toast.success("Amount Transfer Successful");
-      // toast.success(t("returnToSupplierSuccess"));
     } catch (error) {
       console.error("Error during account transfer:", error);
       toast.error("Something went wrong during the transfer");
-      toast.error(t("genericError"));
     }
   };
 
@@ -5058,11 +5058,19 @@ const AccountDetails = () => {
             >
               {t("reconcile")}
             </button>
-            <button
+            {/* <button
               type="button"
               className="btn btn-danger"
               data-bs-toggle="modal"
               data-bs-target="#modalPayment1"
+            >
+              {t("transfer")}
+            </button> */}
+            <button
+              type="button"
+              className="btn btn-danger"
+              data-bs-toggle="modal"
+              data-bs-target="#modalClaim"
             >
               {t("transfer")}
             </button>
@@ -6139,14 +6147,6 @@ const AccountDetails = () => {
           </div>
 
           <div>
-            {/* <button
-               type="button"
-               className="btn btn-danger"
-               data-bs-toggle="modal"
-               data-bs-target="#modalClaim"
-             >
-               {t("transfer")}
-             </button> */}
             {/* Modal */}
             <div
               className="modal fade"

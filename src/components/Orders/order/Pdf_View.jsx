@@ -245,7 +245,7 @@ export const Pdf_View = () => {
     }
     const commonStartY = 56;  // Set common starting Y position for both blocks
     // First set of texts (left side)
-    const maxWidth1 = 72;
+    const maxWidth1 = 90;
     const startX1 = 7;
     const lineHeight1 = 4.2;
     const longText1_1 = `${from.client_name}(${from.client_tax_number})`;
@@ -259,7 +259,7 @@ export const Pdf_View = () => {
     currentY1 = renderWrappedText(doc, longText1_3, startX1, currentY1, maxWidth1, lineHeight1);
 
     // Reset the starting Y position for the second block (right side) to be the same as the first block
-    const maxWidth2 = 72;
+    const maxWidth2 = 90;
     const startX2 = 100;
     let currentY2 = commonStartY;  // Use the same starting Y position as the first block
     doc.setFontSize(11);

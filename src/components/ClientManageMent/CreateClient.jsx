@@ -355,6 +355,40 @@ const CreateClient = () => {
       };
     });
   };
+
+  const handleSubmit6 = () => {
+    axios
+      .post(`${API_BASE_URL}/updateConsigneeNotify`, {
+        consignee_id: updateId1,
+        notify_name: formData.notify_name,
+        notify_tax_number: formData.notify_tax_number,
+        notify_email: formData.notify_email,
+        notify_phone: formData.notify_phone,
+        notify_address: formData.notify_address,
+      })
+      .then(() => {
+        getAllContact1();
+        toast.success(t("updatedSuccessfully"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      })
+      .catch((error) => {
+        console.error("Error updating data:", error);
+        toast.error(t("updateFailed"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      });
+  };
+  const handleChange7 = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
   const handleChange6 = (e) => {
     const { name, type, checked, value } = e.target;
     if (name === "commissionCurrency") {
@@ -1224,6 +1258,13 @@ const CreateClient = () => {
       [name]: value,
     }));
   };
+  const [formData, setFormData] = useState({
+    notify_name: "",
+    notify_tax_number: "",
+    notify_email: "",
+    notify_phone: "",
+    notify_address: "",
+  });
   const handleAddClick = () => {
     setIsEdit(false);
     setState8({
@@ -2230,13 +2271,14 @@ const CreateClient = () => {
   };
 
   console.log(updateId);
-  const handleEditClick1 = (rowData) => {
-    console.log(rowData);
-    getAllCustomization(rowData);
-    setUpdateId(rowData);
+
+  const handleEditClick1 = (updateId1) => {
+    console.log(updateId1);
+    getAllCustomization(updateId1);
+    setUpdateId(updateId1);
     axios
       .get(`${API_BASE_URL}/getClientConsigneeByID`, {
-        params: { ID: rowData },
+        params: { ID: updateId1 },
       })
       .then((res) => {
         const d = res.data?.data || {};
@@ -2264,6 +2306,13 @@ const CreateClient = () => {
           port_of_orign: d.port_of_orign || "",
           destination_port: d.destination_port || "",
           liner_Drop: d.Liner || "",
+        });
+        setFormData({
+          notify_name: d.notify_name || "",
+          notify_tax_number: d.notify_tax_number || "",
+          notify_email: d.notify_email || "",
+          notify_phone: d.notify_phone || "",
+          notify_address: d.notify_address || "",
         });
       })
       .catch((err) => {
@@ -2440,7 +2489,9 @@ const CreateClient = () => {
                           <tr key={rowIndex}>
                             {/* Dynamic row data (excluding ID) */}
                             {Object.keys(headers)
-                              .filter((key) => key !== "ID" && key !== "consignee_ID") // exclude ID
+                              .filter(
+                                (key) => key !== "ID" && key !== "consignee_ID"
+                              ) // exclude ID
                               .map((key, colIndex) => (
                                 <td key={colIndex}>{item[key]}</td>
                               ))}
@@ -2458,6 +2509,7 @@ const CreateClient = () => {
                                   onClick={() => {
                                     setUpdateId1(item.Consignee_ID); // store the ID
                                     getAllCustomization(item.Consignee_ID); // call API with that ID
+                                    handleEditClick1(item.ID);
                                     setShowFirst(true); // open modal
                                   }}
                                 >
@@ -7635,36 +7687,30 @@ const CreateClient = () => {
                                 <h6>{t("name")}</h6>
                                 <input
                                   type="text"
-                                  id="name_en"
                                   className="form-control"
-                                  placeholder={t("name")}
-                                  value={state.notify_name}
+                                  value={formData.notify_name}
                                   name="notify_name"
-                                  onChange={handleChange}
+                                  onChange={handleChange7}
                                 />
                               </div>
                               <div className="form-group col-lg-6">
                                 <h6>{t("taxNumber")}</h6>
                                 <input
-                                  type="number"
-                                  id="name_en"
+                                  type="text"
                                   className="form-control"
-                                  placeholder={t("taxNumber")}
-                                  value={state.notify_tax_number}
+                                  value={formData.notify_tax_number}
                                   name="notify_tax_number"
-                                  onChange={handleChange}
+                                  onChange={handleChange7}
                                 />
                               </div>
                               <div className="form-group col-lg-6">
                                 <h6> {t("email")}</h6>
                                 <input
-                                  onChange={handleChange}
                                   type="email"
-                                  id="hs_name"
                                   className="form-control"
-                                  placeholder={t("email")}
-                                  value={state.notify_email}
+                                  value={formData.notify_email}
                                   name="notify_email"
+                                  onChange={handleChange7}
                                 />
                               </div>
                               <div className="form-group col-lg-6">
@@ -7672,12 +7718,12 @@ const CreateClient = () => {
                                 <input
                                   type="text"
                                   className="form-control"
-                                  placeholder={t("phoneNumber")}
-                                  value={state.notify_phone}
+                                  value={formData.notify_phone}
                                   name="notify_phone"
-                                  onChange={handleChange}
+                                  onChange={handleChange7}
                                 />
                               </div>
+
                               <div className="form-group col-lg-12">
                                 <h6>{t("address")}</h6>
                                 <textarea
@@ -7685,10 +7731,19 @@ const CreateClient = () => {
                                   style={{
                                     border: "2px solid #245486",
                                   }}
-                                  value={state.notify_address}
+                                  value={formData.notify_address}
                                   name="notify_address"
-                                  onChange={handleChange}
+                                  onChange={handleChange7}
                                 />
+                              </div>
+                              <div className="col-lg-12 mt-3 text-center">
+                                <button
+                                  className="btn btn-danger"
+                                  type="button"
+                                  onClick={handleSubmit6}
+                                >
+                                  {t("submit")}
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -8167,6 +8222,16 @@ const CreateClient = () => {
                                     </div>
                                   </div>
                                 </div>
+                                <div className="col-lg-12 text-center mt-3">
+                                  <button
+                                    type="button"
+                                    class="btn btn-primary mb-0"
+                                    onClick={updatePaymentValue}
+                                  >
+                                    {t("submit")}{" "}
+                                  </button>
+                                </div>
+
                                 {/* <div className="col-lg-2 form-group">
                                 <h6>{t("final")}</h6>
                                 <div className="parentShip">
@@ -9215,6 +9280,15 @@ const CreateClient = () => {
                                     </div>
                                   </div>
                                 </div>
+                                <div className="col-lg-12 text-center mt-3">
+                                  <button
+                                    type="button"
+                                    class="btn btn-primary mb-0"
+                                    onClick={updatePaymentValue}
+                                  >
+                                    {t("submit")}{" "}
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -9404,13 +9478,13 @@ const CreateClient = () => {
                 </div>
               </div>
               <div class="modal-footer">
-                <button
+                {/* <button
                   type="button"
                   class="btn btn-primary mb-0"
                   onClick={updatePaymentValue}
                 >
                   {t("submit")}{" "}
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

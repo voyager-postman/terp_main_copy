@@ -462,7 +462,7 @@ const Test = () => {
   const form = useForm({
     defaultValues: {
       Liner: totalDetails?.Liner_ID || "",
-      journey_number: totalDetails?.journey_number || "",
+      journey_number: totalDetails?.journey_id || "",
       Customer_ref: inputValue,
       bl: totalDetails?.BL || "",
       // Customer_ref: totalDetails?.Customer_ref || "",
@@ -1483,17 +1483,13 @@ const Test = () => {
 
     const commonStartY = 60;
     const lineHeight = 4.2;
-    const maxWidth1 = 72;
+    const maxWidth1 = 90;
     const startX1 = 7;
-    const textBlock1 = [
-      invoiceResponse.data?.client_address.client_name,
-      invoiceResponse.data?.client_address.client_tax_number,
-      invoiceResponse.data?.client_address.Address1,
-      invoiceResponse.data?.client_address.Address2,
-      invoiceResponse.data?.client_address.Address3,
-      invoiceResponse.data?.client_address.Address4,
-      invoiceResponse.data?.client_address.client_phone,
-    ].filter((text) => text && text.toString().trim() !== "");
+    const textBlock1 =
+      invoiceResponse.data?.client_address?.vc_address
+        ?.split("\n") // split by newline
+        .map((line) => line.trim()) // clean spaces
+        .filter((line) => line !== "") || []; // remove empty lines
 
     let currentY1 = commonStartY;
     doc.setFontSize(11);
@@ -1509,18 +1505,14 @@ const Test = () => {
       if (index === 0) doc.setFontSize(10); // Adjust font size after the first text
     });
 
-    const maxWidth2 = 72;
+    const maxWidth2 = 90;
     const startX2 = 100;
 
-    const textBlock2 = [
-      invoiceResponse.data?.consignee_address.consignee_name,
-      invoiceResponse.data?.consignee_address.consignee_tax_number,
-      invoiceResponse.data?.consignee_address.Address1,
-      invoiceResponse.data?.consignee_address.Address2,
-      invoiceResponse.data?.consignee_address.Address3,
-      invoiceResponse.data?.consignee_address.Address4,
-      invoiceResponse.data?.consignee_address.consignee_email,
-    ].filter((text) => text && text.toString().trim() !== "");
+    const textBlock2 =
+  invoiceResponse.data?.consignee_address?.vc_address
+    ?.split("\n") // split into lines
+    .map((line) => line.trim()) // clean spaces
+    .filter((line) => line !== "") || []; // remove empty lines
     let currentY2 = commonStartY;
     doc.setFontSize(11);
     textBlock2.forEach((text, index) => {
@@ -1839,12 +1831,13 @@ const Test = () => {
   });
 
   const uploadPDF = async (pdfBlob, a) => {
+    console.log(a);
     const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
     const formData = new FormData();
     formData.append(
       "document",
       pdfBlob,
-      `${a?.Order_Number || "default"}_Proforma_${dateTime}.pdf`
+      `${a?.COL1 || "default"}_Proforma_${dateTime}.pdf`
     );
 
     setIsLoading(true);
@@ -1854,9 +1847,7 @@ const Test = () => {
       console.log(response);
       if (response.data.success) {
         console.log("PDF uploaded successfully");
-        window.open(
-          `${API_IMAGE_URL}${a?.Order_Number}_Proforma_${dateTime}.pdf`
-        );
+        window.open(`${API_IMAGE_URL}${a?.COL1}_Proforma_${dateTime}.pdf`);
       } else {
         console.log("Failed to upload PDF");
       }
@@ -1869,6 +1860,7 @@ const Test = () => {
   };
 
   const operationPdfTest = async (a) => {
+    console.log(a);
     try {
       let messageSet = "";
       let messageNote = "";
@@ -2163,7 +2155,7 @@ const Test = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${a?.Order_Number || "default"}_Operation_${dateTime}.pdf`
+      `${a?.COL1 || "default"}_Operation_${dateTime}.pdf`
     );
 
     setIsLoading(true);
@@ -2173,9 +2165,7 @@ const Test = () => {
       console.log(response);
       if (response.data.success) {
         console.log("PDF uploaded successfully");
-        window.open(
-          `${API_IMAGE_URL}${a?.Order_Number}_Operation_${dateTime}.pdf`
-        );
+        window.open(`${API_IMAGE_URL}${a?.COL1}_Operation_${dateTime}.pdf`);
       } else {
         console.log("Failed to upload PDF");
       }
@@ -2769,7 +2759,6 @@ const Test = () => {
                             id: v.ID,
                             name: v.journey_number,
                           }))}
-                          defaultValues={totalDetails?.journey_number}
                           value={field.state.value}
                           onChange={(e) => {
                             field.handleChange(e);

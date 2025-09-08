@@ -1040,7 +1040,7 @@ const QuotationTest = () => {
       const commonStartY = 47; // Set common starting Y position for both blocks
 
       // First set of texts (left side)
-      const maxWidth1 = 72;
+      const maxWidth1 = 90;
       const startX1 = 7;
       const lineHeight1 = 4.2;
       doc.setFontSize(11);
@@ -1070,7 +1070,7 @@ const QuotationTest = () => {
       });
 
       // Reset the starting Y position for the second block (right side) to be the same as the first block
-      const maxWidth2 = 72;
+      const maxWidth2 = 90;
       const startX2 = 106;
       let currentY2 = commonStartY; // Use the same starting Y position as the first block
 
