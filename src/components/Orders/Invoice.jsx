@@ -151,12 +151,13 @@ const Invoice = () => {
       //  Refresh receipt data for Invoice (using IID)
       fetchReceiptData(singlePodId.Order_ID);
 
-      console.log(`Field "${apiField}" updated successfully for RID: ${receiptID}`);
+      console.log(
+        `Field "${apiField}" updated successfully for RID: ${receiptID}`
+      );
     } catch (error) {
       console.error("Error updating field:", error);
     }
   };
-
 
   // const submitPaymentData = async () => {
   //   const paymentData = {
@@ -217,7 +218,7 @@ const Invoice = () => {
   //     toast.error(t("tryAgain"));
   //   }
   // };
-  
+
   const [companyAddress, setCompanyAddress] = useState("");
   const [data3, setData3] = useState("");
   const [tableData, setTableData] = useState([]);
@@ -269,8 +270,8 @@ const Invoice = () => {
 
   console.log(deliveryList);
 
-  const [modalHead, setModalHead] = useState(null);   // Stores API head data
-  const [modalData, setModalData] = useState(null);   // Stores API row data
+  const [modalHead, setModalHead] = useState(null); // Stores API head data
+  const [modalData, setModalData] = useState(null); // Stores API row data
   const [loading, setLoading] = useState(false);
 
   const fetchInvoiceClaim = async (invoiceID2) => {
@@ -372,11 +373,29 @@ const Invoice = () => {
       reader.readAsDataURL(fileInv);
     }
   };
+  // const allInvoiceData = () => {
+  //   axios.get(`${API_BASE_URL}/invoiceDetailsList`).then((res) => {
+  //     setData(res.data.data || []);
+  //   });
+  // };
+  // Get language from localStorage
+  const lang = localStorage.getItem("language") || "en"; // fallback to "en"
+  const langValue = lang === "en" ? 1 : 2;
+
+  // Function to fetch invoice data
   const allInvoiceData = () => {
-    axios.get(`${API_BASE_URL}/invoiceDetailsList`).then((res) => {
-      setData(res.data.data || []);
-    });
+    axios
+      .get(`${API_BASE_URL}/invoiceDetailsList`, {
+        params: { lang: langValue }, // pass lang as query param
+      })
+      .then((res) => {
+        setData(res.data.data || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching invoice data:", error);
+      });
   };
+
   const handleClose = () => setShow(false);
   useEffect(() => {
     allInvoiceData();
@@ -632,10 +651,13 @@ const Invoice = () => {
       });
 
       if (response?.data?.success) {
-        toast.success(response.data?.message || "Invoice payment submitted successfully!", {
-          autoClose: 1000,
-          theme: "colored",
-        });
+        toast.success(
+          response.data?.message || "Invoice payment submitted successfully!",
+          {
+            autoClose: 1000,
+            theme: "colored",
+          }
+        );
 
         // Close the modal
         let modalElement = document.getElementById("modalCombine");
@@ -827,18 +849,21 @@ const Invoice = () => {
           const textDataLeft = [
             {
               label: invoiceResponse?.data?.orderMetaLabels["Order : "],
-              value: `${invoiceResponse?.data?.orderMetaValues.Order_Number || ""
-                }`,
+              value: `${
+                invoiceResponse?.data?.orderMetaValues.Order_Number || ""
+              }`,
             },
             {
               label: invoiceResponse?.data?.orderMetaLabels["TT Ref : "],
-              value: `${invoiceResponse?.data?.orderMetaValues.Shipment_ref || ""
-                }`,
+              value: `${
+                invoiceResponse?.data?.orderMetaValues.Shipment_ref || ""
+              }`,
             },
             {
               label: invoiceResponse?.data?.orderMetaLabels["PO Number : "],
-              value: `${invoiceResponse?.data?.orderMetaValues.Customer_ref || ""
-                }`,
+              value: `${
+                invoiceResponse?.data?.orderMetaValues.Customer_ref || ""
+              }`,
             },
             {
               label: invoiceResponse?.data?.transportTypeLabel.AWB,
@@ -1095,7 +1120,7 @@ const Invoice = () => {
 
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Box : "] ||
-          "Total Box : ",
+            "Total Box : ",
           7,
           finalY + 1
         );
@@ -1106,7 +1131,7 @@ const Invoice = () => {
         );
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
-          "Total Packages : ",
+            "Total Packages : ",
           7,
           finalY + 5.5
         );
@@ -1119,7 +1144,7 @@ const Invoice = () => {
         );
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Items : "] ||
-          "Total Items : ",
+            "Total Items : ",
           7,
           finalY + 10
         );
@@ -1142,7 +1167,7 @@ const Invoice = () => {
         }
         doc.text(
           invoiceResponse?.data?.weightLabels?.["Total Net Weight : "] ||
-          "Total Net Weight : ",
+            "Total Net Weight : ",
           72,
           finalY + 1
         );
@@ -1154,7 +1179,7 @@ const Invoice = () => {
         // if (cbm) {
         doc.text(
           invoiceResponse?.data?.weightLabels?.["Total Gross Weight : "] ||
-          "Total Gross Weight : ",
+            "Total Gross Weight : ",
           72,
           finalY + 5.5
         );
@@ -1165,7 +1190,7 @@ const Invoice = () => {
         );
         doc.text(
           invoiceResponse?.data?.weightLabels?.["Total CBM : "] ||
-          "Total CBM : ",
+            "Total CBM : ",
           72,
           finalY + 10
         );
@@ -1638,7 +1663,7 @@ const Invoice = () => {
         const finalY = doc.autoTable.previous.finalY + 4;
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Box : "] ||
-          "Total Box : ",
+            "Total Box : ",
           7,
           finalY + 1
         );
@@ -1651,7 +1676,7 @@ const Invoice = () => {
 
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
-          "Total Packages : ",
+            "Total Packages : ",
           7,
           finalY + 5.5
         );
@@ -1667,7 +1692,7 @@ const Invoice = () => {
 
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Items : "] ||
-          "Total Items : ",
+            "Total Items : ",
           7,
           finalY + 10
         );
@@ -1682,7 +1707,7 @@ const Invoice = () => {
 
         doc.text(
           invoiceResponse?.data?.weightLabels?.["Total Net Weight : "] ||
-          "Total Net Weight : ",
+            "Total Net Weight : ",
 
           72,
           finalY + 1
@@ -1697,7 +1722,7 @@ const Invoice = () => {
         if (cbm1) {
           doc.text(
             invoiceResponse?.data?.weightLabels?.["Total Gross Weight : "] ||
-            "Total Gross Weight : ",
+              "Total Gross Weight : ",
             72,
             finalY + 5.5
           );
@@ -1709,7 +1734,7 @@ const Invoice = () => {
           // doc.text(formatterNo.format(totalDetails[0]?.gw? totalDetails[0]?.gw:totalDetails[0]?.port_weight), 105, finalY + 5.5);
           doc.text(
             invoiceResponse?.data?.weightLabels?.["Total CBM : "] ||
-            "Total CBM : ",
+              "Total CBM : ",
             72,
             finalY + 10
           ),
@@ -1865,18 +1890,21 @@ const Invoice = () => {
         const textDataLeft = [
           {
             label: invoiceResponse?.data?.orderMetaLabels["Order : "],
-            value: `${invoiceResponse?.data?.orderMetaValues.Order_Number || ""
-              }`,
+            value: `${
+              invoiceResponse?.data?.orderMetaValues.Order_Number || ""
+            }`,
           },
           {
             label: invoiceResponse?.data?.orderMetaLabels["TT Ref : "],
-            value: `${invoiceResponse?.data?.orderMetaValues.Shipment_ref || ""
-              }`,
+            value: `${
+              invoiceResponse?.data?.orderMetaValues.Shipment_ref || ""
+            }`,
           },
           {
             label: invoiceResponse?.data?.orderMetaLabels["PO Number : "],
-            value: `${invoiceResponse?.data?.orderMetaValues.Customer_ref || ""
-              }`,
+            value: `${
+              invoiceResponse?.data?.orderMetaValues.Customer_ref || ""
+            }`,
           },
           {
             label: invoiceResponse?.data?.transportTypeLabel.AWB,
@@ -2100,7 +2128,7 @@ const Invoice = () => {
 
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Box : "] ||
-          "Total Box : ",
+            "Total Box : ",
           7,
           finalY + 1
         );
@@ -2111,7 +2139,7 @@ const Invoice = () => {
         );
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
-          "Total Packages : ",
+            "Total Packages : ",
           7,
           finalY + 5.5
         );
@@ -2124,7 +2152,7 @@ const Invoice = () => {
         );
         doc.text(
           invoiceResponse?.data?.summaryLabels?.["Total Items : "] ||
-          "Total Items : ",
+            "Total Items : ",
           7,
           finalY + 10
         );
@@ -2147,7 +2175,7 @@ const Invoice = () => {
         }
         doc.text(
           invoiceResponse?.data?.weightLabels?.["Total Net Weight : "] ||
-          "Total Net Weight : ",
+            "Total Net Weight : ",
           72,
           finalY + 1
         );
@@ -2159,7 +2187,7 @@ const Invoice = () => {
         // if (cbm) {
         doc.text(
           invoiceResponse?.data?.weightLabels?.["Total Gross Weight : "] ||
-          "Total Gross Weight : ",
+            "Total Gross Weight : ",
           72,
           finalY + 5.5
         );
@@ -2170,7 +2198,7 @@ const Invoice = () => {
         );
         doc.text(
           invoiceResponse?.data?.weightLabels?.["Total CBM : "] ||
-          "Total CBM : ",
+            "Total CBM : ",
           72,
           finalY + 10
         );
@@ -2532,7 +2560,7 @@ const Invoice = () => {
         const finalY1 = doc.autoTable.previous.finalY + 4;
         doc.text(
           invoiceResponse1?.data?.summaryLabels?.["Total Box : "] ||
-          "Total Box : ",
+            "Total Box : ",
           7,
           finalY1 + 1
         );
@@ -2545,7 +2573,7 @@ const Invoice = () => {
 
         doc.text(
           invoiceResponse1?.data?.summaryLabels?.["Total Packages : "] ||
-          "Total Packages : ",
+            "Total Packages : ",
           7,
           finalY1 + 5.5
         );
@@ -2561,7 +2589,7 @@ const Invoice = () => {
 
         doc.text(
           invoiceResponse1?.data?.summaryLabels?.["Total Items : "] ||
-          "Total Items : ",
+            "Total Items : ",
           7,
           finalY1 + 10
         );
@@ -2576,7 +2604,7 @@ const Invoice = () => {
 
         doc.text(
           invoiceResponse1?.data?.weightLabels?.["Total Net Weight : "] ||
-          "Total Net Weight : ",
+            "Total Net Weight : ",
 
           72,
           finalY1 + 1
@@ -2591,7 +2619,7 @@ const Invoice = () => {
         if (cbm1) {
           doc.text(
             invoiceResponse1?.data?.weightLabels?.["Total Gross Weight : "] ||
-            "Total Gross Weight : ",
+              "Total Gross Weight : ",
             72,
             finalY1 + 5.5
           );
@@ -2602,7 +2630,7 @@ const Invoice = () => {
           doc.text(weight, 105, finalY1 + 5.5);
           doc.text(
             invoiceResponse1?.data?.weightLabels?.["Total CBM : "] ||
-            "Total CBM : ",
+              "Total CBM : ",
             72,
             finalY1 + 10
           ),
@@ -2719,7 +2747,8 @@ const Invoice = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${a?.Invoice_Number || "default"
+          `${API_IMAGE_URL}${
+            a?.Invoice_Number || "default"
           }_packing_list_${dateTime}.pdf`
         );
       } else {
@@ -2737,7 +2766,8 @@ const Invoice = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${a?.Invoice_Number || "default"
+      `${
+        a?.Invoice_Number || "default"
       }_Invoice_and_packing_list_${dateTime}.pdf`
     );
 
@@ -2848,7 +2878,8 @@ const Invoice = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${a?.Invoice_number || "default"
+          `${API_IMAGE_URL}${
+            a?.Invoice_number || "default"
           }_Invoice_${dateTime}.pdf`
         );
       } else {
@@ -3260,47 +3291,47 @@ const Invoice = () => {
                 +a.Status === 11 ||
                 +a.Status === 12 ||
                 +a.Status === 13) && (
-                  <Link to="/invoiceview" state={{ from: { ...a } }}>
-                    <i className="mdi mdi-eye" />
-                  </Link>
-                )}
+                <Link to="/invoiceview" state={{ from: { ...a } }}>
+                  <i className="mdi mdi-eye" />
+                </Link>
+              )}
               <>
                 {(+a.Status === 7 ||
                   +a.Status === 8 ||
                   +a.Status === 9 ||
                   +a.Status === 12) && (
-                    <Link to="/invoice_edit" state={{ from: { ...a } }}>
-                      <i className="mdi mdi-pencil" />
-                    </Link>
-                  )}
+                  <Link to="/invoice_edit" state={{ from: { ...a } }}>
+                    <i className="mdi mdi-pencil" />
+                  </Link>
+                )}
                 {(+a.Status === 7 ||
                   +a.Status === 8 ||
                   +a.Status === 9 ||
                   +a.Status === 12) && (
-                    <button
-                      type="button"
-                      onClick={() => restoreEanPackage(a.Order_ID)}
-                    >
-                      <i className="mdi mdi-restore" />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => restoreEanPackage(a.Order_ID)}
+                  >
+                    <i className="mdi mdi-restore" />
+                  </button>
+                )}
               </>
               {(+a.Status === 7 ||
                 +a.Status === 8 ||
                 +a.Status === 9 ||
                 +a.Status === 10 ||
                 +a.Status === 11) && (
-                  <button type="button" onClick={() => generatePdf2(a)}>
-                    <svg
-                      className="SvgQuo"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                    >
-                      <title>alpha-c-box-outline</title>
-                      <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
-                    </svg>
-                  </button>
-                )}
+                <button type="button" onClick={() => generatePdf2(a)}>
+                  <svg
+                    className="SvgQuo"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <title>alpha-c-box-outline</title>
+                    <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
+                  </svg>
+                </button>
+              )}
               {(+a.Status === 7 ||
                 +a.Status === 8 ||
                 +a.Status === 9 ||
@@ -3308,22 +3339,22 @@ const Invoice = () => {
                 +a.Status === 11 ||
                 +a.Status === 12 ||
                 +a.Status === 13) && (
-                  <button
-                    type="button"
-                    data-bs-toggle="modal"
-                    onClick={() => setFilterData1(a)}
-                    data-bs-target="#exampleModalCustomization"
+                <button
+                  type="button"
+                  data-bs-toggle="modal"
+                  onClick={() => setFilterData1(a)}
+                  data-bs-target="#exampleModalCustomization"
+                >
+                  <svg
+                    className="SvgQuo"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      className="SvgQuo"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                    >
-                      <title>invoice-text-check-outline</title>
-                      <path d="M12 20L13.3 20.86C13.1 20.28 13 19.65 13 19C13 18.76 13 18.5 13.04 18.29L12 17.6L9 19.6L6 17.6L5 18.26V5H19V13C19.7 13 20.37 13.12 21 13.34V3H3V22L6 20L9 22L12 20M17 9V7H7V9H17M15 13V11H7V13H15M15.5 19L18.25 22L23 17.23L21.84 15.82L18.25 19.41L16.66 17.82L15.5 19Z"></path>
-                    </svg>
-                  </button>
-                )}
+                    <title>invoice-text-check-outline</title>
+                    <path d="M12 20L13.3 20.86C13.1 20.28 13 19.65 13 19C13 18.76 13 18.5 13.04 18.29L12 17.6L9 19.6L6 17.6L5 18.26V5H19V13C19.7 13 20.37 13.12 21 13.34V3H3V22L6 20L9 22L12 20M17 9V7H7V9H17M15 13V11H7V13H15M15.5 19L18.25 22L23 17.23L21.84 15.82L18.25 19.41L16.66 17.82L15.5 19Z"></path>
+                  </svg>
+                </button>
+              )}
               {(+a.Status === 7 ||
                 +a.Status === 8 ||
                 +a.Status === 9 ||
@@ -3331,36 +3362,36 @@ const Invoice = () => {
                 +a.Status === 11 ||
                 +a.Status === 12 ||
                 +a.Status === 13) && (
-                  <button
-                    type="button"
-                    data-bs-toggle="modal"
-                    onClick={() => setFilterData1(a)}
-                    data-bs-target="#exampleModalCustomization5"
+                <button
+                  type="button"
+                  data-bs-toggle="modal"
+                  onClick={() => setFilterData1(a)}
+                  data-bs-target="#exampleModalCustomization5"
+                >
+                  <svg
+                    className="SvgQuo"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      className="SvgQuo"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                    >
-                      <title>package-variant-closed</title>
-                      <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L10.11,5.22L16,8.61L17.96,7.5L12,4.15M6.04,7.5L12,10.85L13.96,9.75L8.08,6.35L6.04,7.5M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V9.21L13,12.58V19.29L19,15.91Z"></path>
-                    </svg>
-                  </button>
-                )}
+                    <title>package-variant-closed</title>
+                    <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L10.11,5.22L16,8.61L17.96,7.5L12,4.15M6.04,7.5L12,10.85L13.96,9.75L8.08,6.35L6.04,7.5M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V9.21L13,12.58V19.29L19,15.91Z"></path>
+                  </svg>
+                </button>
+              )}
               {(+a.Status === 7 ||
                 +a.Status === 8 ||
                 +a.Status === 9 ||
                 +a.Status === 10 ||
                 +a.Status === 11) && (
-                  <button
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal2"
-                    onClick={() => quotationCopy(a.Order_ID)}
-                  >
-                    <i className="mdi mdi-note-outline" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal2"
+                  onClick={() => quotationCopy(a.Order_ID)}
+                >
+                  <i className="mdi mdi-note-outline" />
+                </button>
+              )}
               {+a.Status === 7 && (
                 <button
                   type="button"
@@ -3450,34 +3481,34 @@ const Invoice = () => {
                 +a.Status === 11 ||
                 +a.Status === 12 ||
                 +a.Status === 13) && (
-                  <button
-                    type="button"
-                    onClick={() => pdfSelectedType(a.Consignee_ID, a)}
+                <button
+                  type="button"
+                  onClick={() => pdfSelectedType(a.Consignee_ID, a)}
+                >
+                  <svg
+                    className=" "
+                    version="1.0"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22px"
+                    height="22px"
+                    viewBox="0 0 350 350"
+                    preserveAspectRatio="xMidYMid meet"
                   >
-                    <svg
-                      className=" "
-                      version="1.0"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="22px"
-                      height="22px"
-                      viewBox="0 0 350 350"
-                      preserveAspectRatio="xMidYMid meet"
+                    <g
+                      transform="translate(0.000000,344.000000) scale(0.100000,-0.100000)"
+                      fill="#203764"
+                      stroke="none"
                     >
-                      <g
-                        transform="translate(0.000000,344.000000) scale(0.100000,-0.100000)"
-                        fill="#203764"
-                        stroke="none"
-                      >
-                        <path d="M1291 2913 c-19 -16 -21 -30 -23 -132 l-3 -115 -219 -37 c-270 -47 -265 -44 -249 -156 6 -43 11 -78 10 -79 -1 0 -96 -33 -212 -73 -203 -70 -245 -92 -245 -127 0 -33 274 -780 292 -796 15 -14 24 -15 39 -8 10 6 19 17 19 24 0 8 -61 184 -136 391 -74 208 -134 378 -132 380 2 1 90 32 196 68 135 47 194 63 197 54 2 -6 65 -372 140 -811 75 -440 141 -808 146 -817 5 -10 18 -20 28 -24 11 -3 167 19 346 50 180 31 332 54 338 52 5 -1 -165 -66 -378 -143 -213 -76 -391 -140 -394 -142 -4 -1 -71 179 -151 400 -79 222 -148 409 -153 416 -13 17 -42 15 -57 -3 -11 -13 13 -86 135 -428 81 -226 154 -422 161 -434 7 -12 22 -24 33 -28 12 -4 253 78 658 223 733 264 727 262 1016 262 181 0 186 1 201 22 14 20 16 118 16 859 l0 836 -175 167 -174 166 -625 0 c-579 0 -625 -1 -645 -17z m1189 -177 c0 -195 12 -206 220 -206 l130 0 0 -790 0 -790 -745 0 -745 0 -2 376 c-3 339 -5 378 -20 387 -12 8 -21 7 -32 -2 -14 -12 -16 -60 -16 -407 0 -344 2 -395 16 -408 13 -14 61 -16 367 -17 215 0 342 -4 327 -9 -32 -11 -801 -143 -806 -138 -2 2 -72 403 -155 892 -119 691 -150 889 -140 895 7 5 88 20 179 35 92 15 177 30 189 33 l23 5 2 -383 3 -384 30 0 30 0 3 513 2 512 570 0 570 0 0 -114z m260 -80 l44 -46 -112 0 -112 0 0 106 0 106 68 -60 c37 -33 87 -81 112 -106z" />
-                        <path d="M1529 2364 c-9 -11 -10 -20 -2 -32 9 -16 58 -17 568 -17 510 0 559 1 568 17 8 12 7 21 -2 32 -12 14 -74 16 -566 16 -492 0 -554 -2 -566 -16z" />
-                        <path d="M1536 2104 c-19 -19 -20 -36 -4 -52 17 -17 1109 -17 1126 0 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
-                        <path d="M1530 1835 c-16 -19 -4 -52 23 -59 29 -8 1055 -8 1084 0 27 7 39 40 23 59 -18 22 -1112 22 -1130 0z" />
-                        <path d="M1529 1564 c-9 -11 -10 -20 -2 -32 9 -16 60 -17 565 -20 597 -2 589 -3 573 48 -6 20 -11 20 -564 20 -497 0 -560 -2 -572 -16z" />
-                        <path d="M1536 1304 c-9 -8 -16 -19 -16 -24 0 -5 7 -16 16 -24 14 -14 79 -16 563 -16 412 0 550 3 559 12 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
-                      </g>
-                    </svg>
-                  </button>
-                )}
+                      <path d="M1291 2913 c-19 -16 -21 -30 -23 -132 l-3 -115 -219 -37 c-270 -47 -265 -44 -249 -156 6 -43 11 -78 10 -79 -1 0 -96 -33 -212 -73 -203 -70 -245 -92 -245 -127 0 -33 274 -780 292 -796 15 -14 24 -15 39 -8 10 6 19 17 19 24 0 8 -61 184 -136 391 -74 208 -134 378 -132 380 2 1 90 32 196 68 135 47 194 63 197 54 2 -6 65 -372 140 -811 75 -440 141 -808 146 -817 5 -10 18 -20 28 -24 11 -3 167 19 346 50 180 31 332 54 338 52 5 -1 -165 -66 -378 -143 -213 -76 -391 -140 -394 -142 -4 -1 -71 179 -151 400 -79 222 -148 409 -153 416 -13 17 -42 15 -57 -3 -11 -13 13 -86 135 -428 81 -226 154 -422 161 -434 7 -12 22 -24 33 -28 12 -4 253 78 658 223 733 264 727 262 1016 262 181 0 186 1 201 22 14 20 16 118 16 859 l0 836 -175 167 -174 166 -625 0 c-579 0 -625 -1 -645 -17z m1189 -177 c0 -195 12 -206 220 -206 l130 0 0 -790 0 -790 -745 0 -745 0 -2 376 c-3 339 -5 378 -20 387 -12 8 -21 7 -32 -2 -14 -12 -16 -60 -16 -407 0 -344 2 -395 16 -408 13 -14 61 -16 367 -17 215 0 342 -4 327 -9 -32 -11 -801 -143 -806 -138 -2 2 -72 403 -155 892 -119 691 -150 889 -140 895 7 5 88 20 179 35 92 15 177 30 189 33 l23 5 2 -383 3 -384 30 0 30 0 3 513 2 512 570 0 570 0 0 -114z m260 -80 l44 -46 -112 0 -112 0 0 106 0 106 68 -60 c37 -33 87 -81 112 -106z" />
+                      <path d="M1529 2364 c-9 -11 -10 -20 -2 -32 9 -16 58 -17 568 -17 510 0 559 1 568 17 8 12 7 21 -2 32 -12 14 -74 16 -566 16 -492 0 -554 -2 -566 -16z" />
+                      <path d="M1536 2104 c-19 -19 -20 -36 -4 -52 17 -17 1109 -17 1126 0 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
+                      <path d="M1530 1835 c-16 -19 -4 -52 23 -59 29 -8 1055 -8 1084 0 27 7 39 40 23 59 -18 22 -1112 22 -1130 0z" />
+                      <path d="M1529 1564 c-9 -11 -10 -20 -2 -32 9 -16 60 -17 565 -20 597 -2 589 -3 573 48 -6 20 -11 20 -564 20 -497 0 -560 -2 -572 -16z" />
+                      <path d="M1536 1304 c-9 -8 -16 -19 -16 -24 0 -5 7 -16 16 -24 14 -14 79 -16 563 -16 412 0 550 3 559 12 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
+                    </g>
+                  </svg>
+                </button>
+              )}
               {+a.Status === 9 && (
                 <button
                   data-bs-toggle="modal"
@@ -3512,7 +3543,6 @@ const Invoice = () => {
                 </svg>
               </button>
             </div>
-
           </>
         ),
       },
@@ -3870,7 +3900,7 @@ const Invoice = () => {
 
     doc.text(
       invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
-      "Total Packages : ",
+        "Total Packages : ",
       7,
       finalY + 5.5
     );
@@ -3886,7 +3916,7 @@ const Invoice = () => {
 
     doc.text(
       invoiceResponse?.data?.summaryLabels?.["Total Items : "] ||
-      "Total Items : ",
+        "Total Items : ",
       7,
       finalY + 10
     );
@@ -3901,7 +3931,7 @@ const Invoice = () => {
 
     doc.text(
       invoiceResponse?.data?.weightLabels?.["Total Net Weight : "] ||
-      "Total Net Weight : ",
+        "Total Net Weight : ",
 
       72,
       finalY + 1
@@ -3916,7 +3946,7 @@ const Invoice = () => {
     if (cbm1) {
       doc.text(
         invoiceResponse?.data?.weightLabels?.["Total Gross Weight : "] ||
-        "Total Gross Weight : ",
+          "Total Gross Weight : ",
         72,
         finalY + 5.5
       );
@@ -4021,7 +4051,8 @@ const Invoice = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${filterData1?.Invoice_Number || "default"
+          `${API_IMAGE_URL}${
+            filterData1?.Invoice_Number || "default"
           }_Invoice_${dateTime}.pdf`
         );
       } else {
@@ -4386,7 +4417,7 @@ const Invoice = () => {
     );
     doc.text(
       invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
-      "Total Packages : ",
+        "Total Packages : ",
       7,
       finalY + 5.5
     );
@@ -4397,7 +4428,7 @@ const Invoice = () => {
     );
     doc.text(
       invoiceResponse?.data?.summaryLabels?.["Total Items : "] ||
-      "Total Items : ",
+        "Total Items : ",
       7,
       finalY + 10
     );
@@ -4420,7 +4451,7 @@ const Invoice = () => {
     }
     doc.text(
       invoiceResponse?.data?.weightLabels?.["Total Net Weight : "] ||
-      "Total Net Weight : ",
+        "Total Net Weight : ",
       72,
       finalY + 1
     );
@@ -4432,7 +4463,7 @@ const Invoice = () => {
     // if (cbm) {
     doc.text(
       invoiceResponse?.data?.weightLabels?.["Total Gross Weight : "] ||
-      "Total Gross Weight : ",
+        "Total Gross Weight : ",
       72,
       finalY + 5.5
     );
@@ -4611,7 +4642,8 @@ const Invoice = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${a?.Invoice_Number || "default"
+          `${API_IMAGE_URL}${
+            a?.Invoice_Number || "default"
           }_Invoice_${dateTime}.pdf`
         );
       } else {
@@ -4630,7 +4662,8 @@ const Invoice = () => {
     formData.append(
       "document",
       pdfBlob,
-      `${filterData1?.Invoice_Number || a?.Invoice_Number || "default"
+      `${
+        filterData1?.Invoice_Number || a?.Invoice_Number || "default"
       }_Invoice_${dateTime}.pdf`
     );
 
@@ -4640,7 +4673,8 @@ const Invoice = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${filterData1?.Invoice_Number || "default"
+          `${API_IMAGE_URL}${
+            filterData1?.Invoice_Number || "default"
           }_Invoice_${dateTime}.pdf`
         );
       } else {
@@ -4954,13 +4988,15 @@ const Invoice = () => {
 
     const textDataLeft = [
       {
-        label: `${invoiceResponse?.data?.summaryLabels?.["Total Box : "] ||
+        label: `${
+          invoiceResponse?.data?.summaryLabels?.["Total Box : "] ||
           "Total Box : "
-          }`,
-        value: `${invoiceResponse?.data?.summaryValues?.Box
-          ? invoiceResponse?.data?.summaryValues?.Box
-          : ""
-          }`,
+        }`,
+        value: `${
+          invoiceResponse?.data?.summaryValues?.Box
+            ? invoiceResponse?.data?.summaryValues?.Box
+            : ""
+        }`,
       },
       {
         label: invoiceResponse?.data?.summaryLabels["Total Packages : "]
@@ -5092,7 +5128,7 @@ const Invoice = () => {
     const rightAlignX = 200;
     doc.text(
       invoiceResponse?.data?.paymentLabels?.["Total (THB) : "] ||
-      "Total (THB) : ",
+        "Total (THB) : ",
       147,
       endY + 4
     );
@@ -5112,7 +5148,7 @@ const Invoice = () => {
     doc.rect(147, endY + 12, 55.5, 0.5, "FD");
     doc.text(
       invoiceResponse?.data?.paymentLabels?.["Exchange Rate "] ||
-      "Exchange Rate ",
+        "Exchange Rate ",
       147,
       endY + 17
     );
@@ -5166,7 +5202,8 @@ const Invoice = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${a?.Invoice_Number || "default"
+          `${API_IMAGE_URL}${
+            a?.Invoice_Number || "default"
           }_Custom_${dateTime}.pdf`
         );
       } else {
@@ -5179,7 +5216,9 @@ const Invoice = () => {
 
   const fetchReceiptData = async (Order_ID) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/receiptBNIDView`, { IID: Order_ID });
+      const res = await axios.post(`${API_BASE_URL}/receiptBNIDView`, {
+        IID: Order_ID,
+      });
       if (res.data.success) {
         setModalHead(res.data.head);
         setModalData(res.data.data);
@@ -5222,15 +5261,15 @@ const Invoice = () => {
     <>
       <Card
         title={t("invoiceManagement")}
-      // endElement={
-      // <button
-      //   type="button"
-      //   onClick={() => navigate("")}
-      //   className="btn button btn-info"
-      // >
-      //   Create
-      // </button>
-      // }
+        // endElement={
+        // <button
+        //   type="button"
+        //   onClick={() => navigate("")}
+        //   className="btn button btn-info"
+        // >
+        //   Create
+        // </button>
+        // }
       >
         <TableView columns={columns} data={data} />
       </Card>
@@ -6379,8 +6418,14 @@ const Invoice = () => {
                         <>
                           {Object.keys(modalHead).map((key) => (
                             <div className="flexBefore" key={key}>
-                              <div><strong>{modalHead[key]}</strong></div>
-                              <div><span>{modalData ? modalData[key] || 0 : 0}</span></div>
+                              <div>
+                                <strong>{modalHead[key]}</strong>
+                              </div>
+                              <div>
+                                <span>
+                                  {modalData ? modalData[key] || 0 : 0}
+                                </span>
+                              </div>
                             </div>
                           ))}
                         </>

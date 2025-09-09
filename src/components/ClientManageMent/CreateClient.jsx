@@ -239,6 +239,62 @@ const CreateClient = () => {
       return false;
     }
   };
+  // const customizationDataSubmit = async () => {
+  //   if (!dataCustomization.ITF) {
+  //     toast.warn(t("enterItf"), { autoClose: 1000, theme: "colored" });
+  //     return;
+  //   }
+  //   if (!dataCustomization.Unit) {
+  //     toast.warn(t("enterUnit"), { autoClose: 1000, theme: "colored" });
+  //     return;
+  //   }
+
+  //   try {
+  //     let payload = {};
+  //     if (modalMode === "add") {
+  //       payload = {
+  //         Consignee_id: updateId1,
+  //         Client_ID: from?.Client,
+  //         ITF: dataCustomization.ITF,
+  //         Custom_Name: dataCustomization.Custom_Name,
+  //         max_Price: dataCustomization.max_Price,
+  //         Unit: dataCustomization.Unit,
+  //         Barcode: dataCustomization.Barcode,
+  //         brand: dataCustomization.brand,
+  //         Custom_Code: dataCustomization.Custom_Code,
+  //         Custom_Margin: dataCustomization.Custom_Margin,
+  //         Dummy_Price: dataCustomization.Dummy_Price,
+  //       };
+
+  //       await axios.post(`${API_BASE_URL}/createConsigneeCustomize`, payload);
+  //       getAllCustomization(updateId1);
+  //       toast.success("Customization added successfully");
+  //     } else {
+  //       payload = {
+  //         Consignee_Customize_id: dataCustomization.Consignee_Customize_id,
+  //         ITF: dataCustomization.ITF,
+  //         Custom_Name: dataCustomization.Custom_Name,
+  //         max_Price: dataCustomization.max_Price,
+  //         Unit: dataCustomization.Unit,
+  //         Barcode: dataCustomization.Barcode,
+  //         brand: dataCustomization.brand,
+  //         Custom_Code: dataCustomization.Custom_Code,
+  //         Custom_Margin: dataCustomization.Custom_Margin,
+  //         Dummy_Price: dataCustomization.Dummy_Price,
+  //       };
+
+  //       await axios.post(`${API_BASE_URL}/updateConsigneeCustomize`, payload);
+  //       getAllCustomization(updateId1);
+  //       toast.success("Customization updated successfully");
+  //     }
+
+  //     setShowModal(false);
+  //     // refresh list here if needed
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error("Something went wrong");
+  //   }
+  // };
   const customizationDataSubmit = async () => {
     if (!dataCustomization.ITF) {
       toast.warn(t("enterItf"), { autoClose: 1000, theme: "colored" });
@@ -251,6 +307,8 @@ const CreateClient = () => {
 
     try {
       let payload = {};
+      let response;
+
       if (modalMode === "add") {
         payload = {
           Consignee_id: updateId1,
@@ -266,9 +324,10 @@ const CreateClient = () => {
           Dummy_Price: dataCustomization.Dummy_Price,
         };
 
-        await axios.post(`${API_BASE_URL}/createConsigneeCustomize`, payload);
-        getAllCustomization(updateId1);
-        toast.success("Customization added successfully");
+        response = await axios.post(
+          `${API_BASE_URL}/createConsigneeCustomize`,
+          payload
+        );
       } else {
         payload = {
           Consignee_Customize_id: dataCustomization.Consignee_Customize_id,
@@ -283,16 +342,39 @@ const CreateClient = () => {
           Dummy_Price: dataCustomization.Dummy_Price,
         };
 
-        await axios.post(`${API_BASE_URL}/updateConsigneeCustomize`, payload);
-        getAllCustomization(updateId1);
-        toast.success("Customization updated successfully");
+        response = await axios.post(
+          `${API_BASE_URL}/updateConsigneeCustomize`,
+          payload
+        );
       }
 
-      setShowModal(false);
-      // refresh list here if needed
+      // Handle API-level validation errors
+      if (response.data?.success === false) {
+        if (response.data.message === "consignee.consigneeITFDuplicate") {
+          toast.error(t("consigneeITFDuplicate"), {
+            autoClose: 1500,
+            theme: "colored",
+          });
+        } else {
+          toast.error(response.data.message || t("unknownError"), {
+            autoClose: 1500,
+            theme: "colored",
+          });
+        }
+        return; // Stop here, don’t close modal or refresh list
+      }
+
+      // Success case
+      getAllCustomization(updateId1);
+      toast.success(
+        modalMode === "add" ? t("customizationAdd") : t("customizationUpdate"),
+        { autoClose: 1000, theme: "colored" }
+      );
+
+      setShowModal(false); // only close modal if success
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong");
+      toast.error(t("networkError"), { autoClose: 1000, theme: "colored" });
     }
   };
 
@@ -1634,6 +1716,8 @@ const CreateClient = () => {
   const [customization1, setCustomization1] = useState([]);
 
   const [headers, setHeaders] = useState({});
+  const [headers1, setHeaders1] = useState({});
+
   const getAllContact = () => {
     axios
       .post(`${API_BASE_URL}/getVCConstact`, {
@@ -1655,7 +1739,7 @@ const CreateClient = () => {
       })
       .then((res) => {
         const { head, data } = res.data;
-        setHeaders(head || {});
+        setHeaders1(head || {});
         setData1(data || []);
       })
       .catch((err) => {
@@ -2274,7 +2358,6 @@ const CreateClient = () => {
 
   const handleEditClick1 = (updateId1) => {
     console.log(updateId1);
-    getAllCustomization(updateId1);
     setUpdateId(updateId1);
     axios
       .get(`${API_BASE_URL}/getClientConsigneeByID`, {
@@ -2471,7 +2554,7 @@ const CreateClient = () => {
                       <thead>
                         <tr>
                           {/* Dynamic headers from API (excluding ID) */}
-                          {Object.entries(headers)
+                          {Object.entries(headers1)
                             .filter(
                               ([key]) => key !== "ID" && key !== "consignee_ID"
                             ) // exclude ID
@@ -2488,7 +2571,7 @@ const CreateClient = () => {
                         {data1?.map((item, rowIndex) => (
                           <tr key={rowIndex}>
                             {/* Dynamic row data (excluding ID) */}
-                            {Object.keys(headers)
+                            {Object.keys(headers1)
                               .filter(
                                 (key) => key !== "ID" && key !== "consignee_ID"
                               ) // exclude ID

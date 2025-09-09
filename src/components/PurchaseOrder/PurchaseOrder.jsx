@@ -1198,13 +1198,25 @@ const PurchaseOrder = () => {
   const handleDownloadPDF = async (po_id, a) => {
     console.log(a);
     try {
+      const lang = localStorage.getItem("language");
+      const langValue = lang === "en" ? 1 : 2;
       const response = await axios.post(
         `${API_BASE_URL}/purchaseOrderPdfDetails`,
         {
           po_id: po_id,
+          lang: langValue,
         }
       );
       console.log(response);
+      const section4Labels = response?.data?.section4_label || {};
+      const section4Values = response?.data?.section4_values || [];
+
+      // Convert section4_label values into header array
+      const headers = [Object.values(section4Labels)];
+
+      // Convert section4_values into rows
+      const rows = section4Values.map((item) => Object.values(item));
+
       const doc = new jsPDF();
       doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular);
       doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
@@ -1213,10 +1225,10 @@ const PurchaseOrder = () => {
       doc.addImage(imgData, "JPEG", 6, 2, 20, 20);
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
-      doc.text(`${response?.data?.companyAddress?.Line_1}`, 30, 8);
+      doc.text(`${response?.data?.Company_Address?.Line_1}`, 30, 8);
       doc.setTextColor(0, 0, 0);
-      doc.text(`${response?.data?.companyAddress?.Line_2}`, 30, 12);
-      const longTextOne = `${response?.data?.companyAddress?.Line_3}`;
+      doc.text(`${response?.data?.Company_Address?.Line_2}`, 30, 12);
+      const longTextOne = `${response?.data?.Company_Address?.Line_3}`;
       const maxWidthOne = 90;
       const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
       let startXOne = 30;
@@ -1226,18 +1238,21 @@ const PurchaseOrder = () => {
       });
       doc.setFont("helvetica", "bold"); // Set font to bold
       doc.setFontSize(19);
-      doc.text("Purchase Order", 150.5, 11);
+      const purchaseOrderTitle =
+        response?.data?.section1_Title?.Title || "Purchase Order";
+      doc.text(purchaseOrderTitle, 150.5, 11);
       doc.setFont("helvetica", "normal"); // Set font to bold
       doc.setFillColor(33, 56, 99);
       doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
-      const poNum = a?.POCODE;
+      doc.text(response?.data?.section2?.Col1, 7, 28);
+      const poNum = response?.data?.section2?.Col2;
       const pageWidth = doc.internal.pageSize.width;
       const textWidth = doc.getTextWidth(poNum);
       const xPosition = (pageWidth - textWidth) / 2;
       doc.text(poNum, xPosition, 28);
-      doc.text("Date: ", 169, 28);
+      // doc.text("Date: ", 169, 28);
       doc.setFillColor(33, 56, 99);
       doc.rect(7, 30, doc.internal.pageSize.width - 15, 0.5, "FD");
       // Define variables for wrapped text
@@ -1247,7 +1262,7 @@ const PurchaseOrder = () => {
       let startY1 = 35;
       const lineHeight1 = 4.2;
       doc.setFont("NotoSansThai"); // Set the font to use
-      const longText1_4 = `${response?.data?.vendor_details?.vendor_name_address}`;
+      const longText1_4 = `${response?.data?.section3?.vc_address || ""}`;
 
       // const longText1_3 = ``;
       // Function to render wrapped text
@@ -1277,7 +1292,7 @@ const PurchaseOrder = () => {
       );
       doc.setFontSize(11);
       let startDate = 28;
-      doc.text(formatDate(new Date()), 182, startDate);
+      doc.text(response?.data?.section2?.Col3, 169, startDate);
       const newFormatter1 = new Intl.NumberFormat("en-US", {
         style: "decimal",
         minimumFractionDigits: 3,
@@ -1294,48 +1309,11 @@ const PurchaseOrder = () => {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       });
-      const rows = response?.data?.data?.map((item, index) => ({
-        index: index + 1,
-        pd: item.Name_EN,
-        it: "",
-        qty: item.Qty ? newFormatter1.format(item.Qty) : "",
-        unit: item.Unit_Name_EN,
-        price: item.pod_price ? newFormatter5.format(item.pod_price) : "",
-        vat: newFormatter5.format(item.VAT),
-        total: newFormatter5.format(item.line_total),
-        wht: item.WHT ? newFormatter5.format(item.WHT) : "",
-        create: noDecimal.format(item.Crates),
-      }));
 
       const yTop = startY1; // Start Y position for the tabl
       doc.autoTable({
-        head: [
-          [
-            "#",
-            "Item",
-            "External Ref",
-            "QTY",
-            "Unit",
-            "Price",
-            "VAT",
-            "Total",
-            "WHT",
-            "Packages",
-          ],
-        ],
-        body: rows.map((row) => [
-          row.index,
-          row.pd,
-          row.it,
-          row.qty,
-          row.unit,
-          row.price,
-          row.vat,
-          row.total,
-          row.wht,
-          row.create,
-        ]),
-
+        head: headers,
+        body: rows,
         columnStyles: {
           0: { halign: "center" },
           1: { halign: "left", font: "NotoSansThai", fontSize: 10 },
@@ -1391,10 +1369,10 @@ const PurchaseOrder = () => {
       const rightBoundary = 202.7;
       const labelX = 145;
       let currentY = tableEndY + 5;
-      const textTotal = newFormatter5.format(response?.data?.total_all);
+      const textTotal = response?.data?.section5_values?.Row1;
       renderRightAlignedText(
         doc,
-        "Total",
+        response?.data?.section5_label?.Row1,
         textTotal,
         labelX,
         rightBoundary,
@@ -1402,10 +1380,10 @@ const PurchaseOrder = () => {
         currentY
       );
       currentY += 5;
-      const textTotalVat = newFormatter5.format(response?.data?.total_vat);
+      const textTotalVat = response?.data?.section5_values?.Row2;
       renderRightAlignedText(
         doc,
-        "VAT",
+        response?.data?.section5_label?.Row2,
         textTotalVat,
         labelX,
         rightBoundary,
@@ -1413,22 +1391,22 @@ const PurchaseOrder = () => {
         currentY
       );
       currentY += 5;
-      const textTotalWht = newFormatter5.format(response?.data?.total_WHT);
+      const textTotalWht = response?.data?.section5_values?.Row3;
       renderRightAlignedText(
         doc,
-        "WHT",
+        response?.data?.section5_label?.Row3,
         textTotalWht,
         labelX,
         rightBoundary,
         fixedWidth,
         currentY
       );
-      doc.rect(145, tableEndY + 16.5, 58, 0.5, "FD");
+      doc.rect(145, tableEndY + 16.5, 60, 0.5, "FD");
       currentY += 6;
-      const textTotalPay = newFormatter5.format(response?.data?.payable);
+      const textTotalPay = response?.data?.section5_values?.Row4;
       renderRightAlignedText(
         doc,
-        "Total",
+        response?.data?.section5_label?.Row4,
         textTotalPay,
         labelX,
         rightBoundary,
@@ -1437,10 +1415,11 @@ const PurchaseOrder = () => {
       );
 
       currentY += 5;
-      const textRounding = newFormatter5.format(response?.data?.rounding ?? 0);
+      const textRounding = response?.data?.section5_values?.Row5;
       renderRightAlignedText(
         doc,
-        "Rounding",
+        response?.data?.section5_label?.Row5,
+
         textRounding,
         labelX,
         rightBoundary,
@@ -1449,14 +1428,45 @@ const PurchaseOrder = () => {
       );
 
       currentY += 5;
-      const textPayable = newFormatter5.format(
-        (response?.data?.payable ?? 0) + (response?.data?.rounding ?? 0)
+      const textPayable = response?.data?.section5_values?.Row6;
+      renderRightAlignedText(
+        doc,
+        response?.data?.section5_label?.Row6,
+        textPayable,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
       );
+      currentY += 6;
+      const pastPayment = response?.data?.section5_values?.Row7;
+      renderRightAlignedText(
+        doc,
+        response?.data?.section5_label?.Row7,
+        pastPayment,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const row8 = response?.data?.section5_values?.Row8;
+      renderRightAlignedText(
+        doc,
+        response?.data?.section5_label?.Row8,
+        row8,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const row9 = response?.data?.section5_values?.Row9;
 
       renderRightAlignedText(
         doc,
-        "Payable",
-        textPayable,
+        response?.data?.section5_label?.Row9,
+        row9,
         labelX,
         rightBoundary,
         fixedWidth,
@@ -1464,7 +1474,11 @@ const PurchaseOrder = () => {
       );
       doc.rect(145, tableEndY + 33, 58, 0.5, "FD");
       doc.setFontSize(11);
-      doc.text("Payment", 7, tableEndY + 25);
+      doc.text(
+        response?.data?.section6_Title["Payment Details"],
+        7,
+        tableEndY + 25
+      );
       doc.setFontSize(10);
       function renderLabelAndValue(doc, label, value, labelX, valueX, y) {
         doc.text(label, labelX, y);
@@ -1472,10 +1486,10 @@ const PurchaseOrder = () => {
       }
       renderLabelAndValue(
         doc,
-        "Bank Name :",
+        response?.data?.section6_label?.row1,
         `${
-          response?.data?.vendor_details?.vendor_bank_name
-            ? response?.data?.vendor_details?.vendor_bank_name
+          response?.data?.section6_values?.Result1
+            ? response?.data?.section6_values?.Result1
             : ""
         }`,
         7,
@@ -1484,10 +1498,10 @@ const PurchaseOrder = () => {
       );
       renderLabelAndValue(
         doc,
-        "Account Name :",
+        response?.data?.section6_label?.row2,
         `${
-          response?.data?.vendor_details?.vendor_bank_account
-            ? response?.data?.vendor_details?.vendor_bank_account
+          response?.data?.section6_values?.Result2
+            ? response?.data?.section6_values?.Result2
             : ""
         }`,
         7,
@@ -1496,35 +1510,42 @@ const PurchaseOrder = () => {
       );
       renderLabelAndValue(
         doc,
-        "Account Number :",
+        response?.data?.section6_label?.row3,
         `${
-          response?.data?.vendor_details?.vendor_bank_number
-            ? response?.data?.vendor_details?.vendor_bank_number
+          response?.data?.section6_values?.Result3
+            ? response?.data?.section6_values?.Result3
             : ""
         }`,
         7,
         40,
         tableEndY + 40
       );
-      if (a.Payment_status !== 0) {
-        renderLabelAndValue(
-          doc,
-          "Paid On :",
-          `${a.payment_date ? formatDate(a.payment_date) : ""}`,
-          7,
-          40,
-          tableEndY + 45
-        );
-        renderLabelAndValue(
-          doc,
-          "Paid With :",
-          `${a.paid_with ? a.paid_with : ""}`,
-          7,
-          40,
-          tableEndY + 50
-        );
-      }
 
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row4,
+        response?.data?.section6_values?.Result4,
+        7,
+        40,
+        tableEndY + 45
+      );
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row5,
+        response?.data?.section6_values?.Result5,
+        7,
+        40,
+        tableEndY + 50
+      );
+
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row6,
+        response?.data?.section6_values?.Result6,
+        7,
+        40,
+        tableEndY + 55
+      );
       const addPageNumbers = (doc) => {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {

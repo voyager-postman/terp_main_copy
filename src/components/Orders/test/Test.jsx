@@ -276,124 +276,7 @@ const Test = () => {
               )}
             </div>
           ),
-          // accessor: (a) => (
-          //   <div className="editIcon">
-          //     <Link to="/quotation_view" state={{ from: { ...a } }}>
-          //       <i className="mdi mdi-eye" />
-          //     </Link>
-
-          //     {(+a.Status_value === 1 || +a.Status_value === 2) && (
-          //       <Link to="/update_Quotation" state={{ from: { ...a } }}>
-          //         <i className="mdi mdi-pencil" />
-          //       </Link>
-          //     )}
-
-          //     <button
-          //       type="button"
-          //       data-bs-toggle="modal"
-          //       onClick={() => setFilterData1(a)}
-          //       data-bs-target="#exampleModalCustomization"
-          //     >
-          //       <svg
-          //         className="SvgQuo"
-          //         xmlns="http://www.w3.org/2000/svg"
-          //         viewBox="0 0 24 24"
-          //       >
-          //         <title>Quotation</title>
-          //         <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H8V21C8 21.6 8.4 22 9 22H9.5C9.7 22 10 21.9 10.2 21.7L13.9 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M11 13H7V8.8L8.3 6H10.3L8.9 9H11V13M17 13H13V8.8L14.3 6H16.3L14.9 9H17V13Z"></path>
-          //       </svg>
-          //     </button>
-
-          //     {(+a.Status_value === 1 ||
-          //       +a.Status_value === 2 ||
-          //       +a.Status_value === 3 ||
-          //       +a.Status_value === 4) && (
-          //       <button
-          //         type="button"
-          //         style={{
-          //           width: "20px",
-          //           color: "#203764",
-          //           fontSize: "22px",
-          //           marginTop: "10px",
-          //         }}
-          //         onClick={() => performaOrder(a)}
-          //       >
-          //         <i className="fi fi-sr-square-p" />
-          //       </button>
-          //     )}
-
-          //     {+a.Status_value > 2 && (
-          //       <button
-          //         type="button"
-          //         style={{
-          //           width: "20px",
-          //           color: "#203764",
-          //           fontSize: "22px",
-          //           marginTop: "10px",
-          //         }}
-          //         onClick={() => handleEditClick1(a.Order_ID)}
-          //       >
-          //         <i
-          //           className="mdi mdi-content-copy"
-          //           type="button"
-          //           data-bs-toggle="modal"
-          //           data-bs-target="#consigneeOne"
-          //         />{" "}
-          //       </button>
-          //     )}
-          //     {+a.Status_value === 3 && (
-          //       <button
-          //         type="button"
-          //         onClick={() => quotationConfirmation(a.Order_ID)}
-          //       >
-          //         <i className="mdi mdi-check-circle" />
-          //       </button>
-          //     )}
-          //     {(+a.Status_value === 1 || +a.Status_value === 2) && (
-          //       <button
-          //         type="button"
-          //         data-bs-toggle="modal"
-          //         data-bs-target="#exampleModal1"
-          //         onClick={() => setDeleteOrderId(a.Order_ID)}
-          //       >
-          //         <i className="mdi mdi-delete" />
-          //       </button>
-          //     )}
-
-          //     {[1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(
-          //       a.Status_value
-          //     ) && (
-          //       <button
-          //         type="button"
-          //         onClick={() => quotationConfirmationForOrder(a.Order_ID)}
-          //       >
-          //         <i
-          //           className="mdi mdi-check"
-          //           style={{
-          //             width: "20px",
-          //             color: "#203764",
-          //             fontSize: "22px",
-          //             marginTop: "10px",
-          //           }}
-          //         />
-          //       </button>
-          //     )}
-          //     {(+a.Status_value === 1 || +a.Status_value === 2) && (
-          //       <button
-          //         type="button"
-          //         style={{
-          //           width: "20px",
-          //           color: "#203764",
-          //           fontSize: "22px",
-          //           marginTop: "10px",
-          //         }}
-          //         onClick={() => expireQoutation(a.Order_ID)}
-          //       >
-          //         <i className="mdi mdi-clock-alert" />
-          //       </button>
-          //     )}
-          //   </div>
-          // ),
+     
         });
 
         setColumns(dynamicColumns);
@@ -1509,10 +1392,10 @@ const Test = () => {
     const startX2 = 100;
 
     const textBlock2 =
-  invoiceResponse.data?.consignee_address?.vc_address
-    ?.split("\n") // split into lines
-    .map((line) => line.trim()) // clean spaces
-    .filter((line) => line !== "") || []; // remove empty lines
+      invoiceResponse.data?.consignee_address?.vc_address
+        ?.split("\n") // split into lines
+        .map((line) => line.trim()) // clean spaces
+        .filter((line) => line !== "") || []; // remove empty lines
     let currentY2 = commonStartY;
     doc.setFontSize(11);
     textBlock2.forEach((text, index) => {
@@ -2185,7 +2068,7 @@ const Test = () => {
       let messageNote = "";
       // First API Call: Invoice Procedure
       const invoiceResponse = await axios.get(
-        `${API_BASE_URL}/NewproformaMain_Order`,
+        `${API_BASE_URL}/Newquotation_proforma`,
         {
           params: { order_id: a?.Order_ID },
         }
@@ -2312,15 +2195,12 @@ const Test = () => {
       let currentY1 = commonStartY; // Use the common starting Y position
 
       const clientAddress = invoiceResponse.data?.section2_Values || {};
-      const longTexts = [
-        clientAddress.client_name,
-        clientAddress.client_tax_number,
-        clientAddress.Address1,
-        clientAddress.Address2,
-        clientAddress.Address3,
-        clientAddress.Address4,
-        clientAddress.client_phone,
-      ].filter((text) => text && text.toString().trim() !== "");
+      const longTexts =
+        clientAddress.vc_address
+          ?.split("\n") // split by newline
+          .map((line) => line.trim()) // remove extra spaces
+          .filter((line) => line !== "") || []; // remove empty lines
+
       longTexts.forEach((line) => {
         currentY1 = renderWrappedText(
           doc,
@@ -2336,15 +2216,11 @@ const Test = () => {
       const startX2 = 127.2;
       let currentY2 = commonStartY; // Use the same starting Y position as the first block
       doc.setFontSize(11);
-      const textBlock2 = [
-        invoiceResponse.data?.section3_Values.consignee_name,
-        invoiceResponse.data?.section3_Values.consignee_tax_number,
-        invoiceResponse.data?.section3_Values.Address1,
-        invoiceResponse.data?.section3_Values.Address2,
-        invoiceResponse.data?.section3_Values.Address3,
-        invoiceResponse.data?.section3_Values.Address4,
-        invoiceResponse.data?.section3_Values.consignee_email,
-      ].filter((text) => text && text.toString().trim() !== "");
+      const textBlock2 =
+        invoiceResponse.data?.section3_Values?.vc_address
+          ?.split("\n") // split into lines
+          .map((line) => line.trim()) // remove spaces
+          .filter((line) => line !== "") || []; // remove empty lines
 
       doc.setFontSize(11);
       textBlock2.forEach((text, index) => {
