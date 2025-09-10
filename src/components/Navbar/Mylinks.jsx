@@ -214,6 +214,7 @@ export const getLinks = () => {
             { name: t("other_expenses"), link: "/expenseItem" },
             { name: t("upload_logos"), link: "/uploadlogo" },
             { name: t("company_address"), link: "/companyaddress" },
+             { name: t("currency"), link: "/currency" },
           ],
         },
       ],

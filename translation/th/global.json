@@ -1117,5 +1117,8 @@
   "messengerId": "รหัสผู้ส่งสาร",
    "customCode": "รหัสที่กำหนดเอง",
   "reconcile": "กระทบยอด",
-  "reimburse": "ชดใช้เงิน"
+  "reimburse": "ชดใช้เงิน",
+  "currencyManagement": "การจัดการสกุลเงิน",
+  "days": "วัน",
+  "fxCorrection": "การปรับอัตราแลกเปลี่ยน"
 }

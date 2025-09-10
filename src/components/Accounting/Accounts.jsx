@@ -4483,6 +4483,7 @@ const Accounts = () => {
           );
           console.log(response);
           getInventoryList();
+          getAccount();
           toast.success(" Credit Account delete successfully");
           // toast.success(t("returnToSupplierSuccess"));
         } catch (e) {

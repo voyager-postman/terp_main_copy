@@ -1117,5 +1117,8 @@
   "messengerId": "Messenger Id",
     "customCode": "Custom Code",
     "reconcile": "Reconcile",
-  "reimburse": "Reimburse"
+  "reimburse": "Reimburse",
+  "currencyManagement": "Currency Management",
+    "days": "Days",
+    "fxCorrection": "FX Correction"
 }

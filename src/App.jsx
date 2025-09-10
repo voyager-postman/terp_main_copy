@@ -3,6 +3,8 @@ import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import Currency from "./components/Setup/Currency/Currency";
+import CurrencyCreate from "./components/Setup/Currency/CurrencyCreate";
 import BillingNote from "./components/Orders/BillingNote";
 import { IsLoginAuthenticateContext } from "./Contexts/LoginContext";
 import PrivateRoute from "./PrivateRoute";
@@ -464,7 +466,7 @@ function App() {
                   path="/createPurchaseOrder"
                   element={<CreatePurchaseOrder />}
                 />
-                                <Route path="/accountDetails" element={<AccountDetails />} />
+                <Route path="/accountDetails" element={<AccountDetails />} />
 
                 <Route
                   path="/updatePurchaseOrder"
@@ -477,6 +479,8 @@ function App() {
                 <Route path="/billing_note" element={<BillingNote />} />
                 <Route path="/createUser" element={<CreateUser />} />
                 <Route path="/updateUser" element={<UpdateUser />} />
+                <Route path="/currency" element={<Currency />} />
+                <Route path="/currency_create" element={<CurrencyCreate />} />
                 <Route path="/userResetPass" element={<UserResetPass />} />
                 <Route path="/packingNew" element={<PackingNew />} />
                 <Route path="/updateHourly" element={<UpdateHourly />} />

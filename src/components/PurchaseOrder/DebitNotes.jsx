@@ -151,9 +151,12 @@ const DebitNotes = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.post(`${API_BASE_URL}/DeleteClaim`, {
-            claim_id: id,
-          });
+          const response = await axios.post(
+            `${API_BASE_URL}/deleteDebitNotes`,
+            {
+              Debit_Note_ID: id,
+            }
+          );
           listClaim();
           toast.success(response.data.messageEN);
           toast.success(response.data.messageTH);
