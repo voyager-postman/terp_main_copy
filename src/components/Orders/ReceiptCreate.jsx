@@ -53,7 +53,13 @@ const ReceiptCreate = () => {
   const [singlePodId, setSinglePodId] = useState("");
   const [singleDataSet, setSingleDataSet] = useState("");
   const [totalBeforText, setTotalBeforText] = useState("0");
-
+  const [poData, setPoData] = useState(null);
+  const [depositValue, setDepositValue] = useState("");
+  const [singleDataSet1, setSingleDataSet1] = useState("");
+  const [paymentSections, setPaymentSections] = useState({
+    labels: {},
+    data: {},
+  });
   const [buttonClicked, setButtonClicked] = React.useState(false);
   const [responceId, setResponceId] = useState("");
   const location = useLocation();
@@ -127,6 +133,31 @@ const ReceiptCreate = () => {
   //     postAccessData();
   //   }
   // }, [from?.PO_ID]);
+  const summaryDeatils = () => {
+    axios
+      .post(`${API_BASE_URL}/PO_Bottom_View_EN`, {
+        po_id: state.po_id || from?.PO_ID,
+      })
+      .then((res) => {
+        console.log("poData", res.data);
+        setPoData(res.data);
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+      });
+  };
+  useEffect(() => {
+    summaryDeatils();
+  }, []);
+  const renderSection = (labels, values) => {
+    if (!labels || !values) return null;
+
+    return Object.keys(labels).map((key, i) => (
+      <div key={i}>
+        <b>{labels[key]}</b> {values[key] || ""}
+      </div>
+    ));
+  };
   const getDetils = (podId) => {
     const idToUse = podId || from?.PO_ID;
     axios
@@ -325,6 +356,7 @@ const ReceiptCreate = () => {
     vendor_id: from?.Vendor,
     rounding: from?.rounding,
     vendor_name: from?.Vendor_name,
+    Notes: from?.Notes,
     created: from?.created || "0000-00-00",
     // `${new Date().getFullYear()}-${new Date().getMonth()}${1}-${new Date().getDate()}`,
     supplier_invoice_number: from?.supplier_invoice_number,
@@ -370,31 +402,69 @@ const ReceiptCreate = () => {
       };
     });
   };
-
   const addPurchaseOrderDetails = async (id) => {
     try {
+      const payload = {
+        ID: formDataAdd?.id || null, // optional, only if updating
+        RID: id || from?.PO_ID, // required
+        dropDown_id: formDataAdd.dropDown_id,
+        Unit: formDataAdd.Unit_Name_EN, // mapping old Unit_Name_EN → Unit
+        Price: formDataAdd.pod_price, // mapping old pod_price → Price
+        QTY: formDataAdd.pod_quantity, // mapping old pod_quantity → QTY
+        Notes: formDataAdd.Notes || "", // add notes if you have it
+        user_id: localStorage.getItem("id"), // still passing user_id
+      };
+
       const response = await axios.post(
-        `${API_BASE_URL}/addPurchaseOrderDetails`,
-        {
-          po_id: id || from?.PO_ID,
-          data: formDataAdd, // Send the object directly
-          user_id: localStorage.getItem("id"),
-        }
+        `${API_BASE_URL}/addOrUpdateReceiptDetail`,
+        payload
       );
-      console.log(response);
+
+      console.log("✅ Receipt Detail Added:", response);
 
       getDetils(id);
       setModalOne(false);
-      console.log(response);
+      summaryDeatils();
       setResponceId(response.data.id);
+
       toast.success(t("successfully"), {
         autoClose: 5000,
         theme: "colored",
       });
     } catch (error) {
-      console.error("Error:", error);
+      console.error("❌ Error:", error);
+      toast.error(t("errorOccurred"), {
+        autoClose: 5000,
+        theme: "colored",
+      });
     }
   };
+
+  // const addPurchaseOrderDetails = async (id) => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${API_BASE_URL}/addOrUpdateReceiptDetail`,
+  //       {
+  //         RID: id || from?.PO_ID,
+  //         data: formDataAdd, // Send the object directly
+  //         user_id: localStorage.getItem("id"),
+  //       }
+  //     );
+  //     console.log(response);
+
+  //     getDetils(id);
+  //     setModalOne(false);
+  //     console.log(response);
+  //     summaryDeatils();
+  //     setResponceId(response.data.id);
+  //     toast.success(t("successfully"), {
+  //       autoClose: 5000,
+  //       theme: "colored",
+  //     });
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   }
+  // };
   const deleteOrder = async () => {
     try {
       // First: update access file
@@ -478,67 +548,111 @@ const ReceiptCreate = () => {
   useEffect(() => {
     everyDataSet();
   }, [responceId]);
+
   const update = async (e) => {
     await fetchDropdownData(); // Load dropdown data
-    setButtonClicked(false);
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/${"addPurchaseOrder"}`,
-        state
-      );
-      console.log(response);
-      setStock(response?.data);
-      setFormDataAdd({
-        pod_type_id: 0,
-        unit_count_id: 0,
-        POD_Selection: 0,
-        pod_quantity: 0,
-        pod_price: 0,
-        pod_vat: 0,
-        pod_wht_id: 0,
-        pod_crate: 1,
-        Unit_Name_EN: 0,
-        Unit_Name_TH: 0,
-        item_Name_EN: 0,
-        item_Name_TH: 0,
-      });
 
-      // ✅ Keep the purchase order ID and vendor details
-      setState((prevState) => ({
-        ...prevState,
-        po_id: response.data?.po_id || from?.po_id || prevState.po_id,
-        vendor_id: prevState.vendor_id,
-        created: prevState.created,
-        supplier_invoice_number: prevState.supplier_invoice_number,
-        supplier_invoice_date: prevState.supplier_invoice_date,
-        supplier_dua_date: prevState.supplier_dua_date,
+    setFormDataAdd({
+      pod_type_id: 0,
+      unit_count_id: 0,
+      POD_Selection: 0,
+      pod_quantity: 1,
+      pod_price: 0,
+      pod_vat: 0,
+      pod_wht_id: 0,
+      pod_crate: 1,
+      Unit_Name_EN: 0,
+      Unit_Name_TH: 0,
+      item_Name_EN: 0,
+      item_Name_TH: 0,
+    });
 
-        rounding: prevState.rounding,
-      }));
-      console.log(state);
-      if (response.status === 200) {
-        if (response.data.success) {
-          const id = response.data?.po_id || from?.po_id;
-          console.log(id);
-
-          setPodId(id); //  Clear podId to avoid fetching last item data
-          setModalOne(true);
-          // toast.success("Create Purchase Orders", {
-          //   autoClose: 5000,
-          //   theme: "colored",
-          // });
-        } else {
-          setShow(true);
-        }
-      }
-    } catch (e) {
-      console.log(e);
-      toast.error(t("errorOccurred"), {
-        autoClose: 5000,
-        theme: "colored",
-      });
+    // ✅ If vendor missing
+    if (!state.vendor_id) {
+      let data = {
+        message_en: "Please enter purchase order supplier",
+        message_th: "กรุณากรอกใบสั่งซื้อของซัพพลายเออร์",
+      };
+      setStock(data);
+      setShow(true);
+      return; // stop here
     }
+
+    // ✅ If date missing
+    if (!state.receipt_date || state.receipt_date === "0000-00-00") {
+      let data = {
+        message_en: "Please enter date",
+        message_th: "กรุณาระบุวันที่สั่งซื้อ",
+      };
+      setStock(data);
+      setShow(true);
+      return; // stop here
+    }
+
+    // ✅ Otherwise proceed (both filled)
+    setModalOne(true);
   };
+  // const update = async (e) => {
+  //   await fetchDropdownData(); // Load dropdown data
+  //   setButtonClicked(false);
+  //   try {
+  //     const response = await axios.post(
+  //       `${API_BASE_URL}/${"addPurchaseOrder"}`,
+  //       state
+  //     );
+  //     console.log(response);
+  //     setStock(response?.data);
+  //     setFormDataAdd({
+  //       pod_type_id: 0,
+  //       unit_count_id: 0,
+  //       POD_Selection: 0,
+  //       pod_quantity: 0,
+  //       pod_price: 0,
+  //       pod_vat: 0,
+  //       pod_wht_id: 0,
+  //       pod_crate: 1,
+  //       Unit_Name_EN: 0,
+  //       Unit_Name_TH: 0,
+  //       item_Name_EN: 0,
+  //       item_Name_TH: 0,
+  //     });
+
+  //     // ✅ Keep the purchase order ID and vendor details
+  //     setState((prevState) => ({
+  //       ...prevState,
+  //       po_id: response.data?.po_id || from?.po_id || prevState.po_id,
+  //       vendor_id: prevState.vendor_id,
+  //       created: prevState.created,
+  //       supplier_invoice_number: prevState.supplier_invoice_number,
+  //       supplier_invoice_date: prevState.supplier_invoice_date,
+  //       supplier_dua_date: prevState.supplier_dua_date,
+
+  //       rounding: prevState.rounding,
+  //     }));
+  //     console.log(state);
+  //     if (response.status === 200) {
+  //       if (response.data.success) {
+  //         const id = response.data?.po_id || from?.po_id;
+  //         console.log(id);
+
+  //         setPodId(id); //  Clear podId to avoid fetching last item data
+  //         setModalOne(true);
+  //         // toast.success("Create Purchase Orders", {
+  //         //   autoClose: 5000,
+  //         //   theme: "colored",
+  //         // });
+  //       } else {
+  //         setShow(true);
+  //       }
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //     toast.error(t("errorOccurred"), {
+  //       autoClose: 5000,
+  //       theme: "colored",
+  //     });
+  //   }
+  // };
   const updateDataPayNow = async () => {
     try {
       const response = await axios.post(
@@ -548,26 +662,10 @@ const ReceiptCreate = () => {
       console.log(response);
       setStock(response?.data);
 
-      // 🔥 Clear the form fields
-      setFormDataAdd({
-        pod_type_id: 0,
-        unit_count_id: 0,
-        POD_Selection: 0,
-        pod_quantity: 0,
-        pod_price: 0,
-        pod_vat: 0,
-        pod_wht_id: 0,
-        pod_crate: 0,
-        Unit_Name_EN: 0,
-        Unit_Name_TH: 0,
-        item_Name_EN: 0,
-        item_Name_TH: 0,
-      });
-
       // ✅ Keep purchase order ID and vendor details
       setState((prevState) => ({
         ...prevState,
-        po_id: response.data?.po_id || from?.po_id || prevState.po_id,
+        po_id: response.data?.po_id || prevState.po_id, // fixed from?.po_id
         vendor_id: prevState.vendor_id,
         created: prevState.created,
         supplier_invoice_number: prevState.supplier_invoice_number,
@@ -576,45 +674,151 @@ const ReceiptCreate = () => {
       }));
 
       if (response.status === 200 && response.data.success) {
-        let modalElement = document.getElementById("modalCombine");
+        // ✅ Show modal
+        const modalElement = document.getElementById("modalCombine");
         if (modalElement) {
-          let modalInstance = new bootstrap.Modal(modalElement);
+          const modalInstance = new bootstrap.Modal(modalElement);
           modalInstance.show();
         } else {
           console.error("Modal element not found!");
         }
 
         const po_id = response.data.po_id;
-
-        let deposit = 0; // ✅ Define deposit here
+        setSingleDataSet1(po_id);
 
         try {
-          const res1 = await axios.get(
+          // ✅ Get purchase order details
+          const poDetailsRes = await axios.get(
             `${API_BASE_URL}/getPurchaseOrderDetails?po_id=${po_id}`
           );
-          console.log(res1);
-          deposit = res1?.data?.data1?.Available_deposit || 0;
-          setDepositAvailableNew(deposit);
+          console.log(poDetailsRes);
 
-          setBasePayment(res1?.data?.data1?.left_pay || 0); // set it once
-          setVatNew(res1?.data?.data1?.Vat_payment || 0);
-          setWhtNew(res1?.data?.data1?.wht_payment || 0);
-          setRoundingNew1(res1?.data?.data1?.Rounding || 0);
-          setTotalBeforText(res1?.data?.data1?.Total_Before_Tax || 0);
+          const deposit = poDetailsRes?.data?.data1?.Available_deposit || 0;
+          setDepositValue(deposit);
 
-          setSingleDataSet(res1?.data?.data1);
-        } catch (error) {
-          console.log(error);
+          // ✅ Initialize payment step
+          const step1Res = await axios.post(`${API_BASE_URL}/EXPPaymentStep1`, {
+            PO_ID: po_id,
+            CPN: "",
+            User_ID: localStorage.getItem("id"),
+          });
+          console.log(step1Res);
+          const lastInsertId = step1Res?.data?.data?.last_insert_id;
+          setSingleDataSet(lastInsertId);
+
+          // ✅ Call with direct value instead of stale state
+          paymentViewSection(po_id, lastInsertId);
+        } catch (innerErr) {
+          console.error("Error in PO details or payment step:", innerErr);
+          toast.error(t("tryAgain"));
         }
       } else {
         setShow(true);
       }
     } catch (e) {
-      console.log(e);
+      console.error("Error in updateDataPayNow:", e);
       toast.error(t("errorOccurred"), {
         autoClose: 5000,
         theme: "colored",
       });
+    }
+  };
+  const handlePaymentChange = (field, value) => {
+    // Update state
+    switch (field) {
+      case "Payment_Date":
+        setSelectedPaymentDate(value);
+        break;
+      case "Payment_Channel":
+        setSelectedPaymentChannel(value);
+        break;
+      case "Bank_Ref":
+        setBankReference(value);
+        break;
+      case "Bank_Fees":
+        setBankChargeAmount(value);
+        break;
+      case "available_Deposit":
+        setDepositAvailableNew(value);
+        break;
+      case "Rounding":
+        setRoundingNew(value);
+        break;
+      case "Payment_Amount":
+        setPaymentAmmountNew(value);
+        break;
+      case "Notes":
+        setPaymentNotes(value);
+        break;
+      default:
+        break;
+    }
+
+    // Build payload with only the changed field
+    const payload = {
+      Expense_Payment_ID: singleDataSet,
+      User_ID: localStorage.getItem("id"),
+      [field]: value, // ✅ only the changed field gets sent
+    };
+
+    axios
+      .post(`${API_BASE_URL}/POCPNPayment`, payload)
+      .then((res) => {
+        console.log(`✅ Updated ${field}:`, res.data);
+        if (res?.data?.success) {
+          toast.success(res?.data?.message || "Field updated successfully ✅");
+        }
+        refreshDepositValue(singleDataSet1);
+        paymentViewSection();
+      })
+      .catch((err) => {
+        console.error(`❌ Failed to update ${field}:`, err);
+      });
+  };
+  const refreshDepositValue = async (poId) => {
+    try {
+      const res1 = await axios.get(
+        `${API_BASE_URL}/getPurchaseOrderDetails?po_id=${poId}`
+      );
+      console.log("🔄 Refreshed Deposit:", res1);
+
+      const deposit = res1?.data?.data1?.Available_deposit || 0;
+      setDepositValue(deposit);
+    } catch (error) {
+      console.error("❌ Failed to refresh deposit:", error);
+    }
+  };
+  const deleteOrderWithPayment = async () => {
+    if (!singleDataSet) {
+      toast.error(t("deleteError"));
+      return;
+    }
+
+    try {
+      // ✅ Delete API
+      await axios.post(`${API_BASE_URL}/EXPPaymentDelete`, {
+        Expense_Payment_ID: singleDataSet,
+      });
+
+      // ✅ Hide modal after delete
+      const modal1 = document.getElementById("modalCombine");
+      if (modal1) {
+        const modalInstance1 = bootstrap.Modal.getInstance(modal1);
+        modalInstance1?.hide();
+      }
+
+      // ✅ Release access
+      await axios.post(`${API_BASE_URL}/ReleaseAccess`, {
+        id: state.po_id,
+        accesstype: 1, // Mark as in use
+      });
+
+      // ✅ Show toast first, then navigate
+      toast.success(t("deleteSuccess"));
+      navigate("/purchase_orders");
+    } catch (e) {
+      console.error("Delete error:", e);
+      toast.error(t("deleteError"));
     }
   };
   const resetPaymentFormFields = (data) => {
@@ -657,88 +861,52 @@ const ReceiptCreate = () => {
       modalElement.removeEventListener("show.bs.modal", handleShow);
     };
   }, [state?.po_id]);
-  const updateData = async (e) => {
+  const updateDataOnchange = async (updatedState = state) => {
+    // Prevent API if mandatory fields missing
+    if (!updatedState.vendor_id || !updatedState.created) {
+      console.log("Vendor and Receipt Date are required");
+      return;
+    }
+
     try {
+      // 🔹 Remap keys for new API
+      const payload = {
+        RID: updatedState.po_id, // old po_id → RID
+        Receipt_Date: updatedState.created, // old created → Receipt_Date
+        Payor_ID: updatedState.vendor_id, // old vendor_id → Payor_ID
+        Bank_Ref: updatedState.bank_ref, // stays same
+        Payor: updatedState.vendor_name, // old vendor_name → Payor
+        user_id: updatedState.user_id, // keep if needed
+      };
+
       const response = await axios.post(
-        `${API_BASE_URL}/addPurchaseOrder`,
-        state
+        `${API_BASE_URL}/addupdateReceipt`,
+        payload
       );
-      console.log("Purchase order response:", response);
-      setStock(response?.data);
 
-      // 🔥 Clear the item form fields for new entry
-      setFormDataAdd({
-        pod_type_id: 0,
-        unit_count_id: 0,
-        POD_Selection: 0,
-        pod_quantity: 0,
-        pod_price: 0,
-        pod_vat: 0,
-        pod_wht_id: 0,
-        pod_crate: 0,
-        Unit_Name_EN: 0,
-        Unit_Name_TH: 0,
-        item_Name_EN: 0,
-        item_Name_TH: 0,
-      });
+      if (response.data.success) {
+        console.log(response, ">>>>>>>>>>>>>>>>>>>>>>>>");
+        setPodId(response.data?.RID);
+        toast.success(t("receiptUpdated"), {
+          autoClose: 3000,
+          theme: "colored",
+        });
 
-      // ✅ Keep the purchase order ID and vendor details
-      setState((prevState) => ({
-        ...prevState,
-        po_id: response.data?.po_id || from?.po_id || prevState.po_id,
-        vendor_id: prevState.vendor_id,
-        created: prevState.created,
-        supplier_invoice_number: prevState.supplier_invoice_number,
-        supplier_invoice_date: prevState.supplier_invoice_date,
-        rounding: prevState.rounding,
-      }));
-
-      if (response.status === 200) {
-        if (response.data.success) {
-          const id = response.data?.po_id || from?.po_id;
-          console.log("PO ID:", id);
-          if (id) {
-            const accessResponse = await axios.post(
-              `${API_BASE_URL}/ReleaseAccess`,
-              {
-                id: id,
-                edit: 1,
-                accesstype: 1, // Opening for edit
-              }
-            );
-            console.log(
-              "Access file updated (edit mode):",
-              accessResponse.data
-            );
-          }
-          setPodId(id);
-          if (from?.PO_ID) {
-            const accessResponse = await axios.post(
-              `${API_BASE_URL}/ReleaseAccess`,
-              {
-                id: from.PO_ID,
-                edit: 1,
-                accesstype: 1, // Opening for edit
-              }
-            );
-            console.log(
-              "Access file updated (edit mode):",
-              accessResponse.data
-            );
-          }
-          navigate("/purchase_orders");
-
-          // toast.success("Create Purchase Orders", {
-          //   autoClose: 5000,
-          //   theme: "colored",
-          // });
-        } else {
-          setShow(true);
-        }
+        setState((prevState) => ({
+          ...prevState,
+          RID: response.data?.RID || prevState.RID,
+          Receipt_Date: prevState.created,
+          Payor_ID: prevState.vendor_id,
+          Bank_Ref: prevState.bank_ref,
+          Payor: prevState.vendor_name,
+        }));
       }
-    } catch (e) {
-      console.log("Error in updateData:", e);
-      toast.error(t("tryAgain"));
+    } catch (error) {
+      console.error(error);
+      toast.error(t("errorOccurred"), {
+        autoClose: 5000,
+        theme: "colored",
+      });
     }
   };
 
@@ -930,6 +1098,33 @@ const ReceiptCreate = () => {
       },
     }),
   };
+  const paymentViewSection = (
+    po_id = state.po_id,
+    expensePaymentId = singleDataSet
+  ) => {
+    axios
+      .post(`${API_BASE_URL}/EXPPaymentView`, {
+        PO_ID: po_id,
+        Expense_Payment_ID: expensePaymentId,
+        CPN: "",
+      })
+      .then((res) => {
+        setPaymentSections({
+          labels: res.data.section_label || {},
+          data: res.data.section_data || {},
+        });
+        console.log("Payment updated ✅", res.data);
+      })
+      .catch((err) => {
+        console.error("Payment update failed ❌", err);
+      });
+  };
+
+  useEffect(() => {
+    if (singleDataSet) {
+      paymentViewSection();
+    }
+  }, [singleDataSet]);
   return (
     <>
       <Card
@@ -952,49 +1147,16 @@ const ReceiptCreate = () => {
                       {/* <Autocomplete
                         options={
                           recieptDroupDown?.map((vendor) => ({
-                            id: vendor.VendorID,
-                            name: vendor.receipt_create,
-                          })) || []
-                        } // Map the vendor list to create options with `id` and `name`
-                        getOptionLabel={(option) => option.name || ""} // Display the vendor name
-                        value={
-                          recieptDroupDown
-                            ?.map((vendor) => ({
-                              id: vendor.VendorID,
-                              name: vendor.receipt_create,
-                            }))
-                            .find((option) => option.id === state.vendor_id) ||
-                          null
-                        } // Find the selected vendor by `vendor_id`
-                        onChange={(e, newValue) => {
-                          setState({
-                            ...state,
-                            vendor_id: newValue?.id || "",
-                            vendor_name: newValue?.name || "",
-                          }); // Update `state.vendor_id` with the selected option's `id`
-                        }}
-                        sx={{ width: 300 }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder={t("clickToSelectDate")} // Adds a placeholder
-                            InputLabelProps={{ shrink: false }} // Prevents floating label
-                          />
-                        )}
-                      /> */}
-                      {/* <Autocomplete
-                        options={
-                          recieptDroupDown?.map((vendor) => ({
-                            id: vendor.VendorID,
-                            name: vendor.Payor, // ✅ Use `Payor` from API instead of `receipt_create`
+                            id: vendor.ID, // ✅ use ID
+                            name: vendor.Name, // ✅ use Name
                           })) || []
                         }
                         getOptionLabel={(option) => option.name || ""}
                         value={
                           recieptDroupDown
                             ?.map((vendor) => ({
-                              id: vendor.VendorID,
-                              name: vendor.Payor, // ✅ Same fix here
+                              id: vendor.ID,
+                              name: vendor.Name,
                             }))
                             .find((option) => option.id === state.vendor_id) ||
                           null
@@ -1032,12 +1194,18 @@ const ReceiptCreate = () => {
                             .find((option) => option.id === state.vendor_id) ||
                           null
                         }
-                        onChange={(e, newValue) => {
-                          setState({
+                        onChange={async (e, newValue) => {
+                          const updatedState = {
                             ...state,
                             vendor_id: newValue?.id || "",
                             vendor_name: newValue?.name || "",
-                          });
+                          };
+                          setState(updatedState);
+
+                          // ✅ Call API only if vendor & created exist
+                          if (updatedState.vendor_id && updatedState.created) {
+                            await updateDataOnchange(updatedState);
+                          }
                         }}
                         sx={{ width: 300 }}
                         renderInput={(params) => (
@@ -1045,13 +1213,14 @@ const ReceiptCreate = () => {
                             {...params}
                             placeholder={t("vendorsAndClients")}
                             InputLabelProps={{ shrink: false }}
+                            error={!state.vendor_id} // highlight missing vendor
                           />
                         )}
                       />
                     </div>
                     <div className="col-lg-3 form-group">
                       <h6>{t("receiptDate")}</h6>
-                      <DatePicker
+                      {/* <DatePicker
                         selected={
                           state.created && !isNaN(new Date(state.created))
                             ? new Date(state.created)
@@ -1076,16 +1245,70 @@ const ReceiptCreate = () => {
                         className="form-control"
                         placeholderText="DD/MM/YYYY"
                         customInput={<CustomInput />}
+                      /> */}
+                      <DatePicker
+                        selected={
+                          state.receipt_date &&
+                          !isNaN(new Date(state.receipt_date))
+                            ? new Date(state.receipt_date)
+                            : null
+                        }
+                        onChange={async (date) => {
+                          const formattedDate = date
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
+                            : null;
+
+                          const updatedState = {
+                            ...state,
+                            receipt_date: formattedDate, // ✅ separate field for receipt date
+                          };
+
+                          setState(updatedState);
+
+                          // ✅ Call API only if vendor & receipt_date exist
+                          if (
+                            updatedState.vendor_id &&
+                            updatedState.receipt_date
+                          ) {
+                            await updateDataOnchange(updatedState);
+                          }
+                        }}
+                        dateFormat="dd/MM/yyyy"
+                        className="form-control"
+                        placeholderText="DD/MM/YYYY"
+                        customInput={<CustomInput />}
                       />
                     </div>
                     <div className="col-lg-3 form-group">
                       <h6> {t("bankRef")}</h6>
-                      <input
+                      {/* <input
                         className="w-full"
                         type="text"
                         name="supplier_invoice_number"
                         onChange={handleChange}
                         value={state.supplier_invoice_number}
+                      /> */}
+                      <input
+                        className="w-full"
+                        type="text"
+                        name="bank_ref"
+                        value={state.bank_ref || ""}
+                        onChange={async (e) => {
+                          const updatedState = {
+                            ...state,
+                            bank_ref: e.target.value,
+                          };
+                          setState(updatedState);
+
+                          // ✅ Call API only if vendor & bank_ref exist
+                          if (updatedState.vendor_id && updatedState.bank_ref) {
+                            await updateDataOnchange(updatedState);
+                          }
+                        }}
                       />
                     </div>
                   </div>
@@ -1207,6 +1430,17 @@ const ReceiptCreate = () => {
                                     onChange={handleChangeAdd}
                                   />
                                 </div>
+                                <div className="col-lg-12 mb-2 parentFormPayment">
+                                  <h6>{t("notes")}</h6>
+                                  <textarea
+                                    className="mb-0 form-control"
+                                    name="Notes"
+                                    value={formDataAdd.Notes || ""}
+                                    placeholder={t("note")}
+                                    onChange={handleChangeAdd}
+                                    rows={3} // you can adjust the number of rows
+                                  />
+                                </div>
 
                                 <div className="row mb-2">
                                   <div className="col-lg-6">
@@ -1308,6 +1542,7 @@ const ReceiptCreate = () => {
                     >
                       <thead>
                         <tr>
+                          <th style={{ width: "170px" }}> {t("pod_Code")}</th>
                           <th style={{ width: "350px" }}> {t("item")}</th>
                           <th style={{ width: "150px" }}> {t("quantity")}</th>
                           <th style={{ width: "100px" }}> {t("unit")}</th>
@@ -1315,7 +1550,7 @@ const ReceiptCreate = () => {
                           <th style={{ width: "70px" }}> {t("price")}</th>
                           <th style={{ width: "150px" }}> {t("total")}</th>
                           <th style={{ width: "100px" }}> {t("vat")}</th>
-
+                          <th style={{ width: "100px" }}> {t("crate")}</th>
                           <th style={{ width: "100px" }}> {t("action")}</th>
                         </tr>
                       </thead>
@@ -1368,126 +1603,30 @@ const ReceiptCreate = () => {
                         ))}
                       </tbody>
                     </table>
-                  </div>
-                  {/* table new end */}
-                  <div className="flex justify-content-end mt-4 totalBefore">
-                    <div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong> {t("totalBeforeTax")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(
-                              tableSummary?.Total_Before_Tax ?? 0
-                            )}
-                          </span>
-                        </div>
+                    <div className="row py-4">
+                      <div className="col-lg-3">
+                        {renderSection(
+                          poData?.section1_label,
+                          poData?.section1_values
+                        )}
                       </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>VAT {t("vat")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(tableSummary?.VAT ?? 0)}
-                          </span>
-                        </div>
+                      <div className="col-lg-3">
+                        {renderSection(
+                          poData?.section2_label,
+                          poData?.section2_values
+                        )}
                       </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("wht")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(tableSummary?.WHT ?? 0)}
-                          </span>
-                        </div>
+                      <div className="col-lg-3">
+                        {renderSection(
+                          poData?.section3_label,
+                          poData?.section3_values
+                        )}
                       </div>
-                      {/* <div className=" d-flex flexBefore">
-                         <div>
-                           <strong>Rounding</strong>
-                         </div>
-                         <input
-                           type="number"
-                           name="rounding"
-                           value={state.rounding}
-                           onChange={(e) =>
-                             handleChange({
-                               target: {
-                                 name: "rounding",
-                                 value: parseFloat(e.target.value) || 0,
-                               },
-                             })
-                           }
-                         />
-                       </div> */}
-                      <div className="d-flex flexBefore">
-                        <div>
-                          <strong> {t("rounding")}: </strong>
-                        </div>
-                        <input
-                          type="number"
-                          name="rounding"
-                          value={state.rounding}
-                          onChange={(e) => {
-                            let value = e.target.value;
-
-                            // Allow empty input (do not force 0 immediately)
-                            if (value === "") {
-                              handleChange({
-                                target: { name: "rounding", value: "" },
-                              });
-                              return;
-                            }
-
-                            // Allow "-" at the start for negative values
-                            if (value === "-" || value === "+") {
-                              handleChange({
-                                target: { name: "rounding", value },
-                              });
-                              return;
-                            }
-
-                            // Convert to float and ensure valid number
-                            let parsedValue = parseFloat(value);
-                            if (!isNaN(parsedValue)) {
-                              handleChange({
-                                target: {
-                                  name: "rounding",
-                                  value: parsedValue,
-                                },
-                              });
-                            }
-                          }}
-                          onBlur={(e) => {
-                            // If input is empty on blur, reset to 0
-                            if (
-                              e.target.value === "" ||
-                              e.target.value === "-"
-                            ) {
-                              handleChange({
-                                target: { name: "rounding", value: 0 },
-                              });
-                            }
-                          }}
-                        />
-                      </div>
-
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("amountToPay")}: </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(
-                              (tableSummary?.Total_Before_Tax ?? 0) +
-                                (tableSummary?.VAT ?? 0) -
-                                (tableSummary?.WHT ?? 0) +
-                                (state.rounding ?? 0)
-                            )}
-                          </span>
-                        </div>
+                      <div className="col-lg-3">
+                        {renderSection(
+                          poData?.section4_label,
+                          poData?.section4_values
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1612,13 +1751,13 @@ const ReceiptCreate = () => {
               <div className="row">
                 <div className="col-lg-9">
                   <div className="row">
-                    {/* Payment Date */}
                     <div className="col-lg-6">
                       <div className="parentFormPayment">
                         <p> {t("paymentDate")}</p>
                         <DatePicker
                           selected={
-                            selectedPaymentDate
+                            selectedPaymentDate &&
+                            !isNaN(new Date(selectedPaymentDate))
                               ? new Date(selectedPaymentDate)
                               : null
                           }
@@ -1631,19 +1770,21 @@ const ReceiptCreate = () => {
                                 ).padStart(2, "0")}`
                               : null;
 
-                            setSelectedPaymentDate(formattedDate); // ✅ अब state में सिर्फ YYYY-MM-DD जाएगा
+                            setSelectedPaymentDate(formattedDate);
+
+                            // ✅ trigger API call like before
+                            handlePaymentChange("Payment_Date", formattedDate);
                           }}
                           dateFormat="dd/MM/yyyy"
-                          placeholderText={t("clickToSelectDate")}
+                          placeholderText="Click to select a date"
                           customInput={<CustomInput />}
                         />
                       </div>
                     </div>
 
-                    {/* Payment Channel */}
                     <div className="col-lg-6">
                       <div className="parentFormPayment autoComplete">
-                        <p>{t("paymentChannel")}</p>
+                        <p> {t("paymentChannel")}</p>
                         <Autocomplete
                           disablePortal
                           options={paymentChannle || []}
@@ -1657,54 +1798,64 @@ const ReceiptCreate = () => {
                             option.Bank_nick_name || ""
                           }
                           onChange={(e, newValue) =>
-                            setSelectedPaymentChannel(newValue?.bank_id || "")
+                            handlePaymentChange(
+                              "Payment_Channel",
+                              newValue?.bank_id || ""
+                            )
                           }
                           sx={{ width: 300 }}
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder={t("searchChannel")}
-                              InputLabelProps={{ shrink: false }}
+                              placeholder="Search Payment Channel"
                             />
                           )}
                         />
                       </div>
                     </div>
 
-                    {/* Bank Ref */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p> {t("bankRef")} </p>
+                        <p> {t("bankRef")}</p>
                         <input
                           type="text"
                           value={bankReference}
-                          onChange={(e) => setBankReference(e.target.value)}
+                          onChange={(e) =>
+                            handlePaymentChange("Bank_Ref", e.target.value)
+                          }
                         />
                       </div>
                     </div>
 
-                    {/* Bank Charges */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p> {t("bankRef")} </p>
+                        <p> {t("bankCharges")}</p>
                         <input
                           type="text"
                           value={bankChargeAmount}
-                          onChange={(e) => setBankChargeAmount(e.target.value)}
+                          onChange={(e) =>
+                            handlePaymentChange("Bank_Fees", e.target.value)
+                          }
                         />
                       </div>
                     </div>
 
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
-                        <p> {t("availableDeposit")}</p>
+                        <p>
+                          {t("availableDeposit")} (
+                          {formatterTwo.format(Number(depositValue))})
+                        </p>
+
                         <input
-                          type="text"
+                          type="number"
                           value={depositAvailableNew}
-                          onChange={(e) => {
-                            setHasUserChangedValues(true);
-                            setDepositAvailableNew(e.target.value);
-                          }}
+                          onChange={(e) =>
+                            handlePaymentChange(
+                              "available_Deposit",
+                              e.target.value
+                            )
+                          }
                         />
                       </div>
                     </div>
@@ -1714,10 +1865,9 @@ const ReceiptCreate = () => {
                         <input
                           type="text"
                           value={roundingNew}
-                          onChange={(e) => {
-                            setHasUserChangedValues(true);
-                            setRoundingNew(e.target.value);
-                          }}
+                          onChange={(e) =>
+                            handlePaymentChange("Rounding", e.target.value)
+                          }
                         />
                       </div>
                     </div>
@@ -1727,21 +1877,20 @@ const ReceiptCreate = () => {
                       <input
                         type="text"
                         value={paymentAmmountNew}
-                        onChange={(e) => {
-                          setHasUserChangedValues(true);
-                          setPaymentAmmountNew(e.target.value); // Optional override
-                        }}
+                        onChange={(e) =>
+                          handlePaymentChange("Payment_Amount", e.target.value)
+                        }
                       />
                     </div>
 
-                    {/* Notes */}
                     <div className="col-lg-6 mt-3">
                       <div className="parentFormPayment">
                         <p> {t("notes")}</p>
                         <textarea
-                          type="text"
                           value={paymentNotes}
-                          onChange={(e) => setPaymentNotes(e.target.value)}
+                          onChange={(e) =>
+                            handlePaymentChange("Notes", e.target.value)
+                          }
                         ></textarea>
                       </div>
                     </div>
@@ -1750,100 +1899,16 @@ const ReceiptCreate = () => {
                 <div className="col-lg-3">
                   <div className="flex ps-3 pt-5 mt-4 totalBefore">
                     <div className="pe-3" style={{ width: "85%" }}>
-                      <div className="flexBefore">
-                        <div>
-                          <strong>{t("totalBeforeTax")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {Number(depositAvailableNew) +
-                              Number(paymentAmmountNew)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong> {t("vat")}: </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {" "}
-                            {(
-                              (Number(depositAvailableNew) +
-                                Number(paymentAmmountNew)) *
-                              Number(vatNew)
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flexBefore">
-                        <div>
-                          <strong> {t("wht")}: </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {(
-                              (Number(depositAvailableNew) +
-                                Number(paymentAmmountNew)) *
-                              Number(whtNew)
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className=" form-group">
-                        <div className="flexBefore">
+                      {Object.keys(paymentSections.labels).map((key) => (
+                        <div className="flexBefore" key={key}>
                           <div>
-                            <strong> {t("rounding")}: </strong>
+                            <strong>{paymentSections.labels[key]}</strong>
                           </div>
                           <div>
-                            <span>
-                              {Number(roundingNew1) + Number(roundingNew)}
-                            </span>
+                            <span>{paymentSections.data[key]}</span>
                           </div>
                         </div>
-                        <div className="flexBefore">
-                          <div>
-                            <strong> {t("deposit")}: </strong>
-                          </div>
-                          <div>
-                            <span>{Number(depositAvailableNew)}</span>
-                          </div>
-                        </div>
-                        <div className="flexBefore">
-                          <div>
-                            <strong> {t("amountToPay")}: </strong>{" "}
-                          </div>
-                          <div>
-                            <span>
-                              {(
-                                Number(paymentAmmountNew) +
-                                (Number(paymentAmmountNew) +
-                                  Number(depositAvailableNew)) *
-                                  Number(vatNew) -
-                                (Number(paymentAmmountNew) +
-                                  Number(depositAvailableNew)) *
-                                  Number(whtNew) +
-                                (Number(roundingNew1) + Number(roundingNew))
-                              ).toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flexBefore">
-                          <div>
-                            <strong> {t("remainder")}: </strong>{" "}
-                          </div>
-                          <div>
-                            <span>
-                              {(
-                                (Number(totalBeforText) -
-                                  (Number(depositAvailableNew) +
-                                    Number(paymentAmmountNew))) *
-                                (1 + Number(vatNew))
-                              ).toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -1857,6 +1922,13 @@ const ReceiptCreate = () => {
                 className="btn btn-primary"
               >
                 {t("submit")}
+              </button>
+              <button
+                type="button"
+                onClick={deleteOrderWithPayment}
+                className="btn btn-primary"
+              >
+                {t("cancel")}
               </button>
             </div>
           </div>

@@ -38,12 +38,15 @@ const Currency = () => {
       console.log(result);
       if (result.isConfirmed) {
         try {
-          const response = await axios.post(`${API_BASE_URL}/deleteUser`, {
-            user_id: id,
-          });
+          const response = await axios.post(
+            `${API_BASE_URL}/deleteFxCorrection`,
+            {
+              id: id,
+            }
+          );
           console.log(response);
           getAllUser();
-          toast.success(t("orderDeleted"));
+          toast.success(t("currency delete successfully!"));
         } catch (e) {
           toast.error(t("genericError"));
         }
@@ -55,10 +58,9 @@ const Currency = () => {
   console.log(data);
   const columns = React.useMemo(
     () => [
-        {
+      {
         Header: t("fx"),
         accessor: "FX_Name",
-       
       },
       {
         Header: t("days"),
@@ -87,7 +89,7 @@ const Currency = () => {
                  }}
                /> */}{" "}
             <div className="userIcon ">
-              <Link to="/updateUser" state={{ from: a }}>
+              <Link to="/currency_create " state={{ from: a }}>
                 <i
                   i
                   className="mdi mdi-pencil"

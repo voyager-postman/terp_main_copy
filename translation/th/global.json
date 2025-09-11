@@ -1112,13 +1112,16 @@
   "SelectEntity": "เลือกนิติบุคคล",
   "add_consignee": "เพิ่มผู้รับสินค้า",
   "updateConsignee": "อัปเดตผู้รับสินค้า",
-    "title": "หัวข้อ",
+  "title": "หัวข้อ",
   "logistics": "โลจิสติกส์",
   "messengerId": "รหัสผู้ส่งสาร",
-   "customCode": "รหัสที่กำหนดเอง",
+  "customCode": "รหัสที่กำหนดเอง",
   "reconcile": "กระทบยอด",
   "reimburse": "ชดใช้เงิน",
   "currencyManagement": "การจัดการสกุลเงิน",
   "days": "วัน",
-  "fxCorrection": "การปรับอัตราแลกเปลี่ยน"
+  "fxCorrection": "การปรับอัตราแลกเปลี่ยน",
+  "inputDays": "จำนวนวัน",
+  "inputValue": "กรอกค่า",
+  "currencyManagementCreateForm": "การจัดการสกุลเงิน / แบบฟอร์มสร้างใหม่"
 }

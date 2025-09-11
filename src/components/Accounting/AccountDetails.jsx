@@ -113,7 +113,7 @@ const AccountDetails = () => {
             return (
               <div className="editIcon">
                 {a.Reconcile_Status === 1 && (
-                  <butto
+                  <button
                     type="button"
                     data-bs-toggle="modal"
                     data-bs-target="#accountEdit"
@@ -126,12 +126,12 @@ const AccountDetails = () => {
                     }
                   >
                     <i className="mdi mdi-pencil pl-2" />
-                  </butto>
+                  </button>
                 )}
 
                 <button
                   type="button"
-                  onClick={() => deleteOrder(a.PAY_ID, a.RID)}
+                  onClick={() => deleteOrder(a.ID)}
                 >
                   <i className="mdi mdi-delete " />
                 </button>
@@ -5230,15 +5230,15 @@ const AccountDetails = () => {
       {/* {/ edit modal end /} */}
       <Card
         title={t("accountDetails")}
-        endElement={
-          <button
-            type="button"
-            onClick={() => navigate("/createaccounts")}
-            className="btn button btn-info"
-          >
-            {t("create")}
-          </button>
-        }
+        // endElement={
+        //   <button
+        //     type="button"
+        //     onClick={() => navigate("/createaccounts")}
+        //     className="btn button btn-info"
+        //   >
+        //     {t("create")}
+        //   </button>
+        // }
       >
         <div className="mainAccFlex justify-content-center mt-5">
           <div>
@@ -5281,6 +5281,14 @@ const AccountDetails = () => {
               data-bs-target="#modalConsignee"
             >
               {t("reimburse")}
+            </button>
+             <button
+              type="button"
+              className="btn btn-danger"
+              // data-bs-toggle="modal"
+              // data-bs-target="#modalConsignee"
+            >
+              {t("Import")}
             </button>
             {/* consignee modal */}
             <div

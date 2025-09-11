@@ -1115,10 +1115,13 @@
   "title": "Title",
   "logistics": "Logistics",
   "messengerId": "Messenger Id",
-    "customCode": "Custom Code",
-    "reconcile": "Reconcile",
+  "customCode": "Custom Code",
+  "reconcile": "Reconcile",
   "reimburse": "Reimburse",
   "currencyManagement": "Currency Management",
-    "days": "Days",
-    "fxCorrection": "FX Correction"
+  "days": "Days",
+  "fxCorrection": "FX Correction",
+  "inputDays": "Input Days",
+  "inputValue": "Input Value",
+  "currencyManagementCreateForm": "Currency Management / Create Form"
 }
