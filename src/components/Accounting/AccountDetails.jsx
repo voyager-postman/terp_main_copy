@@ -20,8 +20,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
-
+import { useRef } from "react";
 const AccountDetails = () => {
+  const fileInputRef = useRef(null);
   const { t, i18n } = useTranslation("global");
   const location = useLocation();
   const accountData = location.state?.from; // this is your "item"
@@ -69,6 +70,12 @@ const AccountDetails = () => {
     allowOutsideClick: false,
   });
   // assuming backend expects bank_id
+  const [formData, setFormData] = useState({
+    bank_id: "",
+    bank_account_number: "",
+    user_id: "",
+    file: null,
+  });
 
   useEffect(() => {
     if (bankId) {
@@ -129,10 +136,7 @@ const AccountDetails = () => {
                   </button>
                 )}
 
-                <button
-                  type="button"
-                  onClick={() => deleteOrder(a.ID)}
-                >
+                <button type="button" onClick={() => deleteOrder(a.ID)}>
                   <i className="mdi mdi-delete " />
                 </button>
 
@@ -913,7 +917,9 @@ const AccountDetails = () => {
     setFromDate("");
     setToDate("");
   };
-
+  const dataClear8 = () => {
+    clearFormData();
+  };
   const handleSubmit7 = async () => {
     const payload = {
       client_id: clientIdSet,
@@ -1427,6 +1433,50 @@ const AccountDetails = () => {
       console.error("Error fetching statement:", error);
       toast.error("Something went Wrong ");
       // Handle the error as needed
+    }
+  };
+  const clearFormData = () => {
+    setFormData({
+      bank_id: "",
+      bank_account_number: "",
+      user_id: "",
+      file: null,
+    });
+
+    // Clear the actual file input field
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSubmit8 = async () => {
+    try {
+      const data = new FormData();
+      data.append("bank_id", formData.bank_id);
+      data.append("account_number", formData.bank_account_number);
+      data.append("user_id", localStorage.getItem("id") || ""); // put your logged-in user id
+      data.append("file", formData.file);
+
+      const res = await axios.post(
+        `${API_BASE_URL}/importExcelToImportedStatement`,
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      let modalElement = document.getElementById("import");
+      let modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+        console.log("Upload success:", res.data);
+        toast.success("File imported successfully!");
+        clearFormData(); // ✅ reset after success
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+      toast.error("Failed to import file");
     }
   };
 
@@ -4550,7 +4600,7 @@ const AccountDetails = () => {
     }
   };
 
-  const deleteOrder = (id, id1) => {
+  const deleteOrder = (id) => {
     console.log(id);
     MySwal.fire({
       title: t("areYouSure"),
@@ -4565,15 +4615,15 @@ const AccountDetails = () => {
       if (result.isConfirmed) {
         try {
           const response = await axios.post(
-            `${API_BASE_URL}/DeleteInvoicePayment`,
+            `${API_BASE_URL}/deleteWalletLedger`,
             {
-              PAY_ID: id,
-              RID: id1,
+              ID: id,
             }
           );
           console.log(response);
+          paymentTable3(bankId);
           getInventoryList();
-          toast.success(" Credit Account delete successfully");
+          toast.success(" delete successfully");
           // toast.success(t("returnToSupplierSuccess"));
         } catch (e) {
           // toast.error("Something went wrong");
@@ -5282,11 +5332,11 @@ const AccountDetails = () => {
             >
               {t("reimburse")}
             </button>
-             <button
+            <button
               type="button"
               className="btn btn-danger"
-              // data-bs-toggle="modal"
-              // data-bs-target="#modalConsignee"
+              data-bs-toggle="modal"
+              data-bs-target="#import"
             >
               {t("Import")}
             </button>
@@ -5424,6 +5474,97 @@ const AccountDetails = () => {
                 </div>
               </div>
             </div>
+
+            <div
+              className="modal fade "
+              id="import"
+              tabIndex={-1}
+              aria-labelledby="5"
+              aria-hidden="true"
+            >
+              <div className="modal-dialog modalShipTo">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h1 className="modal-title fs-5" id="yt56555">
+                      {t("Import Statement")}
+                    </h1>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                      onClick={dataClear8}
+                    >
+                      <i className="mdi mdi-close"></i>
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <div className="client_filter mb-2 autoComplete">
+                      <h6>{t("Choose bank")}</h6>
+                      <Autocomplete
+                        options={bankList || []}
+                        getOptionLabel={(option) => option.Bank_nick_name || ""} // ✅ show nickname
+                        onChange={(event, newValue) => {
+                          if (newValue) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              bank_id: newValue.bank_id,
+                              bank_account_number: newValue.bank_account_number,
+                            }));
+                          } else {
+                            setFormData((prev) => ({
+                              ...prev,
+                              bank_id: "",
+                              bank_account_number: "",
+                            }));
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("Select Bank")}
+                            variant="outlined"
+                          />
+                        )}
+                        value={
+                          bankList.find(
+                            (b) => b.bank_id === formData.bank_id
+                          ) || null
+                        } // keep selected value in sync
+                        isOptionEqualToValue={(option, value) =>
+                          option.bank_id === value.bank_id
+                        }
+                      />
+                    </div>
+
+                    <label className="mt-2" htmlFor="toDate">
+                      {t("Upload file")}
+                    </label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      ref={fileInputRef}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          file: e.target.files[0],
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleSubmit8}
+                    >
+                      {t("submit")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* consignee modal end */}
             <div
               className="modal fade "

@@ -161,27 +161,28 @@ const ReceiptCreate = () => {
   const getDetils = (podId) => {
     const idToUse = podId || from?.PO_ID;
     axios
-      .get(`${API_BASE_URL}/getPurchaseOrderDetails?po_id=${idToUse}`)
+      .get(`${API_BASE_URL}/getReceiptDetails?rid=${idToUse}`)
       .then((response) => {
         console.log(response);
         setTableSummary(response.data.data1);
         const mappedData = response.data.data.map((item) => ({
           pod_status: item.Receiving_Status,
-          pod_id: item.POD_ID,
-          pod_code: item.PODCODE,
-          pod_type_id: item.Item,
-          dropDown_id: item.Item,
+          pod_id: item.ID,
+          pod_code: item.Account,
+          pod_type_id: item.POD,
+          dropDown_id: item.POD,
           produce_name_en: item.Name_EN,
-          pod_quantity: item.Qty,
+          pod_quantity: item.QTY,
           unit_count_id: item.Unit,
           Unit_Name_EN: item.Unit_Name_EN,
           Unit_Name_TH: item.Unit_Name_TH,
           item_Name_EN: item.Name_EN,
           item_Name_TH: item.Name_TH,
-          pod_price: item.pod_price,
-          pod_vat: item.VAT_value,
-          pod_wht_id: item.WHT_value,
+          pod_price: item.Price,
+          pod_vat: item.VAT,
+          pod_wht_id: item.WHT,
           pod_crate: item.Crates,
+          Notes: item.Notes,
         }));
         setDetails(mappedData);
       })
@@ -340,8 +341,8 @@ const ReceiptCreate = () => {
     try {
       console.log(pod_id);
 
-      await axios.post(`${API_BASE_URL}/deletePurchaseOrderDetails`, {
-        pod_id: pod_id,
+      await axios.post(`${API_BASE_URL}/deleteReceipDetails`, {
+        ID: pod_id,
       });
       toast.success(t("deleteSuccess"), {
         autoClose: 1000,
@@ -405,10 +406,10 @@ const ReceiptCreate = () => {
   const addPurchaseOrderDetails = async (id) => {
     try {
       const payload = {
-        ID: formDataAdd?.id || null, // optional, only if updating
+        ID: formDataAdd?.pod_id || null, // optional, only if updating
         RID: id || from?.PO_ID, // required
         dropDown_id: formDataAdd.dropDown_id,
-        Unit: formDataAdd.Unit_Name_EN, // mapping old Unit_Name_EN → Unit
+        Unit: formDataAdd.unit_count_id, // mapping old Unit_Name_EN → Unit
         Price: formDataAdd.pod_price, // mapping old pod_price → Price
         QTY: formDataAdd.pod_quantity, // mapping old pod_quantity → QTY
         Notes: formDataAdd.Notes || "", // add notes if you have it
@@ -1542,15 +1543,14 @@ const ReceiptCreate = () => {
                     >
                       <thead>
                         <tr>
-                          <th style={{ width: "170px" }}> {t("pod_Code")}</th>
+                          <th style={{ width: "170px" }}> {t("account")}</th>
                           <th style={{ width: "350px" }}> {t("item")}</th>
                           <th style={{ width: "150px" }}> {t("quantity")}</th>
-                          <th style={{ width: "100px" }}> {t("unit")}</th>
-                          <th style={{ width: "150px" }}> {t("price")}</th>
+                          <th style={{ width: "100px" }}> {t("unit")}</th>                     
                           <th style={{ width: "70px" }}> {t("price")}</th>
                           <th style={{ width: "150px" }}> {t("total")}</th>
                           <th style={{ width: "100px" }}> {t("vat")}</th>
-                          <th style={{ width: "100px" }}> {t("crate")}</th>
+                          {/* <th style={{ width: "100px" }}> {t("crate")}</th> */}
                           <th style={{ width: "100px" }}> {t("action")}</th>
                         </tr>
                       </thead>
@@ -1567,9 +1567,7 @@ const ReceiptCreate = () => {
                               {" "}
                               {formatterTwo.format(item.pod_price)}
                             </td>
-                            <td className="text-right">
-                              {formatterTwo.format(item.pod_vat)}
-                            </td>
+                          
                             <td className="text-right">
                               {formatterTwo.format(
                                 item.pod_quantity * item.pod_price
@@ -1578,11 +1576,11 @@ const ReceiptCreate = () => {
                             <td className="text-right">
                               {formatterTwo.format(item.pod_wht_id)}
                             </td>
-                            <td className="text-right">
+                            {/* <td className="text-right">
                               {formatterTwo.format(item.pod_crate)}
-                            </td>
+                            </td> */}
                             <td>
-                              {item.pod_status === 1 && (
+                              {/* {item.pod_status === 1 && ( */}
                                 <>
                                   <button
                                     type="button"
@@ -1597,7 +1595,7 @@ const ReceiptCreate = () => {
                                     <i className="mdi mdi-minus text-2xl" />
                                   </button>
                                 </>
-                              )}
+                              {/* )} */}
                             </td>
                           </tr>
                         ))}
