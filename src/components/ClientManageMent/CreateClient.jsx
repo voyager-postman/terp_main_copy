@@ -21,6 +21,8 @@ const CreateClient = () => {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   const { data: massengerTypeList } = useQuery("getMessengerType");
+  const { data: dropdownWHT } = useQuery("getWHT");
+
   console.log(massengerTypeList);
   const messengerOptions =
     massengerTypeList?.map((item) => ({
@@ -98,6 +100,8 @@ const CreateClient = () => {
     name: from?.Name ?? "",
     taxId: from?.TAX ?? "",
     Entity: from?.Legal_Entity ?? "",
+    WHT_Type: from?.WHT_Type ?? 1, // default = 1
+
     phone: from?.Phone_Main ?? "",
     email: from?.Email_Main ?? "",
     Messenger_Type: from?.Messenger_Type ?? "",
@@ -522,6 +526,7 @@ const CreateClient = () => {
           Address2: state5.address2,
           Bank_Name: state5.Bank_Name,
           Legal_Entity: state5.Entity,
+          WHT_Type: state5.WHT_Type,
           Bank_Branch: state5.Bank_Branch,
           Bank_Account: state5.Bank_Account,
           Bank_IBAN: state5.Bank_IBAN,
@@ -2820,7 +2825,7 @@ const CreateClient = () => {
                         <div className="row justify-content-between">
                           <div className="col-lg-8">
                             <div className="row">
-                              <div className="col-lg-4 form-group">
+                              <div className="col-lg-3 form-group">
                                 <h6>{t("name")}</h6>
                                 <input
                                   type="text"
@@ -2833,7 +2838,7 @@ const CreateClient = () => {
                                 />
                               </div>
 
-                              <div className="col-lg-4 form-group">
+                              <div className="col-lg-3 form-group">
                                 <h6>{t("taxId")}</h6>
                                 <input
                                   type="text"
@@ -2845,7 +2850,7 @@ const CreateClient = () => {
                                   placeholder="Tax"
                                 />
                               </div>
-                              <div className="form-group col-lg-4 autoComplete">
+                              <div className="form-group col-lg-3 autoComplete">
                                 <h6>{t("Entity")}</h6>
 
                                 <Autocomplete
@@ -2876,6 +2881,52 @@ const CreateClient = () => {
                                   isOptionEqualToValue={(option, value) =>
                                     option.id === value.id
                                   } // Ensure proper matching
+                                  sx={{ width: 300 }}
+                                />
+                              </div>
+                              <div className="form-group col-lg-3 autoComplete">
+                                <h6>{t("Select WHT")}</h6>
+
+                                <Autocomplete
+                                  options={
+                                    dropdownWHT
+                                      ? dropdownWHT.map((item) => ({
+                                          id: item.ID,
+                                          name: item.Name_EN,
+                                        }))
+                                      : []
+                                  }
+                                  getOptionLabel={(option) => option.name || ""}
+                                  value={
+                                    dropdownWHT
+                                      ? dropdownWHT
+                                          .map((item) => ({
+                                            id: item.ID,
+                                            name: item.Name_EN,
+                                          }))
+                                          .find(
+                                            (wht) => wht.id === state5.WHT_Type
+                                          ) || null
+                                      : null
+                                  }
+                                  onChange={(e, newValue) => {
+                                    handleChange5({
+                                      target: {
+                                        name: "WHT_Type",
+                                        value: newValue?.id || "",
+                                      },
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder={t("Select WHT")}
+                                      InputLabelProps={{ shrink: false }}
+                                    />
+                                  )}
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.id === value.id
+                                  }
                                   sx={{ width: 300 }}
                                 />
                               </div>

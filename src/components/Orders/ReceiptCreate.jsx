@@ -309,7 +309,7 @@ const ReceiptCreate = () => {
   console.log(tableSummary);
   useEffect(() => {
     getDetils();
-  }, [podId, from?.PO_ID]);
+  }, []);
 
   const closeIcon = () => {
     setShow(false);
@@ -407,6 +407,7 @@ const ReceiptCreate = () => {
     try {
       const payload = {
         ID: formDataAdd?.pod_id || null, // optional, only if updating
+        POD_Selection: formDataAdd.dropDown_id,
         RID: id || from?.PO_ID, // required
         dropDown_id: formDataAdd.dropDown_id,
         Unit: formDataAdd.unit_count_id, // mapping old Unit_Name_EN → Unit
@@ -580,7 +581,7 @@ const ReceiptCreate = () => {
     }
 
     // ✅ If date missing
-    if (!state.receipt_date || state.receipt_date === "0000-00-00") {
+    if(!state.created || state.created === "0000-00-00") {
       let data = {
         message_en: "Please enter date",
         message_th: "กรุณาระบุวันที่สั่งซื้อ",
@@ -895,7 +896,7 @@ const ReceiptCreate = () => {
 
         setState((prevState) => ({
           ...prevState,
-          RID: response.data?.RID || prevState.RID,
+          po_id: response.data?.RID || from?.RID || prevState.RID,
           Receipt_Date: prevState.created,
           Payor_ID: prevState.vendor_id,
           Bank_Ref: prevState.bank_ref,
@@ -1247,7 +1248,7 @@ const ReceiptCreate = () => {
                         placeholderText="DD/MM/YYYY"
                         customInput={<CustomInput />}
                       /> */}
-                      <DatePicker
+                      {/* <DatePicker
                         selected={
                           state.receipt_date &&
                           !isNaN(new Date(state.receipt_date))
@@ -1281,9 +1282,42 @@ const ReceiptCreate = () => {
                         dateFormat="dd/MM/yyyy"
                         className="form-control"
                         placeholderText="DD/MM/YYYY"
+                        customInpu
+                        t={<CustomInput />}
+                      /> */}
+                      <DatePicker
+                        selected={
+                          state.created && !isNaN(new Date(state.created))
+                            ? new Date(state.created)
+                            : null
+                        }
+                        onChange={async (date) => {
+                          const formattedDate = date
+                            ? `${date.getFullYear()}-${String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0")}-${String(
+                                date.getDate()
+                              ).padStart(2, "0")}`
+                            : null;
+
+                          const updatedState = {
+                            ...state,
+                            created: formattedDate,
+                          };
+
+                          setState(updatedState);
+
+                          if (updatedState.vendor_id && updatedState.created) {
+                            await updateDataOnchange(updatedState);
+                          }
+                        }}
+                        dateFormat="dd/MM/yyyy"
+                        className="form-control"
+                        placeholderText="DD/MM/YYYY"
                         customInput={<CustomInput />}
                       />
                     </div>
+
                     <div className="col-lg-3 form-group">
                       <h6> {t("bankRef")}</h6>
                       {/* <input
@@ -1546,7 +1580,7 @@ const ReceiptCreate = () => {
                           <th style={{ width: "170px" }}> {t("account")}</th>
                           <th style={{ width: "350px" }}> {t("item")}</th>
                           <th style={{ width: "150px" }}> {t("quantity")}</th>
-                          <th style={{ width: "100px" }}> {t("unit")}</th>                     
+                          <th style={{ width: "100px" }}> {t("unit")}</th>
                           <th style={{ width: "70px" }}> {t("price")}</th>
                           <th style={{ width: "150px" }}> {t("total")}</th>
                           <th style={{ width: "100px" }}> {t("vat")}</th>
@@ -1567,7 +1601,7 @@ const ReceiptCreate = () => {
                               {" "}
                               {formatterTwo.format(item.pod_price)}
                             </td>
-                          
+
                             <td className="text-right">
                               {formatterTwo.format(
                                 item.pod_quantity * item.pod_price
@@ -1581,20 +1615,20 @@ const ReceiptCreate = () => {
                             </td> */}
                             <td>
                               {/* {item.pod_status === 1 && ( */}
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleEditClick(item)}
-                                  >
-                                    <i className="mdi mdi-pencil text-2xl" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => deleteDetails(item.pod_id)}
-                                  >
-                                    <i className="mdi mdi-minus text-2xl" />
-                                  </button>
-                                </>
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditClick(item)}
+                                >
+                                  <i className="mdi mdi-pencil text-2xl" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteDetails(item.pod_id)}
+                                >
+                                  <i className="mdi mdi-minus text-2xl" />
+                                </button>
+                              </>
                               {/* )} */}
                             </td>
                           </tr>

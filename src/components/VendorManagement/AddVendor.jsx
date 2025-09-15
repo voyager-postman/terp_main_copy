@@ -263,7 +263,7 @@ const AddVendor = () => {
       })
       .then((res) => {
         const { head, data } = res.data;
-     
+
         setData(data || []);
       })
       .catch((err) => {
@@ -306,6 +306,7 @@ const AddVendor = () => {
     name: from?.Name ?? "",
     taxId: from?.TAX ?? "",
     Entity: from?.Legal_Entity ?? "",
+    WHT_Type: from?.WHT_Type ?? 1, // default = 1
     phone: from?.Phone_Main ?? "",
     email: from?.Email_Main ?? "",
     Messenger_Type: from?.Messenger_Type ?? "",
@@ -321,6 +322,8 @@ const AddVendor = () => {
     Bank_Address: from?.Bank_Address ?? "",
   });
   const { data: dropdownVendor } = useQuery("getDropdownVendor");
+  const { data: dropdownWHT } = useQuery("getWHT");
+
   const { data: dropdownDistrict } = useQuery("getDropdownAddressDistrict");
   const { data: dropdownSubDistrict } = useQuery(
     "getDropdownAddressSub-district"
@@ -446,6 +449,7 @@ const AddVendor = () => {
           taxId: state.taxId,
           Phone_Main: state.phone,
           Email_Main: state.email,
+          WHT_Type: state.WHT_Type,
           Messenger_Type: state.Messenger_Type,
           Messenger_Main_ID: state.messangerId,
           Country: selectedCountry?.name || "",
@@ -749,7 +753,7 @@ const AddVendor = () => {
             <div className="tab-content px-2 md:!px-4">
               <div className="vc_form formCreate ">
                 <div className="row">
-                  <div className="col-lg-4 form-group">
+                  <div className="col-lg-3 form-group">
                     <h6>{t("name")}</h6>
                     <input
                       type="text"
@@ -762,7 +766,7 @@ const AddVendor = () => {
                     />
                   </div>
 
-                  <div className="col-lg-4 form-group">
+                  <div className="col-lg-3 form-group">
                     <h6>{t("taxId")}</h6>
                     <input
                       type="text"
@@ -774,7 +778,7 @@ const AddVendor = () => {
                       placeholder="Tax"
                     />
                   </div>
-                  <div className="form-group col-lg-4 autoComplete">
+                  <div className="form-group col-lg-3 autoComplete">
                     <h6>{t("Entity")}</h6>
 
                     <Autocomplete
@@ -803,6 +807,50 @@ const AddVendor = () => {
                       isOptionEqualToValue={(option, value) =>
                         option.id === value.id
                       } // Ensure proper matching
+                      sx={{ width: 300 }}
+                    />
+                  </div>
+                  <div className="form-group col-lg-3 autoComplete">
+                    <h6>{t("Select WHT")}</h6>
+
+                    <Autocomplete
+                      options={
+                        dropdownWHT
+                          ? dropdownWHT.map((item) => ({
+                              id: item.ID,
+                              name: item.Name_EN,
+                            }))
+                          : []
+                      }
+                      getOptionLabel={(option) => option.name || ""}
+                      value={
+                        dropdownWHT
+                          ? dropdownWHT
+                              .map((item) => ({
+                                id: item.ID,
+                                name: item.Name_EN,
+                              }))
+                              .find((wht) => wht.id === state.WHT_Type) || null
+                          : null
+                      }
+                      onChange={(e, newValue) => {
+                        handleChange({
+                          target: {
+                            name: "WHT_Type",
+                            value: newValue?.id || "",
+                          },
+                        });
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder={t("Select WHT")}
+                          InputLabelProps={{ shrink: false }}
+                        />
+                      )}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value.id
+                      }
                       sx={{ width: 300 }}
                     />
                   </div>

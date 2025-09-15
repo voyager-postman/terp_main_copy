@@ -677,6 +677,7 @@ const PurchaseOrder = () => {
       })
       .then((response) => {
         getPurchaseOrder();
+        getOrdersDetails();
       })
       .catch((error) => {
         console.log(error);
@@ -704,6 +705,7 @@ const PurchaseOrder = () => {
           },
         ]);
         getPurchaseOrder();
+        getOrdersDetails();
       })
       .catch((error) => {
         console.log(error);
@@ -895,6 +897,7 @@ const PurchaseOrder = () => {
   };
   useEffect(() => {
     getPurchaseOrder();
+    getOrdersDetails();
   }, []);
 
   const handleLossGainChange1 = (e) => {
@@ -2261,6 +2264,7 @@ const PurchaseOrder = () => {
         setStock1(response.data || "Procedure returned an error");
       }
       getPurchaseOrder();
+      getOrdersDetails();
       // Update client details and summary table with collectPaymentId from the response
       const updatedCollectPaymentId = response?.data.data;
       setCollectPaymentId(updatedCollectPaymentId);
@@ -2417,7 +2421,7 @@ const PurchaseOrder = () => {
       const result = await response.json();
       console.log(result);
       getPurchaseOrder();
-
+      getOrdersDetails();
       if (result?.data) {
         setSingleCpnId(result?.data);
 
@@ -2521,6 +2525,7 @@ const PurchaseOrder = () => {
       toast.success(t("paymentDone"));
       dataAllClearVender();
       getPurchaseOrder();
+      getOrdersDetails();
 
       let modalElement = document.getElementById("modalCombine1");
       let modalInstance = bootstrap.Modal.getInstance(modalElement);
@@ -2796,6 +2801,7 @@ const PurchaseOrder = () => {
       });
       console.log("Payment data submitted successfully", response);
       getPurchaseOrder();
+      getOrdersDetails();
       if (response?.data?.success === true) {
         // If success = true, show success toast
         toast.success(response.data?.message);
@@ -3070,6 +3076,7 @@ const PurchaseOrder = () => {
       setPaymentNotes("");
       toast.success(t("deleteSuccess"));
       getPurchaseOrder();
+      getOrdersDetails();
     } catch (e) {
       console.error("Delete error:", e);
       toast.error(t("deleteError"));
@@ -3138,6 +3145,7 @@ const PurchaseOrder = () => {
             );
 
             getPurchaseOrder();
+            getOrdersDetails();
             toast.success(response.data.Message_EN);
             toast.success(response.data.Message_TH);
           } catch (e) {
@@ -3152,6 +3160,7 @@ const PurchaseOrder = () => {
               accesstype: 1,
             });
             getPurchaseOrder();
+            getOrdersDetails();
           } catch (e) {
             toast.error(t("accessUpdateError"));
           }
