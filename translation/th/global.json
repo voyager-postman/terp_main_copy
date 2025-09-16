@@ -1123,5 +1123,7 @@
   "fxCorrection": "การปรับอัตราแลกเปลี่ยน",
   "inputDays": "จำนวนวัน",
   "inputValue": "กรอกค่า",
-  "currencyManagementCreateForm": "การจัดการสกุลเงิน / แบบฟอร์มสร้างใหม่"
+  "currencyManagementCreateForm": "การจัดการสกุลเงิน / แบบฟอร์มสร้างใหม่",
+  "withHoldingTax": "ภาษีหัก ณ ที่จ่าย",
+  "withHoldingTaxManagement": "การจัดการภาษีหัก ณ ที่จ่าย"
 }

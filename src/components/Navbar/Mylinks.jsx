@@ -184,6 +184,7 @@ export const getLinks = () => {
             { name: t("income_statement"), link: "/incomeState" },
             { name: t("accounts"), link: "/accounts" },
             { name: t("accounting_ledger"), link: "/accountLedger" },
+            { name: t("withHoldingTax"), link: "/with_hold_tax" },
           ],
         },
       ],

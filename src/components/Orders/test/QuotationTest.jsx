@@ -61,19 +61,7 @@ const QuotationTest = () => {
   const handleAgreedPricingChange = (e) => {
     setIsRecalculateChecked(e.target.checked);
   };
-  // const getAllQuotation = () => {
-  //   axios
-  //     .get(`${API_BASE_URL}/NewgetOrders`, {
-  //       params: { is_quotation: 1 },
-  //     })
-  //     .then((res) => {
-  //       console.log(res);
-  //       setData(res.data.data || []);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching quotations:", err);
-  //     });
-  // };
+  
   const getAllQuotation = () => {
     axios
       .get(`${API_BASE_URL}/QuotationEN`)

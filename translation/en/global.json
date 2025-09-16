@@ -1123,5 +1123,7 @@
   "fxCorrection": "FX Correction",
   "inputDays": "Input Days",
   "inputValue": "Input Value",
-  "currencyManagementCreateForm": "Currency Management / Create Form"
+  "currencyManagementCreateForm": "Currency Management / Create Form",
+  "withHoldingTax": "Withholding Tax",
+  "withHoldingTaxManagement": "Withholding Tax Management"
 }

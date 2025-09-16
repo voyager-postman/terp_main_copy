@@ -48,9 +48,12 @@ const AccountLedger = () => {
             const a = row.original;
             return (
               <>
-                <Link to="/update_ean" state={{ from: a }}>
+                <button
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal"
+                >
                   <i
-                    i
                     className="mdi mdi-pencil"
                     style={{
                       width: "20px",
@@ -59,7 +62,36 @@ const AccountLedger = () => {
                       marginTop: "10px",
                     }}
                   />
-                </Link>
+                </button>
+                <div
+                  className="modal fade"
+                  id="exampleModal"
+                  tabIndex={-1}
+                  aria-labelledby="exampleModalLabel"
+                  aria-hidden="true"
+                >
+                  <div className="modal-dialog modal-lg freightModalCreate">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h1 className="modal-title fs-5" id="exampleModalLabel">
+                          Modal title
+                        </h1>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        >
+                          <i className="mdi mdi-close" />
+                        </button>
+                      </div>
+                      <div className="modal-body">...</div>
+                      <div className="modal-footer">
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </>
             );
           },

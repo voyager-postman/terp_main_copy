@@ -230,6 +230,8 @@ const BillingNoteCreate = () => {
 
   const { data: vendorList } = useQuery("getAllVendor");
   const { data: recieptDroupDown } = useQuery("RecieptsDropdown");
+    const { data: BNDropDown } = useQuery("BNDropDown");
+
   const { data: dropdownType } = useQuery("getDropdownType");
   const { data: produceList } = useQuery("getAllProduceItem");
   const { data: packagingList } = useQuery("getAllPackaging");

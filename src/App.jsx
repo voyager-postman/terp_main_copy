@@ -25,6 +25,7 @@ import Footer from "./components/Footer/Footer";
 import Inventory from "./components/Inventory/Inventory";
 import Language from "./components/Language";
 import Login from "./components/Login/Login";
+import WithHold from "./components/Accounting/WithHold";
 import Navbar from "./components/Navbar/Navbar";
 import Claim from "./components/Orders/Claim";
 import ClaimDetails from "./components/Orders/ClaimDetails";
@@ -506,6 +507,7 @@ function App() {
                   path="/billingNoteCreate"
                   element={<BillingNoteCreate />}
                 />
+                <Route path="/with_hold_tax" element={<WithHold />} />
                 <Route path="/incomeState" element={<IncomeState />} />
                 <Route
                   path="/orderPackaging"

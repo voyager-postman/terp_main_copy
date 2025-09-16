@@ -581,7 +581,7 @@ const ReceiptCreate = () => {
     }
 
     // ✅ If date missing
-    if(!state.created || state.created === "0000-00-00") {
+    if (!state.created || state.created === "0000-00-00") {
       let data = {
         message_en: "Please enter date",
         message_th: "กรุณาระบุวันที่สั่งซื้อ",
@@ -1431,29 +1431,33 @@ const ReceiptCreate = () => {
                                     )}
                                   />
                                 </div>
-                                <div className="col-lg-12 mb-2">
-                                  <h6> {t("quantity")}</h6>
-                                  <input
-                                    className="mb-0"
-                                    type="text"
-                                    name="pod_quantity"
-                                    value={formDataAdd.pod_quantity || ""}
-                                    placeholder={t("quantity")}
-                                    onChange={handleChangeAdd}
-                                  />
-                                </div>
-                                <div className="col-lg-12 mb-2">
-                                  <h6> {t("crate")}</h6>
-                                  <input
-                                    className="mb-0"
-                                    type="text"
-                                    name="pod_crate"
-                                    value={formDataAdd.pod_crate}
-                                    placeholder={t("crate")}
-                                    onChange={handleChangeAdd}
-                                  />
-                                </div>
-
+                                {formDataAdd.Unit_Name_EN !== "Time" &&
+                                  formDataAdd.unit_count_id !== 4 && (
+                                    <>
+                                      <div className="col-lg-12 mb-2">
+                                        <h6> {t("quantity")}</h6>
+                                        <input
+                                          className="mb-0"
+                                          type="text"
+                                          name="pod_quantity"
+                                          value={formDataAdd.pod_quantity || ""}
+                                          placeholder={t("quantity")}
+                                          onChange={handleChangeAdd}
+                                        />
+                                      </div>
+                                      <div className="col-lg-12 mb-2">
+                                        <h6> {t("crate")}</h6>
+                                        <input
+                                          className="mb-0"
+                                          type="text"
+                                          name="pod_crate"
+                                          value={formDataAdd.pod_crate}
+                                          placeholder={t("crate")}
+                                          onChange={handleChangeAdd}
+                                        />
+                                      </div>
+                                    </>
+                                  )}
                                 <div className="col-lg-12 mb-2">
                                   <h6> {t("price")}</h6>
                                   <input

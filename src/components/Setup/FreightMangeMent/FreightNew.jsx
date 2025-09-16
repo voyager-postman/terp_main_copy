@@ -148,13 +148,9 @@ const FreightNew = () => {
               className="toggleSwitch large"
             >
               <input
-                checked={a.Status == "on" ? true : false}
-                onChange={() => {
-                  setIsOn(!isOn);
-                }}
-                onClick={() => updateEanStatus(a.ID)}
-                value={a.Status}
                 type="checkbox"
+                checked={a.Available === 1} // ✅ check with 1 (not "on")
+                onChange={() => updateEanStatus(a.ID)} // ✅ update directly
               />
               <span>
                 <span>{t("off")}</span>
@@ -181,7 +177,7 @@ const FreightNew = () => {
                   }}
                 />
               </Link>
-              <button type="button" >
+              <button type="button">
                 <i
                   className="mdi mdi-delete"
                   style={{
