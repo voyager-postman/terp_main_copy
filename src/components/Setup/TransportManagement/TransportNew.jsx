@@ -127,9 +127,10 @@ const TransportNew = () => {
   const updatePort = () => {
     axios
       .post(
-        `${API_BASE_URL}/${typeof from?.transport_id == "undefined"
-          ? "addTransportation"
-          : "updateTransportation"
+        `${API_BASE_URL}/${
+          typeof from?.transport_id == "undefined"
+            ? "addTransportation"
+            : "updateTransportation"
         }`,
         editProduceData
       )
@@ -247,7 +248,7 @@ const TransportNew = () => {
       },
 
       {
-        Header:t("status"),
+        Header: t("status"),
         accessor: (a) => (
           <label
             style={{
@@ -326,7 +327,7 @@ const TransportNew = () => {
               data-bs-toggle="modal"
               data-bs-target="#exampleModal2"
             >
-               {t("create")}
+              {t("create")}
             </button>
 
             <div
@@ -340,7 +341,7 @@ const TransportNew = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="exampleModalLabel">
-                       {t("transportRoute")}
+                      {t("transportRoute")}
                     </h5>
                     <button
                       type="button"
@@ -355,7 +356,10 @@ const TransportNew = () => {
                   <div className="modal-body">
                     <div className="row">
                       <div className="col-lg-12 form-group vendorInputUnset  mb-2">
-                        <h6> {t("vendor")}</h6>
+                        <h6 style={{ textDecoration: "none", color: "#000" }}>
+                          {t("vendor")}
+                        </h6>
+
                         <div className="ceateTransport">
                           <Autocomplete
                             disablePortal
@@ -364,8 +368,8 @@ const TransportNew = () => {
                             value={
                               clientId
                                 ? clients.find(
-                                  (client) => client.ID === clientId
-                                )
+                                    (client) => client.ID === clientId
+                                  )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) =>
@@ -384,7 +388,9 @@ const TransportNew = () => {
                       </div>
 
                       <div className="col-lg-12 form-group mb-2">
-                        <h6>{t("fromLocation")}</h6>
+                        <h6 style={{ textDecoration: "none", color: "#000" }}>
+                          {t("fromLocation")}{" "}
+                        </h6>
                         <div className="ceateTransport">
                           <Autocomplete
                             disablePortal
@@ -393,8 +399,8 @@ const TransportNew = () => {
                             value={
                               formData.loading_from
                                 ? fromLocation.find(
-                                  (loc) => loc.id === formData.loading_from
-                                )
+                                    (loc) => loc.id === formData.loading_from
+                                  )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) =>
@@ -409,7 +415,7 @@ const TransportNew = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder={t("searchPortOrigin")}// Adds a placeholder
+                                placeholder={t("searchPortOrigin")} // Adds a placeholder
                                 InputLabelProps={{ shrink: false }} // Prevents floating label
                               />
                             )}
@@ -417,7 +423,9 @@ const TransportNew = () => {
                         </div>
                       </div>
                       <div className="col-lg-12 form-group mb-2">
-                        <h6>{t("departurePort")}</h6>
+                        <h6 style={{ textDecoration: "none", color: "#000" }}>
+                          {t("departurePort")}{" "}
+                        </h6>
                         <div className="ceateTransport">
                           <Autocomplete
                             disablePortal
@@ -426,9 +434,9 @@ const TransportNew = () => {
                             value={
                               formData.departure_port // Use departure_port to find the selected value
                                 ? departurePort.find(
-                                  (port) =>
-                                    port.port_id === formData.departure_port
-                                )
+                                    (port) =>
+                                      port.port_id === formData.departure_port
+                                  )
                                 : null
                             } // Bind to state
                             onChange={(e, newValue) => {
@@ -450,7 +458,7 @@ const TransportNew = () => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder= {t("departurePort")}
+                                placeholder={t("departurePort")}
                                 InputLabelProps={{ shrink: false }}
                               />
                             )}
@@ -465,7 +473,7 @@ const TransportNew = () => {
                       className="UpdatePopupBtn btn btn-primary "
                       onClick={handleSubmit} // Call handleSubmit when clicking the button
                     >
-                       {t("submit")}
+                      {t("submit")}
                     </button>
                   </div>
                 </div>

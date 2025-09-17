@@ -30,6 +30,8 @@ const BillingNoteView = () => {
   const [tableHead, setTableHead] = useState({});
   const [tableData, setTableData] = useState([]);
   const [invoiceDate, setInvoiceDate] = useState("");
+  const [poData, setPoData] = useState(null);
+
   function formatNumber(num) {
     return new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 2,
@@ -159,6 +161,35 @@ const BillingNoteView = () => {
       maximumFractionDigits: 2,
     }).format(num);
   }
+  const summaryDeatils = () => {
+    const lang = localStorage.getItem("language");
+    const langValue = lang === "en" ? 1 : 0;
+    axios
+      .post(`${API_BASE_URL}/BN_Bottom_View`, {
+        BN_ID: from?.ID,
+        lang: langValue,
+      })
+      .then((res) => {
+        console.log("poData", res.data);
+        setPoData(res.data);
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+      });
+  };
+  useEffect(() => {
+    summaryDeatils();
+  }, []);
+  // Utility to render each section
+  const renderSection = (labels, values) => {
+    if (!labels || !values) return null;
+
+    return Object.keys(labels).map((key, i) => (
+      <div key={i}>
+        <b>{labels[key]}</b> {values[key] || ""}
+      </div>
+    ));
+  };
   return (
     <div>
       <div className="databaseTableSection pt-0">
@@ -662,72 +693,46 @@ const BillingNoteView = () => {
                 {/*--------------------------- table data end--------------------------------*/}
               </div>
               <div className="flex justify-content-end mt-4 totalBefore">
-                <div style={{ width: "300px" }}>
-                  {/* <div className="flexBefore">
-                    <div>
-                      <strong>Payable : </strong>
-                    </div>
-                    <div>
-                      <span>
-                        {formatterTwo.format(totalDataDetails?.total_payable)}
-                      </span>
-                    </div>
-                  </div> */}
+                <div>
                   <div className="flexBefore">
-                    <div>
-                      <strong>{t("totalBeforeTax")} : </strong>
-                    </div>
-                    <div>
-                      <span>
-                        {formatterTwo.format(
-                          totalDataDetails?.total_before_tax
-                        )}
-                      </span>
-                    </div>
+                    {renderSection(
+                      poData?.section1_label,
+                      poData?.section1_values
+                    )}
                   </div>
                   <div className="flexBefore">
-                    <div>
-                      <strong>{t("vat")} : </strong>
-                    </div>
-                    <div>
-                      <span>
-                        {formatterTwo.format(totalDataDetails?.total_vat)}
-                      </span>
-                    </div>
+                    {renderSection(
+                      poData?.section2_label,
+                      poData?.section2_values
+                    )}
                   </div>
                   <div className="flexBefore">
-                    <div>
-                      <strong>{t("wht")} : </strong>
-                    </div>
-                    <div>
-                      <span>
-                        {formatterTwo.format(totalDataDetails?.total_wht)}
-                      </span>
-                    </div>
+                    {renderSection(
+                      poData?.section3_label,
+                      poData?.section3_values
+                    )}
                   </div>
                   <div className=" d-flex flexBefore">
-                    <div>
-                      <strong>{t("rounding")}</strong>
-                    </div>
-                    <div>
-                      <span> {totalDataDetails?.total_rounding}</span>
-                    </div>
+                    {renderSection(
+                      poData?.section4_label,
+                      poData?.section4_values
+                    )}
                   </div>
-                  <div className="flexBefore">
-                    <div>
-                      <strong>{t("amountToPay")} : </strong>
-                    </div>
-                    <div>
-                      <span>
-                        {formatterTwo.format(
-                          (totalDataDetails?.total_before_tax || 0) +
-                            (totalDataDetails?.total_vat || 0) -
-                            (totalDataDetails?.total_wht || 0) +
-                            (totalDataDetails?.total_rounding || 0)
-                        )}
-                      </span>
-                    </div>
-                  </div>
+                  {/* <div className="flexBefore">
+                        <div>
+                          <strong>{t("amountToPay")} : </strong>
+                        </div>
+                        <div>
+                          <span>
+                            {formatterTwo.format(
+                              (sumAmountToPay ?? 0) +
+                                (VATTotal ?? 0) -
+                                (WHTTotal ?? 0) +
+                                roundingData
+                            )}
+                          </span>
+                        </div>
+                      </div> */}
                 </div>
               </div>
             </div>

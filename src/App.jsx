@@ -490,10 +490,7 @@ function App() {
                 <Route path="/eanPacking" element={<EanPacking />} />
                 <Route path="/newEanPacking" element={<NewEanPacking />} />
                 <Route path="/combinePayment" element={<CombinePayment />} />
-                <Route
-                  path="/reciept/billing_receipt"
-                  element={<BillingNoteReciept />}
-                />
+              
                 <Route
                   path="/combinePaymentView"
                   element={<CombinePaymentView />}

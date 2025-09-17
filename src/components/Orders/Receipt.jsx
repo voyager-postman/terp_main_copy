@@ -694,9 +694,7 @@ const Receipt = () => {
   }, [responceId]);
 
   const everyDataSet = async (a) => {
-
     setSinglePodId(a);
-
   };
 
   useEffect(() => {
@@ -1058,9 +1056,10 @@ const Receipt = () => {
       renderLabelAndValue(
         doc,
         "Bank Name :",
-        `${response?.data?.vendor_details?.vendor_bank_name
-          ? response?.data?.vendor_details?.vendor_bank_name
-          : ""
+        `${
+          response?.data?.vendor_details?.vendor_bank_name
+            ? response?.data?.vendor_details?.vendor_bank_name
+            : ""
         }`,
         7,
         40,
@@ -1069,9 +1068,10 @@ const Receipt = () => {
       renderLabelAndValue(
         doc,
         "Account Name :",
-        `${response?.data?.vendor_details?.vendor_bank_account
-          ? response?.data?.vendor_details?.vendor_bank_account
-          : ""
+        `${
+          response?.data?.vendor_details?.vendor_bank_account
+            ? response?.data?.vendor_details?.vendor_bank_account
+            : ""
         }`,
         7,
         40,
@@ -1080,9 +1080,10 @@ const Receipt = () => {
       renderLabelAndValue(
         doc,
         "Account Number :",
-        `${response?.data?.vendor_details?.vendor_bank_number
-          ? response?.data?.vendor_details?.vendor_bank_number
-          : ""
+        `${
+          response?.data?.vendor_details?.vendor_bank_number
+            ? response?.data?.vendor_details?.vendor_bank_number
+            : ""
         }`,
         7,
         40,
@@ -1273,27 +1274,32 @@ const Receipt = () => {
         const startX1 = 7;
         const lineHeight1 = 4.2;
 
-        const longText1_1 = `${response.data.section2_Values?.Row1
-          ? response.data.section2_Values?.Row1
-          : ""
-          }`;
+        const longText1_1 = `${
+          response.data.section2_Values?.Row1
+            ? response.data.section2_Values?.Row1
+            : ""
+        }`;
         doc.setFont("helvetica", "normal");
-        const longText1_2 = `${response.data.section2_Values?.Row2
-          ? response.data.section2_Values?.Row2
-          : ""
-          }`;
-        const longText1_3 = `${response.data.section2_Values?.Row3
-          ? response.data.section2_Values?.Row3
-          : ""
-          }`;
-        const longText1_4 = `${response.data.section2_Values?.Row4
-          ? response.data.section2_Values?.Row4
-          : ""
-          }`;
-        const longText1_5 = `${response.data.section2_Values?.Row5
-          ? response.data.section2_Values?.Row5
-          : ""
-          }`;
+        const longText1_2 = `${
+          response.data.section2_Values?.Row2
+            ? response.data.section2_Values?.Row2
+            : ""
+        }`;
+        const longText1_3 = `${
+          response.data.section2_Values?.Row3
+            ? response.data.section2_Values?.Row3
+            : ""
+        }`;
+        const longText1_4 = `${
+          response.data.section2_Values?.Row4
+            ? response.data.section2_Values?.Row4
+            : ""
+        }`;
+        const longText1_5 = `${
+          response.data.section2_Values?.Row5
+            ? response.data.section2_Values?.Row5
+            : ""
+        }`;
 
         // Render client details
         doc.setFont("NotoSansThai"); // Set the font to use
@@ -1488,8 +1494,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row1 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row1 || ""}`),
           finalY + 1
         );
 
@@ -1498,8 +1504,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row2 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row2 || ""}`),
           finalY + 5
         );
 
@@ -1508,8 +1514,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row3 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row3 || ""}`),
           finalY + 9
         );
         // new
@@ -1517,8 +1523,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row7 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row7 || ""}`),
           finalY + 13
         );
 
@@ -1526,8 +1532,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row5 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row5 || ""}`),
           finalY + 17
         );
 
@@ -1535,8 +1541,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row6 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row6 || ""}`),
           finalY + 21
         );
 
@@ -1548,8 +1554,8 @@ const Receipt = () => {
         doc.text(
           `${response?.data.section6_Values.Row4 || ""}`,
           105 +
-          valueWidth -
-          doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
+            valueWidth -
+            doc.getTextWidth(`${response?.data.section6_Values.Row4 || ""}`),
           finalY + 29
         );
 
@@ -2397,8 +2403,8 @@ const Receipt = () => {
       const updatedCheckedItems = { ...prev, [invoiceNumber]: isChecked };
       const amountToPay = isChecked
         ? paymentTable2.find(
-          (item) => item["Transaction Ref"] === invoiceNumber
-        )?.["Amount to Pay"] || 0
+            (item) => item["Transaction Ref"] === invoiceNumber
+          )?.["Amount to Pay"] || 0
         : "";
 
       // Update Paid Amounts
@@ -2433,7 +2439,7 @@ const Receipt = () => {
       // Automatically set Paid Amount to the corresponding amount_to_pay if checked
       const amountToPay = isChecked
         ? paymentTable1.find((item) => item.po_id === invoiceNumber)
-          ?.amount_to_pay || 0
+            ?.amount_to_pay || 0
         : "";
 
       // Update Paid Amounts
@@ -2651,27 +2657,23 @@ const Receipt = () => {
 
       if (result.isConfirmed) {
         try {
-          const response = await axios.post(
-            `${API_BASE_URL}/receiptDelete`,
-            {
-              RID: id,
-              user_id: localStorage.getItem("id"),
-            }
-          );
+          const response = await axios.post(`${API_BASE_URL}/receiptDelete`, {
+            RID: id,
+            user_id: localStorage.getItem("id"),
+          });
 
           receipt();
           toast.success(response.data.Message_EN);
           toast.success(response.data.Message_TH);
         } catch (e) {
           toast.error(t("deleteError"));
-          console.log(e)
+          console.log(e);
         }
       }
     } catch (e) {
       toast.error(t("genericError"));
     }
   };
-
 
   const options = useMemo(
     () => ({
@@ -3173,7 +3175,7 @@ const Receipt = () => {
             className="btn btn-danger"
             // data-bs-toggle="modal"
             // data-bs-target="#modalCombine1"
-            onClick={() => navigate("/reciept/billing_receipt")}
+            onClick={() => navigate("/billingNoteCreate")}
           >
             {t("billingNote")}
           </button>
@@ -3771,10 +3773,10 @@ const Receipt = () => {
                                     Number(paymentAmmountNew) +
                                     (Number(paymentAmmountNew) +
                                       Number(depositAvailableNew)) *
-                                    Number(vatNew) -
+                                      Number(vatNew) -
                                     (Number(paymentAmmountNew) +
                                       Number(depositAvailableNew)) *
-                                    Number(whtNew) +
+                                      Number(whtNew) +
                                     (Number(roundingNew1) + Number(roundingNew))
                                   ).toFixed(2)}
                                 </span>
@@ -4454,9 +4456,9 @@ const Receipt = () => {
                             <span>
                               {formatNumber(
                                 (TotalBeforeTaxTotal ?? 0) + // Summed checked Total_Before_Tax
-                                (VATTotal ?? 0) - // Summed checked VAT
-                                (WHTTotal ?? 0) + // Summed checked WHT
-                                (Number(roundingData) || 0) // Summed checked Rounding, ensuring it's a number
+                                  (VATTotal ?? 0) - // Summed checked VAT
+                                  (WHTTotal ?? 0) + // Summed checked WHT
+                                  (Number(roundingData) || 0) // Summed checked Rounding, ensuring it's a number
                               )}
                             </span>
                           </div>

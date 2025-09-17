@@ -22,6 +22,7 @@ const BillingNoteCreate = () => {
   const [t, i18n] = useTranslation("global");
 
   const [buttonClicked, setButtonClicked] = React.useState(false);
+  const [poData, setPoData] = useState(null);
   const location = useLocation();
   const [dropdownItems, setDropdownItems] = useState([]);
   const [editDataShow, setEditDataShow] = useState([]);
@@ -230,7 +231,7 @@ const BillingNoteCreate = () => {
 
   const { data: vendorList } = useQuery("getAllVendor");
   const { data: recieptDroupDown } = useQuery("RecieptsDropdown");
-    const { data: BNDropDown } = useQuery("BNDropDown");
+  const { data: BNDropDown } = useQuery("BNDropDown");
 
   const { data: dropdownType } = useQuery("getDropdownType");
   const { data: produceList } = useQuery("getAllProduceItem");
@@ -1090,20 +1091,50 @@ const BillingNoteCreate = () => {
   //     toast.error(t("genericError"));
   //   }
   // };
-const options =
-    recieptDroupDown?.map((item) => ({
-      value: item.VendorID,
-      label: item.Payor,
-      clientId: item.ClientID,
-      consigneeId: item.ConsigneeID,
+  const options =
+    BNDropDown?.map((item) => ({
+      value: item.ID, // vendor_id
+      label: item.name, // vendor_name
+      clientId: item.Client, // clientId
+      consigneeId: item.Consignee, // consigneeId
     })) || [];
- 
+
+  // ✅ Set selected option
   const selectedOption = options.find(
     (option) =>
       Number(option.value) === Number(state.vendor_id) &&
       Number(option.clientId) === Number(state.ClientID) &&
       Number(option.consigneeId) === Number(state.ConsigneeID)
   );
+  const summaryDeatils = () => {
+    const lang = localStorage.getItem("language");
+    const langValue = lang === "en" ? 1 : 0;
+    axios
+      .post(`${API_BASE_URL}/BN_Bottom_View`, {
+        BN_ID: totalDataDetails2 || from?.ID,
+        lang: langValue,
+      })
+      .then((res) => {
+        console.log("poData", res.data);
+        setPoData(res.data);
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+      });
+  };
+  useEffect(() => {
+    summaryDeatils();
+  }, []);
+  // Utility to render each section
+  const renderSection = (labels, values) => {
+    if (!labels || !values) return null;
+
+    return Object.keys(labels).map((key, i) => (
+      <div key={i}>
+        <b>{labels[key]}</b> {values[key] || ""}
+      </div>
+    ));
+  };
   return (
     <>
       <Card
@@ -1211,7 +1242,7 @@ const options =
                             />
                           )}
                         /> */}
-                            <Select
+                        <Select
                           options={options}
                           value={selectedOption || null}
                           onChange={(selected) => {
@@ -1228,7 +1259,7 @@ const options =
                           classNamePrefix="select"
                           className="basic-single"
                           styles={{
-                            container: (base) => ({ ...base}),
+                            container: (base) => ({ ...base }),
                           }}
                         />
                       </div>
@@ -1597,42 +1628,30 @@ const options =
                   <div className="flex justify-content-end mt-4 totalBefore">
                     <div>
                       <div className="flexBefore">
-                        <div>
-                          <strong>{t("totalBeforeTax")} : </strong>
-                        </div>
-                        <div>
-                          <span> {formatterTwo.format(sumAmountToPay)}</span>
-                        </div>
+                        {renderSection(
+                          poData?.section1_label,
+                          poData?.section1_values
+                        )}
                       </div>
                       <div className="flexBefore">
-                        <div>
-                          <strong>{t("vat")} : </strong>
-                        </div>
-                        <div>
-                          <span>{formatterTwo.format(VATTotal)}</span>
-                        </div>
+                        {renderSection(
+                          poData?.section2_label,
+                          poData?.section2_values
+                        )}
                       </div>
                       <div className="flexBefore">
-                        <div>
-                          <strong>{t("wht")} : </strong>
-                        </div>
-                        <div>
-                          <span>{formatterTwo.format(WHTTotal)}</span>
-                        </div>
+                        {renderSection(
+                          poData?.section3_label,
+                          poData?.section3_values
+                        )}
                       </div>
                       <div className=" d-flex flexBefore">
-                        <div>
-                          <strong>{t("rounding")}</strong>
-                        </div>
-                        <input
-                          type="number"
-                          name="rounding"
-                          value={roundingData}
-                          onChange={handleRoundingChange}
-                          onBlur={handleRoundingBlur}
-                        />
+                        {renderSection(
+                          poData?.section4_label,
+                          poData?.section4_values
+                        )}
                       </div>
-                      <div className="flexBefore">
+                      {/* <div className="flexBefore">
                         <div>
                           <strong>{t("amountToPay")} : </strong>
                         </div>
@@ -1646,7 +1665,7 @@ const options =
                             )}
                           </span>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </form>

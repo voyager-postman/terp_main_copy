@@ -53,8 +53,6 @@ const BillingNote = () => {
   //   }));
   // };
 
-
-
   const [roundingData, setRoundingData] = useState("");
   const [VATTotal, setVATTotal] = useState(0);
   const [WHTTotal, setWHTTotal] = useState(0);
@@ -120,7 +118,7 @@ const BillingNote = () => {
     });
 
     return () => {
-      modal?.removeEventListener("hidden.bs.modal", () => { });
+      modal?.removeEventListener("hidden.bs.modal", () => {});
     };
   }, []);
 
@@ -177,8 +175,8 @@ const BillingNote = () => {
   const [payableDATA, setPayableData] = useState("");
   const [show2, setShow2] = useState(false);
   const [color, setColor] = useState(false);
-  const [modalHead, setModalHead] = useState(null);   // Stores API head data
-  const [modalData, setModalData] = useState(null);   // Stores API row data
+  const [modalHead, setModalHead] = useState(null); // Stores API head data
+  const [modalData, setModalData] = useState(null); // Stores API row data
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -245,7 +243,6 @@ const BillingNote = () => {
   //     toast.error(t("tryAgain"));
   //   }
   // };
-
 
   const submitPaymentData2 = async () => {
     if (!receiptID) {
@@ -332,7 +329,9 @@ const BillingNote = () => {
 
         // Step 1: Create dynamic columns from head
         const generatedColumns = Object.entries(head)
-          .filter(([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID")
+          .filter(
+            ([key]) => key !== "ID" && key !== "Payment_Status" && key !== "RID"
+          )
           .map(([key, label]) => ({
             Header: t(label || key),
             accessor: key,
@@ -360,7 +359,7 @@ const BillingNote = () => {
                         <i className="mdi mdi-pencil pl-2" />
                       </Link> */}
 
-                      <button
+                      {/* <button
                         onClick={async () => {
                           try {
                             const res = await axios.post(
@@ -390,8 +389,13 @@ const BillingNote = () => {
                         }}
                       >
                         <i className="mdi mdi-pencil pl-2" />
-                      </button>
-
+                      </button> */}
+                      <Link
+                        to="/billingNoteCreate"
+                        state={{ from: { ...a, isReadOnly: true } }}
+                      >
+                        <i className="mdi mdi-pencil pl-2" />{" "}
+                      </Link>
                       <button type="button" onClick={() => deleteOrder(a.ID)}>
                         <i className="mdi mdi-delete " />
                       </button>
@@ -554,9 +558,9 @@ const BillingNote = () => {
       amount_to_pay: (
         Number(paymentAmmountNew) +
         (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-        Number(vatNew) -
+          Number(vatNew) -
         (Number(paymentAmmountNew) + Number(depositAvailableNew)) *
-        Number(whtNew) +
+          Number(whtNew) +
         (Number(roundingNew1) + Number(roundingNew))
       ).toFixed(2),
       Deposit_Used: Number(depositAvailableNew),
@@ -614,7 +618,9 @@ const BillingNote = () => {
 
   const fetchReceiptData = async (bn_id) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/receiptBNIDView`, { bn_id });
+      const res = await axios.post(`${API_BASE_URL}/receiptBNIDView`, {
+        bn_id,
+      });
       if (res.data.success) {
         setModalHead(res.data.head);
         setModalData(res.data.data);
@@ -625,7 +631,6 @@ const BillingNote = () => {
   };
 
   const handleChange5 = async (field, value) => {
-
     // 1. Update UI immediately
     setPaymentForm((prev) => ({
       ...prev,
@@ -679,7 +684,6 @@ const BillingNote = () => {
 
       // 6. Refresh data using correct bn_id
       fetchReceiptData(singlePodId?.ID); // ensure singlePodId is correct
-
     } catch (error) {
       console.error("❌ Error updating field:", error);
     }
@@ -701,9 +705,9 @@ const BillingNote = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          bn_id: a.ID,       // Pass BN ID from selected record
-          IID: "",              // Keep empty if not applicable
-          USER_ID: 7            // Replace with logged-in user ID
+          bn_id: a.ID, // Pass BN ID from selected record
+          IID: "", // Keep empty if not applicable
+          USER_ID: 7, // Replace with logged-in user ID
         }),
       });
 
@@ -723,9 +727,7 @@ const BillingNote = () => {
     }
   };
 
-
   // billing pdf
-
 
   /*   const handleSubmit7 = async () => {
       try {
@@ -1141,9 +1143,17 @@ const BillingNote = () => {
           if (leftValueLines[j])
             doc.text(leftValueLines[j], leftValueX, currentY + j * lineHeight);
           if (rightLabelLines[j])
-            doc.text(rightLabelLines[j], rightLabelX, currentY + j * lineHeight);
+            doc.text(
+              rightLabelLines[j],
+              rightLabelX,
+              currentY + j * lineHeight
+            );
           if (rightValueLines[j])
-            doc.text(rightValueLines[j], rightValueX, currentY + j * lineHeight);
+            doc.text(
+              rightValueLines[j],
+              rightValueX,
+              currentY + j * lineHeight
+            );
         }
         currentY += maxLines * lineHeight;
       }
@@ -1155,9 +1165,18 @@ const BillingNote = () => {
         head: [tableHeaders],
         body: tableRows,
         startY: currentY,
-        headStyles: { fillColor: "#203764", textColor: "#FFFFFF", halign: "center" },
+        headStyles: {
+          fillColor: "#203764",
+          textColor: "#FFFFFF",
+          halign: "center",
+        },
         bodyStyles: { valign: "top" },
-        styles: { overflow: "linebreak", textColor: "#000000", lineColor: "#203764", lineWidth: 0.1 },
+        styles: {
+          overflow: "linebreak",
+          textColor: "#000000",
+          lineColor: "#203764",
+          lineWidth: 0.1,
+        },
         margin: { left: 7, right: 7 },
         tableWidth: "auto",
         columnStyles: {
@@ -1194,10 +1213,12 @@ const BillingNote = () => {
 
         // Continue to Section 6
         if (section6_label && section6_Values) {
-          const section6Data = Object.keys(section6_label).map((key, index) => ({
-            label: section6_label[key],
-            value: section6_Values[`Row${index + 1}`],
-          }));
+          const section6Data = Object.keys(section6_label).map(
+            (key, index) => ({
+              label: section6_label[key],
+              value: section6_Values[`Row${index + 1}`],
+            })
+          );
           const startX = 7;
           const colSpacing = 35;
           const labelY = nextStartY;
@@ -1210,7 +1231,10 @@ const BillingNote = () => {
         }
       }
       // Case 2: No Notes → Treat section5 as section6
-      else if (typeof section5_label === "object" && typeof section5_Values === "object") {
+      else if (
+        typeof section5_label === "object" &&
+        typeof section5_Values === "object"
+      ) {
         const section6Data = Object.keys(section5_label).map((key, index) => ({
           label: section5_label[key],
           value: section5_Values[`Row${index + 1}`],
@@ -1225,7 +1249,6 @@ const BillingNote = () => {
           doc.text(item.value || "-", x, valueY);
         });
       }
-
 
       // Page Numbers
       const addPageNumbers = () => {
@@ -1267,8 +1290,7 @@ const BillingNote = () => {
       if (response.data.success) {
         console.log("PDF uploaded successfully");
         window.open(
-          `${API_IMAGE_URL}${a?.COL1 || "default"
-          }_Billing_Note_${dateTime}.pdf`
+          `${API_IMAGE_URL}${a?.COL1 || "default"}_Billing_Note_${dateTime}.pdf`
         );
       } else {
         console.log("Failed to upload PDF");
@@ -1602,8 +1624,14 @@ const BillingNote = () => {
                         <>
                           {Object.keys(modalHead).map((key) => (
                             <div className="flexBefore" key={key}>
-                              <div><strong>{modalHead[key]}</strong></div>
-                              <div><span>{modalData ? modalData[key] || 0 : 0}</span></div>
+                              <div>
+                                <strong>{modalHead[key]}</strong>
+                              </div>
+                              <div>
+                                <span>
+                                  {modalData ? modalData[key] || 0 : 0}
+                                </span>
+                              </div>
                             </div>
                           ))}
                         </>

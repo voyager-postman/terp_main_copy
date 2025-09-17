@@ -3,6 +3,8 @@ import { useForm } from "@tanstack/react-form";
 import axios from "../../Url/Api";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "react-query";
+import img from "../../../src/assets/image.jpeg"; // your local image
+import NotoSansThaiRegular from "../../assets/fonts/NotoSansThai-Regular-normal";
 import { Link, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import logo from "../../assets/logoT.jpg";
@@ -20,7 +22,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslation } from "react-i18next";
 import TextField from "@mui/material/TextField";
 import { FaCalendarAlt } from "react-icons/fa";
-
+import wht from "../../assets/wht.png";
 const CustomInput = ({ value, onClick }) => (
   <div
     className="custom-input"
@@ -643,7 +645,7 @@ const WithHold = () => {
                     <i className="mdi mdi-scale"></i>{" "}
                   </button>
                 )}
-                <button
+                {/* <button
                   type="button"
                   className="SvgAnchor"
                   data-bs-toggle="modal"
@@ -665,7 +667,13 @@ const WithHold = () => {
                     <title>cash-check</title>
                     <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z" />
                   </svg>
-                </button>
+                </button> */}
+                {/* <button className="iconWht" onClick={generatePdfWithBackground}>
+                  WHT
+                </button> */}
+                <div className="whtImg" onClick={generatePdfWithBackground}>
+                <img src={wht} alt="" />
+              </div>
               </div>
             </>
           ),
@@ -5184,7 +5192,247 @@ const WithHold = () => {
       console.error("Error uploading PDF:", error);
     }
   };
+  const generatePdfWithBackground = () => {
+    const doc = new jsPDF("p", "mm", "a4");
+    doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular); // NotoSansThaiRegular is the variable exported from the .js file
+    doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
+    const pageCount = doc.internal.getNumberOfPages();
+    const pageWidth = doc.internal.pageSize.getWidth();
 
+    // Add background image
+    doc.addImage(img, "JPEG", 0, 0, 210, 297); // full A4 page
+    // white rectangle
+    doc.setFillColor(255, 255, 255); // red
+    doc.rect(7, 0, pageWidth, 15.1, "F");
+    // end white rectangle
+    doc.setFont("NotoSansThai");
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.setFillColor(255, 255, 255); // red
+    doc.rect(149.7, 16.1, 50, 12.2, "F");
+    // PO Label + value
+    doc.text("เล่มท", 165, 21.7, { align: "center" });
+    doc.text("PO-20250915001", 182, 21.7, { align: "center" });
+
+    // วาดเส้นประใต้ค่า PO
+    doc.setLineDash([0.2, 0.2], 0); // เส้นประ
+    doc.line(169, 22.5, 200, 22); // (x1,y1,x2,y2) กำหนดความยาวเส้นเอง
+    doc.setLineDash([]); // reset
+
+    // WHT Label + value
+    doc.text("เลขท", 165, 26.7, { align: "center" });
+    doc.text("WHT-202500001", 182, 26, { align: "center" });
+
+    // วาดเส้นประใต้ค่า WHT
+    doc.setLineDash([0.2, 0.2], 0);
+    doc.line(169, 27.5, 200, 27);
+    doc.setLineDash([]);
+
+    doc.setFontSize(9);
+    doc.setFont("NotoSansThai");
+    doc.text("บริษัท สยาม อีทส์ จำกัด", 19, 39);
+    const longTextOne =
+      "16/8 หมู่ที่ 11 คลองหนึ่ง คลองหลวง ปทุมธานี 12120 ประเทศไทย";
+    const linesOne = doc.splitTextToSize(longTextOne);
+    let startXOne = 20;
+    let startYOne = 47;
+    let lineHeight = 4.2;
+    let lastYOne = startYOne;
+
+    linesOne.forEach((lineOne, index) => {
+      let currentY = startYOne + index * lineHeight;
+      doc.text(lineOne, startXOne, currentY);
+      lastYOne = currentY;
+    });
+    const taxId = "0395561000010"; // Tax ID
+    const boxSize = 4; // width & height of each box
+    const gap = 0; // default gap
+    const startX = pageWidth - 77.37;
+    const startY = 30;
+
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+
+    // Define specific gaps after certain indexes
+    const gapMap = {
+      0: 2, // after 2nd digit -> 4mm gap
+      1: 0.5, // after 6th digit -> 4mm gap
+      2: 0.5,
+      3: 0.5,
+      4: 2,
+      5: 0.5,
+      6: 0.3,
+      7: 0.1,
+      8: 0.1,
+      9: 2,
+      10: 0.5,
+      11: 2.3,
+    };
+
+    let currentX = startX;
+
+    for (let i = 0; i < taxId.length; i++) {
+      const x = currentX;
+      const y = startY;
+      // center digit inside
+      const textX = x + boxSize / 2;
+      const textY = y + boxSize / 2 + 1.2;
+      doc.text(taxId[i], textX, textY, { align: "center" });
+
+      // move forward by box + default gap
+      currentX += boxSize + gap;
+
+      // if this index has an extra gap, add it
+      if (gapMap[i] !== undefined) {
+        currentX += gapMap[i];
+      }
+    }
+
+    // second id
+
+    const secId = "1234567890123"; // your Sec ID
+    const boxSize1 = 4; // width & height of each box
+    const gap1 = 0; // default gap
+    const startX1 = pageWidth - 77.37; // X start position
+    const startY1 = 54; // Y start position (below first row)
+
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+
+    // Define specific gaps after certain indexes
+    const secGapMap = {
+      0: 2,
+      1: 0.5,
+      2: 0.5,
+      3: 0.5,
+      4: 2,
+      5: 0.5,
+      6: 0.3,
+      7: 0.1,
+      8: 0.1,
+      9: 2,
+      10: 0.5,
+      11: 2.3,
+    };
+
+    let currentX1 = startX1;
+
+    for (let i = 0; i < secId.length; i++) {
+      const x = currentX1;
+      const y = startY1;
+
+      // center digit inside
+      const textX = x + boxSize1 / 2;
+      const textY = y + boxSize1 / 2 + 1.2;
+      doc.text(secId[i], textX, textY, { align: "center" });
+
+      // move forward by box + default gap
+      currentX1 += boxSize1 + gap1;
+
+      // add extra gap if defined
+      if (secGapMap[i] !== undefined) {
+        currentX1 += secGapMap[i];
+      }
+    }
+    doc.text("บริษัท เอ็กเซล ทรานสปอร์ต อินเตอร์เนชั่นแนล จำกัด", 20, 64.5);
+    doc.text("เลขที่ 65/1 ซอยสุขุมวิท 19, ถนนสุขุมวิท 10390", 23, 74);
+
+    const checkY = 74;
+    const values = ["1", "2", "2", "2", "3", "4", "5", "0"];
+    const xPositions = [75, 103, 103, 141, 168, 75, 103, 141];
+    const YPositions = [
+      checkY + 10,
+      checkY + 10,
+      checkY + 10,
+      checkY + 10,
+      checkY + 10,
+      checkY + 16.5,
+      checkY + 16.5,
+      checkY + 16.5,
+    ];
+    values.forEach((val, i) => {
+      doc.text(val, xPositions[i], YPositions[i]);
+    });
+
+    //for table row 1
+    const startXTable = 118;
+    const startYTable1 = 107.5;
+    // Column 1 values
+    const rows1 = [
+      { text: "item1", y: startYTable1 },
+      { text: "item2", y: startYTable1 + 5 },
+      { text: "item3", y: startYTable1 + 10 },
+      { text: "item4", y: startYTable1 + 15 },
+      { text: "item5", y: startYTable1 + 28 },
+      { text: "item6", y: startYTable1 + 41 },
+      { text: "item7", y: startYTable1 + 46 },
+      { text: "item8", y: startYTable1 + 51 },
+      { text: "item9", y: startYTable1 + 59 },
+      { text: "item10", y: startYTable1 + 69 },
+      { text: "item11", y: startYTable1 + 79 },
+      { text: "item12", y: startYTable1 + 89 },
+      { text: "15-09-2025", y: startYTable1 + 104 },
+      { text: "0.00", y: startYTable1 + 117.4 },
+    ];
+
+    // Column 2 values
+    const rows2 = [
+      { text: "item1", y: startYTable1 },
+      { text: "item2", y: startYTable1 + 5 },
+      { text: "item3", y: startYTable1 + 10 },
+      { text: "item4", y: startYTable1 + 15 },
+      { text: "item5", y: startYTable1 + 28 },
+      { text: "item6", y: startYTable1 + 41 },
+      { text: "item7", y: startYTable1 + 46 },
+      { text: "item8", y: startYTable1 + 51 },
+      { text: "item9", y: startYTable1 + 59 },
+      { text: "item10", y: startYTable1 + 69 },
+      { text: "item11", y: startYTable1 + 79 },
+      { text: "item12", y: startYTable1 + 89 },
+      { text: "14-09-2025", y: startYTable1 + 104 },
+      { text: "0.00", y: startYTable1 + 117.4 },
+    ];
+
+    // Column 3 values
+    const rows3 = [
+      { text: "item1", y: startYTable1 },
+      { text: "item2", y: startYTable1 + 5 },
+      { text: "item3", y: startYTable1 + 10 },
+      { text: "item4", y: startYTable1 + 15 },
+      { text: "item5", y: startYTable1 + 28 },
+      { text: "item6", y: startYTable1 + 41 },
+      { text: "item7", y: startYTable1 + 46 },
+      { text: "item8", y: startYTable1 + 51 },
+      { text: "item9", y: startYTable1 + 59 },
+      { text: "item10", y: startYTable1 + 69 },
+      { text: "item11", y: startYTable1 + 79 },
+      { text: "item12", y: startYTable1 + 89 },
+      { text: "14-09-2025", y: startYTable1 + 104 },
+      { text: " 0.00", y: startYTable1 + 117.4 },
+    ];
+    const newY1 = startYTable1 + 117.4;
+    // Draw all three columns
+    rows1.forEach((row) => doc.text(row.text, startXTable, row.y));
+    rows2.forEach((row) => doc.text(row.text, startXTable + 28, row.y));
+    rows3.forEach((row) => doc.text(row.text, startXTable + 58, row.y));
+    doc.text("คลองหนึ่งคลองหลวงปทุมธาน", 34, newY1 + 1);
+    doc.text("0.00", startXTable + 28, newY1 + 7);
+    doc.text("0.00", startXTable + 58, newY1 + 7);
+    const values1 = ["1", "2", "2", "2"];
+    const xPositions1 = [30.5, 63, 101, 140];
+    const YPositions1 = [newY1 + 29, newY1 + 29, newY1 + 29, newY1 + 29];
+
+    values1.forEach((val, i) => {
+      doc.text(val, xPositions1[i], YPositions1[i]);
+    });
+
+    doc.text("1234", startXTable + 9, newY1 + 41);
+    doc.text("15-09-2025", startXTable - 1, newY1 + 45);
+
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl, "_blank"); // Opens PDF in a new tab
+  };
   const fetchReceiptData = async (Order_ID) => {
     try {
       const res = await axios.post(`${API_BASE_URL}/receiptBNIDView`, {

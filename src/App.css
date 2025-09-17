@@ -4108,3 +4108,14 @@ td {
 .form-group .MuiAutocomplete-root {
   margin-bottom: 10px;
 }
+button.iconWht {
+    color: #203764;
+    padding: 1px;
+    border-radius: 4px;
+    border: 2px solid #203764;
+    font-size: 8px;
+    line-height: 11px !important;
+}
+.whtImg img{
+height: 40px;
+}
