@@ -488,14 +488,11 @@ const BillingNoteCreate = () => {
         setTotalDataDetails2(newCpnId);
 
         // Step 2: Now call "VendorFilteredPaymentDetails" using updated cpn_id
-        const response = await axios.post(
-          `${API_BASE_URL}/getInvoicesByClientConsignee`,
-          {
-            client_id: state.ClientID || editId?.client_id,
-            consignee_id: state.ConsigneeID || editId?.consignee_id,
-            vendor_id: state.vendor_id,
-          }
-        );
+        const response = await axios.post(`${API_BASE_URL}/BN_Create_List`, {
+          Client_ID: state.ClientID || editId?.client_id,
+          Consignee_ID: state.ConsigneeID || editId?.consignee_id,
+          // vendor_id: state.vendor_id,
+        });
         const res = response.data;
         console.log("VendorFilteredPaymentDetails response:", response);
         setDynamicHeaders(res.head);
@@ -1625,47 +1622,30 @@ const BillingNoteCreate = () => {
                     </table>
                   </div>
                   {/* table new end */}
-                  <div className="flex justify-content-end mt-4 totalBefore">
-                    <div>
-                      <div className="flexBefore">
-                        {renderSection(
-                          poData?.section1_label,
-                          poData?.section1_values
-                        )}
-                      </div>
-                      <div className="flexBefore">
-                        {renderSection(
-                          poData?.section2_label,
-                          poData?.section2_values
-                        )}
-                      </div>
-                      <div className="flexBefore">
-                        {renderSection(
-                          poData?.section3_label,
-                          poData?.section3_values
-                        )}
-                      </div>
-                      <div className=" d-flex flexBefore">
-                        {renderSection(
-                          poData?.section4_label,
-                          poData?.section4_values
-                        )}
-                      </div>
-                      {/* <div className="flexBefore">
-                        <div>
-                          <strong>{t("amountToPay")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(
-                              (sumAmountToPay ?? 0) +
-                                (VATTotal ?? 0) -
-                                (WHTTotal ?? 0) +
-                                roundingData
-                            )}
-                          </span>
-                        </div>
-                      </div> */}
+                  <div className="row py-4">
+                    <div className="col-lg-3">
+                      {renderSection(
+                        poData?.section1_label,
+                        poData?.section1_values
+                      )}
+                    </div>
+                    <div className="col-lg-3">
+                      {renderSection(
+                        poData?.section2_label,
+                        poData?.section2_values
+                      )}
+                    </div>
+                    <div className="col-lg-3">
+                      {renderSection(
+                        poData?.section3_label,
+                        poData?.section3_values
+                      )}
+                    </div>
+                    <div className="col-lg-3">
+                      {renderSection(
+                        poData?.section4_label,
+                        poData?.section4_values
+                      )}
                     </div>
                   </div>
                 </form>

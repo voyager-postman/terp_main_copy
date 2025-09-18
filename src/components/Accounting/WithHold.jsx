@@ -671,9 +671,12 @@ const WithHold = () => {
                 {/* <button className="iconWht" onClick={generatePdfWithBackground}>
                   WHT
                 </button> */}
-                <div className="whtImg" onClick={generatePdfWithBackground}>
-                <img src={wht} alt="" />
-              </div>
+                <div
+                  className="whtImg"
+                  onClick={() => generatePdfWithBackground(a.ID)}
+                >
+                  <img src={wht} alt="" />
+                </div>
               </div>
             </>
           ),
@@ -5192,246 +5195,294 @@ const WithHold = () => {
       console.error("Error uploading PDF:", error);
     }
   };
-  const generatePdfWithBackground = () => {
-    const doc = new jsPDF("p", "mm", "a4");
-    doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular); // NotoSansThaiRegular is the variable exported from the .js file
-    doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
-    const pageCount = doc.internal.getNumberOfPages();
-    const pageWidth = doc.internal.pageSize.getWidth();
+  const generatePdfWithBackground = async (PAY_ID1) => {
+    try {
+      // 1️⃣ Call your API with PAY_ID
+      const response = await axios.post(`${API_BASE_URL}/WHT_3_PDF`, {
+        PAY_ID: PAY_ID1,
+      });
+      const apiData = response.data;
+      console.log("API Data:", apiData);
 
-    // Add background image
-    doc.addImage(img, "JPEG", 0, 0, 210, 297); // full A4 page
-    // white rectangle
-    doc.setFillColor(255, 255, 255); // red
-    doc.rect(7, 0, pageWidth, 15.1, "F");
-    // end white rectangle
-    doc.setFont("NotoSansThai");
-    doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.setFillColor(255, 255, 255); // red
-    doc.rect(149.7, 16.1, 50, 12.2, "F");
-    // PO Label + value
-    doc.text("เล่มท", 165, 21.7, { align: "center" });
-    doc.text("PO-20250915001", 182, 21.7, { align: "center" });
+      const doc = new jsPDF("p", "mm", "a4");
 
-    // วาดเส้นประใต้ค่า PO
-    doc.setLineDash([0.2, 0.2], 0); // เส้นประ
-    doc.line(169, 22.5, 200, 22); // (x1,y1,x2,y2) กำหนดความยาวเส้นเอง
-    doc.setLineDash([]); // reset
+      doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular); // NotoSansThaiRegular is the variable exported from the .js file
+      doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
+      const pageCount = doc.internal.getNumberOfPages();
+      const pageWidth = doc.internal.pageSize.getWidth();
 
-    // WHT Label + value
-    doc.text("เลขท", 165, 26.7, { align: "center" });
-    doc.text("WHT-202500001", 182, 26, { align: "center" });
+      // Add background image
+      doc.addImage(img, "JPEG", 0, 0, 210, 297); // full A4 page
+      // white rectangle
+      doc.setFillColor(255, 255, 255); // red
+      doc.rect(7, 0, pageWidth, 15.1, "F");
+      // end white rectangle
+      doc.setFont("NotoSansThai");
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      doc.setFillColor(255, 255, 255); // red
+      doc.rect(149.7, 16.1, 50, 12.2, "F");
+      // PO Label + value
+      doc.text("เล่มท", 165, 21.7, { align: "center" });
+      doc.text("PO-20250915001", 182, 21.7, { align: "center" });
 
-    // วาดเส้นประใต้ค่า WHT
-    doc.setLineDash([0.2, 0.2], 0);
-    doc.line(169, 27.5, 200, 27);
-    doc.setLineDash([]);
+      // วาดเส้นประใต้ค่า PO
+      doc.setLineDash([0.2, 0.2], 0); // เส้นประ
+      doc.line(169, 22.5, 200, 22); // (x1,y1,x2,y2) กำหนดความยาวเส้นเอง
+      doc.setLineDash([]); // reset
 
-    doc.setFontSize(9);
-    doc.setFont("NotoSansThai");
-    doc.text("บริษัท สยาม อีทส์ จำกัด", 19, 39);
-    const longTextOne =
-      "16/8 หมู่ที่ 11 คลองหนึ่ง คลองหลวง ปทุมธานี 12120 ประเทศไทย";
-    const linesOne = doc.splitTextToSize(longTextOne);
-    let startXOne = 20;
-    let startYOne = 47;
-    let lineHeight = 4.2;
-    let lastYOne = startYOne;
+      // WHT Label + value
+      doc.text("เลขท", 165, 26.7, { align: "center" });
+      doc.text("WHT-202500001", 182, 26, { align: "center" });
 
-    linesOne.forEach((lineOne, index) => {
-      let currentY = startYOne + index * lineHeight;
-      doc.text(lineOne, startXOne, currentY);
-      lastYOne = currentY;
-    });
-    const taxId = "0395561000010"; // Tax ID
-    const boxSize = 4; // width & height of each box
-    const gap = 0; // default gap
-    const startX = pageWidth - 77.37;
-    const startY = 30;
+      // วาดเส้นประใต้ค่า WHT
+      doc.setLineDash([0.2, 0.2], 0);
+      doc.line(169, 27.5, 200, 27);
+      doc.setLineDash([]);
 
-    doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0);
+      doc.setFontSize(9);
+      doc.setFont("NotoSansThai");
+      doc.text(apiData?.Section_1?.row1 || "", 19, 39);
+      const longTextOne = apiData?.Section_1?.row2 || "";
+      const linesOne = doc.splitTextToSize(longTextOne);
+      let startXOne = 20;
+      let startYOne = 47;
+      let lineHeight = 4.2;
+      let lastYOne = startYOne;
 
-    // Define specific gaps after certain indexes
-    const gapMap = {
-      0: 2, // after 2nd digit -> 4mm gap
-      1: 0.5, // after 6th digit -> 4mm gap
-      2: 0.5,
-      3: 0.5,
-      4: 2,
-      5: 0.5,
-      6: 0.3,
-      7: 0.1,
-      8: 0.1,
-      9: 2,
-      10: 0.5,
-      11: 2.3,
-    };
+      linesOne.forEach((lineOne, index) => {
+        let currentY = startYOne + index * lineHeight;
+        doc.text(lineOne, startXOne, currentY);
+        lastYOne = currentY;
+      });
+      const taxId = apiData?.Section_1?.tax || ""; // Tax ID
+      const boxSize = 4; // width & height of each box
+      const gap = 0; // default gap
+      const startX = pageWidth - 77.37;
+      const startY = 30;
 
-    let currentX = startX;
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
 
-    for (let i = 0; i < taxId.length; i++) {
-      const x = currentX;
-      const y = startY;
-      // center digit inside
-      const textX = x + boxSize / 2;
-      const textY = y + boxSize / 2 + 1.2;
-      doc.text(taxId[i], textX, textY, { align: "center" });
+      // Define specific gaps after certain indexes
+      const gapMap = {
+        0: 2, // after 2nd digit -> 4mm gap
+        1: 0.5, // after 6th digit -> 4mm gap
+        2: 0.5,
+        3: 0.5,
+        4: 2,
+        5: 0.5,
+        6: 0.3,
+        7: 0.1,
+        8: 0.1,
+        9: 2,
+        10: 0.5,
+        11: 2.3,
+      };
 
-      // move forward by box + default gap
-      currentX += boxSize + gap;
+      let currentX = startX;
 
-      // if this index has an extra gap, add it
-      if (gapMap[i] !== undefined) {
-        currentX += gapMap[i];
+      for (let i = 0; i < taxId.length; i++) {
+        const x = currentX;
+        const y = startY;
+        // center digit inside
+        const textX = x + boxSize / 2;
+        const textY = y + boxSize / 2 + 1.2;
+        doc.text(taxId[i], textX, textY, { align: "center" });
+
+        // move forward by box + default gap
+        currentX += boxSize + gap;
+
+        // if this index has an extra gap, add it
+        if (gapMap[i] !== undefined) {
+          currentX += gapMap[i];
+        }
       }
-    }
 
-    // second id
+      // second id
+      doc.text(apiData?.Section_2?.row1 || "", 20, 64.5);
+      doc.text(apiData?.Section_2?.row2 || "", 23, 74);
+      const secId = apiData?.Section_2?.tax || ""; // your Sec ID
+      const boxSize1 = 4; // width & height of each box
+      const gap1 = 0; // default gap
+      const startX1 = pageWidth - 77.37; // X start position
+      const startY1 = 54; // Y start position (below first row)
 
-    const secId = "1234567890123"; // your Sec ID
-    const boxSize1 = 4; // width & height of each box
-    const gap1 = 0; // default gap
-    const startX1 = pageWidth - 77.37; // X start position
-    const startY1 = 54; // Y start position (below first row)
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
 
-    doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0);
+      // Define specific gaps after certain indexes
+      const secGapMap = {
+        0: 2,
+        1: 0.5,
+        2: 0.5,
+        3: 0.5,
+        4: 2,
+        5: 0.5,
+        6: 0.3,
+        7: 0.1,
+        8: 0.1,
+        9: 2,
+        10: 0.5,
+        11: 2.3,
+      };
 
-    // Define specific gaps after certain indexes
-    const secGapMap = {
-      0: 2,
-      1: 0.5,
-      2: 0.5,
-      3: 0.5,
-      4: 2,
-      5: 0.5,
-      6: 0.3,
-      7: 0.1,
-      8: 0.1,
-      9: 2,
-      10: 0.5,
-      11: 2.3,
-    };
+      let currentX1 = startX1;
 
-    let currentX1 = startX1;
+      for (let i = 0; i < secId.length; i++) {
+        const x = currentX1;
+        const y = startY1;
 
-    for (let i = 0; i < secId.length; i++) {
-      const x = currentX1;
-      const y = startY1;
+        // center digit inside
+        const textX = x + boxSize1 / 2;
+        const textY = y + boxSize1 / 2 + 1.2;
+        doc.text(secId[i], textX, textY, { align: "center" });
 
-      // center digit inside
-      const textX = x + boxSize1 / 2;
-      const textY = y + boxSize1 / 2 + 1.2;
-      doc.text(secId[i], textX, textY, { align: "center" });
+        // move forward by box + default gap
+        currentX1 += boxSize1 + gap1;
 
-      // move forward by box + default gap
-      currentX1 += boxSize1 + gap1;
-
-      // add extra gap if defined
-      if (secGapMap[i] !== undefined) {
-        currentX1 += secGapMap[i];
+        // add extra gap if defined
+        if (secGapMap[i] !== undefined) {
+          currentX1 += secGapMap[i];
+        }
       }
+
+      // Assuming apiData = response.data
+      const checks = apiData.WHT_Checks;
+
+      const checkY = 74;
+      const xPositions = [75, 103, 141, 168, 75, 103, 141];
+      const yPositions = [
+        checkY + 10,
+        checkY + 10,
+        checkY + 10,
+        checkY + 10,
+        checkY + 16.5,
+        checkY + 16.5,
+        checkY + 16.5,
+      ];
+
+      // Convert API object into array
+      const checkValues = [
+        checks.WHT1,
+        checks.WHT2,
+        checks.WHT3,
+        checks.WHT4,
+        checks.WHT5,
+        checks.WHT6,
+        checks.WHT7,
+      ];
+
+      // Draw only when value exists
+      checkValues.forEach((val, i) => {
+        if (val && val.toUpperCase() === "X") {
+          doc.setFont("zapfdingbats", "normal");
+          doc.setFontSize(12);
+
+          // 52 = checkmark ✔ in ZapfDingbats
+          doc.text(String.fromCharCode(52), xPositions[i], yPositions[i]);
+        }
+      });
+      doc.setFont("NotoSansThai");
+      //for table row 1
+      const startXTable = 118;
+      const startYTable1 = 107.5;
+      // Column 1 values
+      const rows1 = [
+        { text: apiData?.Section_3?.row1 || "", y: startYTable1 },
+        { text: apiData?.Section_3?.row2 || "", y: startYTable1 + 5 },
+        { text: apiData?.Section_3?.row3 || "", y: startYTable1 + 10 },
+        { text: apiData?.Section_3?.row4 || "", y: startYTable1 + 15 },
+        { text: apiData?.Section_3?.row5 || "", y: startYTable1 + 28 },
+        { text: apiData?.Section_3?.row6 || "", y: startYTable1 + 41 },
+        { text: apiData?.Section_3?.row7 || "", y: startYTable1 + 46 },
+        { text: apiData?.Section_3?.row8 || "", y: startYTable1 + 51 },
+        { text: apiData?.Section_3?.row9 || "", y: startYTable1 + 59 },
+        { text: apiData?.Section_3?.row10 || "", y: startYTable1 + 69 },
+        { text: apiData?.Section_3?.row11 || "", y: startYTable1 + 79 },
+        { text: apiData?.Section_3?.row12 || "", y: startYTable1 + 89 },
+        { text: apiData?.Section_3?.row13 || "", y: startYTable1 + 104 },
+        { text: apiData?.Section_3?.row14 || "", y: startYTable1 + 117.4 },
+      ];
+
+      // Column 2 values
+      const rows2 = [
+        { text: apiData?.Section_4?.row1 || "", y: startYTable1 },
+        { text: apiData?.Section_4?.row2 || "", y: startYTable1 + 5 },
+        { text: apiData?.Section_4?.row3 || "", y: startYTable1 + 10 },
+        { text: apiData?.Section_4?.row4 || "", y: startYTable1 + 15 },
+        { text: apiData?.Section_4?.row5 || "", y: startYTable1 + 28 },
+        { text: apiData?.Section_4?.row6 || "", y: startYTable1 + 41 },
+        { text: apiData?.Section_4?.row7 || "", y: startYTable1 + 46 },
+        { text: apiData?.Section_4?.row8 || "", y: startYTable1 + 51 },
+        { text: apiData?.Section_4?.row9 || "", y: startYTable1 + 59 },
+        { text: apiData?.Section_4?.row10 || "", y: startYTable1 + 69 },
+        { text: apiData?.Section_4?.row11 || "", y: startYTable1 + 79 },
+        { text: apiData?.Section_4?.row12 || "", y: startYTable1 + 89 },
+        { text: apiData?.Section_4?.row13 || "", y: startYTable1 + 104 },
+        { text: apiData?.Section_4?.row14 || "", y: startYTable1 + 117.4 },
+      ];
+
+      // Column 3 values
+      const rows3 = [
+        { text: apiData?.Section_5?.row1 || "", y: startYTable1 },
+        { text: apiData?.Section_5?.row2 || "", y: startYTable1 + 5 },
+        { text: apiData?.Section_5?.row3 || "", y: startYTable1 + 10 },
+        { text: apiData?.Section_5?.row4 || "", y: startYTable1 + 15 },
+        { text: apiData?.Section_5?.row5 || "", y: startYTable1 + 28 },
+        { text: apiData?.Section_5?.row6 || "", y: startYTable1 + 41 },
+        { text: apiData?.Section_5?.row7 || "", y: startYTable1 + 46 },
+        { text: apiData?.Section_5?.row8 || "", y: startYTable1 + 51 },
+        { text: apiData?.Section_5?.row9 || "", y: startYTable1 + 59 },
+        { text: apiData?.Section_5?.row10 || "", y: startYTable1 + 69 },
+        { text: apiData?.Section_5?.row11 || "", y: startYTable1 + 79 },
+        { text: apiData?.Section_5?.row12 || "", y: startYTable1 + 89 },
+        { text: apiData?.Section_5?.row13 || "", y: startYTable1 + 104 },
+        { text: apiData?.Section_5?.row14 || "", y: startYTable1 + 117.4 },
+      ];
+      const newY1 = startYTable1 + 117.4;
+      // Draw all three columns
+      rows1.forEach((row) => doc.text(row.text, startXTable, row.y));
+      rows2.forEach((row) => doc.text(row.text, startXTable + 28, row.y));
+      rows3.forEach((row) => doc.text(row.text, startXTable + 58, row.y));
+      doc.text(apiData?.Totals?.Col1 || "", 34, newY1 + 1);
+      doc.text(apiData?.Totals?.Col2 || "", startXTable + 28, newY1 + 7);
+      doc.text(apiData?.Totals?.Col3 || "", startXTable + 58, newY1 + 7);
+      const options = apiData?.Options || {};
+
+      const apiValues = [options.OP1, options.OP2, options.OP3, options.OP4];
+      const xPositions1 = [30.5, 63, 101, 140];
+      const yPositions1 = [newY1 + 29, newY1 + 29, newY1 + 29, newY1 + 29];
+
+      apiValues.forEach((val, i) => {
+        if (val && val.toUpperCase() === "X") {
+          doc.setFont("zapfdingbats", "normal");
+          doc.setFontSize(12);
+
+          // 52 = checkmark ✔ in ZapfDingbats
+          doc.text(String.fromCharCode(52), xPositions1[i], yPositions1[i]);
+        }
+      });
+      doc.setFont("NotoSansThai");
+      const rawDate = apiData?.Dates?.Row2 || "";
+      let formattedDate = "";
+
+      if (rawDate) {
+        const d = new Date(rawDate);
+        const year = d.getUTCFullYear();
+        const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(d.getUTCDate()).padStart(2, "0");
+        formattedDate = `${year}-${month}-${day}`;
+      }
+      doc.text(apiData?.Dates?.Row1 || "", startXTable + 9, newY1 + 41);
+      doc.text(formattedDate, startXTable - 1, newY1 + 45);
+
+      const pdfBlob = doc.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, "_blank"); // Opens PDF in a new tab
+    } catch (error) {
+      console.error("API Error:", error);
     }
-    doc.text("บริษัท เอ็กเซล ทรานสปอร์ต อินเตอร์เนชั่นแนล จำกัด", 20, 64.5);
-    doc.text("เลขที่ 65/1 ซอยสุขุมวิท 19, ถนนสุขุมวิท 10390", 23, 74);
-
-    const checkY = 74;
-    const values = ["1", "2", "2", "2", "3", "4", "5", "0"];
-    const xPositions = [75, 103, 103, 141, 168, 75, 103, 141];
-    const YPositions = [
-      checkY + 10,
-      checkY + 10,
-      checkY + 10,
-      checkY + 10,
-      checkY + 10,
-      checkY + 16.5,
-      checkY + 16.5,
-      checkY + 16.5,
-    ];
-    values.forEach((val, i) => {
-      doc.text(val, xPositions[i], YPositions[i]);
-    });
-
-    //for table row 1
-    const startXTable = 118;
-    const startYTable1 = 107.5;
-    // Column 1 values
-    const rows1 = [
-      { text: "item1", y: startYTable1 },
-      { text: "item2", y: startYTable1 + 5 },
-      { text: "item3", y: startYTable1 + 10 },
-      { text: "item4", y: startYTable1 + 15 },
-      { text: "item5", y: startYTable1 + 28 },
-      { text: "item6", y: startYTable1 + 41 },
-      { text: "item7", y: startYTable1 + 46 },
-      { text: "item8", y: startYTable1 + 51 },
-      { text: "item9", y: startYTable1 + 59 },
-      { text: "item10", y: startYTable1 + 69 },
-      { text: "item11", y: startYTable1 + 79 },
-      { text: "item12", y: startYTable1 + 89 },
-      { text: "15-09-2025", y: startYTable1 + 104 },
-      { text: "0.00", y: startYTable1 + 117.4 },
-    ];
-
-    // Column 2 values
-    const rows2 = [
-      { text: "item1", y: startYTable1 },
-      { text: "item2", y: startYTable1 + 5 },
-      { text: "item3", y: startYTable1 + 10 },
-      { text: "item4", y: startYTable1 + 15 },
-      { text: "item5", y: startYTable1 + 28 },
-      { text: "item6", y: startYTable1 + 41 },
-      { text: "item7", y: startYTable1 + 46 },
-      { text: "item8", y: startYTable1 + 51 },
-      { text: "item9", y: startYTable1 + 59 },
-      { text: "item10", y: startYTable1 + 69 },
-      { text: "item11", y: startYTable1 + 79 },
-      { text: "item12", y: startYTable1 + 89 },
-      { text: "14-09-2025", y: startYTable1 + 104 },
-      { text: "0.00", y: startYTable1 + 117.4 },
-    ];
-
-    // Column 3 values
-    const rows3 = [
-      { text: "item1", y: startYTable1 },
-      { text: "item2", y: startYTable1 + 5 },
-      { text: "item3", y: startYTable1 + 10 },
-      { text: "item4", y: startYTable1 + 15 },
-      { text: "item5", y: startYTable1 + 28 },
-      { text: "item6", y: startYTable1 + 41 },
-      { text: "item7", y: startYTable1 + 46 },
-      { text: "item8", y: startYTable1 + 51 },
-      { text: "item9", y: startYTable1 + 59 },
-      { text: "item10", y: startYTable1 + 69 },
-      { text: "item11", y: startYTable1 + 79 },
-      { text: "item12", y: startYTable1 + 89 },
-      { text: "14-09-2025", y: startYTable1 + 104 },
-      { text: " 0.00", y: startYTable1 + 117.4 },
-    ];
-    const newY1 = startYTable1 + 117.4;
-    // Draw all three columns
-    rows1.forEach((row) => doc.text(row.text, startXTable, row.y));
-    rows2.forEach((row) => doc.text(row.text, startXTable + 28, row.y));
-    rows3.forEach((row) => doc.text(row.text, startXTable + 58, row.y));
-    doc.text("คลองหนึ่งคลองหลวงปทุมธาน", 34, newY1 + 1);
-    doc.text("0.00", startXTable + 28, newY1 + 7);
-    doc.text("0.00", startXTable + 58, newY1 + 7);
-    const values1 = ["1", "2", "2", "2"];
-    const xPositions1 = [30.5, 63, 101, 140];
-    const YPositions1 = [newY1 + 29, newY1 + 29, newY1 + 29, newY1 + 29];
-
-    values1.forEach((val, i) => {
-      doc.text(val, xPositions1[i], YPositions1[i]);
-    });
-
-    doc.text("1234", startXTable + 9, newY1 + 41);
-    doc.text("15-09-2025", startXTable - 1, newY1 + 45);
-
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl, "_blank"); // Opens PDF in a new tab
   };
   const fetchReceiptData = async (Order_ID) => {
     try {

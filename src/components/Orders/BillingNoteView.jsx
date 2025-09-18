@@ -692,47 +692,30 @@ const BillingNoteView = () => {
                 {/* table new end */}
                 {/*--------------------------- table data end--------------------------------*/}
               </div>
-              <div className="flex justify-content-end mt-4 totalBefore">
-                <div>
-                  <div className="flexBefore">
-                    {renderSection(
-                      poData?.section1_label,
-                      poData?.section1_values
-                    )}
-                  </div>
-                  <div className="flexBefore">
-                    {renderSection(
-                      poData?.section2_label,
-                      poData?.section2_values
-                    )}
-                  </div>
-                  <div className="flexBefore">
-                    {renderSection(
-                      poData?.section3_label,
-                      poData?.section3_values
-                    )}
-                  </div>
-                  <div className=" d-flex flexBefore">
-                    {renderSection(
-                      poData?.section4_label,
-                      poData?.section4_values
-                    )}
-                  </div>
-                  {/* <div className="flexBefore">
-                        <div>
-                          <strong>{t("amountToPay")} : </strong>
-                        </div>
-                        <div>
-                          <span>
-                            {formatterTwo.format(
-                              (sumAmountToPay ?? 0) +
-                                (VATTotal ?? 0) -
-                                (WHTTotal ?? 0) +
-                                roundingData
-                            )}
-                          </span>
-                        </div>
-                      </div> */}
+              <div className="row py-4">
+                <div className="col-lg-3">
+                  {renderSection(
+                    poData?.section1_label,
+                    poData?.section1_values
+                  )}
+                </div>
+                <div className="col-lg-3">
+                  {renderSection(
+                    poData?.section2_label,
+                    poData?.section2_values
+                  )}
+                </div>
+                <div className="col-lg-3">
+                  {renderSection(
+                    poData?.section3_label,
+                    poData?.section3_values
+                  )}
+                </div>
+                <div className="col-lg-3">
+                  {renderSection(
+                    poData?.section4_label,
+                    poData?.section4_values
+                  )}
                 </div>
               </div>
             </div>
