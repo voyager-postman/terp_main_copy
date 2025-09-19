@@ -1,4 +1,4 @@
-import { useForm } from "@tanstack/react-form";
+ import { useForm } from "@tanstack/react-form";
 // import axios from "axios";
 import axios from "../../Url/Api";
 import { useMemo, useState, useEffect } from "react";
@@ -5377,7 +5377,7 @@ const WithHold = () => {
       checkValues.forEach((val, i) => {
         if (val && val.toUpperCase() === "X") {
           doc.setFont("zapfdingbats", "normal");
-          doc.setFontSize(12);
+          doc.setFontSize(9);
 
           // 52 = checkmark ✔ in ZapfDingbats
           doc.text(String.fromCharCode(52), xPositions[i], yPositions[i]);
@@ -5385,69 +5385,257 @@ const WithHold = () => {
       });
       doc.setFont("NotoSansThai");
       //for table row 1
+      doc.setFontSize(9);
+
       const startXTable = 118;
       const startYTable1 = 107.5;
       // Column 1 values
       const rows1 = [
-        { text: apiData?.Section_3?.row1 || "", y: startYTable1 },
-        { text: apiData?.Section_3?.row2 || "", y: startYTable1 + 5 },
-        { text: apiData?.Section_3?.row3 || "", y: startYTable1 + 10 },
-        { text: apiData?.Section_3?.row4 || "", y: startYTable1 + 15 },
-        { text: apiData?.Section_3?.row5 || "", y: startYTable1 + 28 },
-        { text: apiData?.Section_3?.row6 || "", y: startYTable1 + 41 },
-        { text: apiData?.Section_3?.row7 || "", y: startYTable1 + 46 },
-        { text: apiData?.Section_3?.row8 || "", y: startYTable1 + 51 },
-        { text: apiData?.Section_3?.row9 || "", y: startYTable1 + 59 },
-        { text: apiData?.Section_3?.row10 || "", y: startYTable1 + 69 },
-        { text: apiData?.Section_3?.row11 || "", y: startYTable1 + 79 },
-        { text: apiData?.Section_3?.row12 || "", y: startYTable1 + 89 },
-        { text: apiData?.Section_3?.row13 || "", y: startYTable1 + 104 },
-        { text: apiData?.Section_3?.row14 || "", y: startYTable1 + 117.4 },
+        { text: apiData?.Section_3?.Row1 || "", y: startYTable1 },
+        { text: apiData?.Section_3?.Row2 || "", y: startYTable1 + 5 },
+        { text: apiData?.Section_3?.Row3 || "", y: startYTable1 + 10 },
+        { text: apiData?.Section_3?.Row4 || "", y: startYTable1 + 15 },
+        { text: apiData?.Section_3?.Row5 || "", y: startYTable1 + 28 },
+        { text: apiData?.Section_3?.Row6 || "", y: startYTable1 + 41 },
+        { text: apiData?.Section_3?.Row7 || "", y: startYTable1 + 46 },
+        { text: apiData?.Section_3?.Row8 || "", y: startYTable1 + 51 },
+        { text: apiData?.Section_3?.Row9 || "", y: startYTable1 + 59 },
+        { text: apiData?.Section_3?.Row10 || "", y: startYTable1 + 69 },
+        { text: apiData?.Section_3?.Row11 || "", y: startYTable1 + 79 },
+        { text: apiData?.Section_3?.Row12 || "", y: startYTable1 + 89 },
+        { text: apiData?.Section_3?.Row13 || "", y: startYTable1 + 104 },
+        { text: apiData?.Section_3?.Row14 || "", y: startYTable1 + 117.4 },
       ];
 
       // Column 2 values
       const rows2 = [
-        { text: apiData?.Section_4?.row1 || "", y: startYTable1 },
-        { text: apiData?.Section_4?.row2 || "", y: startYTable1 + 5 },
-        { text: apiData?.Section_4?.row3 || "", y: startYTable1 + 10 },
-        { text: apiData?.Section_4?.row4 || "", y: startYTable1 + 15 },
-        { text: apiData?.Section_4?.row5 || "", y: startYTable1 + 28 },
-        { text: apiData?.Section_4?.row6 || "", y: startYTable1 + 41 },
-        { text: apiData?.Section_4?.row7 || "", y: startYTable1 + 46 },
-        { text: apiData?.Section_4?.row8 || "", y: startYTable1 + 51 },
-        { text: apiData?.Section_4?.row9 || "", y: startYTable1 + 59 },
-        { text: apiData?.Section_4?.row10 || "", y: startYTable1 + 69 },
-        { text: apiData?.Section_4?.row11 || "", y: startYTable1 + 79 },
-        { text: apiData?.Section_4?.row12 || "", y: startYTable1 + 89 },
-        { text: apiData?.Section_4?.row13 || "", y: startYTable1 + 104 },
-        { text: apiData?.Section_4?.row14 || "", y: startYTable1 + 117.4 },
+        { text: apiData?.Section_4?.Row1 || "", y: startYTable1 },
+        { text: apiData?.Section_4?.Row2 || "", y: startYTable1 + 5 },
+        { text: apiData?.Section_4?.Row3 || "", y: startYTable1 + 10 },
+        { text: apiData?.Section_4?.Row4 || "", y: startYTable1 + 15 },
+        { text: apiData?.Section_4?.Row5 || "", y: startYTable1 + 28 },
+        { text: apiData?.Section_4?.Row6 || "", y: startYTable1 + 41 },
+        { text: apiData?.Section_4?.Row7 || "", y: startYTable1 + 46 },
+        { text: apiData?.Section_4?.Row8 || "", y: startYTable1 + 51 },
+        { text: apiData?.Section_4?.Row9 || "", y: startYTable1 + 59 },
+        { text: apiData?.Section_4?.Row10 || "", y: startYTable1 + 69 },
+        { text: apiData?.Section_4?.Row11 || "", y: startYTable1 + 79 },
+        { text: apiData?.Section_4?.Row12 || "", y: startYTable1 + 89 },
+        { text: apiData?.Section_4?.Row13 || "", y: startYTable1 + 104 },
+        { text: apiData?.Section_4?.Row14 || "", y: startYTable1 + 117.4 },
       ];
 
       // Column 3 values
       const rows3 = [
-        { text: apiData?.Section_5?.row1 || "", y: startYTable1 },
-        { text: apiData?.Section_5?.row2 || "", y: startYTable1 + 5 },
-        { text: apiData?.Section_5?.row3 || "", y: startYTable1 + 10 },
-        { text: apiData?.Section_5?.row4 || "", y: startYTable1 + 15 },
-        { text: apiData?.Section_5?.row5 || "", y: startYTable1 + 28 },
-        { text: apiData?.Section_5?.row6 || "", y: startYTable1 + 41 },
-        { text: apiData?.Section_5?.row7 || "", y: startYTable1 + 46 },
-        { text: apiData?.Section_5?.row8 || "", y: startYTable1 + 51 },
-        { text: apiData?.Section_5?.row9 || "", y: startYTable1 + 59 },
-        { text: apiData?.Section_5?.row10 || "", y: startYTable1 + 69 },
-        { text: apiData?.Section_5?.row11 || "", y: startYTable1 + 79 },
-        { text: apiData?.Section_5?.row12 || "", y: startYTable1 + 89 },
-        { text: apiData?.Section_5?.row13 || "", y: startYTable1 + 104 },
-        { text: apiData?.Section_5?.row14 || "", y: startYTable1 + 117.4 },
+        { text: apiData?.Section_5?.Row1 || "", y: startYTable1 },
+        { text: apiData?.Section_5?.Row2 || "", y: startYTable1 + 5 },
+        { text: apiData?.Section_5?.Row3 || "", y: startYTable1 + 10 },
+        { text: apiData?.Section_5?.Row4 || "", y: startYTable1 + 15 },
+        { text: apiData?.Section_5?.Row5 || "", y: startYTable1 + 28 },
+        { text: apiData?.Section_5?.Row6 || "", y: startYTable1 + 41 },
+        { text: apiData?.Section_5?.Row7 || "", y: startYTable1 + 46 },
+        { text: apiData?.Section_5?.Row8 || "", y: startYTable1 + 51 },
+        { text: apiData?.Section_5?.Row9 || "", y: startYTable1 + 59 },
+        { text: apiData?.Section_5?.Row10 || "", y: startYTable1 + 69 },
+        { text: apiData?.Section_5?.Row11 || "", y: startYTable1 + 79 },
+        { text: apiData?.Section_5?.Row12 || "", y: startYTable1 + 89 },
+        { text: apiData?.Section_5?.Row13 || "", y: startYTable1 + 104 },
+        { text: apiData?.Section_5?.Row14 || "", y: startYTable1 + 117.4 },
       ];
       const newY1 = startYTable1 + 117.4;
       // Draw all three columns
       rows1.forEach((row) => doc.text(row.text, startXTable, row.y));
-      rows2.forEach((row) => doc.text(row.text, startXTable + 28, row.y));
-      rows3.forEach((row) => doc.text(row.text, startXTable + 58, row.y));
+      // rows2.forEach((row) => {
+      //   const value = row.text;
+
+      //   if (value && !isNaN(value)) {
+      //     // Format with commas and 2 decimals
+      //     const formatted = Number(value).toLocaleString("en-US", {
+      //       minimumFractionDigits: 2,
+      //       maximumFractionDigits: 2,
+      //     });
+
+      //     const [int, dec] = formatted.split(".");
+      //     const integerPart = int || "";
+      //     const decimalPart = dec ? dec : "";
+
+      //     doc.text(integerPart, startXTable + 28, row.y);
+
+      //     if (decimalPart) {
+      //       doc.text(decimalPart, startXTable + 50, row.y); // decimal part shifted
+      //     }
+      //   } else {
+      //     doc.text(value, startXTable + 28, row.y);
+      //   }
+      // });
+rows2.forEach((row) => {
+  const value = row.text;
+
+  if (value && !isNaN(value)) {
+    // Format with commas and 2 decimals
+    const formatted = Number(value).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    const [int, dec] = formatted.split(".");
+    const integerPart = int || "";
+    const decimalPart = dec ? dec : "";
+
+    // Integer column setup
+    const colX = startXTable + 28;                     // left edge of integer column
+    const colWidth = doc.getTextWidth("9,999,999,999"); // width for 10-digit integer
+
+    // Measure actual text width
+    const intWidth = doc.getTextWidth(integerPart);
+
+    // Right-align integer inside the column
+    const intX = colX + colWidth - intWidth;
+
+    // Draw integer
+    doc.text(integerPart, intX, row.y);
+
+    // Draw decimal part at fixed X
+    if (decimalPart) {
+      doc.text(decimalPart, startXTable + 50, row.y);
+    }
+  } else {
+    doc.text(value, startXTable + 28, row.y);
+  }
+});
+      // rows3.forEach((row) => {
+      //   const value = row.text;
+
+      //   if (value && !isNaN(value)) {
+      //     // Format with commas and 2 decimals
+      //     const formatted = Number(value).toLocaleString("en-US", {
+      //       minimumFractionDigits: 2,
+      //       maximumFractionDigits: 2,
+      //     });
+
+      //     const [int, dec] = formatted.split(".");
+      //     const integerPart = int || "";
+      //     const decimalPart = dec ? dec : "";
+
+      //     doc.text(integerPart, startXTable + 58, row.y);
+
+      //     if (decimalPart) {
+      //       doc.text(decimalPart, startXTable + 75, row.y); // decimal part shifted
+      //     }
+      //   } else {
+      //     doc.text(value, startXTable + 58, row.y);
+      //   }
+      // });
+rows3.forEach((row) => {
+  const value = row.text;
+
+  if (value && !isNaN(value)) {
+    // Format with commas and 2 decimals
+    const formatted = Number(value).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    const [int, dec] = formatted.split(".");
+    const integerPart = int || "";
+    const decimalPart = dec ? dec : "";
+
+    // Integer column setup
+    const colX = startXTable + 58;                     // left edge of integer column
+    const colWidth = doc.getTextWidth("9,999,9999"); // width for 10-digit integer
+
+    // Measure actual text width
+    const intWidth = doc.getTextWidth(integerPart);
+
+    // Right-align integer inside the column
+    const intX = colX + colWidth - intWidth;
+
+    // Draw integer
+    doc.text(integerPart, intX, row.y);
+
+    // Draw decimal part at fixed X
+    if (decimalPart) {
+      doc.text(decimalPart, startXTable + 75, row.y);
+    }
+  } else {
+    doc.text(value, startXTable + 58, row.y);
+  }
+});
+
+
       doc.text(apiData?.Totals?.Col1 || "", 34, newY1 + 1);
-      doc.text(apiData?.Totals?.Col2 || "", startXTable + 28, newY1 + 7);
-      doc.text(apiData?.Totals?.Col3 || "", startXTable + 58, newY1 + 7);
+    // col-2 
+{
+  const value = apiData?.Totals?.Col2 || "";
+  if (value && !isNaN(value)) {
+    // Format with commas and 2 decimals
+    const formatted = Number(value).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    const [int, dec] = formatted.split(".");
+    const integerPart = int || "";
+    const decimalPart = dec ? dec : "";
+
+    // Column setup
+    const colX = startXTable + 28;                  // left edge of integer column
+    const colWidth = doc.getTextWidth("9,999,999,999"); // max width for 7 digits + commas
+
+    // Actual integer text width
+    const intWidth = doc.getTextWidth(integerPart);
+
+    // Right-align integer inside fixed width
+    const intX = colX + colWidth - intWidth;
+
+    // Draw integer
+    doc.text(integerPart, intX, newY1 + 7);
+
+    // Decimal part at fixed X
+    if (decimalPart) {
+      doc.text(decimalPart, startXTable + 50, newY1 + 7);
+    }
+  } else {
+    doc.text(value, startXTable + 28, newY1 + 7);
+  }
+}
+
+      // col-3
+    {
+        const value = apiData?.Totals?.Col3 || "";
+        if (value && !isNaN(value)) {
+          // Format with commas and 2 decimals
+          const formatted = Number(value).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+
+          const [int, dec] = formatted.split(".");
+          const integerPart = int || "";
+          const decimalPart = dec ? dec : "";
+
+          // Integer column setup
+          const colX = startXTable + 58; // left boundary of integer column
+         const colWidth = doc.getTextWidth("9,999,9999"); // enough for 7 digits with commas
+
+          // Measure integer text width
+          const intWidth = doc.getTextWidth(integerPart);
+
+          // Align integer to right within the 30px width
+          const intX = colX + colWidth - intWidth;
+
+          // Draw integer part (right aligned)
+          doc.text(integerPart, intX, newY1 + 7);
+
+          // Draw decimal part at fixed X you provided
+          if (decimalPart) {
+            doc.text(decimalPart, startXTable + 75, newY1 + 7);
+          }
+        } else {
+          doc.text(value, startXTable + 58, newY1 + 7);
+        }
+      }
+
       const options = apiData?.Options || {};
 
       const apiValues = [options.OP1, options.OP2, options.OP3, options.OP4];
@@ -5457,7 +5645,7 @@ const WithHold = () => {
       apiValues.forEach((val, i) => {
         if (val && val.toUpperCase() === "X") {
           doc.setFont("zapfdingbats", "normal");
-          doc.setFontSize(12);
+          doc.setFontSize(9);
 
           // 52 = checkmark ✔ in ZapfDingbats
           doc.text(String.fromCharCode(52), xPositions1[i], yPositions1[i]);
@@ -5475,7 +5663,7 @@ const WithHold = () => {
         formattedDate = `${year}-${month}-${day}`;
       }
       doc.text(apiData?.Dates?.Row1 || "", startXTable + 9, newY1 + 41);
-      doc.text(formattedDate, startXTable - 1, newY1 + 45);
+      doc.text(formattedDate, startXTable + 19, newY1 + 45);
 
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);

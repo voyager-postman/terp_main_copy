@@ -1347,21 +1347,35 @@ const Accounts = () => {
   };
 
   const handleDownloadPDFSlip = async (Expense_Payment_ID, a) => {
-    console.log(Expense_Payment_ID);
     console.log(a);
     try {
+      const lang = localStorage.getItem("language");
+      const langValue = lang === "en" ? 1 : 2;
       const response = await axios.post(`${API_BASE_URL}/expensePaymentSlip`, {
         Expense_Payment_ID: Expense_Payment_ID,
+        lang: langValue,
       });
-      console.log(response.data.table_data);
+      console.log(response);
+
+      const section4Labels = response?.data?.tablelabels || {};
+      const section4Values = response?.data?.tablerows || [];
+      // Convert section4_label values into header array
+      const headers = [Object.values(section4Labels)];
+
+      // Convert section4_values into rows
+      const rows = section4Values.map((item) => Object.values(item));
+
       const doc = new jsPDF();
       doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular);
       doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
+      // Draw the top line and center the text "Receipt"
       const imgData = logo;
       doc.addImage(imgData, "JPEG", 6, 2, 20, 20);
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
+
       doc.text(`${response?.data?.companyAddress?.Line_1}`, 30, 8);
+
       doc.setTextColor(0, 0, 0);
       doc.text(`${response?.data?.companyAddress?.Line_2}`, 30, 12);
       const longTextOne = `${response?.data?.companyAddress?.Line_3}`;
@@ -1370,39 +1384,39 @@ const Accounts = () => {
       let startXOne = 30;
       let startYOne = 16;
       linesOne.forEach((lineOne, index) => {
-        doc.text(lineOne, startXOne, startYOne + index * 4.2);
+        doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
       });
+      doc.setFont("helvetica", "bold"); // Set font to bold
+      doc.setFontSize(19);
+      const purchaseOrderTitle =
+        response?.data?.section1_Title?.Title || "Purchase Order";
+      doc.text(purchaseOrderTitle, 150.5, 11);
+      doc.setFont("helvetica", "normal"); // Set font to bold
       doc.setFillColor(33, 56, 99);
       doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
-      const newFormatter1 = new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 3,
-        maximumFractionDigits: 3,
-      });
-      const newFormatterZero = new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      });
-      const newFormatter5 = new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-      const text = " Expense Payment Slip";
+      doc.text(response?.data?.header?.Col1 || "", 7, 28);
+
+      const poNum = response?.data?.header?.Col2 || "";
       const pageWidth = doc.internal.pageSize.width;
-      const textWidth = doc.getTextWidth(text);
+      const textWidth = doc.getTextWidth(poNum);
       const xPosition = (pageWidth - textWidth) / 2;
-      doc.text(text, xPosition, 28);
+      doc.text(poNum, xPosition, 28);
+      // doc.text("Date: ", 169, 28);
       doc.setFillColor(33, 56, 99);
       doc.rect(7, 30, doc.internal.pageSize.width - 15, 0.5, "FD");
+      // Define variables for wrapped text
       doc.setFontSize(12);
-      const maxWidth1 = 70;
+      const maxWidth1 = 100;
       const startX1 = 7;
       let startY1 = 35;
       const lineHeight1 = 4.2;
-      const longText1_4 = `${response?.data?.vendorAddress?.Name_exp_2}`;
-      // Function to render wrapped text
       doc.setFont("NotoSansThai"); // Set the font to use
+      const longText1_4 = `${response?.data?.vendorAddress?.vc_address || ""}`;
+
+      // const longText1_3 = ``;
+      // Function to render wrapped text
       function renderWrappedText1(
         doc,
         text,
@@ -1427,146 +1441,44 @@ const Accounts = () => {
         maxWidth1,
         lineHeight1
       );
-      doc.setFontSize(11); // Adjust font size for the next text block
-      doc.setFontSize(10);
-      const lineHeight = 5;
-      const maxWidthValue = 70;
+      doc.setFontSize(11);
+      let startDate = 28;
+      doc.text(response?.data?.header?.Col3 || "", 169, startDate);
+      const newFormatter1 = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      });
+      const newFormatter5 = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
-      function renderLabelAndValue(
-        doc,
-        label,
-        value,
-        labelX,
-        valueX,
-        yPosition,
-        maxWidth,
-        lineHeight,
-        alignRight = false
-      ) {
-        // Render the label on the left
-        doc.text(label, labelX, yPosition);
-        const valueLines = doc.splitTextToSize(value, maxWidth);
-        valueLines.forEach((line, index) => {
-          const yOffset = index * lineHeight;
-          let finalValueX = valueX;
-          if (alignRight) {
-            const textWidth = doc.getTextWidth(line);
-            finalValueX = valueX - textWidth;
-          }
-          doc.text(line, finalValueX, yPosition + yOffset);
-        });
-        return yPosition + (valueLines.length - 1) * lineHeight;
-      }
-      let tableEndY = 30;
-      let currentY = tableEndY + 4;
-      // Right side
-      let currentYRight = tableEndY + 4;
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Bank Name:",
-        `${response?.data?.bank_details?.bank_name}`,
-        130,
-        200,
-        currentYRight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      doc.setFont("NotoSansThai"); // Set the font to use
+      const noDecimal = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
 
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Account Name:",
-        `${response?.data?.bank_details?.bank_account}`,
-        130,
-        200,
-        currentYRight + lineHeight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Account Number:",
-        `${response?.data?.bank_details?.bank_number}`,
-        130,
-        200,
-        currentYRight + lineHeight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Paid On:",
-        new Date(
-          `${response?.data?.bank_details?.Payment_Date}`
-        ).toLocaleDateString(),
-        130,
-        200,
-        currentYRight + lineHeight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Paid With:",
-        `${response?.data?.bank_details?.bankAccount_name}`,
-        130,
-        200,
-        currentYRight + lineHeight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      // currentYRight = renderLabelAndValue(doc, "Loss/Gain on Exchange Rate:", "2123.12312", 100, 149, currentYRight + lineHeight, maxWidthValue, lineHeight);
-      const maxY = Math.max(startY1, currentYRight);
-      const helloYPosition = maxY + 2;
-      const rows = response?.data?.table_data.map((item, index) => ({
-        index: index + 1,
-        paidAmount: item.Date
-          ? new Date(item.Date).toLocaleDateString("en-GB") // Format as DD/MM/YYYY
-          : "",
-        docAcc: item["PO Number"],
-        invNum: item.Invoice_Number,
-        unit: item.FX,
-        invAmount: newFormatter5.format(item.Total_After_Tax),
-        detbit: item["Debit Note"],
-        net: item["Net Amount"] ? newFormatter5.format(item["Net Amount"]) : "",
-      }));
-
+      const yTop = startY1; // Start Y position for the tabl
       doc.autoTable({
-        head: [
-          [
-            "#",
-            "Date",
-            "Document Number",
-            "Invoice Number",
-            "FX",
-            "Invoice Amount",
-            "Debit Note",
-            "Net Amount",
-          ],
-        ],
-        body: rows.map((row) => [
-          row.index,
-          row.paidAmount,
-          row.docAcc,
-          row.invNum,
-          row.unit,
-          row.invAmount,
-          row.detbit,
-          row.net,
-          row.paidAmount,
-        ]),
+        head: headers,
+        body: rows,
         columnStyles: {
-          3: { halign: "center" },
-          5: { halign: "right" },
-          7: { halign: "right" },
+          0: { halign: "center" },
+          1: { halign: "left", font: "NotoSansThai", fontSize: 10 },
+          2: { halign: "right", font: "NotoSansThai" },
+          3: { halign: "right", font: "NotoSansThai" },
+          4: { halign: "center", font: "NotoSansThai" },
+          5: { halign: "right", font: "NotoSansThai" },
+          6: { halign: "right", font: "NotoSansThai" },
+          7: { halign: "right", font: "NotoSansThai" },
+          8: { halign: "right", font: "NotoSansThai" },
+          9: { halign: "right", font: "NotoSansThai" },
         },
         startX: 0,
-        startY: helloYPosition,
+        startY: yTop,
         margin: {
           left: 7,
           right: 7,
@@ -1585,8 +1497,7 @@ const Accounts = () => {
           lineColor: "#203764",
         },
       });
-
-      const tableEndYSlip = doc.lastAutoTable.finalY;
+      const tableEndY = doc.lastAutoTable.finalY;
       // autotable end
       doc.setFontSize(10);
       // Reusable function to render right-aligned text
@@ -1608,73 +1519,190 @@ const Accounts = () => {
       const fixedWidth = 150;
       const rightBoundary = 202.7;
       const labelX = 145;
-      let currentYSlip = tableEndYSlip + 5;
-      const totalPayAmount = parseFloat(
-        response?.data?.total_all?.["Apayment Amount"]
-          ? response.data.total_all["Apayment Amount"].replace(/,/g, "")
-          : 0 // Default value if undefined or null
-      );
-
-      const totalAmount = parseFloat(
-        response?.data?.total_all?.Total
-          ? response.data.total_all.Total.replace(/,/g, "")
-          : 0
-      );
-
-      // Render "Total"
-      const textTotal = newFormatter5.format(totalAmount);
-
+      let currentY = tableEndY + 5;
+      const textTotal = response?.data?.totalsvalues?.Row1 || "";
       renderRightAlignedText(
         doc,
-        "TOTAL",
+        response?.data?.totalslabels?.Row1 || "",
         textTotal,
         labelX,
         rightBoundary,
         fixedWidth,
-        currentYSlip
+        currentY
       );
-      currentYSlip += 5;
-      const textTotalVat = newFormatter5.format(
-        parseFloat(response?.data?.total_all?.VAT?.replace(/,/g, "")) || 0
-      );
+      currentY += 5;
+      const textTotalVat = response?.data?.totalsvalues?.Row2 || "";
 
       renderRightAlignedText(
         doc,
-        "VAT",
+        response?.data?.totalslabels?.Row2,
         textTotalVat,
         labelX,
         rightBoundary,
         fixedWidth,
-        currentYSlip
+        currentY
       );
-      currentYSlip += 5;
-      const textTotalWht = newFormatter5.format(
-        parseFloat(response?.data?.total_all?.WHT?.replace(/,/g, "")) || 0
-      );
-
+      currentY += 5;
+      const textTotalWht = response?.data?.totalsvalues?.Row3 || "";
       renderRightAlignedText(
         doc,
-        "WHT",
+        response?.data?.totalslabels?.Row3,
         textTotalWht,
         labelX,
         rightBoundary,
         fixedWidth,
-        currentYSlip
+        currentY
       );
-      doc.rect(145, tableEndYSlip + 16.5, 58, 0.5, "FD");
-      currentYSlip += 5.5;
-      const textTotalPay = newFormatter5.format(totalPayAmount);
-
+      doc.rect(145, tableEndY + 16.5, 60, 0.5, "FD");
+      currentY += 6;
+      const textTotalPay = response?.data?.totalsvalues?.Row4 || "";
       renderRightAlignedText(
         doc,
-        "Payment Amount   ",
+        response?.data?.totalslabels?.Row4,
         textTotalPay,
         labelX,
         rightBoundary,
         fixedWidth,
-        currentYSlip
+        currentY
       );
-      doc.rect(145, tableEndYSlip + 22, 58, 0.5, "FD");
+
+      currentY += 5;
+      const textRounding = response?.data?.totalsvalues?.Row5 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.totalslabels?.Row5 || "",
+
+        textRounding,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+
+      currentY += 5;
+      const textPayable = response?.data?.totalsvalues?.Row6 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.totalslabels?.Row6,
+        textPayable,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 6;
+      const pastPayment = response?.data?.totalsvalues?.Row7 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.totalslabels?.Row7 || "",
+        pastPayment,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const row8 = response?.data?.totalsvalues?.Row8 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.totalslabels?.Row8 || "",
+        row8,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const row9 = response?.data?.totalsvalues?.Row9 || "";
+
+      renderRightAlignedText(
+        doc,
+        response?.data?.totalslabels?.Row9 || "",
+        row9,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      doc.rect(145, tableEndY + 33, 58, 0.5, "FD");
+      doc.setFontSize(11);
+
+      doc.text(
+        response?.data?.paymentTitle?.["Payment Details"] || " ",
+        7,
+        tableEndY + 25
+      );
+
+      doc.setFontSize(10);
+
+      function renderLabelAndValue(doc, label, value, labelX, valueX, y) {
+        doc.text(label, labelX, y);
+        doc.text(value, valueX, y);
+      }
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row1 || "",
+        `${
+          response?.data?.section6_values?.Result1
+            ? response?.data?.section6_values?.Result1
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 30
+      );
+      
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row2||"",
+        `${
+          response?.data?.section6_values?.Result2||""
+            ? response?.data?.section6_values?.Result2||""
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 35
+      );
+          
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row3||"",
+        `${
+          response?.data?.section6_values?.Result3||""
+            ? response?.data?.section6_values?.Result3||""
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 40
+      );
+
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row4||"",
+        response?.data?.section6_values?.Result4||"",
+        7,
+        40,
+        tableEndY + 45
+      );
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row5||"",
+        response?.data?.section6_values?.Result5||"",
+        7,
+        40,
+        tableEndY + 50
+      );
+
+      renderLabelAndValue(
+        doc,
+        response?.data?.section6_label?.row6||"",
+        response?.data?.section6_values?.Result6||"",
+        7,
+        40,
+        tableEndY + 55
+      );
       const addPageNumbers = (doc) => {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
@@ -1684,13 +1712,13 @@ const Accounts = () => {
         }
       };
       addPageNumbers(doc);
+
       // Output PDF as a Blob and open it in a new tab
       const pdfBlob = doc.output("blob");
-      // Upload the PDF to the server
       await uploadPDF1(pdfBlob, Expense_Payment_ID);
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error(t("genericError"));
+      toast.error("Something went Wrong ");
       // Handle the error as needed
     }
   };
@@ -4267,22 +4295,21 @@ const Accounts = () => {
                     <i className="mdi mdi-pencil pl-2" />
                   </butto>
                 )}
-             
-                  <button
-                    type="button"
-                    onClick={() => deleteOrder(a.PAY_ID,a.RID)}
-                  >
-                    <i className="mdi mdi-delete " />
-                  </button>
-            
-                
-                {a.Credit !== "0.00" ? (
+
+                <button
+                  type="button"
+                  onClick={() => deleteOrder(a.PAY_ID, a.RID)}
+                >
+                  <i className="mdi mdi-delete " />
+                </button>
+
+                {a.RID !== null ? (
                   <button
                     type="button"
                     className="accountSvg"
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModalCustomization"
-                    onClick={() => handleDownloadPDF(a.PAY_ID, a)}
+                    onClick={() => handleDownloadPDF(a.RID, a)}
                   >
                     <div className="d-flex">
                       <svg
@@ -4327,13 +4354,11 @@ const Accounts = () => {
                       </svg>
                     </div>
                   </button>
-                ) : a.Debit !== "0.00" ? (
+                ) : a.PAY_ID !== null ? (
                   <button
                     type="button"
                     className="svgIconPurchase"
-                    onClick={() =>
-                      handleDownloadPDFSlip(a.PAY_ID, a)
-                    }
+                    onClick={() => handleDownloadPDFSlip(a.PAY_ID, a)}
                   >
                     <div>
                       <svg
@@ -4423,10 +4448,6 @@ const Accounts = () => {
     getInventoryList();
   }, []);
 
-  // const handleChange = (e) => {
-  //   setQuantity(e.target.value);
-  // };
-
   const inventoryBoxes = (unit_type, pod_item) => {
     setSelectedUnitType(unit_type);
     setSelectedPodItem(pod_item);
@@ -4460,7 +4481,7 @@ const Accounts = () => {
     }
   };
 
-  const deleteOrder = (id,id1) => {
+  const deleteOrder = (id, id1) => {
     console.log(id);
     MySwal.fire({
       title: t("areYouSure"),
@@ -4478,7 +4499,7 @@ const Accounts = () => {
             `${API_BASE_URL}/DeleteInvoicePayment`,
             {
               PAY_ID: id,
-              RID:id1
+              RID: id1,
             }
           );
           console.log(response);

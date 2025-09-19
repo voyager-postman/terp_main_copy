@@ -493,6 +493,7 @@ const BillingNoteCreate = () => {
           Consignee_ID: state.ConsigneeID || editId?.consignee_id,
           // vendor_id: state.vendor_id,
         });
+
         const res = response.data;
         console.log("VendorFilteredPaymentDetails response:", response);
         setDynamicHeaders(res.head);
@@ -787,6 +788,7 @@ const BillingNoteCreate = () => {
           );
           console.log(response);
           paymentTable10();
+
           toast.success(t("combinedPaymentDeleteSuccess"));
         } catch (e) {
           toast.error(t("genericError"));
