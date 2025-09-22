@@ -466,7 +466,35 @@ const UpdateTest = () => {
   useEffect(() => {
     consigneeValueFilter(state.consignee_id, state.order_id);
   }, [state.consignee_id, state.order_id]);
+  const fetchConsigneesNew1 = async () => {
+    console.log(computedState.client_id);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/OrderConsigneeUpdate`,
+        {
+          Client_id: computedState.client_id,
+          Consignee_ID: computedState.consignee_id,
+          Order_ID: state.order_id,
+          User_ID: localStorage.getItem("id"),
+        }
+      );
+      console.log(response);
+      oneQoutationDAta();
+      // setConsigneesNew(response.data.data);
+    } catch (error) {
+      console.error("Error fetching consignees:", error);
+    }
+  };
+  console.log(computedState);
 
+  useEffect(() => {
+    if (state.client_id) {
+      fetchConsigneesNew();
+    }
+    if (state.client_id && state.consignee_id) {
+      fetchConsigneesNew1();
+    }
+  }, [state.client_id, state.consignee_id]);
   const calculateList = async () => {
     if (state.order_id) {
       try {
@@ -1468,7 +1496,7 @@ const UpdateTest = () => {
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">
                         <h6>{t("consignee")}</h6>
-                        <Autocomplete
+                        {/* <Autocomplete
                           options={consigneesNew || []} // Ensure consignees is an array
                           getOptionLabel={(option) =>
                             option.consignee_name || ""
@@ -1513,6 +1541,69 @@ const UpdateTest = () => {
                           isOptionEqualToValue={(option, value) =>
                             option.consignee_id === value?.consignee_id
                           } // Compare based on consignee_id
+                        /> */}
+                        <Autocomplete
+                          options={
+                            consigneesNew?.map((v) => ({
+                              consignee_id: v.ID, // normalize API field to match state
+                              consignee_name: v.Name, // normalize name
+                            })) || []
+                          }
+                          getOptionLabel={(option) =>
+                            option.consignee_name || ""
+                          }
+                          value={
+                            consigneesNew
+                              ?.map((v) => ({
+                                consignee_id: v.ID,
+                                consignee_name: v.Name,
+                              }))
+                              .find(
+                                (c) => c.consignee_id === state.consignee_id
+                              ) || null
+                          }
+                          isOptionEqualToValue={(option, value) =>
+                            option.consignee_id === value?.consignee_id
+                          }
+                          onChange={(event, newValue) => {
+                            const consigneeId = newValue
+                              ? newValue.consignee_id
+                              : "";
+
+                            // ✅ Update state consistently
+                            setState({
+                              ...state,
+                              rebate: "",
+                              Clearance_provider: "",
+                              Freight_provider_: "",
+                              Transportation_provider: "",
+                              brand_id: "",
+                              fx_id: "",
+                              mark_up: "",
+                              fx_rate: "",
+                              from_port_: "",
+                              Q_Markup: "",
+                              destination_port_id: "",
+                              liner_id: "",
+                              loading_location: "",
+                              consignee_id: consigneeId,
+                              consignee_name: newValue
+                                ? newValue.consignee_name
+                                : "",
+                            });
+
+                            // 🔥 Call API immediately after consignee change
+                            if (consigneeId) {
+                              fetchConsigneesNew1();
+                            }
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("selectConsignee")}
+                              variant="outlined"
+                            />
+                          )}
                         />
                       </div>
                       <div className="col-lg-3 form-group mb-3 quotationSelectSer">

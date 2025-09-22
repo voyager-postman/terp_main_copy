@@ -50,6 +50,7 @@ const CreateTest = () => {
   );
   const { data: RoundingDataList } = useQuery("GetRoundingTable");
   const [copyData, setCopyData] = useState("");
+  const [selectedConsigneeData, setSelectedConsigneeData] = useState(null); // detailed data
 
   const [state5, setState5] = useState({
     Rounding: "", // Initial state
@@ -87,6 +88,8 @@ const CreateTest = () => {
   console.log(from);
   const isReadOnly = from?.isReadOnly;
   const [data, setData] = useState("");
+  const [orderIdData, setOrderIdData] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const [orderErr, setOrderErr] = useState(true);
   const [deleteOrderId, setDeleteOrderId] = useState("");
@@ -196,7 +199,7 @@ const CreateTest = () => {
     if (updatableFields.includes(name)) {
       try {
         await axios.post(`${API_BASE_URL}/updateOrdersValues`, {
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           [name]: value,
         });
         console.log(`${name} updated successfully`);
@@ -286,10 +289,10 @@ const CreateTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate5(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -325,10 +328,10 @@ const CreateTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate1(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -355,10 +358,10 @@ const CreateTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate2(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -384,10 +387,10 @@ const CreateTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate3(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -413,10 +416,10 @@ const CreateTest = () => {
     const newValue = checked ? 1 : 0;
 
     setExchangeRate4(newValue);
-    if (state?.order_id) {
+    if (state?.order_id || selectedConsigneeData.Order_ID) {
       try {
         const response = await updateAllOrderStatuses({
-          id: state.order_id,
+          id: state.order_id || selectedConsigneeData.Order_ID,
           field: name,
           value: newValue,
         });
@@ -457,56 +460,49 @@ const CreateTest = () => {
     }
   }, [state.consignee_id, consigneesNew]);
   const computedState = useMemo(() => {
-    console.log(state.quote_id);
-
-    console.log(state);
     const r = {
       ...state,
       consignee_id: state.consignee_id,
       client_id: state.client_id,
     };
-    console.log(r);
-    const consigneeFind = consigneesNew?.find(
-      (v) => v.consignee_id == state.consignee_id
-    );
-    setCopyData(consigneeFind);
 
+    const consigneeFind = selectedConsigneeData;
+    // ? selectedConsigneeData
+    // : consigneesNew?.find((v) => v.ID == state.consignee_id);
     console.log(consigneeFind);
     const portDestinationFind = ports?.find(
       (v) =>
-        v.port_id == (r.destination_port_id || consigneeFind?.destination_port)
+        v.port_id == (r.destination_port_id || consigneeFind?.Destination_Port)
     );
     const portOriginFind = ports?.find(
-      (v) => v.port_id == (r.from_port_ || consigneeFind?.port_of_orign)
+      (v) => v.port_id == (r.from_port_ || consigneeFind?.Origin_Port)
     );
-    r.fx_id = r.fx_id || consigneeFind?.currency;
 
+    r.fx_id = r.fx_id || consigneeFind?.FX_ID;
     r.O_Extra = r.O_Extra || consigneeFind?.Extra_cost;
-
     r.fx_rate =
       !state.fx_rate_manually_set && r.fx_id
         ? currency?.find((v) => +v.ID === +r.fx_id)?.fx_rate || 0
         : state.fx_rate;
-
-    r.rebate = r.rebate || consigneeFind?.O_Rebate;
+    r.rebate = r.rebate || consigneeFind?.Rebate;
     r.Clearance_provider =
       r.Clearance_provider ||
       portOriginFind?.preferred_clearance ||
       consigneeFind?.Clearance_provider;
-    r.loading_location = r.loading_location || consigneeFind?.Default_location;
-    r.brand_id = state.brand_id || consigneeFind?.brand;
+    r.loading_location = r.loading_location || consigneeFind?.loading_location;
+    r.brand_id = state.brand_id || consigneeFind?.Brand_id;
     r.mark_up = r.mark_up || consigneeFind?.O_Markup;
     r.consignee_name = r.consignee_name || consigneeFind?.consignee_name;
     r.Transportation_provider =
       r.Transportation_provider || portOriginFind?.preferred_transport;
-    r.from_port_ = r.from_port_ || consigneeFind?.port_of_orign;
+    r.from_port_ = r.from_port_ || consigneeFind?.Origin_Port;
     r.destination_port_id =
-      r.destination_port_id || consigneeFind?.destination_port;
+      r.destination_port_id || consigneeFind?.Destination_Port;
     r.liner_id = r.liner_id || portDestinationFind?.prefered_liner;
     r.Freight_provider_ =
       state.Freight_provider_ ||
       liners?.find((v) => v.liner_id == r.liner_id)?.preffered_supplier;
-    r.Q_Markup = consigneeNew2;
+    r.Q_Markup = r.Q_Markup || consigneeFind?.Q_Markup;
     r.Location_name = consigneeFind?.name;
 
     return r;
@@ -523,6 +519,7 @@ const CreateTest = () => {
     freights,
     unit,
     itf,
+    selectedConsigneeData, // added dependency
   ]);
   console.log(from);
   console.log(computedState);
@@ -919,6 +916,7 @@ const CreateTest = () => {
       const { data } = await axios.post(`${API_BASE_URL}/NewaddOrderInput`, {
         input: {
           ...computedState,
+          order_id: selectedConsigneeData.Order_ID || null,
           user: localStorage.getItem("id"),
           palletized: exchangeRate2 ? 1 : 0,
           Chamber: exchangeRate3 ? 1 : 0,
@@ -1040,6 +1038,16 @@ const CreateTest = () => {
   //     fetchConsigneesNew();
   //   }
   // }, [computedState.client_id, computedState.consignee_id]);
+  // useEffect(() => {
+  //   if (!state.client_id) return;
+
+  //   axios
+  //     .post(`${API_BASE_URL}/ConsigneeDropDown`, { Client_id: state.client_id })
+  //     .then((res) => {
+  //       setConsigneesNew(res.data.data || []);
+  //     })
+  //     .catch(console.error);
+  // }, [state.client_id]);
   useEffect(() => {
     if (!state.client_id) return;
 
@@ -1052,23 +1060,49 @@ const CreateTest = () => {
   }, [state.client_id]);
 
   // Fetch detailed info for selected consignee
+  // useEffect(() => {
+  //   if (!state.client_id || !state.consignee_id) return;
+  //   console.log("run.............");
+
+  //   axios
+  //     .post(`${API_BASE_URL}/ConsigneeDropDown`, {
+  //       Client_id: state.client_id,
+  //       Consignee_ID: state.consignee_id,
+  //       Is_Quotation: 0,
+  //       User_ID: localStorage.getItem("id"),
+  //     })
+  //     .then((res) => {
+  //       const detail = res.data.data?.[0] || null;
+  //       setSelectedConsigneeData(detail); // store detailed data
+  //     })
+  //     .catch(console.error);
+  // }, [state.consignee_id]);
+  useEffect(() => {
+    if (!state.consignee_id) {
+      setSelectedConsigneeData(null);
+      setCopyData(null);
+    }
+  }, [state.consignee_id]);
   useEffect(() => {
     if (!state.client_id || !state.consignee_id) return;
     console.log("run.............");
 
     axios
       .post(`${API_BASE_URL}/ConsigneeDropDown`, {
+        orderId: orderIdData || "",
         Client_id: state.client_id,
         Consignee_ID: state.consignee_id,
         Is_Quotation: 0,
         User_ID: localStorage.getItem("id"),
       })
       .then((res) => {
-        const detail = res.data.data?.[0] || null;
+        const detail = res.data.detailRow || null;
+        setOrderIdData(res.data.detailRow.Order_ID);
         setSelectedConsigneeData(detail); // store detailed data
       })
       .catch(console.error);
   }, [state.consignee_id]);
+
   console.log(state);
   const closeIcon = () => {
     setShow(false);
@@ -1164,7 +1198,7 @@ const CreateTest = () => {
   };
   const handleSaveOrderPopulate = () => {
     const payload = {
-      order_id: state.order_id, // You must have this in your component
+      order_id: state.order_id || selectedConsigneeData.Order_ID, // You must have this in your component
       user_id: localStorage.getItem("id"), // You must also define this
       Order_NW: orderNetWeight,
       input: {
@@ -1605,7 +1639,8 @@ const CreateTest = () => {
                               await axios.post(
                                 `${API_BASE_URL}/updateOrdersValues`,
                                 {
-                                  id: state.order_id,
+                                  id: state.order_id ||
+                                    selectedConsigneeData.Order_ID,
                                   liner_id: newId,
                                   Freight_provider_: state.Freight_provider_,
                                 }
@@ -1765,7 +1800,8 @@ const CreateTest = () => {
                               await axios.post(
                                 `${API_BASE_URL}/updateOrdersValues`,
                                 {
-                                  id: state.order_id,
+                                  id: state.order_id ||
+                                    selectedConsigneeData.Order_ID,
                                   Freight_provider_: newId,
                                 }
                               );

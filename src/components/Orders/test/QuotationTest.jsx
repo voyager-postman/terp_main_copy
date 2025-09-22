@@ -61,7 +61,7 @@ const QuotationTest = () => {
   const handleAgreedPricingChange = (e) => {
     setIsRecalculateChecked(e.target.checked);
   };
-  
+
   const getAllQuotation = () => {
     axios
       .get(`${API_BASE_URL}/QuotationEN`)
@@ -182,7 +182,9 @@ const QuotationTest = () => {
               {+a.QI8 === 1 && (
                 <button
                   type="button"
-                  onClick={() => quotationConfirmationForOrder(a.Order_ID)}
+                  onClick={() =>
+                    quotationConfirmationForOrder(a.Order_ID, a.Status_value)
+                  }
                 >
                   <i
                     className="mdi mdi-check"
@@ -371,25 +373,38 @@ const QuotationTest = () => {
     }
   };
 
-  const quotationConfirmationForOrder = async (quotation_id) => {
+  const quotationConfirmationForOrder = async (quotation_id, Status_value) => {
     loadingModal.fire();
+
     try {
-      const response = await axios.post(`${API_BASE_URL}/QuotationConfirm`, {
+      let endpoint = "";
+
+      if (Status_value === 1) {
+        endpoint = `${API_BASE_URL}/QuotationConfirm`;
+      } else if (Status_value === 2) {
+        endpoint = `${API_BASE_URL}/QuotationConfirm2`;
+      } else {
+        toast.error("Invalid status value");
+        loadingModal.close();
+        return;
+      }
+
+      const response = await axios.post(endpoint, {
         order_id: quotation_id,
-        // user_id: localStorage.getItem("id"),
-        // Other data you may need to pass
+        user_id: localStorage.getItem("id"), // 👈 add user_id here
       });
+
       console.log("API response:", response);
       loadingModal.close();
       getAllQuotation();
       toast.success(t("quotationConfirmationSuccess"));
-      // Handle the response as needed
     } catch (error) {
       console.error("API call error:", error);
       loadingModal.close();
       toast.error(t("quotationConfirmationFailed"));
     }
   };
+
   const performaOrder = async (a) => {
     try {
       let messageSet = "";
