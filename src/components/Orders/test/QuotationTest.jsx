@@ -179,24 +179,25 @@ const QuotationTest = () => {
                 </button>
               )}
 
-              {+a.QI8 === 1 && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    quotationConfirmationForOrder(a.Order_ID, a.Status_value)
-                  }
-                >
-                  <i
-                    className="mdi mdi-check"
-                    style={{
-                      width: "20px",
-                      color: "#203764",
-                      fontSize: "22px",
-                      marginTop: "10px",
-                    }}
-                  />
-                </button>
-              )}
+              {+a.QI8 === 1 &&
+                (+a.Status_value === 1 || +a.Status_value === 2) && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      quotationConfirmationForOrder(a.Order_ID, a.Status_value)
+                    }
+                  >
+                    <i
+                      className="mdi mdi-check"
+                      style={{
+                        width: "20px",
+                        color: "#203764",
+                        fontSize: "22px",
+                        marginTop: "10px",
+                      }}
+                    />
+                  </button>
+                )}
 
               {+a.QI9 === 1 && (
                 <button

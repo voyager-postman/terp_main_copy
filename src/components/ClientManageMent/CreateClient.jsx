@@ -467,6 +467,33 @@ const CreateClient = () => {
         });
       });
   };
+  const handleSubmit10 = () => {
+    axios
+      .post(`${API_BASE_URL}/updateClientConsigneePartial`, {
+        id: updateId, // Consignee ID
+        Consignee_Code: state6.consigneeCode, // ✅ from input
+        brand: state6.brand, // ✅ brand ID
+        port_of_orign: state6.port_of_orign, // ✅ origin port_id
+        destination_port: state6.destination_port, // ✅ destination port_id
+        Liner: state6.liner_Drop, // ✅ liner_id
+        Default_location: state6.Default_location, // ✅ location id
+      })
+      .then(() => {
+        getAllContact1(); // refresh list
+        toast.success(t("updatedSuccessfully"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      })
+      .catch((error) => {
+        console.error("Error updating consignee:", error);
+        toast.error(t("updateFailed"), {
+          autoClose: 1000,
+          theme: "colored",
+        });
+      });
+  };
+
   const handleChange7 = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -7676,6 +7703,21 @@ const CreateClient = () => {
                           <li className="nav-item" role="presentation">
                             <button
                               className="nav-link active"
+                              id="destination-tab"
+                              data-bs-toggle="tab"
+                              data-bs-target="#destination-pane"
+                              type="button"
+                              role="tab"
+                              aria-controls="destination-pane"
+                              aria-selected="false"
+                            >
+                              {t("destination")}
+                            </button>
+                          </li>
+
+                          <li className="nav-item" role="presentation">
+                            <button
+                              className="nav-link "
                               id="consignee-customization-tab"
                               data-bs-toggle="tab"
                               data-bs-target="#consignee-customization-pane"
@@ -7740,6 +7782,210 @@ const CreateClient = () => {
                         >
                           <div
                             className="tab-pane fade show active"
+                            id="destination-pane"
+                            role="tabpanel"
+                            aria-labelledby="destination-tab"
+                          >
+                            {/* destinationNew */}
+                            <div className="row my-3">
+                              <div className="col-lg-4 form-group">
+                                <h6>{t("Consignee Code")}</h6>
+                                <div className="parentthb packParent">
+                                  <div className="childThb">
+                                    <input
+                                      type="text"
+                                      name="consigneeCode"
+                                      placeholder={t("Consignee Code")}
+                                      value={state6.consigneeCode}
+                                      onChange={handleChange6}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="col-lg-4 form-group autoComplete">
+                                <h6>{t("brand")}</h6>
+                                <Autocomplete
+                                  options={brands || []} // API data array
+                                  getOptionLabel={(option) =>
+                                    option.Name_EN || ""
+                                  } // Display English name
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "brand",
+                                        value: newValue ? newValue.ID : "", // Store selected brand ID
+                                      },
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select Brand"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    brands?.find(
+                                      (item) => item.ID === state6.brand
+                                    ) || null
+                                  } // Match by ID
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.ID === value.ID
+                                  } // Comparison by ID
+                                />
+                              </div>
+
+                              <div className="col-lg-4 form-group autoComplete">
+                                <h6>Port of origin</h6>
+
+                                <Autocomplete
+                                  options={port || []} // List of port options
+                                  getOptionLabel={(option) =>
+                                    option.port_name || ""
+                                  } // Label to display
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "port_of_orign",
+                                        value: newValue ? newValue.port_id : "",
+                                      }, // Update selected port_id
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select Airport"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    port?.find(
+                                      (item) =>
+                                        item.port_id === state6.port_of_orign
+                                    ) || null
+                                  } // Set value based on selected port_id
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.port_id === value.port_id
+                                  } // Option comparison
+                                />
+                              </div>
+                              <div className="col-lg-4 form-group autoComplete">
+                                <h6>Port of Destination</h6>
+
+                                <Autocomplete
+                                  options={port || []} // List of port options
+                                  getOptionLabel={(option) =>
+                                    option.port_name || ""
+                                  } // Label to display
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "destination_port",
+                                        value: newValue ? newValue.port_id : "",
+                                      }, // Update selected port_id
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select Airport"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    port?.find(
+                                      (item) =>
+                                        item.port_id === state6.destination_port
+                                    ) || null
+                                  } // Set value based on selected port_id
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.port_id === value.port_id
+                                  } // Option comparison
+                                />
+                              </div>
+
+                              <div className="col-lg-4 form-group autoComplete">
+                                <h6>Liner</h6>
+
+                                <Autocomplete
+                                  options={liner || []} // List of airline options
+                                  getOptionLabel={(option) =>
+                                    option.liner_name || ""
+                                  } // Label to display
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "liner_Drop",
+                                        value: newValue
+                                          ? newValue.liner_id
+                                          : "",
+                                      }, // Update selected liner_id
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select Liner"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    liner?.find(
+                                      (item) =>
+                                        item.liner_id === state6.liner_Drop
+                                    ) || null
+                                  } // Set value based on selected liner_id
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.liner_id === value.liner_id
+                                  } // Option comparison
+                                />
+                              </div>
+
+                              <div className="col-lg-4 form-group autoComplete">
+                                <h6>Location</h6>
+
+                                <Autocomplete
+                                  options={locations || []} // List of location options
+                                  getOptionLabel={(option) => option.name || ""} // Label to display
+                                  onChange={(event, newValue) => {
+                                    handleChange6({
+                                      target: {
+                                        name: "Default_location",
+                                        value: newValue ? newValue.id : "",
+                                      }, // Update selected location id
+                                    });
+                                  }}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder="Select Location"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  value={
+                                    locations?.find(
+                                      (item) =>
+                                        item.id === state6.Default_location
+                                    ) || null
+                                  } // Set value based on selected location id
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.id === value.id
+                                  } // Option comparison
+                                />
+                              </div>
+                              <div className="col-lg-12 mt-3 text-center">
+                                <button
+                                  className="btn btn-danger"
+                                  type="button"
+                                  onClick={handleSubmit10}
+                                >
+                                  {t("submit")}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            className="tab-pane fade "
                             id="consignee-customization-pane"
                             role="tabpanel"
                             aria-labelledby="consignee-customization-tab"

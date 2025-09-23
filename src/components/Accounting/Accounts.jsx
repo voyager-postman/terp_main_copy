@@ -1641,36 +1641,36 @@ const Accounts = () => {
       }
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row1 || "",
+        "Bank Name" || "",
         `${
-          response?.data?.section6_values?.Result1
-            ? response?.data?.section6_values?.Result1
+          response?.data?.bankDetails?.bank_name
+            ? response?.data?.bankDetails?.bank_name
             : ""
         }`,
         7,
         40,
         tableEndY + 30
       );
-      
+
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row2||"",
+        "Bank Number" || "",
         `${
-          response?.data?.section6_values?.Result2||""
-            ? response?.data?.section6_values?.Result2||""
+          response?.data?.bankDetails?.bank_number
+            ? response?.data?.bankDetails?.bank_number
             : ""
         }`,
         7,
         40,
         tableEndY + 35
       );
-          
+
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row3||"",
+        "Bank Account" || "",
         `${
-          response?.data?.section6_values?.Result3||""
-            ? response?.data?.section6_values?.Result3||""
+          response?.data?.bankDetails?.bank_account
+            ? response?.data?.bankDetails?.bank_account
             : ""
         }`,
         7,
@@ -1680,16 +1680,24 @@ const Accounts = () => {
 
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row4||"",
-        response?.data?.section6_values?.Result4||"",
+        "Payment Date" || "",
+        `${
+          response?.data?.bankDetails?.Payment_Date
+            ? response?.data?.bankDetails?.Payment_Date
+            : ""
+        }`,
         7,
         40,
         tableEndY + 45
       );
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row5||"",
-        response?.data?.section6_values?.Result5||"",
+        "Bank Account Name" || "",
+        `${
+          response?.data?.bankDetails?.bankAccount_name
+            ? response?.data?.bankDetails?.bankAccount_name
+            : ""
+        }`,
         7,
         40,
         tableEndY + 50
@@ -1697,8 +1705,8 @@ const Accounts = () => {
 
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row6||"",
-        response?.data?.section6_values?.Result6||"",
+        response?.data?.section6_label?.row6 || "",
+        response?.data?.section6_values?.Result6 || "",
         7,
         40,
         tableEndY + 55
