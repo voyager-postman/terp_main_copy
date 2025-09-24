@@ -111,6 +111,7 @@ const AddShipTo = () => {
     messangerId: from?.Messenger_Main_ID ?? "",
     address1: from?.Address1 ?? "",
     address2: from?.Address2 ?? "",
+    address3: from?.Address3 ?? "",
     Bank_Name: from?.Bank_Name ?? "",
     Bank_Branch: from?.Bank_Branch ?? "",
     Bank_Account: from?.Bank_Account ?? "",
@@ -289,6 +290,8 @@ const AddShipTo = () => {
           Postcode: postalCode,
           Address1: state7.address1,
           Address2: state7.address2,
+          Address3: state7.address3,
+
           Bank_Name: state7.Bank_Name,
           Legal_Entity: state7.Entity,
           WHT_Type: state7.WHT_Type,
@@ -4345,6 +4348,18 @@ const AddShipTo = () => {
                             name="address2"
                             className="form-control"
                             placeholder="Address2"
+                          />
+                        </div>
+                        <div className="col-lg-3 form-group">
+                          <h6>{t("address")} 3</h6>
+                          <input
+                            type="text"
+                            id="address3"
+                            value={state7.address3 || ""}
+                            onChange={handleChange9}
+                            name="address3"
+                            className="form-control"
+                            placeholder="Address3"
                           />
                         </div>
                       </div>

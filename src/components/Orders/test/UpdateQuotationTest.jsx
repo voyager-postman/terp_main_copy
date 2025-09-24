@@ -2755,7 +2755,7 @@ const UpdateQuotationTest = () => {
                                         : "";
                                     }
                                     if (field === "Profit_Percentage")
-                                      return `${rawValue}%`;
+                                      return `${rawValue}`;
                                     return rawValue;
                                   })();
 

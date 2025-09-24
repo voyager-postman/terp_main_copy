@@ -1,4 +1,4 @@
-import axios from "axios";
+ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../../Url/Url";
@@ -464,7 +464,7 @@ const UpdateFreight = () => {
               </div>
             </div>
             <Link className="btn btn-danger" to={"/freightNew"}>
-              {t("cancel")}
+              {t("close")}
             </Link>
           </div>
         </div>

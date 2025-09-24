@@ -1,4 +1,4 @@
-import axios from "axios";
+ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -170,6 +170,16 @@ const UpdateTransport = () => {
       }
     });
   };
+   const handleClick = () => {
+    if (typeof from?.transport_id === "undefined") {
+      // Perform create logic
+      console.log("Creating transport...");
+      // Call your create function here
+    } else {
+      // Close logic: go back to transportNew menu
+      navigate("/transportNew"); // adjust the route as per your app
+    }
+  };
   return (
     <Card
       title={`${t("transportManagement")} / ${typeof from?.transport_id == "undefined" ? t("create") : t("update")
@@ -292,7 +302,7 @@ const UpdateTransport = () => {
             aria-labelledby="exampleModalLabel"
             aria-hidden="true"
           >
-            <div className="modal-dialog modal-xl">
+            <div className="modal-dialog modal-xl modalShipTo  ">
               <div className="modal-content">
                 <div className="modal-header">
                   <h1 className="modal-title fs-5" id="exampleModalLabel">
@@ -415,7 +425,7 @@ const UpdateTransport = () => {
             aria-labelledby="exampleModalLabel"
             aria-hidden="true"
           >
-            <div className="modal-dialog modal-xl">
+            <div className="modal-dialog modal-xl modalShipTo  ">
               <div className="modal-content">
                 <div className="modal-header">
                   <h1 className="modal-title fs-5" id="exampleModalAdd">
@@ -515,13 +525,14 @@ const UpdateTransport = () => {
               className="btn btn-primary"
               type="submit"
               name="signup"
-            //   onClick={updatePort}
+            //   onClick={updatePort }
+              onClick={handleClick}
             >
-              {typeof from?.transport_id == "undefined" ? t("create") : t("update")}
+              {typeof from?.transport_id == "undefined" ? t("create") : t("close")}
             </button>
-            <Link className="btn btn-danger" to={"/transportNew"}>
+            {/* <Link className="btn btn-danger" to={"/transportNew"}>
               {t("cancel")}
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

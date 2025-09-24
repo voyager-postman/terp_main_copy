@@ -554,7 +554,7 @@ const CreateQuotationTest = () => {
   const dataSubmit1 = () => {
     axios
       .post(`${API_BASE_URL}/deleteOrder`, {
-        id: deleteOrderId,
+        id: state.order_id || selectedConsigneeData.Order_ID,
         user_id: localStorage.getItem("id"),
         // NOTES: notes1,
       })
@@ -2325,7 +2325,7 @@ const CreateQuotationTest = () => {
                                         : "";
                                     }
                                     if (field === "Profit_Percentage")
-                                      return `${rawValue}%`;
+                                      return `${rawValue}`;
                                     return rawValue;
                                   })();
 

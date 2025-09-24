@@ -313,6 +313,7 @@ const AddVendor = () => {
     messangerId: from?.Messenger_Main_ID ?? "",
     address1: from?.Address1 ?? "",
     address2: from?.Address2 ?? "",
+    address3: from?.Address3 ?? "",
     Bank_Name: from?.Bank_Name ?? "",
     Bank_Branch: from?.Bank_Branch ?? "",
     Bank_Account: from?.Bank_Account ?? "",
@@ -459,6 +460,7 @@ const AddVendor = () => {
           Postcode: postalCode,
           Address1: state.address1,
           Address2: state.address2,
+          Address3: state.address3,
           Bank_Name: state.Bank_Name,
           Legal_Entity: state.Entity,
           Bank_Branch: state.Bank_Branch,
@@ -1278,6 +1280,18 @@ const AddVendor = () => {
                       name="address2"
                       className="form-control"
                       placeholder="Address2"
+                    />
+                  </div>
+                  <div className="col-lg-3 form-group">
+                    <h6>{t("address")} 3</h6>
+                    <input
+                      type="text"
+                      id="address3"
+                      value={state.address3 || ""}
+                      onChange={handleChange}
+                      name="address3"
+                      className="form-control"
+                      placeholder="Address3"
                     />
                   </div>
                 </div>

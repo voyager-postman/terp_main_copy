@@ -540,7 +540,7 @@ const CreateTest = () => {
 
   const isError = useMemo(() => {
     return (details?.section5_Values || []).some((v) => {
-      return +v.Box % 1 !== 0;
+      return (+v.Box % 1 !== 0) | (+v.cal_error == 1);
     });
   }, [details]);
 
@@ -576,10 +576,11 @@ const CreateTest = () => {
 
   const dataSubmit1 = () => {
     console.log(notes1);
-    if (deleteOrderId) {
+    const orderId = state.order_id || selectedConsigneeData?.Order_ID;
+    if (orderId) {
       axios
         .post(`${API_BASE_URL}/deleteOrder`, {
-          id: deleteOrderId,
+          id: orderId,
           user_id: localStorage.getItem("id"),
           // NOTES: notes1,
         })
@@ -1639,7 +1640,8 @@ const CreateTest = () => {
                               await axios.post(
                                 `${API_BASE_URL}/updateOrdersValues`,
                                 {
-                                  id: state.order_id ||
+                                  id:
+                                    state.order_id ||
                                     selectedConsigneeData.Order_ID,
                                   liner_id: newId,
                                   Freight_provider_: state.Freight_provider_,
@@ -1800,7 +1802,8 @@ const CreateTest = () => {
                               await axios.post(
                                 `${API_BASE_URL}/updateOrdersValues`,
                                 {
-                                  id: state.order_id ||
+                                  id:
+                                    state.order_id ||
                                     selectedConsigneeData.Order_ID,
                                   Freight_provider_: newId,
                                 }
@@ -2285,7 +2288,7 @@ const CreateTest = () => {
 
                         <tbody>
                           {details?.section5_Values?.map((v, i) => {
-                            const isRed = +v.Box % 1 !== 0; // Apply red styling if Box is decimal
+                            const isRed = +v.Box % 1 !== 0 || +v.cal_error == 1; // Apply red styling if Box is decimal
 
                             return (
                               <tr

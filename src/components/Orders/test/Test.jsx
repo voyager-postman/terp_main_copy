@@ -2189,7 +2189,7 @@ const Test = () => {
       const commonStartY = 36.3;
 
       // First set of texts (left side)
-      const maxWidth1 = 72;
+      const maxWidth1 = 87;
       const startX1 = 7;
       const lineHeight1 = 4.2;
       let currentY1 = commonStartY; // Use the common starting Y position
@@ -2212,7 +2212,7 @@ const Test = () => {
         );
       });
       // Reset the starting Y position for the second block (right side) to be the same as the first block
-      const maxWidth2 = 72;
+      const maxWidth2 = 87;
       const startX2 = 127.2;
       let currentY2 = commonStartY; // Use the same starting Y position as the first block
       doc.setFontSize(11);

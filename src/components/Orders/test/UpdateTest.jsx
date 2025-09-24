@@ -2632,7 +2632,7 @@ const UpdateTest = () => {
 
                         <tbody>
                           {details?.section5_Values?.map((v, i) => {
-                            const isRed = +v.Box % 1 !== 0; // Apply red styling if Box is decimal
+                          const isRed = +v.Box % 1 !== 0 || +v.cal_error == 1;; // Apply red styling if Box is decimal
 
                             return (
                               <tr
@@ -2692,7 +2692,7 @@ const UpdateTest = () => {
                                         : "";
                                     }
                                     if (field === "Profit_Percentage")
-                                      return `${rawValue}%`;
+                                      return `${rawValue}`;
                                     return rawValue;
                                   })();
 
