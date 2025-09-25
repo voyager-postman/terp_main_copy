@@ -313,6 +313,7 @@ const QuotationTest = () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/ExpireQuotations`, {
         quotationId: quotation_id,
+        user_id: localStorage.getItem("id"),
       });
       console.log("API response:", response);
       getAllQuotation();

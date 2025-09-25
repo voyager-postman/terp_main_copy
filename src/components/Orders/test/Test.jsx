@@ -192,12 +192,33 @@ const Test = () => {
                     <button type="button" onClick={() => generatePdf2(a)}>
                       {" "}
                       <svg
-                        className="SvgQuo"
                         xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
+                        viewBox="0 0 200 80" // scalable, you can change width/height via props or CSS
+                        className="customIcon"
                       >
-                        <title>alpha-c-box-outline</title>
-                        <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
+                        <rect
+                          x="5"
+                          y="5"
+                          rx="15"
+                          ry="15"
+                          width="190"
+                          height="70"
+                          fill="none"
+                          stroke="#203764" // ✅ border color
+                          strokeWidth="8" // ✅ thickness like your image
+                        />
+                        <text
+                          x="50%"
+                          y="50%"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fontSize="28"
+                          fontWeight="bold"
+                          fill="#203764" // ✅ text color same as border
+                          fontFamily="Arial, sans-serif"
+                        >
+                          CUSTOMS
+                        </text>
                       </svg>
                     </button>
                   )}
@@ -276,7 +297,6 @@ const Test = () => {
               )}
             </div>
           ),
-     
         });
 
         setColumns(dynamicColumns);
@@ -1183,7 +1203,6 @@ const Test = () => {
     const dynamicBody = tableData.map((row) => {
       return orderedHeaders.map((_, index) => row[`COL${index + 1}`] ?? "");
     });
-
     console.log(invoiceResponse.data);
     const companyAddress = invoiceResponse?.data?.Company_Address;
     const currency = invoiceResponse?.data?.currencyResults;
@@ -1256,7 +1275,7 @@ const Test = () => {
       doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
-      doc.text("Packing List / Invoice", 83, 27.5);
+      doc.text(invoiceResponse?.data?.invoiceHeaderLabel?.Title, 83, 27.5);
       doc.setFillColor(32, 55, 100);
       doc.rect(7, 29, doc.internal.pageSize.width - 15, 0.5, "FD");
       // order part left
@@ -1268,20 +1287,44 @@ const Test = () => {
 
       const textDataLeft = [
         {
-          label: invoiceResponse?.data?.orderMetaLabels?.Row1,
-          value: `${invoiceResponse?.data?.invoiceHeader.Row1 || ""}`,
+          label: invoiceResponse?.data?.orderMetaLabels?.Row1 || "",
+          value: `${invoiceResponse?.data?.invoiceHeader.Result1 || ""}`,
         },
         {
-          label: invoiceResponse?.data?.dateLabels?.Row2,
-          value: invoiceResponse?.data?.invoiceHeader.Row2 || "",
+          label: invoiceResponse?.data?.orderMetaLabels?.Row2 || "",
+          value: invoiceResponse?.data?.invoiceHeader.Result2 || "",
         },
         {
-          label: invoiceResponse?.data?.orderMetaLabels?.Row3,
-          value: `${invoiceResponse?.data?.invoiceHeader.Row3 || ""}`,
+          label: invoiceResponse?.data?.orderMetaLabels?.Row3 || "",
+          value: `${invoiceResponse?.data?.invoiceHeader.Result3 || ""}`,
+        },
+        {
+          label: `${invoiceResponse?.data?.transportTypeLabel.AWB || ""}`,
+          value: invoiceResponse?.data?.transportInfo?.AWB || "",
         },
       ];
-      doc.text(`${invoiceResponse?.data?.transportTypeLabel?.Row1}`, 7, 48);
-      doc.text(`${invoiceResponse?.data?.transportInfo?.Row1}`, 40, 48);
+
+      doc.text(
+        `${invoiceResponse?.data?.transportTypeLabel?.Row1 || ""}`,
+        7,
+        48
+      );
+      const transportDateRaw = invoiceResponse?.data?.transportInfo?.Row1 || "";
+      let transportDate = "";
+
+      if (transportDateRaw) {
+        const dateObj = new Date(transportDateRaw);
+        transportDate = dateObj
+          .toISOString()
+          .split("T")[0]
+          .split("-")
+          .reverse()
+          .join("-");
+      }
+
+      doc.text(transportDate, 40, 48);
+      doc.text(`${invoiceResponse?.data?.transportInfo?.Row1 || ""}`, 40, 48);
+
       textDataLeft.forEach((item) => {
         const labelXLeft = 7;
         const valueXLeft = 40;
@@ -1301,22 +1344,27 @@ const Test = () => {
       const maxWidthRight = 72; // Maximum width in pixels
       let yRight = 33;
       const yIncrementRight = 1; // Adjust this value based on your spacing requirements
-
+      console.log(">>>>>>>>");
+      const formatDate = (dateString) => {
+        if (!dateString) return ""; // handle empty or null
+        const date = new Date(dateString);
+        if (isNaN(date)) return ""; // handle invalid date
+        return date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+      };
       const textDataRight = [
         {
-          label: `${invoiceResponse?.data?.dateLabels.Row1}`,
-          value: `${invoiceResponse?.data?.dateValues.Row1}`,
+          label: `${invoiceResponse?.data?.dateLabels.Row1 || ""}`,
+          value: formatDate(invoiceResponse?.data?.dateValues?.Result1),
         },
         {
-          label: `${invoiceResponse?.data?.dateLabels.Row2}`,
-          value: `${invoiceResponse?.data?.dateValues?.Row2 || ""}`,
+          label: `${invoiceResponse?.data?.dateLabels.Row2 || ""}`,
+          value: formatDate(invoiceResponse?.data?.dateValues?.Result2),
         },
         {
-          label: `${invoiceResponse?.data?.dateLabels.Row3}`,
-          value: `${invoiceResponse?.data?.dateValues?.Row3 || ""}`,
+          label: `${invoiceResponse?.data?.dateLabels.Row3 || ""}`,
+          value: formatDate(invoiceResponse?.data?.dateValues?.Result3),
         },
       ];
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
       textDataRight.forEach((item) => {
         const labelXRight = 100;
         const valueXRight = 127;
@@ -1345,6 +1393,7 @@ const Test = () => {
         54
       );
     };
+
     doc.setFillColor(32, 55, 100);
     doc.rect(7, 55.5, doc.internal.pageSize.width - 15, 0.5, "FD");
     doc.setFontSize(10);
@@ -1458,44 +1507,47 @@ const Test = () => {
 
     const textDataLeft = [
       {
-        label: `${
+        label:
           invoiceResponse?.data?.summaryLabels?.["Total Box : "] ||
-          "Total Box : "
-        }`,
-        value: `${
-          invoiceResponse?.data?.summaryValues?.Box
-            ? invoiceResponse?.data?.summaryValues?.Box
-            : ""
-        }`,
+          "Total Box : ",
+        value: invoiceResponse?.data?.summaryValues?.Box || "",
       },
       {
-        label: invoiceResponse?.data?.summaryLabels["Total Packages : "]
-          ? invoiceResponse?.data?.summaryLabels?.["Total Packages : "]
-          : "",
-        value: invoiceResponse?.data?.summaryValues?.Packages
-          ? invoiceResponse?.data?.summaryValues?.Packages
-          : "",
+        label:
+          invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
+          "Total Packages : ",
+        value: invoiceResponse?.data?.summaryValues?.Packages || "",
       },
       {
-        label: invoiceResponse?.data?.summaryLabels["Total Items : "]
-          ? invoiceResponse?.data?.summaryLabels["Total Items : "]
-          : "",
-        value: invoiceResponse?.data?.summaryValues?.Items
-          ? invoiceResponse?.data?.summaryValues?.Items
-          : "",
+        label:
+          invoiceResponse?.data?.summaryLabels?.["Total Items : "] ||
+          "Total Items : ",
+        value: invoiceResponse?.data?.summaryValues?.Items || "",
       },
     ];
+
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", textDataLeft);
+
+    // Render each label/value in PDF
     textDataLeft.forEach((item) => {
+      if (!item.label && !item.value) return; // skip empty rows
+
       const labelXLeft = 7;
       const valueXLeft = 43;
-      const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
-      doc.text(item.label, labelXLeft, yLeft);
-      valueLinesLeft.forEach((line, index) => {
-        doc.text(line, valueXLeft, yLeft + index * 4); // Adjust y position for each line of value
-      });
-      yLeft += valueLinesLeft.length * 4 + yIncrementLeft; // Adjust spacing between sections
-    });
 
+      const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+
+      // Print label
+      doc.text(item.label, labelXLeft, yLeft);
+
+      // Print value (possibly wrapped into multiple lines)
+      valueLinesLeft.forEach((line, index) => {
+        doc.text(line, valueXLeft, yLeft + index * 4);
+      });
+
+      // Move Y for next section
+      yLeft += valueLinesLeft.length * 4 + yIncrementLeft;
+    });
     // Draw the text for the order part (right side)
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
@@ -1528,6 +1580,7 @@ const Test = () => {
           : "",
       },
     ];
+
     // Draw the text for the order part (right side)
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
@@ -1573,6 +1626,7 @@ const Test = () => {
           : "",
       },
     ];
+
     let yRightNew = endY + 20;
     textDataRightThree.forEach((item) => {
       const labelXRight = 7;
@@ -1590,11 +1644,11 @@ const Test = () => {
       yRightNew += valueLinesRight.length * 4 + yIncrementRight;
     });
 
-    const cnfText = invoiceResponse?.data?.paymentValues?.CNF;
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    const cnfFXText = invoiceResponse?.data?.paymentValues?.CNF_FX;
+    const cnfText = invoiceResponse?.data?.paymentValues?.CNF || "";
+    const cnfFXText = invoiceResponse?.data?.paymentValues?.CNF_FX || "";
     const textWidthCNF = doc.getTextWidth(cnfText);
     const textWidthCNFFX = doc.getTextWidth(cnfFXText);
+
     const rightAlignX = 200;
     doc.text(
       invoiceResponse?.data?.paymentLabels?.["Total (THB) : "] ||
@@ -1613,6 +1667,7 @@ const Test = () => {
       147,
       endY + 11
     );
+
     doc.text(cnfFXText, rightAlignX - textWidthCNFFX, endY + 11);
     doc.setFillColor(32, 55, 100);
     doc.rect(147, endY + 12, 55.5, 0.5, "FD");
@@ -1622,7 +1677,8 @@ const Test = () => {
       147,
       endY + 17
     );
-    const cnfFXTextNew = invoiceResponse?.data?.paymentValues?.Daily_FX_Rate;
+    const cnfFXTextNew =
+      invoiceResponse?.data?.paymentValues?.Daily_FX_Rate || "";
     doc.text(cnfFXTextNew, rightAlignX - textWidthCNFFX, endY + 17);
     doc.rect(147, endY + 18, 55.5, 0.5, "FD");
 

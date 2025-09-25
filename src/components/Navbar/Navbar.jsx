@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate, Link } from "react-router-dom";
-import Logo from "../../assets/white-logo.png";
+import logo from "../../assets/logoNew.png";
+
 import Button from "../Button";
 import ChooseLang from "./ChooseLang";
 import NavLinks from "./Navlinks.jsx";
@@ -89,12 +90,11 @@ const Navbar = () => {
       style={{ backgroundColor: "#203764", zIndex: "999" }}
     >
       <div className="flex items-center font-medium justify-between">
-        <div className="z-50 flex justify-between navLogo w-full md:w-auto">
+        <div className="z-50 flex justify-between  w-full md:w-auto">
           <NavLink to={targetRoute} className="flex">
-            <img src={Logo} alt="logo" className="md:cursor-pointer h-9" />
-            <span className="text-white ml-2  justify-between items-center flex terplogo">
-              {t("terp")}
-            </span>
+            <div class="logoTerp">
+              <img src={logo} />
+            </div>
           </NavLink>
           <button
             type="button"

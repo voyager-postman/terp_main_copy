@@ -702,7 +702,7 @@ const Receiving = () => {
                               </div>
                               <div className="row mt-2 inputMarginUnset">
                                 <div className="form-group col-lg-6">
-                                  <h6>{t("create")}</h6>
+                                  <h6>{t("crate")}</h6>
                                   <input
                                     onChange={handleChange}
                                     type="text"

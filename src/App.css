@@ -834,7 +834,7 @@ button.btn.btn-primary {
   border: 2px solid #203764 !important;
   padding: 7px 30px;
   height: unset !important;
- }
+}
 
 .btn-danger:hover {
   border: 2px solid #203764 !important;
@@ -2072,13 +2072,13 @@ ul.dropdown-menu {
 .modal-footer button {
   margin: unset !important;
   box-shadow: unset !important;
-   background: #fff !important;
+  background: #fff !important;
   border: unset !important;
   color: #000 !important;
   padding: 7px 30px !important;
   height: unset !important;
 }
-.modal-footer button:nth-child(1){
+.modal-footer button:nth-child(1) {
   margin-right: 5px !important;
 }
 /* 17 */
@@ -4109,13 +4109,22 @@ td {
   margin-bottom: 10px;
 }
 button.iconWht {
-    color: #203764;
-    padding: 1px;
-    border-radius: 4px;
-    border: 2px solid #203764;
-    font-size: 8px;
-    line-height: 11px !important;
+  color: #203764;
+  padding: 1px;
+  border-radius: 4px;
+  border: 2px solid #203764;
+  font-size: 8px;
+  line-height: 11px !important;
 }
-.whtImg img{
-height: 40px;
+.whtImg img {
+  height: 40px;
+}
+.logoTerp img {
+  width: 76px;
+  height: 76px;
+  filter: brightness(0) invert(1);
+  margin: auto;
+}
+.customIcon {
+  height: 20px;
 }

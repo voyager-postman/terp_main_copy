@@ -1,4 +1,4 @@
-import axios from "../../Url/Api";
+ import axios from "../../Url/Api";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
@@ -314,6 +314,10 @@ const AddVendor = () => {
     address1: from?.Address1 ?? "",
     address2: from?.Address2 ?? "",
     address3: from?.Address3 ?? "",
+    postcode: from?.Postcode ?? "", // ✅ add this
+    provinces: from?.Province ?? "", // ✅ add this
+    district: from?.District ?? "", // ✅ add this
+    subdistrict: from?.Subdistrict ?? "", // ✅ add this
     Bank_Name: from?.Bank_Name ?? "",
     Bank_Branch: from?.Bank_Branch ?? "",
     Bank_Account: from?.Bank_Account ?? "",
@@ -454,10 +458,10 @@ const AddVendor = () => {
           Messenger_Type: state.Messenger_Type,
           Messenger_Main_ID: state.messangerId,
           Country: selectedCountry?.name || "",
-          Province: selectedProvince?.name || "",
-          District: selectedDistrict?.name || "",
-          Subdistrict: selectedSubdistrict?.name || "",
-          Postcode: postalCode,
+          Province: state.provinces || "", // use state
+          District: state.district || "", // use state
+          Subdistrict: state.subdistrict || "", // use state
+          Postcode: state.postcode || "", // use state
           Address1: state.address1,
           Address2: state.address2,
           Address3: state.address3,
@@ -497,166 +501,190 @@ const AddVendor = () => {
       })
       .catch((err) => console.error("Axios error:", err));
   }, []);
-  const [provinceList, setProvinceList] = useState([]);
-  const [selectedProvince, setSelectedProvince] = useState(null);
+  // const [provinceList, setProvinceList] = useState([]);
+  // const [selectedProvince, setSelectedProvince] = useState(null);
+  // useEffect(() => {
+  //   const fetchProvinces = async () => {
+  //     if (!selectedCountry?.id) {
+  //       setProvinceList([]);
+  //       setSelectedProvince(null);
+  //       return;
+  //     }
+
+  //     try {
+  //       const { data } = await axios.get(
+  //         `https://r3.siameats.net/api/provinces/${selectedCountry.id}`
+  //       );
+  //       if (Array.isArray(data?.provinces)) {
+  //         setProvinceList(data.provinces);
+  //       } else {
+  //         console.error("Expected 'provinces' to be an array", data);
+  //         setProvinceList([]);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching provinces:", error);
+  //       setProvinceList([]);
+  //     }
+  //   };
+
+  //   fetchProvinces();
+  // }, [selectedCountry]);
+  // // district
+  // const [districtList, setDistrictList] = useState([]);
+  // const [selectedDistrict, setSelectedDistrict] = useState(null);
+  // useEffect(() => {
+  //   if (!selectedProvince?.id) {
+  //     setDistrictList([]);
+  //     setSelectedDistrict(null);
+  //     return;
+  //   }
+
+  //   axios
+  //     .get(`${API_BASE_URL}/districts/${selectedProvince.id}`)
+  //     .then(({ data }) => {
+  //       console.log("", data);
+  //       if (Array.isArray(data?.districts)) {
+  //         setDistrictList(data.districts);
+  //       } else {
+  //         console.error("Expected districts array", data);
+  //         setDistrictList([]);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching districts:", err);
+  //       setDistrictList([]);
+  //     });
+  // }, [selectedProvince]);
+  // // sub district
+  // const [subdistrictList, setSubdistrictList] = useState([]);
+  // const [selectedSubdistrict, setSelectedSubdistrict] = useState(null);
+  // useEffect(() => {
+  //   if (!selectedDistrict?.id) {
+  //     setSubdistrictList([]);
+  //     setSelectedSubdistrict(null);
+  //     return;
+  //   }
+
+  //   axios
+  //     .get(`${API_BASE_URL}/subdistricts/${selectedDistrict.id}`)
+  //     .then(({ data }) => {
+  //       console.log("pratimaDis", data);
+  //       if (Array.isArray(data?.Subdistricts)) {
+  //         setSubdistrictList(data.Subdistricts);
+  //       } else {
+  //         console.error("pratima", data);
+  //         setSubdistrictList([]);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching subdistricts:", err);
+  //       setSubdistrictList([]);
+  //     });
+  // }, [selectedDistrict]);
+
+  // const [postalCode, setPostalCode] = useState(null);
+
+  // useEffect(() => {
+  //   if (!selectedSubdistrict?.lat || !selectedSubdistrict?.lng) {
+  //     setPostalCode("");
+  //     return;
+  //   }
+
+  //   axios
+  //     .get(
+  //       `${API_BASE_URL}/postal-code?lat=${selectedSubdistrict.lat}&lng=${selectedSubdistrict.lng}`
+  //     )
+  //     .then(({ data }) => {
+  //       if (data?.date?.postal_code) {
+  //         setPostalCode(data.date.postal_code);
+  //       } else {
+  //         setPostalCode("");
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setPostalCode("");
+  //     });
+  // }, [selectedSubdistrict]);
+  // // Pre-fill form for update mode
+  // useEffect(() => {
+  //   if (!from || countryList.length === 0) return;
+
+  //   // 1️⃣ Find Country
+  //   const countryObj = countryList.find((c) => c.name === from.Country);
+  //   if (countryObj) {
+  //     setSelectedCountry(countryObj);
+
+  //     // Fetch provinces and set province
+  //     axios
+  //       .get(`https://r3.siameats.net/api/provinces/${countryObj.id}`)
+  //       .then(({ data }) => {
+  //         if (Array.isArray(data?.provinces)) {
+  //           setProvinceList(data.provinces);
+  //           const provinceObj = data.provinces.find(
+  //             (p) => p.name === from.Province
+  //           );
+  //           if (provinceObj) {
+  //             setSelectedProvince(provinceObj);
+
+  //             // Fetch districts and set district
+  //             axios
+  //               .get(`${API_BASE_URL}/districts/${provinceObj.id}`)
+  //               .then(({ data }) => {
+  //                 if (Array.isArray(data?.districts)) {
+  //                   setDistrictList(data.districts);
+  //                   const districtObj = data.districts.find(
+  //                     (d) => d.name === from.District
+  //                   );
+  //                   if (districtObj) {
+  //                     setSelectedDistrict(districtObj);
+
+  //                     // Fetch subdistricts and set subdistrict
+  //                     axios
+  //                       .get(`${API_BASE_URL}/subdistricts/${districtObj.id}`)
+  //                       .then(({ data }) => {
+  //                         if (Array.isArray(data?.Subdistricts)) {
+  //                           setSubdistrictList(data.Subdistricts);
+  //                           const subdistrictObj = data.Subdistricts.find(
+  //                             (s) => s.name === from.Subdistrict
+  //                           );
+  //                           if (subdistrictObj) {
+  //                             setSelectedSubdistrict(subdistrictObj);
+  //                             setPostalCode(from.Postcode || "");
+  //                           }
+  //                         }
+  //                       });
+  //                   }
+  //                 }
+  //               });
+  //           }
+  //         }
+  //       });
+  //   }
+  // }, [from, countryList]);
+  const { data: dropdownProvinces } = useQuery("getDropdownAddressProvinces");
+  // const { data: dropdownDistrict } = useQuery("getDropdownAddressDistrict");
+  // const { data: dropdownSubDistrict } = useQuery(
+  //   "getDropdownAddressSub-district"
+  // );
+  // const availableDistrict = useMemo(() => {
+  //   return dropdownDistrict?.filter((item) => item._id == state.provinces);
+  // }, [state.provinces, dropdownDistrict]);
+
+  // const availableSubDistrict = useMemo(() => {
+  //   return dropdownSubDistrict?.filter((item) => item._id == state.district);
+  // }, [state.provinces, dropdownDistrict, state.district, dropdownSubDistrict]);
   useEffect(() => {
-    const fetchProvinces = async () => {
-      if (!selectedCountry?.id) {
-        setProvinceList([]);
-        setSelectedProvince(null);
-        return;
-      }
-
-      try {
-        const { data } = await axios.get(
-          `https://r3.siameats.net/api/provinces/${selectedCountry.id}`
-        );
-        if (Array.isArray(data?.provinces)) {
-          setProvinceList(data.provinces);
-        } else {
-          console.error("Expected 'provinces' to be an array", data);
-          setProvinceList([]);
-        }
-      } catch (error) {
-        console.error("Error fetching provinces:", error);
-        setProvinceList([]);
-      }
-    };
-
-    fetchProvinces();
-  }, [selectedCountry]);
-  // district
-  const [districtList, setDistrictList] = useState([]);
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
-  useEffect(() => {
-    if (!selectedProvince?.id) {
-      setDistrictList([]);
-      setSelectedDistrict(null);
-      return;
-    }
-
-    axios
-      .get(`${API_BASE_URL}/districts/${selectedProvince.id}`)
-      .then(({ data }) => {
-        console.log("", data);
-        if (Array.isArray(data?.districts)) {
-          setDistrictList(data.districts);
-        } else {
-          console.error("Expected districts array", data);
-          setDistrictList([]);
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching districts:", err);
-        setDistrictList([]);
+    const p = dropdownSubDistrict?.find(
+      (item) => item.code == state.id
+    )?.zipcode;
+    if (p)
+      setState((prevState) => {
+        return {
+          ...prevState,
+          postcode: p,
+        };
       });
-  }, [selectedProvince]);
-  // sub district
-  const [subdistrictList, setSubdistrictList] = useState([]);
-  const [selectedSubdistrict, setSelectedSubdistrict] = useState(null);
-  useEffect(() => {
-    if (!selectedDistrict?.id) {
-      setSubdistrictList([]);
-      setSelectedSubdistrict(null);
-      return;
-    }
-
-    axios
-      .get(`${API_BASE_URL}/subdistricts/${selectedDistrict.id}`)
-      .then(({ data }) => {
-        console.log("pratimaDis", data);
-        if (Array.isArray(data?.Subdistricts)) {
-          setSubdistrictList(data.Subdistricts);
-        } else {
-          console.error("pratima", data);
-          setSubdistrictList([]);
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching subdistricts:", err);
-        setSubdistrictList([]);
-      });
-  }, [selectedDistrict]);
-
-  const [postalCode, setPostalCode] = useState(null);
-
-  useEffect(() => {
-    if (!selectedSubdistrict?.lat || !selectedSubdistrict?.lng) {
-      setPostalCode("");
-      return;
-    }
-
-    axios
-      .get(
-        `${API_BASE_URL}/postal-code?lat=${selectedSubdistrict.lat}&lng=${selectedSubdistrict.lng}`
-      )
-      .then(({ data }) => {
-        if (data?.date?.postal_code) {
-          setPostalCode(data.date.postal_code);
-        } else {
-          setPostalCode("");
-        }
-      })
-      .catch(() => {
-        setPostalCode("");
-      });
-  }, [selectedSubdistrict]);
-  // Pre-fill form for update mode
-  useEffect(() => {
-    if (!from || countryList.length === 0) return;
-
-    // 1️⃣ Find Country
-    const countryObj = countryList.find((c) => c.name === from.Country);
-    if (countryObj) {
-      setSelectedCountry(countryObj);
-
-      // Fetch provinces and set province
-      axios
-        .get(`https://r3.siameats.net/api/provinces/${countryObj.id}`)
-        .then(({ data }) => {
-          if (Array.isArray(data?.provinces)) {
-            setProvinceList(data.provinces);
-            const provinceObj = data.provinces.find(
-              (p) => p.name === from.Province
-            );
-            if (provinceObj) {
-              setSelectedProvince(provinceObj);
-
-              // Fetch districts and set district
-              axios
-                .get(`${API_BASE_URL}/districts/${provinceObj.id}`)
-                .then(({ data }) => {
-                  if (Array.isArray(data?.districts)) {
-                    setDistrictList(data.districts);
-                    const districtObj = data.districts.find(
-                      (d) => d.name === from.District
-                    );
-                    if (districtObj) {
-                      setSelectedDistrict(districtObj);
-
-                      // Fetch subdistricts and set subdistrict
-                      axios
-                        .get(`${API_BASE_URL}/subdistricts/${districtObj.id}`)
-                        .then(({ data }) => {
-                          if (Array.isArray(data?.Subdistricts)) {
-                            setSubdistrictList(data.Subdistricts);
-                            const subdistrictObj = data.Subdistricts.find(
-                              (s) => s.name === from.Subdistrict
-                            );
-                            if (subdistrictObj) {
-                              setSelectedSubdistrict(subdistrictObj);
-                              setPostalCode(from.Postcode || "");
-                            }
-                          }
-                        });
-                    }
-                  }
-                });
-            }
-          }
-        });
-    }
-  }, [from, countryList]);
+  }, [state.subdistrict, dropdownSubDistrict]);
   const handleSubmit8 = async () => {
     try {
       const payload = {
@@ -1171,8 +1199,8 @@ const AddVendor = () => {
                       />
                     </div>
                   </div>
-
-                  <div className="col-lg-3 form-group autoComplete mb-3">
+                </div>
+                {/* <div className="col-lg-3 form-group autoComplete mb-3">
                     <h6>{t("country")}</h6>
                     <div>
                       <Autocomplete
@@ -1194,71 +1222,9 @@ const AddVendor = () => {
                         )}
                       />
                     </div>
-                  </div>
-                  <div className="form-group col-lg-3 autoComplete mb-3">
-                    <h6>{t("province")}</h6>
-                    <Autocomplete
-                      options={provinceList}
-                      getOptionLabel={(opt) => opt.name ?? ""}
-                      isOptionEqualToValue={(opt, val) => opt.id === val?.id}
-                      value={selectedProvince}
-                      onChange={(e, newProv) => setSelectedProvince(newProv)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder={t("province")}
-                          variant="outlined"
-                        />
-                      )}
-                      style={{ marginTop: 16 }}
-                    />
-                  </div>
-                  <div className="form-group col-lg-3 autoComplete mb-3">
-                    <h6>{t("district")}</h6>
-                    <Autocomplete
-                      options={districtList}
-                      getOptionLabel={(opt) => opt.name ?? ""}
-                      isOptionEqualToValue={(opt, val) => opt.id === val?.id}
-                      value={selectedDistrict}
-                      onChange={(e, dis) => setSelectedDistrict(dis)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder={t("district")}
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className="col-lg-3 form-group autoComplete">
-                    <h6>{t("subDistrict")}</h6>
-                    <Autocomplete
-                      options={subdistrictList || []}
-                      getOptionLabel={(opt) => opt?.name ?? ""}
-                      isOptionEqualToValue={(opt, val) => opt?.id === val?.id}
-                      value={selectedSubdistrict || null}
-                      onChange={(e, sub) => setSelectedSubdistrict(sub)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder="Select Subdistrict"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </div>
-
-                  <div className="col-lg-3 form-group">
-                    <h6>{t("postCode")}</h6>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={postalCode || ""}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="col-lg-3 form-group">
+                  </div> */}
+                <div className="row">
+                  <div className="col-lg-6 form-group">
                     <h6>{t("address")} 1</h6>
                     <input
                       type="text"
@@ -1270,7 +1236,8 @@ const AddVendor = () => {
                       placeholder="Address1"
                     />
                   </div>
-                  <div className="col-lg-3 form-group">
+                  <div className="col-lg-6"></div>
+                  <div className="col-lg-6 form-group">
                     <h6>{t("address")} 2</h6>
                     <input
                       type="text"
@@ -1282,7 +1249,38 @@ const AddVendor = () => {
                       placeholder="Address2"
                     />
                   </div>
-                  <div className="col-lg-3 form-group">
+                  <div className="form-group col-lg-6 autoComplete">
+                    <h6>Sub District</h6>
+                    <Autocomplete
+                      options={availableSubDistrict || []} // Populate with available subdistricts
+                      getOptionLabel={(option) => option.name_en || ""} // Display the English name of the subdistrict
+                      value={
+                        availableSubDistrict?.find(
+                          (subdistrict) => subdistrict.id === state.subdistrict
+                        ) || null
+                      } // Match the current subdistrict ID in state with the options
+                      onChange={(e, newValue) => {
+                        handleChange({
+                          target: {
+                            name: "subdistrict",
+                            value: newValue?.id || "",
+                          },
+                        }); // Trigger handleChange with the selected subdistrict's ID
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select Subdistrict" // Adds a placeholder
+                          InputLabelProps={{ shrink: false }} // Prevents floating label
+                        />
+                      )}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value.id
+                      } // Proper option matching
+                      sx={{ width: 300 }}
+                    />
+                  </div>
+                  <div className="col-lg-6 form-group">
                     <h6>{t("address")} 3</h6>
                     <input
                       type="text"
@@ -1293,6 +1291,102 @@ const AddVendor = () => {
                       className="form-control"
                       placeholder="Address3"
                     />
+                  </div>
+                  <div className="form-group col-lg-6 autoComplete">
+                    <h6>District</h6>
+                    <Autocomplete
+                      options={availableDistrict || []} // Use the array of available districts
+                      getOptionLabel={(option) => option.name_en || ""} // Display the English name of the district
+                      value={
+                        availableDistrict?.find(
+                          (district) => district.id === state.district
+                        ) || null
+                      } // Match the current district ID in state with the options
+                      onChange={(e, newValue) => {
+                        handleChange({
+                          target: {
+                            name: "district",
+                            value: newValue?.id || "",
+                          },
+                        }); // Trigger handleChange with the selected district's ID
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select District" // Adds a placeholder
+                          InputLabelProps={{ shrink: false }} // Prevents floating label
+                        />
+                      )}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value.id
+                      } // Ensure proper matching
+                      sx={{ width: 300 }}
+                    />
+                  </div>
+                  <div className="form-group col-lg-6 autoComplete">
+                    <h6>Province</h6>
+                    <Autocomplete
+                      options={dropdownProvinces || []} // Pass the array of provinces
+                      getOptionLabel={(option) => option.name_en || ""} // Display the English name of the province
+                      value={
+                        dropdownProvinces?.find(
+                          (province) => province.id === state.provinces
+                        ) || null
+                      } // Match the current value in state with the options
+                      onChange={(e, newValue) => {
+                        handleChange({
+                          target: {
+                            name: "provinces",
+                            value: newValue?.id || "",
+                          },
+                        }); // Trigger the handleChange function with the selected province ID
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select Province" // Adds a placeholder
+                          InputLabelProps={{ shrink: false }} // Prevents floating label
+                        />
+                      )}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value.id
+                      } // Proper option matching
+                      sx={{ width: 300 }}
+                    />
+                  </div>
+                  <div className="form-group col-lg-6">
+                    <h6 className="whitespace-nowrap">Postal Code</h6>
+                    <input
+                      type="text"
+                      onChange={handleChange}
+                      name="postcode"
+                      className="form-control"
+                      placeholder="Postal Code"
+                      defaultValue={state.postcode}
+                    />
+                  </div>
+                  <div className="col-lg-6 form-group autoComplete mb-3">
+                    <h6>{t("country")}</h6>
+                    <div>
+                      <Autocomplete
+                        options={countryList}
+                        getOptionLabel={(option) => option.name || ""}
+                        isOptionEqualToValue={(option, value) =>
+                          option.id === value?.id
+                        }
+                        value={selectedCountry}
+                        onChange={(event, newValue) =>
+                          setSelectedCountry(newValue)
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t("country")}
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="row">
