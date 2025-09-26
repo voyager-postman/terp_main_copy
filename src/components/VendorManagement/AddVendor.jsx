@@ -1,4 +1,4 @@
- import axios from "../../Url/Api";
+import axios from "../../Url/Api";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
@@ -336,7 +336,7 @@ const AddVendor = () => {
   const availableDistrict = useMemo(() => {
     return dropdownDistrict?.filter((item) => item._id == state.provinces);
   }, [state.provinces, dropdownDistrict]);
-
+console.log(availableDistrict);
   const availableSubDistrict = useMemo(() => {
     return dropdownSubDistrict?.filter((item) => item._id == state.district);
   }, [state.provinces, dropdownDistrict, state.district, dropdownSubDistrict]);
@@ -501,166 +501,166 @@ const AddVendor = () => {
       })
       .catch((err) => console.error("Axios error:", err));
   }, []);
-  // const [provinceList, setProvinceList] = useState([]);
-  // const [selectedProvince, setSelectedProvince] = useState(null);
-  // useEffect(() => {
-  //   const fetchProvinces = async () => {
-  //     if (!selectedCountry?.id) {
-  //       setProvinceList([]);
-  //       setSelectedProvince(null);
-  //       return;
-  //     }
+  const [provinceList, setProvinceList] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      if (!selectedCountry?.id) {
+        setProvinceList([]);
+        setSelectedProvince(null);
+        return;
+      }
 
-  //     try {
-  //       const { data } = await axios.get(
-  //         `https://r3.siameats.net/api/provinces/${selectedCountry.id}`
-  //       );
-  //       if (Array.isArray(data?.provinces)) {
-  //         setProvinceList(data.provinces);
-  //       } else {
-  //         console.error("Expected 'provinces' to be an array", data);
-  //         setProvinceList([]);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching provinces:", error);
-  //       setProvinceList([]);
-  //     }
-  //   };
+      try {
+        const { data } = await axios.get(
+          `https://r3.siameats.net/api/provinces/${selectedCountry.id}`
+        );
+        if (Array.isArray(data?.provinces)) {
+          setProvinceList(data.provinces);
+        } else {
+          console.error("Expected 'provinces' to be an array", data);
+          setProvinceList([]);
+        }
+      } catch (error) {
+        console.error("Error fetching provinces:", error);
+        setProvinceList([]);
+      }
+    };
 
-  //   fetchProvinces();
-  // }, [selectedCountry]);
-  // // district
-  // const [districtList, setDistrictList] = useState([]);
-  // const [selectedDistrict, setSelectedDistrict] = useState(null);
-  // useEffect(() => {
-  //   if (!selectedProvince?.id) {
-  //     setDistrictList([]);
-  //     setSelectedDistrict(null);
-  //     return;
-  //   }
+    fetchProvinces();
+  }, [selectedCountry]);
+  // district
+  const [districtList, setDistrictList] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  useEffect(() => {
+    if (!selectedProvince?.id) {
+      setDistrictList([]);
+      setSelectedDistrict(null);
+      return;
+    }
 
-  //   axios
-  //     .get(`${API_BASE_URL}/districts/${selectedProvince.id}`)
-  //     .then(({ data }) => {
-  //       console.log("", data);
-  //       if (Array.isArray(data?.districts)) {
-  //         setDistrictList(data.districts);
-  //       } else {
-  //         console.error("Expected districts array", data);
-  //         setDistrictList([]);
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching districts:", err);
-  //       setDistrictList([]);
-  //     });
-  // }, [selectedProvince]);
-  // // sub district
-  // const [subdistrictList, setSubdistrictList] = useState([]);
-  // const [selectedSubdistrict, setSelectedSubdistrict] = useState(null);
-  // useEffect(() => {
-  //   if (!selectedDistrict?.id) {
-  //     setSubdistrictList([]);
-  //     setSelectedSubdistrict(null);
-  //     return;
-  //   }
+    axios
+      .get(`${API_BASE_URL}/districts/${selectedProvince.id}`)
+      .then(({ data }) => {
+        console.log("", data);
+        if (Array.isArray(data?.districts)) {
+          setDistrictList(data.districts);
+        } else {
+          console.error("Expected districts array", data);
+          setDistrictList([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching districts:", err);
+        setDistrictList([]);
+      });
+  }, [selectedProvince]);
+  // sub district
+  const [subdistrictList, setSubdistrictList] = useState([]);
+  const [selectedSubdistrict, setSelectedSubdistrict] = useState(null);
+  useEffect(() => {
+    if (!selectedDistrict?.id) {
+      setSubdistrictList([]);
+      setSelectedSubdistrict(null);
+      return;
+    }
 
-  //   axios
-  //     .get(`${API_BASE_URL}/subdistricts/${selectedDistrict.id}`)
-  //     .then(({ data }) => {
-  //       console.log("pratimaDis", data);
-  //       if (Array.isArray(data?.Subdistricts)) {
-  //         setSubdistrictList(data.Subdistricts);
-  //       } else {
-  //         console.error("pratima", data);
-  //         setSubdistrictList([]);
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching subdistricts:", err);
-  //       setSubdistrictList([]);
-  //     });
-  // }, [selectedDistrict]);
+    axios
+      .get(`${API_BASE_URL}/subdistricts/${selectedDistrict.id}`)
+      .then(({ data }) => {
+        console.log("pratimaDis", data);
+        if (Array.isArray(data?.Subdistricts)) {
+          setSubdistrictList(data.Subdistricts);
+        } else {
+          console.error("pratima", data);
+          setSubdistrictList([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching subdistricts:", err);
+        setSubdistrictList([]);
+      });
+  }, [selectedDistrict]);
 
-  // const [postalCode, setPostalCode] = useState(null);
+  const [postalCode, setPostalCode] = useState(null);
 
-  // useEffect(() => {
-  //   if (!selectedSubdistrict?.lat || !selectedSubdistrict?.lng) {
-  //     setPostalCode("");
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!selectedSubdistrict?.lat || !selectedSubdistrict?.lng) {
+      setPostalCode("");
+      return;
+    }
 
-  //   axios
-  //     .get(
-  //       `${API_BASE_URL}/postal-code?lat=${selectedSubdistrict.lat}&lng=${selectedSubdistrict.lng}`
-  //     )
-  //     .then(({ data }) => {
-  //       if (data?.date?.postal_code) {
-  //         setPostalCode(data.date.postal_code);
-  //       } else {
-  //         setPostalCode("");
-  //       }
-  //     })
-  //     .catch(() => {
-  //       setPostalCode("");
-  //     });
-  // }, [selectedSubdistrict]);
-  // // Pre-fill form for update mode
-  // useEffect(() => {
-  //   if (!from || countryList.length === 0) return;
+    axios
+      .get(
+        `${API_BASE_URL}/postal-code?lat=${selectedSubdistrict.lat}&lng=${selectedSubdistrict.lng}`
+      )
+      .then(({ data }) => {
+        if (data?.date?.postal_code) {
+          setPostalCode(data.date.postal_code);
+        } else {
+          setPostalCode("");
+        }
+      })
+      .catch(() => {
+        setPostalCode("");
+      });
+  }, [selectedSubdistrict]);
+  // Pre-fill form for update mode
+  useEffect(() => {
+    if (!from || countryList.length === 0) return;
 
-  //   // 1️⃣ Find Country
-  //   const countryObj = countryList.find((c) => c.name === from.Country);
-  //   if (countryObj) {
-  //     setSelectedCountry(countryObj);
+    // 1️⃣ Find Country
+    const countryObj = countryList.find((c) => c.name === from.Country);
+    if (countryObj) {
+      setSelectedCountry(countryObj);
 
-  //     // Fetch provinces and set province
-  //     axios
-  //       .get(`https://r3.siameats.net/api/provinces/${countryObj.id}`)
-  //       .then(({ data }) => {
-  //         if (Array.isArray(data?.provinces)) {
-  //           setProvinceList(data.provinces);
-  //           const provinceObj = data.provinces.find(
-  //             (p) => p.name === from.Province
-  //           );
-  //           if (provinceObj) {
-  //             setSelectedProvince(provinceObj);
+      // Fetch provinces and set province
+      axios
+        .get(`https://r3.siameats.net/api/provinces/${countryObj.id}`)
+        .then(({ data }) => {
+          if (Array.isArray(data?.provinces)) {
+            setProvinceList(data.provinces);
+            const provinceObj = data.provinces.find(
+              (p) => p.name === from.Province
+            );
+            if (provinceObj) {
+              setSelectedProvince(provinceObj);
 
-  //             // Fetch districts and set district
-  //             axios
-  //               .get(`${API_BASE_URL}/districts/${provinceObj.id}`)
-  //               .then(({ data }) => {
-  //                 if (Array.isArray(data?.districts)) {
-  //                   setDistrictList(data.districts);
-  //                   const districtObj = data.districts.find(
-  //                     (d) => d.name === from.District
-  //                   );
-  //                   if (districtObj) {
-  //                     setSelectedDistrict(districtObj);
+              // Fetch districts and set district
+              axios
+                .get(`${API_BASE_URL}/districts/${provinceObj.id}`)
+                .then(({ data }) => {
+                  if (Array.isArray(data?.districts)) {
+                    setDistrictList(data.districts);
+                    const districtObj = data.districts.find(
+                      (d) => d.name === from.District
+                    );
+                    if (districtObj) {
+                      setSelectedDistrict(districtObj);
 
-  //                     // Fetch subdistricts and set subdistrict
-  //                     axios
-  //                       .get(`${API_BASE_URL}/subdistricts/${districtObj.id}`)
-  //                       .then(({ data }) => {
-  //                         if (Array.isArray(data?.Subdistricts)) {
-  //                           setSubdistrictList(data.Subdistricts);
-  //                           const subdistrictObj = data.Subdistricts.find(
-  //                             (s) => s.name === from.Subdistrict
-  //                           );
-  //                           if (subdistrictObj) {
-  //                             setSelectedSubdistrict(subdistrictObj);
-  //                             setPostalCode(from.Postcode || "");
-  //                           }
-  //                         }
-  //                       });
-  //                   }
-  //                 }
-  //               });
-  //           }
-  //         }
-  //       });
-  //   }
-  // }, [from, countryList]);
+                      // Fetch subdistricts and set subdistrict
+                      axios
+                        .get(`${API_BASE_URL}/subdistricts/${districtObj.id}`)
+                        .then(({ data }) => {
+                          if (Array.isArray(data?.Subdistricts)) {
+                            setSubdistrictList(data.Subdistricts);
+                            const subdistrictObj = data.Subdistricts.find(
+                              (s) => s.name === from.Subdistrict
+                            );
+                            if (subdistrictObj) {
+                              setSelectedSubdistrict(subdistrictObj);
+                              setPostalCode(from.Postcode || "");
+                            }
+                          }
+                        });
+                    }
+                  }
+                });
+            }
+          }
+        });
+    }
+  }, [from, countryList]);
   const { data: dropdownProvinces } = useQuery("getDropdownAddressProvinces");
   // const { data: dropdownDistrict } = useQuery("getDropdownAddressDistrict");
   // const { data: dropdownSubDistrict } = useQuery(
@@ -1299,7 +1299,7 @@ const AddVendor = () => {
                       getOptionLabel={(option) => option.name_en || ""} // Display the English name of the district
                       value={
                         availableDistrict?.find(
-                          (district) => district.id === state.district
+                          (district) => district.id == state.district
                         ) || null
                       } // Match the current district ID in state with the options
                       onChange={(e, newValue) => {
@@ -1330,7 +1330,7 @@ const AddVendor = () => {
                       getOptionLabel={(option) => option.name_en || ""} // Display the English name of the province
                       value={
                         dropdownProvinces?.find(
-                          (province) => province.id === state.provinces
+                          (province) => province.id == state.provinces
                         ) || null
                       } // Match the current value in state with the options
                       onChange={(e, newValue) => {

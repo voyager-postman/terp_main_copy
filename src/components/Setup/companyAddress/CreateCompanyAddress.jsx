@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../../Url/Url";
 import { Card } from "../../../card";
- import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 const CreateCompanyAddress = () => {
   const [t, i18n] = useTranslation("global");
@@ -81,14 +81,14 @@ const CreateCompanyAddress = () => {
                         placeholder={t("line_1")}
                         required
                         style={{
-                          width: '100%',
-                          minHeight: '40px',
-                          resize: 'none',
-                          overflow: 'hidden',
+                          width: "100%",
+                          minHeight: "40px",
+                          resize: "none",
+                          overflow: "hidden",
                         }}
                         rows={1} // Initial rows set to 1
                         onInput={(e) => {
-                          e.target.style.height = 'auto'; // Reset the height
+                          e.target.style.height = "auto"; // Reset the height
                           e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on scroll height
                         }}
                       />
@@ -103,14 +103,14 @@ const CreateCompanyAddress = () => {
                         className="form-control"
                         placeholder={t("line_2")}
                         style={{
-                          width: '100%',
-                          minHeight: '40px',
-                          resize: 'none',
-                          overflow: 'hidden',
+                          width: "100%",
+                          minHeight: "40px",
+                          resize: "none",
+                          overflow: "hidden",
                         }}
                         rows={1} // Initial rows set to 1
                         onInput={(e) => {
-                          e.target.style.height = 'auto'; // Reset the height
+                          e.target.style.height = "auto"; // Reset the height
                           e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on scroll height
                         }}
                       />
@@ -125,14 +125,14 @@ const CreateCompanyAddress = () => {
                         className="form-control"
                         placeholder={t("line_3")}
                         style={{
-                          width: '100%',
-                          minHeight: '40px',
-                          resize: 'none',
-                          overflow: 'hidden',
+                          width: "100%",
+                          minHeight: "40px",
+                          resize: "none",
+                          overflow: "hidden",
                         }}
                         rows={1} // Initial rows set to 1
                         onInput={(e) => {
-                          e.target.style.height = 'auto'; // Reset the height
+                          e.target.style.height = "auto"; // Reset the height
                           e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on scroll height
                         }}
                       />
@@ -147,23 +147,21 @@ const CreateCompanyAddress = () => {
                         className="form-control"
                         placeholder={t("line_4")}
                         style={{
-                          width: '100%',
-                          minHeight: '40px',
-                          resize: 'none',
-                          overflow: 'hidden',
+                          width: "100%",
+                          minHeight: "40px",
+                          resize: "none",
+                          overflow: "hidden",
                         }}
                         rows={1} // Initial rows set to 1
                         onInput={(e) => {
-                          e.target.style.height = 'auto'; // Reset the height
+                          e.target.style.height = "auto"; // Reset the height
                           e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on scroll height
                         }}
                       />
                     </div>
                   </div>
                   <div className="row mt-4">
-                    <h6>
-                      {t("upload_logo")}
-                    </h6>
+                    <h6>{t("upload_logo")}</h6>
                     <div className="uploadLogo d-flex">
                       <div className="me-4">
                         <input type="file" onChange={handleImageUpload} />
