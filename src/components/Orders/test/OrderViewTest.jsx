@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 const OrderViewTest = () => {
   const { t, i18n } = useTranslation("global");
-  
+
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -269,7 +269,7 @@ const OrderViewTest = () => {
                     id="datatable_wrapper"
                     className="information_dataTables dataTables_wrapper dt-bootstrap4 table-responsive mt-"
                   >
-                    <table
+                    {/* <table
                       id="example"
                       className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
                       style={{ width: "100%" }}
@@ -337,7 +337,58 @@ const OrderViewTest = () => {
                           </tr>
                         ))}
                       </tbody>
+                    </table> */}
+                    <table
+                      id="example"
+                      className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
+                      style={{ width: "100%" }}
+                    >
+                      <thead>
+                        <tr role="row" className="borderTh">
+                          {Object.entries(data1.section5_Labels2 || {}).map(
+                            ([key, label]) => {
+                              // Hide Profit column for specific roles/levels
+                              if (
+                                key === "Col9" &&
+                                ((localStorage.getItem("level") === "Level 1" &&
+                                  localStorage.getItem("role") === "Admin") ||
+                                  localStorage.getItem("level") === "Level 5")
+                              ) {
+                                return null;
+                              }
+
+                              return <th key={key}>{label}</th>;
+                            }
+                          )}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {data1.section5_Values?.map((item, i) => (
+                          <tr
+                            key={i}
+                            className="rowCursorPointer orderViewRoew"
+                            data-bs-toggle="modal"
+                            data-bs-target="#myModal"
+                          >
+                            {Object.keys(data1.section5_Labels2).map((key) => {
+                              // Hide Profit cell too
+                              if (
+                                key === "Col9" &&
+                                ((localStorage.getItem("level") === "Level 1" &&
+                                  localStorage.getItem("role") === "Admin") ||
+                                  localStorage.getItem("level") === "Level 5")
+                              ) {
+                                return null;
+                              }
+
+                              return <td key={key}>{item[key] ?? ""}</td>;
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
                     </table>
+
                     <div className="row py-4 px-4">
                       <div className="col-lg-3">
                         <div>

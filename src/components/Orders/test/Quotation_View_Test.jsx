@@ -6,8 +6,7 @@ import { API_BASE_URL } from "../../../Url/Url";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 const Quotation_View_Test = () => {
-  
-const { t, i18n } = useTranslation("global");
+  const { t, i18n } = useTranslation("global");
   const location = useLocation();
   const navigate = useNavigate();
   const { from } = location.state || {};
@@ -84,7 +83,7 @@ const { t, i18n } = useTranslation("global");
                   <div className="row">
                     <div className="col-md-6">
                       <h6 className="font-weight-bolder mb-0 pt-2">
-                     {t("quotationViewForm")}
+                        {t("quotationViewForm")}
                       </h6>
                     </div>
                   </div>
@@ -193,7 +192,7 @@ const { t, i18n } = useTranslation("global");
                         </p>
                       </div>
                     </div>
-                   
+
                     {localStorage.getItem("level") !== "Level 5" && (
                       <div className="parentPurchaseView">
                         <div className="me-3">
@@ -256,7 +255,7 @@ const { t, i18n } = useTranslation("global");
                     id="datatable_wrapper"
                     className="information_dataTables dataTables_wrapper dt-bootstrap4 table-responsive mt-"
                   >
-                    <table
+                    {/* <table
                       id="example"
                       className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
                       style={{ width: "100%" }}
@@ -323,7 +322,66 @@ const { t, i18n } = useTranslation("global");
                           </tr>
                         ))}
                       </tbody>
+                    </table> */}
+                    <table
+                      id="example"
+                      className="display transPortCreate table table-hover table-striped borderTerpProduce table-responsive"
+                      style={{ width: "100%" }}
+                    >
+                      <thead>
+                        <tr role="row" className="borderTh">
+                          {Object.entries(data1.section5_Labels2 || {}).map(
+                            ([key, label]) => {
+                              // Hide Profit column (Col9) for Level 1 Admin and Level 5
+                              if (
+                                key === "Col9" &&
+                                ((localStorage.getItem("level") === "Level 1" &&
+                                  localStorage.getItem("role") === "Admin") ||
+                                  localStorage.getItem("level") === "Level 5")
+                              ) {
+                                return null;
+                              }
+
+                              return <th key={key}>{label}</th>;
+                            }
+                          )}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {data1.section5_Values?.map((item, i) => (
+                          <tr
+                            key={i}
+                            className="rowCursorPointer orderViewRoew"
+                            data-bs-toggle="modal"
+                            data-bs-target="#myModal"
+                          >
+                            {Object.keys(data1.section5_Labels2).map((key) => {
+                              // Hide Profit cell too
+                              if (
+                                key === "Col9" &&
+                                ((localStorage.getItem("level") === "Level 1" &&
+                                  localStorage.getItem("role") === "Admin") ||
+                                  localStorage.getItem("level") === "Level 5")
+                              ) {
+                                return null;
+                              }
+
+                              const value = item[key];
+
+                              return (
+                                <td key={key}>
+                                  {key === "Col9" && value != null
+                                    ? `${value}`
+                                    : value ?? ""}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
                     </table>
+
                     <div className="row py-4 px-4">
                       <div className="col-lg-3">
                         <div>
@@ -530,7 +588,7 @@ const { t, i18n } = useTranslation("global");
                 Create
               </button> */}
               <Link className="btn btn-danger" to={"/quotation"}>
-             {t("close")}
+                {t("close")}
               </Link>
             </div>
           </div>

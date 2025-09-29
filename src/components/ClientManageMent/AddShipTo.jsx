@@ -4231,8 +4231,114 @@ const AddShipTo = () => {
                             />
                           </div>
                         </div>
-
-                        <div className="col-lg-3 form-group autoComplete mb-3">
+<div className="col-lg-6 form-group">
+                          <h6>{t("address")} 1</h6>
+                          <input
+                            type="text"
+                            id="address1"
+                            value={state7.address1 || ""}
+                            onChange={handleChange9}
+                            name="address1"
+                            className="form-control"
+                            placeholder="Address1"
+                          />
+                        </div>
+                        <div className="col-lg-6"></div>
+                        <div className="col-lg-6 form-group">
+                          <h6>{t("address")} 2</h6>
+                          <input
+                            type="text"
+                            id="address2"
+                            value={state7.address2 || ""}
+                            onChange={handleChange9}
+                            name="address2"
+                            className="form-control"
+                            placeholder="Address2"
+                          />
+                        </div>
+                        <div className="col-lg-6 form-group autoComplete">
+                          <h6>{t("subDistrict")}</h6>
+                          <Autocomplete
+                            options={subdistrictList || []}
+                            getOptionLabel={(opt) => opt?.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt?.id === val?.id
+                            }
+                            value={selectedSubdistrict || null}
+                            onChange={(e, sub) => setSelectedSubdistrict(sub)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("subDistrict")}
+                                variant="outlined"
+                              />
+                            )}
+                          />
+                        </div>
+                        <div className="col-lg-6 form-group">
+                          <h6>{t("address")} 3</h6>
+                          <input
+                            type="text"
+                            id="address3"
+                            value={state7.address3 || ""}
+                            onChange={handleChange9}
+                            name="address3"
+                            className="form-control"
+                            placeholder={t("address")}
+                          />
+                        </div>
+                        <div className="form-group col-lg-6 autoComplete">
+                          <h6>{t("district")}</h6>
+                          <Autocomplete
+                            options={districtList}
+                            getOptionLabel={(opt) => opt.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt.id === val?.id
+                            }
+                            value={selectedDistrict}
+                            onChange={(e, dis) => setSelectedDistrict(dis)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("district")}
+                                variant="outlined"
+                              />
+                            )}
+                          />
+                        </div>
+ 
+                        <div className="form-group col-lg-6 autoComplete">
+                          <h6>{t("province")}</h6>
+                          <Autocomplete
+                            options={provinceList}
+                            getOptionLabel={(opt) => opt.name ?? ""}
+                            isOptionEqualToValue={(opt, val) =>
+                              opt.id === val?.id
+                            }
+                            value={selectedProvince}
+                            onChange={(e, newProv) =>
+                              setSelectedProvince(newProv)
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder={t("province")}
+                                variant="outlined"
+                              />
+                            )}
+                   />
+                        </div>
+ 
+                        <div className="col-lg-6 form-group">
+                          <h6>{t("postalCode")}</h6>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={postalCode || ""}
+                            onChange={(e) => setPostalCode(e.target.value)}
+                          />
+                        </div>
+                        <div className="col-lg-6 form-group autoComplete mb-3">
                           <h6>{t("country")}</h6>
                           <div>
                             <Autocomplete
@@ -4254,113 +4360,6 @@ const AddShipTo = () => {
                               )}
                             />
                           </div>
-                        </div>
-                        <div className="form-group col-lg-3 autoComplete mb-3">
-                          <h6>{t("province")}</h6>
-                          <Autocomplete
-                            options={provinceList}
-                            getOptionLabel={(opt) => opt.name ?? ""}
-                            isOptionEqualToValue={(opt, val) =>
-                              opt.id === val?.id
-                            }
-                            value={selectedProvince}
-                            onChange={(e, newProv) =>
-                              setSelectedProvince(newProv)
-                            }
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder={t("province")}
-                                variant="outlined"
-                              />
-                            )}
-                            style={{ marginTop: 16 }}
-                          />
-                        </div>
-                        <div className="form-group col-lg-3 autoComplete mb-3">
-                          <h6>{t("district")}</h6>
-                          <Autocomplete
-                            options={districtList}
-                            getOptionLabel={(opt) => opt.name ?? ""}
-                            isOptionEqualToValue={(opt, val) =>
-                              opt.id === val?.id
-                            }
-                            value={selectedDistrict}
-                            onChange={(e, dis) => setSelectedDistrict(dis)}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder={t("district")}
-                                variant="outlined"
-                              />
-                            )}
-                          />
-                        </div>
-                        <div className="col-lg-3 form-group autoComplete">
-                          <h6>{t("subDistrict")}</h6>
-                          <Autocomplete
-                            options={subdistrictList || []}
-                            getOptionLabel={(opt) => opt?.name ?? ""}
-                            isOptionEqualToValue={(opt, val) =>
-                              opt?.id === val?.id
-                            }
-                            value={selectedSubdistrict || null}
-                            onChange={(e, sub) => setSelectedSubdistrict(sub)}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Select Subdistrict"
-                                variant="outlined"
-                              />
-                            )}
-                          />
-                        </div>
-
-                        <div className="col-lg-3 form-group">
-                          <h6>{t("postCode")}</h6>
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={postalCode || ""}
-                            onChange={(e) => setPostalCode(e.target.value)}
-                          />
-                        </div>
-
-                        <div className="col-lg-3 form-group">
-                          <h6>{t("address")} 1</h6>
-                          <input
-                            type="text"
-                            id="address1"
-                            value={state7.address1 || ""}
-                            onChange={handleChange9}
-                            name="address1"
-                            className="form-control"
-                            placeholder="Address1"
-                          />
-                        </div>
-                        <div className="col-lg-3 form-group">
-                          <h6>{t("address")} 2</h6>
-                          <input
-                            type="text"
-                            id="address2"
-                            value={state7.address2 || ""}
-                            onChange={handleChange9}
-                            name="address2"
-                            className="form-control"
-                            placeholder="Address2"
-                          />
-                        </div>
-                        <div className="col-lg-3 form-group">
-                          <h6>{t("address")} 3</h6>
-                          <input
-                            type="text"
-                            id="address3"
-                            value={state7.address3 || ""}
-                            onChange={handleChange9}
-                            name="address3"
-                            className="form-control"
-                            placeholder="Address3"
-                          />
                         </div>
                       </div>
                       <div className="row">
@@ -4480,7 +4479,7 @@ const AddShipTo = () => {
                         <div className="col-lg-12 form-group">
                           <h6>{t("bankAddress")}</h6>
                           <textarea
-                            className="form-control p-2"
+                            className=" p-2"
                             placeholder={t("bankAddress")}
                             value={state7.Bank_Address || ""}
                             onChange={(e) =>

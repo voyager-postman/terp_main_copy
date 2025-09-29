@@ -550,7 +550,7 @@ const UpdateQuotationTest = () => {
   console.log(computedState);
   const isError = useMemo(() => {
     return (details?.section5_Values || []).some((v) => {
-      return +v.Box % 1 !== 0  || +v.cal_error == 1 ;
+      return +v.Col5 % 1 !== 0 || +v.cal_error == 1;
     });
   }, [details]);
 
@@ -905,7 +905,7 @@ const UpdateQuotationTest = () => {
     console.log(isRecalculateClicked);
 
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -970,7 +970,7 @@ const UpdateQuotationTest = () => {
   };
   const updateOrderTest = async () => {
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -1116,7 +1116,7 @@ const UpdateQuotationTest = () => {
     setIsRecalculateClicked(isClicked);
     console.log(isRecalculateClicked);
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -1271,7 +1271,7 @@ const UpdateQuotationTest = () => {
         toEditDetails?.HSCODE ?? defaultDetailsValue?.HS_Code ?? undefined,
       ITF_Name:
         toEditDetails?.itf_name ?? defaultDetailsValue?.ITF_Name ?? undefined,
-      itf_quantity: toEditDetails?.itf_quantity ?? defaultDetailsValue?.QTY,
+      itf_quantity: toEditDetails?.itf_quantity ?? defaultDetailsValue?.Col3,
       itf_unit: toEditDetails?.itf_unit ?? defaultDetailsValue?.Unit,
       adjusted_price:
         toEditDetails?.adjusted_price ??
@@ -2695,7 +2695,8 @@ const UpdateQuotationTest = () => {
 
                         <tbody>
                           {details?.section5_Values?.map((v, i) => {
-                            const isRed = +v.Box % 1 !== 0 || +v.cal_error == 1;
+                            const isRed =
+                              +v.Col5 % 1 !== 0 || +v.cal_error == 1;
 
                             return (
                               <tr
@@ -3057,7 +3058,7 @@ const UpdateQuotationTest = () => {
                     type="number"
                     value={
                       toEditDetails?.itf_quantity ??
-                      defaultDetailsValue?.QTY ??
+                      defaultDetailsValue?.Col3 ??
                       0
                     }
                     name="itf_quantity"

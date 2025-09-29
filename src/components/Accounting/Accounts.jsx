@@ -1389,7 +1389,7 @@ const Accounts = () => {
       doc.setFont("helvetica", "bold"); // Set font to bold
       doc.setFontSize(19);
       const purchaseOrderTitle =
-        response?.data?.section1_Title?.Title || "Purchase Order";
+        response?.data?.headerTitle?.Title || " ";
       doc.text(purchaseOrderTitle, 150.5, 11);
       doc.setFont("helvetica", "normal"); // Set font to bold
       doc.setFillColor(33, 56, 99);

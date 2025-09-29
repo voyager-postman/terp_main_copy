@@ -404,7 +404,7 @@ const UpdateTest = () => {
 
   const isError = useMemo(() => {
     return (details?.section5_Values || []).some((v) => {
-      return +v.Box % 1 !== 0;
+      return +v.Col5 % 1 !== 0 || +v.cal_error == 1;
     });
   }, [details]);
 
@@ -799,7 +799,7 @@ const UpdateTest = () => {
     setIsRecalculateClicked(isClicked);
     console.log(isRecalculateClicked);
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -862,7 +862,7 @@ const UpdateTest = () => {
   };
   const updateOrderTest = async () => {
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -920,8 +920,9 @@ const UpdateTest = () => {
     console.log(isRecalculateClicked);
     setIsRecalculateClicked(isClicked);
     console.log(isRecalculateClicked);
+    console.log(details);
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -1073,7 +1074,7 @@ const UpdateTest = () => {
         toEditDetails?.HSCODE ?? defaultDetailsValue?.HS_Code ?? undefined,
       ITF_Name:
         toEditDetails?.itf_name ?? defaultDetailsValue?.ITF_Name ?? undefined,
-      itf_quantity: toEditDetails?.itf_quantity ?? defaultDetailsValue?.QTY,
+      itf_quantity: toEditDetails?.itf_quantity ?? defaultDetailsValue?.Col3,
       itf_unit: toEditDetails?.itf_unit ?? defaultDetailsValue?.Unit,
       adjusted_price:
         toEditDetails?.adjusted_price ??
@@ -2375,215 +2376,214 @@ const UpdateTest = () => {
                     </div>
                     <div className="flex gap-2 items-center justify-between flex-wrap">
                       {!isReadOnly && (
-                        <div className="addBtnEan flex flex-wrap gap-3 items-center mb-4">
-                          <button
-                            type="button"
-                            className=""
-                            onClick={() => calculate1(false)}
-                          >
-                            {t("calculate")}
-                          </button>
+                      <div className="addBtnEan flex flex-wrap gap-3 items-center mb-4">
+                        <button
+                          type="button"
+                          className=""
+                          onClick={() => calculate1(false)}
+                        >
+                          {t("calculate")}
+                        </button>
 
-                          {!isError && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!computedState.load_date) {
-                                  // Show error modal if load_date is not present
-                                  setShow1(true); // assuming `show1` is controlled by `setShow1`
-                                } else {
-                                  // Proceed to open the main modal if validation passes
-                                  setSelectedDetails(null);
-                                  setToEditDetails({});
-                                  openModal();
-                                }
-                              }}
-                            >
-                              {t("add")}
-                            </button>
-                          )}
+                        {!isError && (
                           <button
                             type="button"
                             onClick={() => {
                               if (!computedState.load_date) {
-                                setShow1(true); // Show error modal
+                                // Show error modal if load_date is not present
+                                setShow1(true); // assuming `show1` is controlled by `setShow1`
                               } else {
-                                const modal = new bootstrap.Modal(
-                                  document.getElementById("consigneeOne")
-                                );
-                                modal.show(); // Manually open the modal if validation passes
+                                // Proceed to open the main modal if validation passes
+                                setSelectedDetails(null);
+                                setToEditDetails({});
+                                openModal();
                               }
                             }}
                           >
-                            {t("addConsigneeItems")}
+                            {t("add")}
                           </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!computedState.load_date) {
+                              setShow1(true); // Show error modal
+                            } else {
+                              const modal = new bootstrap.Modal(
+                                document.getElementById("consigneeOne")
+                              );
+                              modal.show(); // Manually open the modal if validation passes
+                            }
+                          }}
+                        >
+                          {t("addConsigneeItems")}
+                        </button>
+                        <div
+                          className="modal fade"
+                          id="consigneeOne"
+                          tabIndex={-1}
+                          aria-labelledby="exampleModalLabel"
+                          aria-hidden="true"
+                        >
+                          <div className="modal-dialog modalShipTo ">
+                            <div className="modal-content">
+                              <div className="modal-header">
+                                <h1
+                                  className="modal-title fs-5"
+                                  id="exampleModalLabel"
+                                >
+                                  {t("orderPopulate")}
+                                </h1>
+                                <button
+                                  type="button"
+                                  className="btn-close"
+                                  data-bs-dismiss="modal"
+                                  aria-label="Close"
+                                >
+                                  <i class="mdi mdi-close"></i>
+                                </button>
+                              </div>
+                              <div className="modal-body">
+                                <label htmlFor="">{t("netWeight")}</label>
+                                <input
+                                  type="number"
+                                  value={orderNetWeight}
+                                  onChange={(e) =>
+                                    setOrderNetWeight(e.target.value)
+                                  }
+                                  className="form-control"
+                                />
+                              </div>
+                              <div className="modal-footer justify-content-right">
+                                <button
+                                  type="button"
+                                  className="btn btn-primary"
+                                  onClick={handleSaveOrderPopulate}
+                                >
+                                  {t("save")}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <button
+                            type="button"
+                            className="  me-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exampleModal"
+                          >
+                            {t("roundPrice")}
+                          </button>
+
+                          {/* Button trigger modal */}
+
+                          {/* Modal */}
                           <div
                             className="modal fade"
-                            id="consigneeOne"
+                            id="exampleModal"
                             tabIndex={-1}
                             aria-labelledby="exampleModalLabel"
                             aria-hidden="true"
                           >
-                            <div className="modal-dialog modalShipTo ">
+                            <div className="modal-dialog modalShipTo">
                               <div className="modal-content">
                                 <div className="modal-header">
                                   <h1
                                     className="modal-title fs-5"
                                     id="exampleModalLabel"
                                   >
-                                    {t("orderPopulate")}
+                                    {t("priceRounding")}
                                   </h1>
                                   <button
                                     type="button"
                                     className="btn-close"
                                     data-bs-dismiss="modal"
                                     aria-label="Close"
+                                    onClick={() =>
+                                      setState5({
+                                        Rounding: "",
+                                      })
+                                    }
                                   >
-                                    <i class="mdi mdi-close"></i>
+                                    <i className="mdi mdi-close"></i>
                                   </button>
                                 </div>
                                 <div className="modal-body">
-                                  <label htmlFor="">{t("netWeight")}</label>
-                                  <input
-                                    type="number"
-                                    value={orderNetWeight}
-                                    onChange={(e) =>
-                                      setOrderNetWeight(e.target.value)
-                                    }
-                                    className="form-control"
-                                  />
+                                  <div className="col-lg-12 form-group autoComplete">
+                                    <h6>{t("rounding")}</h6>
+                                    <Autocomplete
+                                      options={RoundingDataList || []}
+                                      getOptionLabel={(option) =>
+                                        option?.DropDown || ""
+                                      }
+                                      value={
+                                        (RoundingDataList || []).find(
+                                          (item) => item.ID === state5?.Rounding
+                                        ) || null
+                                      }
+                                      isOptionEqualToValue={(option, value) =>
+                                        option.ID === value.ID
+                                      }
+                                      onChange={(event, newValue) => {
+                                        handleChange5({
+                                          target: {
+                                            name: "Rounding",
+                                            value: newValue?.ID || "",
+                                          },
+                                        });
+                                      }}
+                                      renderInput={(params) => (
+                                        <TextField
+                                          {...params}
+                                          placeholder={t("selectRounding")}
+                                          variant="outlined"
+                                        />
+                                      )}
+                                    />
+                                  </div>
                                 </div>
-                                <div className="modal-footer justify-content-right">
+                                <div className="modal-footer">
                                   <button
                                     type="button"
                                     className="btn btn-primary"
-                                    onClick={handleSaveOrderPopulate}
+                                    onClick={handleSubmit}
                                   >
-                                    {t("save")}
+                                    {t("submit")}
                                   </button>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <div>
-                            <button
-                              type="button"
-                              className="  me-2"
-                              data-bs-toggle="modal"
-                              data-bs-target="#exampleModal"
-                            >
-                              {t("roundPrice")}
-                            </button>
-
-                            {/* Button trigger modal */}
-
-                            {/* Modal */}
-                            <div
-                              className="modal fade"
-                              id="exampleModal"
-                              tabIndex={-1}
-                              aria-labelledby="exampleModalLabel"
-                              aria-hidden="true"
-                            >
-                              <div className="modal-dialog modalShipTo">
-                                <div className="modal-content">
-                                  <div className="modal-header">
-                                    <h1
-                                      className="modal-title fs-5"
-                                      id="exampleModalLabel"
-                                    >
-                                      {t("priceRounding")}
-                                    </h1>
-                                    <button
-                                      type="button"
-                                      className="btn-close"
-                                      data-bs-dismiss="modal"
-                                      aria-label="Close"
-                                      onClick={() =>
-                                        setState5({
-                                          Rounding: "",
-                                        })
-                                      }
-                                    >
-                                      <i className="mdi mdi-close"></i>
-                                    </button>
-                                  </div>
-                                  <div className="modal-body">
-                                    <div className="col-lg-12 form-group autoComplete">
-                                      <h6>{t("rounding")}</h6>
-                                      <Autocomplete
-                                        options={RoundingDataList || []}
-                                        getOptionLabel={(option) =>
-                                          option?.DropDown || ""
-                                        }
-                                        value={
-                                          (RoundingDataList || []).find(
-                                            (item) =>
-                                              item.ID === state5?.Rounding
-                                          ) || null
-                                        }
-                                        isOptionEqualToValue={(option, value) =>
-                                          option.ID === value.ID
-                                        }
-                                        onChange={(event, newValue) => {
-                                          handleChange5({
-                                            target: {
-                                              name: "Rounding",
-                                              value: newValue?.ID || "",
-                                            },
-                                          });
-                                        }}
-                                        renderInput={(params) => (
-                                          <TextField
-                                            {...params}
-                                            placeholder={t("selectRounding")}
-                                            variant="outlined"
-                                          />
-                                        )}
-                                      />
-                                    </div>
-                                  </div>
-                                  <div className="modal-footer">
-                                    <button
-                                      type="button"
-                                      className="btn btn-primary"
-                                      onClick={handleSubmit}
-                                    >
-                                      {t("submit")}
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <button
-                              type="button"
-                              className="me-2"
-                              onClick={handleSubmit1}
-                            >
-                              {t("useInvoicePrice")}
-                            </button>
-                          </div>
-                          <div>
-                            <button
-                              type="button"
-                              className="me-2"
-                              onClick={handleSubmit2}
-                            >
-                              {t("agreedPrice")}
-                            </button>
-                          </div>
-                          <div>
-                            <button
-                              type="button"
-                              className="me-1"
-                              onClick={handleSubmit3}
-                            >
-                              {t("lastPrice")}
-                            </button>
-                          </div>
                         </div>
+                        <div>
+                          <button
+                            type="button"
+                            className="me-2"
+                            onClick={handleSubmit1}
+                          >
+                            {t("useInvoicePrice")}
+                          </button>
+                        </div>
+                        <div>
+                          <button
+                            type="button"
+                            className="me-2"
+                            onClick={handleSubmit2}
+                          >
+                            {t("agreedPrice")}
+                          </button>
+                        </div>
+                        <div>
+                          <button
+                            type="button"
+                            className="me-1"
+                            onClick={handleSubmit3}
+                          >
+                            {t("lastPrice")}
+                          </button>
+                        </div>
+                      </div>
                       )}
                       {isError && (
                         <div className="my-4 text-red-500">
@@ -2632,7 +2632,8 @@ const UpdateTest = () => {
 
                         <tbody>
                           {details?.section5_Values?.map((v, i) => {
-                          const isRed = +v.Box % 1 !== 0 || +v.cal_error == 1;; // Apply red styling if Box is decimal
+                            const isRed =
+                              +v.Col5 % 1 !== 0 || +v.cal_error == 1; // Apply red styling if Box is decimal
 
                             return (
                               <tr
@@ -3138,7 +3139,7 @@ const UpdateTest = () => {
                     type="number"
                     value={
                       toEditDetails?.itf_quantity ??
-                      defaultDetailsValue?.QTY ??
+                      defaultDetailsValue?.Col3 ??
                       0
                     }
                     name="itf_quantity"

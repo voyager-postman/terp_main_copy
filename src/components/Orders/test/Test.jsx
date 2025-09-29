@@ -1507,22 +1507,16 @@ const Test = () => {
 
     const textDataLeft = [
       {
-        label:
-          invoiceResponse?.data?.summaryLabels?.["Total Box : "] ||
-          "Total Box : ",
-        value: invoiceResponse?.data?.summaryValues?.Box || "",
+        label: invoiceResponse?.data?.summaryLabels?.Row1 || " ",
+        value: invoiceResponse?.data?.summaryValues?.Row1 || "",
       },
       {
-        label:
-          invoiceResponse?.data?.summaryLabels?.["Total Packages : "] ||
-          "Total Packages : ",
-        value: invoiceResponse?.data?.summaryValues?.Packages || "",
+        label: invoiceResponse?.data?.summaryLabels?.Row2 || " ",
+        value: invoiceResponse?.data?.summaryValues?.Row2 || "",
       },
       {
-        label:
-          invoiceResponse?.data?.summaryLabels?.["Total Items : "] ||
-          "Total Items : ",
-        value: invoiceResponse?.data?.summaryValues?.Items || "",
+        label: invoiceResponse?.data?.summaryLabels?.Row3 || "",
+        value: invoiceResponse?.data?.summaryValues?.Row3 || "",
       },
     ];
 
@@ -1556,27 +1550,21 @@ const Test = () => {
     const yIncrementRight = 1; // Adjust this value based on your spacing requirements
     const textDataRight = [
       {
-        label:
-          invoiceResponse?.data?.weightLabels?.["Total Net Weight : "] ||
-          "Total Net Weight : ",
-        value: invoiceResponse?.data?.weightValues?.total_nw
-          ? invoiceResponse.data.weightValues.total_nw
+        label: invoiceResponse?.data?.weightLabels?.Row1 || " ",
+        value: invoiceResponse?.data?.weightValues?.Row1
+          ? invoiceResponse.data.weightValues.Row1
           : "",
       },
       {
-        label:
-          invoiceResponse?.data?.weightLabels?.["Total Gross Weight : "] ||
-          "Total Gross Weight : ",
-        value: invoiceResponse?.data?.weightValues?.total_gw
-          ? invoiceResponse?.data?.weightValues?.total_gw
+        label: invoiceResponse?.data?.weightLabels?.Row2 || " ",
+        value: invoiceResponse?.data?.weightValues?.Row2
+          ? invoiceResponse?.data?.weightValues?.Row2
           : "",
       },
       {
-        label:
-          invoiceResponse?.data?.weightLabels?.["Total CBM : "] ||
-          "Total CBM : ",
-        value: invoiceResponse?.data?.weightValues?.total_cbm
-          ? invoiceResponse?.data?.weightValues?.total_cbm
+        label: invoiceResponse?.data?.weightLabels?.Row3 || " ",
+        value: invoiceResponse?.data?.weightValues?.Row3
+          ? invoiceResponse?.data?.weightValues?.Row3
           : "",
       },
     ];
@@ -1602,27 +1590,21 @@ const Test = () => {
     });
     const textDataRightThree = [
       {
-        label:
-          invoiceResponse?.data?.dummyTotalLabels?.["FOB (THB) : "] ||
-          "FOB (THB) : ",
-        value: invoiceResponse?.data?.dummyTotalCalc?.FOB
-          ? invoiceResponse.data.dummyTotalCalc.FOB
+        label: invoiceResponse?.data?.dummyTotalLabels?.Row1 || "",
+        value: invoiceResponse?.data?.dummyTotalCalc?.Row1
+          ? invoiceResponse.data.dummyTotalCalc.Row1
           : "",
       },
       {
-        label:
-          invoiceResponse?.data?.dummyTotalLabels?.["Freight : "] ||
-          "Freight : ",
-        value: invoiceResponse?.data?.dummyTotalCalc?.Freight
-          ? invoiceResponse?.data?.dummyTotalCalc?.Freight
+        label: invoiceResponse?.data?.dummyTotalLabels?.Row2 || " ",
+        value: invoiceResponse?.data?.dummyTotalCalc?.Row2
+          ? invoiceResponse?.data?.dummyTotalCalc?.Row2
           : "",
       },
       {
-        label:
-          invoiceResponse?.data?.dummyTotalLabels?.["Exchange Rate "] ||
-          "Exchange Rate ",
-        value: invoiceResponse?.data?.dummyTotalCalc?.Daily_FX_Rate
-          ? invoiceResponse?.data?.dummyTotalCalc?.Daily_FX_Rate
+        label: invoiceResponse?.data?.dummyTotalLabels?.Row3 || " ",
+        value: invoiceResponse?.data?.dummyTotalCalc?.Row3
+          ? invoiceResponse?.data?.dummyTotalCalc?.Row3
           : "",
       },
     ];
@@ -1644,41 +1626,26 @@ const Test = () => {
       yRightNew += valueLinesRight.length * 4 + yIncrementRight;
     });
 
-    const cnfText = invoiceResponse?.data?.paymentValues?.CNF || "";
-    const cnfFXText = invoiceResponse?.data?.paymentValues?.CNF_FX || "";
+    const cnfText = invoiceResponse?.data?.paymentValues?.Row1 || "";
+    const cnfFXText = invoiceResponse?.data?.paymentValues?.Row2 || "";
     const textWidthCNF = doc.getTextWidth(cnfText);
     const textWidthCNFFX = doc.getTextWidth(cnfFXText);
 
     const rightAlignX = 200;
-    doc.text(
-      invoiceResponse?.data?.paymentLabels?.["Total (THB) : "] ||
-        "Total (THB) : ",
-      147,
-      endY + 4
-    );
+    doc.text(invoiceResponse?.data?.paymentLabels?.Row1 || " ", 147, endY + 4);
     doc.text(cnfText, rightAlignX - textWidthCNF, endY + 4);
 
     // Separator line
     doc.rect(147, endY + 6, 55.5, 0.5, "FD");
 
     // Total with currency
-    doc.text(
-      invoiceResponse?.data?.paymentLabels?.["total"] || "total",
-      147,
-      endY + 11
-    );
+    doc.text(invoiceResponse?.data?.paymentLabels?.Row2 || " ", 147, endY + 11);
 
     doc.text(cnfFXText, rightAlignX - textWidthCNFFX, endY + 11);
     doc.setFillColor(32, 55, 100);
     doc.rect(147, endY + 12, 55.5, 0.5, "FD");
-    doc.text(
-      invoiceResponse?.data?.paymentLabels?.["Exchange Rate "] ||
-        "Exchange Rate ",
-      147,
-      endY + 17
-    );
-    const cnfFXTextNew =
-      invoiceResponse?.data?.paymentValues?.Daily_FX_Rate || "";
+    doc.text(invoiceResponse?.data?.paymentLabels?.Row3 || " ", 147, endY + 17);
+    const cnfFXTextNew = invoiceResponse?.data?.paymentValues?.Row3 || "";
     doc.text(cnfFXTextNew, rightAlignX - textWidthCNFFX, endY + 17);
     doc.rect(147, endY + 18, 55.5, 0.5, "FD");
 

@@ -540,7 +540,7 @@ const CreateTest = () => {
 
   const isError = useMemo(() => {
     return (details?.section5_Values || []).some((v) => {
-      return (+v.Box % 1 !== 0) | (+v.cal_error == 1);
+      return +v.Col5 % 1 !== 0 || +v.cal_error == 1;
     });
   }, [details]);
 
@@ -658,7 +658,7 @@ const CreateTest = () => {
     setIsRecalculateClicked(isClicked);
     console.log(isRecalculateClicked);
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -719,7 +719,7 @@ const CreateTest = () => {
     setIsRecalculateClicked(isClicked);
     console.log(isRecalculateClicked);
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -779,7 +779,7 @@ const CreateTest = () => {
 
   const createTestOrder = async () => {
     const reai = details?.section5_Values?.filter(
-      (v) => v.ITF_Name && v.QTY && v.Unit_Name
+      (v) => v.Col1 && v.Col3 && v.Col4
     );
     console.log("Filtered details:", reai);
 
@@ -886,7 +886,7 @@ const CreateTest = () => {
         undefined,
       ITF_Name:
         toEditDetails?.itf_name ?? defaultDetailsValue?.ITF_Name ?? undefined,
-      itf_quantity: toEditDetails?.itf_quantity ?? defaultDetailsValue?.QTY,
+      itf_quantity: toEditDetails?.itf_quantity ?? defaultDetailsValue?.Col3,
       itf_unit: toEditDetails?.itf_unit ?? defaultDetailsValue?.Unit,
       adjusted_price:
         toEditDetails?.adjusted_price ??
@@ -2288,7 +2288,7 @@ const CreateTest = () => {
 
                         <tbody>
                           {details?.section5_Values?.map((v, i) => {
-                            const isRed = +v.Box % 1 !== 0 || +v.cal_error == 1; // Apply red styling if Box is decimal
+                            const isRed = +v.Col5 % 1 !== 0 || +v.cal_error == 1; // Apply red styling if Box is decimal
 
                             return (
                               <tr
@@ -2846,7 +2846,7 @@ const CreateTest = () => {
                 <input
                   type="number"
                   value={
-                    toEditDetails?.itf_quantity ?? defaultDetailsValue?.QTY ?? 0
+                    toEditDetails?.itf_quantity ?? defaultDetailsValue?.Col3 ?? 0
                   }
                   name="itf_quantity"
                   onChange={updateDetails}

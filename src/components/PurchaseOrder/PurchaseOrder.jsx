@@ -1211,8 +1211,8 @@ const PurchaseOrder = () => {
         }
       );
       console.log(response);
-      const section4Labels = response?.data?.section4_label || {};
-      const section4Values = response?.data?.section4_values || [];
+      const section4Labels = response?.data?.section5_label || {};
+      const section4Values = response?.data?.section5_values || [];
 
       // Convert section4_label values into header array
       const headers = [Object.values(section4Labels)];
@@ -1249,8 +1249,8 @@ const PurchaseOrder = () => {
       doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
-      doc.text(response?.data?.section2?.Col1, 7, 28);
-      const poNum = response?.data?.section2?.Col2;
+      doc.text(response?.data?.section2?.Col1 || "", 7, 28);
+      const poNum = response?.data?.section2?.Col2 || "";
       const pageWidth = doc.internal.pageSize.width;
       const textWidth = doc.getTextWidth(poNum);
       const xPosition = (pageWidth - textWidth) / 2;
@@ -1296,6 +1296,58 @@ const PurchaseOrder = () => {
       doc.setFontSize(11);
       let startDate = 28;
       doc.text(response?.data?.section2?.Col3, 169, startDate);
+      doc.setFontSize(10);
+      const startX2 = 120;
+      const startY2 = 35;
+
+      const section4_label = {
+        Row1: response?.data?.section4_label?.Row1,
+        Row2: response?.data?.section4_label?.Row2,
+        Row3: response?.data?.section4_label?.Row3,
+        Row4: response?.data?.section4_label?.Row4,
+      };
+
+      const section4_values = {
+        Row1: response?.data?.section4_values?.Row1,
+        Row2: response?.data?.section4_values?.Row2,
+        Row3: response?.data?.section4_values?.Row3,
+        Row4: response?.data?.section4_values?.Row4,
+      };
+
+      // Set line height
+      const lineHeight = 5;
+
+      // Find max label width so values align properly
+      let maxLabelWidth = 0;
+      Object.values(section4_label).forEach((label) => {
+        const width = doc.getTextWidth(label);
+        if (width > maxLabelWidth) {
+          maxLabelWidth = width;
+        }
+      });
+
+      // Add padding after label
+      const labelColumnWidth = maxLabelWidth + 10;
+
+      // Start Y position
+      let y = startY2;
+
+      // Loop through rows
+      Object.keys(section4_label).forEach((key) => {
+        const label = section4_label[key];
+        const value = section4_values[key];
+
+        // Print label
+        doc.text(label, startX2, y);
+
+        // Print value (aligned)
+        doc.text(value, startX2 + labelColumnWidth, y);
+
+        // Next line
+        y += lineHeight;
+      });
+
+      // Save PDF
       const newFormatter1 = new Intl.NumberFormat("en-US", {
         style: "decimal",
         minimumFractionDigits: 3,
@@ -1313,7 +1365,14 @@ const PurchaseOrder = () => {
         maximumFractionDigits: 0,
       });
 
-      const yTop = startY1; // Start Y position for the tabl
+      const yTop = Math.max(startY1, startY2); // Start Y position for the tabl
+      // doc.text(response?.data?.section5_title?.Title || "", 7, yTop + 1);
+      const titleData = response?.data?.section5_title?.Title||"";
+      const titleString = new TextDecoder("utf-8").decode(
+        new Uint8Array(titleData)
+      );
+
+      doc.text(titleString, 7, yTop + 1);
       doc.autoTable({
         head: headers,
         body: rows,
@@ -1330,7 +1389,7 @@ const PurchaseOrder = () => {
           9: { halign: "right", font: "NotoSansThai" },
         },
         startX: 0,
-        startY: yTop,
+        startY: yTop + 3,
         margin: {
           left: 7,
           right: 7,
@@ -1372,10 +1431,10 @@ const PurchaseOrder = () => {
       const rightBoundary = 202.7;
       const labelX = 145;
       let currentY = tableEndY + 5;
-      const textTotal = response?.data?.section5_values?.Row1;
+      const textTotal = response?.data?.section6_values?.Row1 || "";
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row1,
+        response?.data?.section6_label?.Row1 || "",
         textTotal,
         labelX,
         rightBoundary,
@@ -1383,10 +1442,10 @@ const PurchaseOrder = () => {
         currentY
       );
       currentY += 5;
-      const textTotalVat = response?.data?.section5_values?.Row2;
+      const textTotalVat = response?.data?.section6_values?.Row2 || "";
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row2,
+        response?.data?.section6_label?.Row2 || "",
         textTotalVat,
         labelX,
         rightBoundary,
@@ -1394,10 +1453,10 @@ const PurchaseOrder = () => {
         currentY
       );
       currentY += 5;
-      const textTotalWht = response?.data?.section5_values?.Row3;
+      const textTotalWht = response?.data?.section6_values?.Row3 || "";
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row3,
+        response?.data?.section6_label?.Row3 || "",
         textTotalWht,
         labelX,
         rightBoundary,
@@ -1406,22 +1465,21 @@ const PurchaseOrder = () => {
       );
       doc.rect(145, tableEndY + 16.5, 60, 0.5, "FD");
       currentY += 6;
-      const textTotalPay = response?.data?.section5_values?.Row4;
+      const textTotalPay = response?.data?.section6_values?.Row4 || "";
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row4,
+        response?.data?.section6_label?.Row4 || "",
         textTotalPay,
         labelX,
         rightBoundary,
         fixedWidth,
         currentY
       );
-
       currentY += 5;
-      const textRounding = response?.data?.section5_values?.Row5;
+      const textRounding = response?.data?.section6_values?.Row5 || "";
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row5,
+        response?.data?.section6_label?.Row5 || "",
 
         textRounding,
         labelX,
@@ -1431,10 +1489,10 @@ const PurchaseOrder = () => {
       );
 
       currentY += 5;
-      const textPayable = response?.data?.section5_values?.Row6;
+      const textPayable = response?.data?.section6_values?.Row6 || "";
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row6,
+        response?.data?.section6_label?.Row6 || "",
         textPayable,
         labelX,
         rightBoundary,
@@ -1442,10 +1500,10 @@ const PurchaseOrder = () => {
         currentY
       );
       currentY += 6;
-      const pastPayment = response?.data?.section5_values?.Row7;
+      const pastPayment = response?.data?.section6_values?.Row7 || "";
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row7,
+        response?.data?.section6_label?.Row7 || "",
         pastPayment,
         labelX,
         rightBoundary,
@@ -1453,10 +1511,10 @@ const PurchaseOrder = () => {
         currentY
       );
       currentY += 5;
-      const row8 = response?.data?.section5_values?.Row8;
+      const row8 = response?.data?.section6_values?.Row8 || "";
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row8,
+        response?.data?.section6_label?.Row8 || "",
         row8,
         labelX,
         rightBoundary,
@@ -1464,11 +1522,11 @@ const PurchaseOrder = () => {
         currentY
       );
       currentY += 5;
-      const row9 = response?.data?.section5_values?.Row9;
+      const row9 = response?.data?.section6_values?.Row9 || "";
 
       renderRightAlignedText(
         doc,
-        response?.data?.section5_label?.Row9,
+        response?.data?.section6_label?.Row9 || "",
         row9,
         labelX,
         rightBoundary,
@@ -1478,7 +1536,7 @@ const PurchaseOrder = () => {
       doc.rect(145, tableEndY + 33, 58, 0.5, "FD");
       doc.setFontSize(11);
       doc.text(
-        response?.data?.section6_Title["Payment Details"],
+        response?.data?.payment_title["Payment Details"] || "",
         7,
         tableEndY + 25
       );
@@ -1489,10 +1547,10 @@ const PurchaseOrder = () => {
       }
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row1,
+        response?.data?.payment_label?.row1 || "",
         `${
-          response?.data?.section6_values?.Result1
-            ? response?.data?.section6_values?.Result1
+          response?.data?.payment_values?.Result1 || ""
+            ? response?.data?.payment_values?.Result1 || ""
             : ""
         }`,
         7,
@@ -1501,10 +1559,10 @@ const PurchaseOrder = () => {
       );
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row2,
+        response?.data?.payment_label?.row2 || "",
         `${
-          response?.data?.section6_values?.Result2
-            ? response?.data?.section6_values?.Result2
+          response?.data?.payment_values?.Result2 || ""
+            ? response?.data?.payment_values?.Result2 || ""
             : ""
         }`,
         7,
@@ -1513,10 +1571,10 @@ const PurchaseOrder = () => {
       );
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row3,
+        response?.data?.payment_label?.row3 || "",
         `${
-          response?.data?.section6_values?.Result3
-            ? response?.data?.section6_values?.Result3
+          response?.data?.payment_values?.Result3 || ""
+            ? response?.data?.payment_values?.Result3 || ""
             : ""
         }`,
         7,
@@ -1526,16 +1584,16 @@ const PurchaseOrder = () => {
 
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row4,
-        response?.data?.section6_values?.Result4,
+        response?.data?.payment_label?.row4 || "",
+        response?.data?.payment_values?.Result4 || "",
         7,
         40,
         tableEndY + 45
       );
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row5,
-        response?.data?.section6_values?.Result5,
+        response?.data?.payment_label?.row5 || "",
+        response?.data?.payment_values?.Result5 || "",
         7,
         40,
         tableEndY + 50
@@ -1543,12 +1601,64 @@ const PurchaseOrder = () => {
 
       renderLabelAndValue(
         doc,
-        response?.data?.section6_label?.row6,
-        response?.data?.section6_values?.Result6,
+        response?.data?.payment_label?.row6 || "",
+        response?.data?.payment_values?.Result6 || "",
         7,
         40,
         tableEndY + 55
       );
+      // bottom part
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text(response?.data?.preStatementTitle?.Statement, 7, tableEndY + 60);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const section8Labels = {
+        Col1: response?.data?.preStatement?.Col1 || "",
+        Col2: response?.data?.preStatement?.Col2 || "",
+        Col3: response?.data?.preStatement?.Col3 || "",
+        Col4: response?.data?.preStatement?.Col4 || "",
+        Col5: response?.data?.preStatement?.Col5 || "",
+        Col6: response?.data?.preStatement?.Col6 || "",
+        Col7: response?.data?.preStatement?.Row7 || "",
+      };
+
+      // Column values (static)
+      const section8Values = {
+        Col1: response?.data?.preStatementDetails?.Col1 || "",
+        Col2: response?.data?.preStatementDetails?.Col2 || "",
+        Col3: response?.data?.preStatementDetails?.Col3 || "",
+        Col4: response?.data?.preStatementDetails?.Col4 || "",
+        Col5: response?.data?.preStatementDetails?.Col5 || "",
+        Col6: response?.data?.preStatementDetails?.Col6 || "",
+        Col7: response?.data?.preStatementDetails?.Col7 || "",
+      };
+      const startOffset = 65;
+      // Render section 8
+      doc.text(section8Labels.Col1, 7, tableEndY + startOffset);
+      doc.text(section8Values.Col1, 7, tableEndY + startOffset + 5);
+
+      doc.text(section8Labels.Col2, 49, tableEndY + startOffset);
+      doc.text(section8Values.Col2, 49, tableEndY + startOffset + 5);
+
+      doc.text(section8Labels.Col3, 75, tableEndY + startOffset);
+      doc.text(section8Values.Col3, 75, tableEndY + startOffset + 5);
+
+      doc.text(section8Labels.Col4, 101, tableEndY + startOffset);
+      doc.text(section8Values.Col4, 101, tableEndY + startOffset + 5);
+
+      doc.text(section8Labels.Col5, 127, tableEndY + startOffset);
+      doc.text(section8Values.Col5, 127, tableEndY + startOffset + 5);
+
+      doc.text(section8Labels.Col6, 153, tableEndY + startOffset);
+      doc.text(section8Values.Col6, 153, tableEndY + startOffset + 5);
+
+      doc.text(section8Labels.Col7, 179, tableEndY + startOffset);
+      doc.text(section8Values.Col7, 179, tableEndY + startOffset + 5);
+
       const addPageNumbers = (doc) => {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
