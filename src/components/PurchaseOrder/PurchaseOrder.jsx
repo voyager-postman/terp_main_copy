@@ -1366,11 +1366,10 @@ const PurchaseOrder = () => {
       });
 
       const yTop = Math.max(startY1, startY2); // Start Y position for the tabl
-      // doc.text(response?.data?.section5_title?.Title || "", 7, yTop + 1);
-      const titleData = response?.data?.section5_title?.Title||"";
-      const titleString = new TextDecoder("utf-8").decode(
-        new Uint8Array(titleData)
-      );
+      const rawTitle = response?.data?.section5_title?.Title || "";
+      const titleString = rawTitle.replace(/\s+/g, " ").trim(); // remove newlines & extra spaces
+
+      doc.text(titleString, 7, yTop + 1);
 
       doc.text(titleString, 7, yTop + 1);
       doc.autoTable({

@@ -314,10 +314,10 @@ const AddVendor = () => {
     address1: from?.Address1 ?? "",
     address2: from?.Address2 ?? "",
     address3: from?.Address3 ?? "",
-    postcode: from?.Postcode ?? "", // ✅ add this
-    provinces: from?.Province ?? "", // ✅ add this
-    district: from?.District ?? "", // ✅ add this
-    subdistrict: from?.Subdistrict ?? "", // ✅ add this
+    postcode: from?.Postcode ?? "", 
+    provinces: from?.Province_ID ?? "", 
+    district: from?.District_ID ?? "", 
+    subdistrict: from?.Subdistrict_ID ?? "", 
     Bank_Name: from?.Bank_Name ?? "",
     Bank_Branch: from?.Bank_Branch ?? "",
     Bank_Account: from?.Bank_Account ?? "",

@@ -674,7 +674,73 @@ const Invoice = () => {
                 <title>cash-check</title>
                 <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z" />
               </svg>
+            </button>  {/* new icon from order */}
+                   <button type="button" onClick={() => generatePdf2(a)}>
+                      {" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 200 80" // scalable, you can change width/height via props or CSS
+                        className="customIcon"
+                      >
+                        <rect
+                          x="5"
+                          y="5"
+                          rx="15"
+                          ry="15"
+                          width="190"
+                          height="70"
+                          fill="none"
+                          stroke="#203764" // ✅ border color
+                          strokeWidth="8" // ✅ thickness like your image
+                        />
+                        <text
+                          x="50%"
+                          y="50%"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fontSize="28"
+                          fontWeight="bold"
+                          fill="#203764" // ✅ text color same as border
+                          fontFamily="Arial, sans-serif"
+                        >
+                          CUSTOMS
+                        </text>
+                      </svg>
+                    </button>
+           
+            <button
+              type="button"
+              style={{
+                width: "20px",
+                color: "#203764",
+                fontSize: "22px",
+                marginTop: "10px",
+              }}
+              onClick={() => handleEditClick1(a.Order_ID)}
+            >
+              <i
+                className="mdi mdi-content-copy"
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#consigneeOne"
+              />{" "}
             </button>
+            <button
+              type="button"
+              onClick={() => openModal(a.Order_ID, a.Consignee_ID)}
+            >
+              <i className="mdi mdi-airplane-clock" />
+            </button>
+            <button
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal1"
+              onClick={() => setDeleteOrderId(a.Order_ID)}
+            >
+              <i className="mdi mdi-delete " />
+            </button>
+         
+           {/* new icon from order */}
           </div>
         );
       },

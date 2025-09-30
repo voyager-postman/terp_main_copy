@@ -1648,7 +1648,26 @@ const Test = () => {
     const cnfFXTextNew = invoiceResponse?.data?.paymentValues?.Row3 || "";
     doc.text(cnfFXTextNew, rightAlignX - textWidthCNFFX, endY + 17);
     doc.rect(147, endY + 18, 55.5, 0.5, "FD");
-
+ const pageWidth = doc.internal.pageSize.getWidth();
+    const marginX = 7; // left & right margin
+    const usableWidth = pageWidth - marginX * 2;
+ 
+    const notesTitle = invoiceResponse?.data?.noteLabels?.Notes;
+    const notesText = invoiceResponse?.data?.noteValues?.NOTES;
+ 
+    let notesY = endY + 26;
+ 
+    if (notesText && notesText.trim() !== "") {
+      doc.setDrawColor(32, 55, 100);
+      doc.setLineWidth(0.2); // thickness (like “height” of the line)
+      doc.line(marginX, notesY, pageWidth - marginX, notesY); // draw horizontal line
+ 
+      doc.text(notesTitle, marginX, notesY + 4);
+      let splitNotes = doc.splitTextToSize(notesText, usableWidth);
+      doc.text(splitNotes, marginX, notesY + 9);
+    }
+ 
+ 
     //*****************************************************************************************//
 
     // Custom page number function

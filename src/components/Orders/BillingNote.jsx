@@ -56,6 +56,8 @@ const BillingNote = () => {
   const [roundingData, setRoundingData] = useState("");
   const [VATTotal, setVATTotal] = useState(0);
   const [WHTTotal, setWHTTotal] = useState(0);
+  const [ridData, setRidData] = useState("");
+
   const [TotalBeforeTaxTotal, setTotalBeforeTaxTotal] = useState(0);
   const [sumAmountToPay, setSumAmountToPay] = useState(0);
   const [singleFilterData, setSingleFilterData] = useState("");
@@ -616,10 +618,11 @@ const BillingNote = () => {
   };
   const inputRef = useRef(null); // Ref for input field
 
-  const fetchReceiptData = async (bn_id) => {
+  const fetchReceiptData = async (bn_id, receiptID) => {
     try {
       const res = await axios.post(`${API_BASE_URL}/receiptBNIDView`, {
         bn_id,
+        RID: receiptID,
       });
       if (res.data.success) {
         setModalHead(res.data.head);
@@ -683,7 +686,7 @@ const BillingNote = () => {
       console.log(`Updated "${apiField}" for RID ${receiptID}`, result);
 
       // 6. Refresh data using correct bn_id
-      fetchReceiptData(singlePodId?.ID); // ensure singlePodId is correct
+      fetchReceiptData(singlePodId?.ID, receiptID); // ensure singlePodId is correct
     } catch (error) {
       console.error("❌ Error updating field:", error);
     }
@@ -698,7 +701,8 @@ const BillingNote = () => {
     try {
       // 1Set existing modal data
       everyDataSet(a);
-      fetchReceiptData(a.ID);
+      setRidData(a?.Reciept_ID);
+      
 
       //  Call BNPaymentStep API to get LastInsertedReceiptID
       const res = await fetch(`${API_BASE_URL}/BNPaymentStep`, {
@@ -718,6 +722,7 @@ const BillingNote = () => {
         if (latestId) {
           console.log("Stored Receipt ID:", latestId);
           setReceiptID(latestId); // <-- Store in state for modal use
+          fetchReceiptData(a.ID, latestId);
         }
       } else {
         console.error("BNPaymentStep Error:", data.message);
