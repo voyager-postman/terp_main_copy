@@ -1369,9 +1369,8 @@ const PurchaseOrder = () => {
       const rawTitle = response?.data?.section5_title?.Title || "";
       const titleString = rawTitle.replace(/\s+/g, " ").trim(); // remove newlines & extra spaces
 
-      doc.text(titleString, 7, yTop + 1);
-
-      doc.text(titleString, 7, yTop + 1);
+      doc.text(titleString, 7, yTop + 4);
+ 
       doc.autoTable({
         head: headers,
         body: rows,
@@ -1388,7 +1387,7 @@ const PurchaseOrder = () => {
           9: { halign: "right", font: "NotoSansThai" },
         },
         startX: 0,
-        startY: yTop + 3,
+        startY: yTop + 7,
         margin: {
           left: 7,
           right: 7,

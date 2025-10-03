@@ -702,7 +702,6 @@ const BillingNote = () => {
       // 1Set existing modal data
       everyDataSet(a);
       setRidData(a?.Reciept_ID);
-      
 
       //  Call BNPaymentStep API to get LastInsertedReceiptID
       const res = await fetch(`${API_BASE_URL}/BNPaymentStep`, {
@@ -711,7 +710,7 @@ const BillingNote = () => {
         body: JSON.stringify({
           bn_id: a.ID, // Pass BN ID from selected record
           IID: "", // Keep empty if not applicable
-          USER_ID: 7, // Replace with logged-in user ID
+          USER_ID: localStorage.getItem("id"), // Replace with logged-in user ID
         }),
       });
 
@@ -1032,7 +1031,12 @@ const BillingNote = () => {
       const res = await fetch(`${API_BASE_URL}/PDFBillingNote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ BN: a.ID, External: "0", RID: a.Reciept_ID }),
+        body: JSON.stringify({
+          BN: a.ID,
+          External: "0",
+          RID: a.Reciept_ID,
+          LANG: 1,
+        }),
       });
       const response = await res.json();
 

@@ -135,8 +135,9 @@ const ReceiptCreate = () => {
   // }, [from?.PO_ID]);
   const summaryDeatils = () => {
     axios
-      .post(`${API_BASE_URL}/PO_Bottom_View_EN`, {
-        po_id: state.po_id || from?.PO_ID,
+      .post(`${API_BASE_URL}/Receipt_Bottom_View`, {
+        RID: state.po_id || from?.PO_ID,
+        LANG: 1,
       })
       .then((res) => {
         console.log("poData", res.data);
@@ -272,7 +273,7 @@ const ReceiptCreate = () => {
           );
         }
         console.log("Access file updated before payment:", accessResponse.data);
-        navigate("/purchase_orders");
+        navigate("/reciept");
         setSelectedPaymentDate(null);
         setSelectedPaymentChannel("");
         setBankReference("");
@@ -504,7 +505,7 @@ const ReceiptCreate = () => {
         );
       }
 
-      navigate("/purchase_orders");
+      navigate("/reciept");
     } catch (error) {
       console.error("Error during cancel process:", error);
       toast.error(t("tryAgain"));
@@ -817,7 +818,7 @@ const ReceiptCreate = () => {
 
       // ✅ Show toast first, then navigate
       toast.success(t("deleteSuccess"));
-      navigate("/purchase_orders");
+      navigate("/reciept");
     } catch (e) {
       console.error("Delete error:", e);
       toast.error(t("deleteError"));

@@ -150,7 +150,7 @@ const Invoice = () => {
       });
 
       //  Refresh receipt data for Invoice (using IID)
-      fetchReceiptData(singlePodId.Order_ID);
+      fetchReceiptData(singlePodId.ID, receiptID);
 
       console.log(
         `Field "${apiField}" updated successfully for RID: ${receiptID}`
@@ -417,116 +417,116 @@ const Invoice = () => {
         return (
           <div className="editIcon">
             <Link to=" " state={{ from: { ...a, isReadOnly: true } }}></Link>
-            {(+a.Status === 7 ||
+            {/* {(+a.Status === 7 ||
               +a.Status === 8 ||
               +a.Status === 9 ||
               +a.Status === 10 ||
               +a.Status === 11 ||
               +a.Status === 12 ||
-              +a.Status === 13) && (
-              <Link to="/invoiceview" state={{ from: { ...a } }}>
-                <i className="mdi mdi-eye" />
-              </Link>
-            )}
+              +a.Status === 13) && ( */}
+            <Link to="/invoiceview" state={{ from: { ...a } }}>
+              <i className="mdi mdi-eye" />
+            </Link>
+            {/* )} */}
             <>
-              {(+a.Status === 7 ||
+              {/* {(+a.Status === 7 ||
                 +a.Status === 8 ||
                 +a.Status === 9 ||
-                +a.Status === 12) && (
-                <Link to="/invoice_edit" state={{ from: { ...a } }}>
+                +a.Status === 12) && ( */}
+              {/* <Link to="/invoice_edit" state={{ from: { ...a } }}>
                   <i className="mdi mdi-pencil" />
-                </Link>
-              )}
-              {(+a.Status === 7 ||
+                </Link> */}
+              {/* )} */}
+              {/* {(+a.Status === 7 ||
                 +a.Status === 8 ||
                 +a.Status === 9 ||
-                +a.Status === 12) && (
-                <button
-                  type="button"
-                  onClick={() => restoreEanPackage(a.Order_ID)}
-                >
-                  <i className="mdi mdi-restore" />
-                </button>
-              )}
+                +a.Status === 12) && ( */}
+              <button
+                type="button"
+                onClick={() => restoreEanPackage(a.Order_ID)}
+              >
+                <i className="mdi mdi-restore" />
+              </button>
+              {/* )} */}
             </>
-            {(+a.Status === 7 ||
+            {/* {(+a.Status === 7 ||
               +a.Status === 8 ||
               +a.Status === 9 ||
               +a.Status === 10 ||
-              +a.Status === 11) && (
-              <button type="button" onClick={() => generatePdf2(a)}>
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>alpha-c-box-outline</title>
-                  <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
-                </svg>
-              </button>
-            )}
-            {(+a.Status === 7 ||
+              +a.Status === 11) && ( */}
+            <button type="button" onClick={() => generatePdf2(a)}>
+              <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <title>alpha-c-box-outline</title>
+                <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
+              </svg>
+            </button>
+            {/* )} */}
+            {/* {(+a.Status === 7 ||
               +a.Status === 8 ||
               +a.Status === 9 ||
               +a.Status === 10 ||
               +a.Status === 11 ||
               +a.Status === 12 ||
-              +a.Status === 13) && (
-              <button
-                type="button"
-                data-bs-toggle="modal"
-                onClick={() => setFilterData1(a)}
-                data-bs-target="#exampleModalCustomization"
+              +a.Status === 13) && ( */}
+            <button
+              type="button"
+              data-bs-toggle="modal"
+              onClick={() => setFilterData1(a)}
+              data-bs-target="#exampleModalCustomization"
+            >
+              <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>invoice-text-check-outline</title>
-                  <path d="M12 20L13.3 20.86C13.1 20.28 13 19.65 13 19C13 18.76 13 18.5 13.04 18.29L12 17.6L9 19.6L6 17.6L5 18.26V5H19V13C19.7 13 20.37 13.12 21 13.34V3H3V22L6 20L9 22L12 20M17 9V7H7V9H17M15 13V11H7V13H15M15.5 19L18.25 22L23 17.23L21.84 15.82L18.25 19.41L16.66 17.82L15.5 19Z"></path>
-                </svg>
-              </button>
-            )}
-            {(+a.Status === 7 ||
+                <title>invoice-text-check-outline</title>
+                <path d="M12 20L13.3 20.86C13.1 20.28 13 19.65 13 19C13 18.76 13 18.5 13.04 18.29L12 17.6L9 19.6L6 17.6L5 18.26V5H19V13C19.7 13 20.37 13.12 21 13.34V3H3V22L6 20L9 22L12 20M17 9V7H7V9H17M15 13V11H7V13H15M15.5 19L18.25 22L23 17.23L21.84 15.82L18.25 19.41L16.66 17.82L15.5 19Z"></path>
+              </svg>
+            </button>
+            {/* )} */}
+            {/* {(+a.Status === 7 ||
               +a.Status === 8 ||
               +a.Status === 9 ||
               +a.Status === 10 ||
               +a.Status === 11 ||
               +a.Status === 12 ||
-              +a.Status === 13) && (
-              <button
-                type="button"
-                data-bs-toggle="modal"
-                onClick={() => setFilterData1(a)}
-                data-bs-target="#exampleModalCustomization5"
+              +a.Status === 13) && ( */}
+            <button
+              type="button"
+              data-bs-toggle="modal"
+              onClick={() => setFilterData1(a)}
+              data-bs-target="#exampleModalCustomization5"
+            >
+              <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>package-variant-closed</title>
-                  <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L10.11,5.22L16,8.61L17.96,7.5L12,4.15M6.04,7.5L12,10.85L13.96,9.75L8.08,6.35L6.04,7.5M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V9.21L13,12.58V19.29L19,15.91Z"></path>
-                </svg>
-              </button>
-            )}
-            {(+a.Status === 7 ||
+                <title>package-variant-closed</title>
+                <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L10.11,5.22L16,8.61L17.96,7.5L12,4.15M6.04,7.5L12,10.85L13.96,9.75L8.08,6.35L6.04,7.5M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V9.21L13,12.58V19.29L19,15.91Z"></path>
+              </svg>
+            </button>
+            {/* )} */}
+            {/* {(+a.Status === 7 ||
               +a.Status === 8 ||
               +a.Status === 9 ||
               +a.Status === 10 ||
-              +a.Status === 11) && (
-              <button
-                type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal2"
-                onClick={() => quotationCopy(a.Order_ID)}
-              >
-                <i className="mdi mdi-note-outline" />
-              </button>
-            )}
-            {+a.Status === 7 && (
-              <button
+              +a.Status === 11) && ( */}
+            <button
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal2"
+              onClick={() => quotationCopy(a.Order_ID)}
+            >
+              <i className="mdi mdi-note-outline" />
+            </button>
+            {/* )} */}
+            {/* {+a.Status === 7 && ( */}
+            {/* <button
                 type="button"
                 onClick={() => quotationConfirmation(a.Order_ID)}
               >
@@ -540,44 +540,44 @@ const Invoice = () => {
                     marginTop: "10px",
                   }}
                 />
-              </button>
-            )}
-            {+a.Status === 8 && (
-              <button onClick={() => quotationConfirmation8(a.Order_ID)}>
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>truck-check-outline</title>
-                  <path d="M18 18.5C18.83 18.5 19.5 17.83 19.5 17C19.5 16.17 18.83 15.5 18 15.5C17.17 15.5 16.5 16.17 16.5 17C16.5 17.83 17.17 18.5 18 18.5M19.5 9.5H17V12H21.46L19.5 9.5M6 18.5C6.83 18.5 7.5 17.83 7.5 17C7.5 16.17 6.83 15.5 6 15.5C5.17 15.5 4.5 16.17 4.5 17C4.5 17.83 5.17 18.5 6 18.5M20 8L23 12V17H21C21 18.66 19.66 20 18 20C16.34 20 15 18.66 15 17H9C9 18.66 7.66 20 6 20C4.34 20 3 18.66 3 17H1V6C1 4.89 1.89 4 3 4H17V8H20M3 6V15H3.76C4.31 14.39 5.11 14 6 14C6.89 14 7.69 14.39 8.24 15H15V6H3M5 10.5L6.5 9L8 10.5L11.5 7L13 8.5L8 13.5L5 10.5Z" />
-                </svg>
-              </button>
-            )}
-            {+a.Status === 12 && (
-              <button
-                type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#modalClaim"
-                onClick={() => boxMinutes(a.Order_ID, a)}
+              </button> */}
+            {/* )} */}
+            {/* {+a.Status === 8 && ( */}
+            <button onClick={() => quotationConfirmation8(a.Order_ID)}>
+              <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>airport</title>
-                  <path d="M14.97,5.92C14.83,5.41 14.3,5.1 13.79,5.24L10.39,6.15L5.95,2.03L4.72,2.36L7.38,6.95L4.19,7.8L2.93,6.82L2,7.07L3.66,9.95L14.28,7.11C14.8,6.96 15.1,6.43 14.97,5.92M21,10L20,12H15L14,10L15,9H17V7H18V9H20L21,10M22,20V22H2V20H15V13H20V20H22Z" />
-                </svg>
-              </button>
-            )}
-            {(+a.Status === 12 || +a.Status === 13) && (
-              <button onClick={() => openPdf(a.document)}>
-                <i class="mdi mdi-download"></i>
-              </button>
-            )}
-            {+a.Status === 12 && (
-              <button
+                <title>truck-check-outline</title>
+                <path d="M18 18.5C18.83 18.5 19.5 17.83 19.5 17C19.5 16.17 18.83 15.5 18 15.5C17.17 15.5 16.5 16.17 16.5 17C16.5 17.83 17.17 18.5 18 18.5M19.5 9.5H17V12H21.46L19.5 9.5M6 18.5C6.83 18.5 7.5 17.83 7.5 17C7.5 16.17 6.83 15.5 6 15.5C5.17 15.5 4.5 16.17 4.5 17C4.5 17.83 5.17 18.5 6 18.5M20 8L23 12V17H21C21 18.66 19.66 20 18 20C16.34 20 15 18.66 15 17H9C9 18.66 7.66 20 6 20C4.34 20 3 18.66 3 17H1V6C1 4.89 1.89 4 3 4H17V8H20M3 6V15H3.76C4.31 14.39 5.11 14 6 14C6.89 14 7.69 14.39 8.24 15H15V6H3M5 10.5L6.5 9L8 10.5L11.5 7L13 8.5L8 13.5L5 10.5Z" />
+              </svg>
+            </button>
+            {/* )} */}
+            {/* {+a.Status === 12 && ( */}
+            <button
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#modalClaim"
+              onClick={() => boxMinutes(a.Order_ID, a)}
+            >
+              <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <title>airport</title>
+                <path d="M14.97,5.92C14.83,5.41 14.3,5.1 13.79,5.24L10.39,6.15L5.95,2.03L4.72,2.36L7.38,6.95L4.19,7.8L2.93,6.82L2,7.07L3.66,9.95L14.28,7.11C14.8,6.96 15.1,6.43 14.97,5.92M21,10L20,12H15L14,10L15,9H17V7H18V9H20L21,10M22,20V22H2V20H15V13H20V20H22Z" />
+              </svg>
+            </button>
+            {/* )} */}
+            {/* {(+a.Status === 12 || +a.Status === 13) && ( */}
+            <button onClick={() => openPdf(a.document)}>
+              <i class="mdi mdi-download"></i>
+            </button>
+            {/* )} */}
+            {/* {+a.Status === 12 && ( */}
+            {/* <button
                 data-bs-toggle="modal"
                 data-bs-target="#modalAdjustBox1"
                 type="button"
@@ -591,67 +591,67 @@ const Invoice = () => {
                   <title>airplane-check</title>
                   <path d="M15.97 13.83C15.08 14.35 14.34 15.09 13.82 16L11.55 11.63L7.66 15.5L8 18L6.95 19.06L5.18 15.87L2 14.11L3.06 13.05L5.54 13.4L9.43 9.5L2 5.62L3.41 4.21L12.61 6.33L16.5 2.44C17.08 1.85 18.03 1.85 18.62 2.44C19.2 3.03 19.2 4 18.62 4.56L14.73 8.45L15.97 13.83M21.34 15.84L17.75 19.43L16.16 17.84L15 19L17.75 22L22.5 17.25L21.34 15.84Z" />
                 </svg>
-              </button>
-            )}
-            {+a.Status === 13 && (
-              <button
-                type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#modalClaim"
-                onClick={() => boxMinutes(a.Order_ID, a)}
+              </button> */}
+            {/* )} */}
+            {/* {+a.Status === 13 && ( */}
+            <button
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#modalClaim"
+              onClick={() => boxMinutes(a.Order_ID, a)}
+            >
+              <svg
+                className="SvgQuo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="SvgQuo"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <title>text-box-minus</title>
-                  <path d="M22,17V19H14V17H22M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z" />
-                </svg>
-              </button>
-            )}
-            {(+a.Status === 10 ||
+                <title>text-box-minus</title>
+                <path d="M22,17V19H14V17H22M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z" />
+              </svg>
+            </button>
+            {/* )} */}
+            {/* {(+a.Status === 10 ||
               +a.Status === 11 ||
               +a.Status === 12 ||
-              +a.Status === 13) && (
-              <button
-                type="button"
-                onClick={() => pdfSelectedType(a.Consignee_ID, a)}
+              +a.Status === 13) && ( */}
+            <button
+              type="button"
+              onClick={() => pdfSelectedType(a.Consignee_ID, a)}
+            >
+              <svg
+                className=" "
+                version="1.0"
+                xmlns="http://www.w3.org/2000/svg"
+                width="22px"
+                height="22px"
+                viewBox="0 0 350 350"
+                preserveAspectRatio="xMidYMid meet"
               >
-                <svg
-                  className=" "
-                  version="1.0"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="22px"
-                  height="22px"
-                  viewBox="0 0 350 350"
-                  preserveAspectRatio="xMidYMid meet"
+                <g
+                  transform="translate(0.000000,344.000000) scale(0.100000,-0.100000)"
+                  fill="#203764"
+                  stroke="none"
                 >
-                  <g
-                    transform="translate(0.000000,344.000000) scale(0.100000,-0.100000)"
-                    fill="#203764"
-                    stroke="none"
-                  >
-                    <path d="M1291 2913 c-19 -16 -21 -30 -23 -132 l-3 -115 -219 -37 c-270 -47 -265 -44 -249 -156 6 -43 11 -78 10 -79 -1 0 -96 -33 -212 -73 -203 -70 -245 -92 -245 -127 0 -33 274 -780 292 -796 15 -14 24 -15 39 -8 10 6 19 17 19 24 0 8 -61 184 -136 391 -74 208 -134 378 -132 380 2 1 90 32 196 68 135 47 194 63 197 54 2 -6 65 -372 140 -811 75 -440 141 -808 146 -817 5 -10 18 -20 28 -24 11 -3 167 19 346 50 180 31 332 54 338 52 5 -1 -165 -66 -378 -143 -213 -76 -391 -140 -394 -142 -4 -1 -71 179 -151 400 -79 222 -148 409 -153 416 -13 17 -42 15 -57 -3 -11 -13 13 -86 135 -428 81 -226 154 -422 161 -434 7 -12 22 -24 33 -28 12 -4 253 78 658 223 733 264 727 262 1016 262 181 0 186 1 201 22 14 20 16 118 16 859 l0 836 -175 167 -174 166 -625 0 c-579 0 -625 -1 -645 -17z m1189 -177 c0 -195 12 -206 220 -206 l130 0 0 -790 0 -790 -745 0 -745 0 -2 376 c-3 339 -5 378 -20 387 -12 8 -21 7 -32 -2 -14 -12 -16 -60 -16 -407 0 -344 2 -395 16 -408 13 -14 61 -16 367 -17 215 0 342 -4 327 -9 -32 -11 -801 -143 -806 -138 -2 2 -72 403 -155 892 -119 691 -150 889 -140 895 7 5 88 20 179 35 92 15 177 30 189 33 l23 5 2 -383 3 -384 30 0 30 0 3 513 2 512 570 0 570 0 0 -114z m260 -80 l44 -46 -112 0 -112 0 0 106 0 106 68 -60 c37 -33 87 -81 112 -106z" />
-                    <path d="M1529 2364 c-9 -11 -10 -20 -2 -32 9 -16 58 -17 568 -17 510 0 559 1 568 17 8 12 7 21 -2 32 -12 14 -74 16 -566 16 -492 0 -554 -2 -566 -16z" />
-                    <path d="M1536 2104 c-19 -19 -20 -36 -4 -52 17 -17 1109 -17 1126 0 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
-                    <path d="M1530 1835 c-16 -19 -4 -52 23 -59 29 -8 1055 -8 1084 0 27 7 39 40 23 59 -18 22 -1112 22 -1130 0z" />
-                    <path d="M1529 1564 c-9 -11 -10 -20 -2 -32 9 -16 60 -17 565 -20 597 -2 589 -3 573 48 -6 20 -11 20 -564 20 -497 0 -560 -2 -572 -16z" />
-                    <path d="M1536 1304 c-9 -8 -16 -19 -16 -24 0 -5 7 -16 16 -24 14 -14 79 -16 563 -16 412 0 550 3 559 12 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
-                  </g>
-                </svg>
-              </button>
-            )}
-            {+a.Status === 9 && (
-              <button
-                data-bs-toggle="modal"
-                data-bs-target="#modalAdjustBox"
-                type="button"
-                onClick={() => inventoryBoxes(a.Order_ID)}
-              >
-                <i className="mdi mdi-scale"></i>{" "}
-              </button>
-            )}
+                  <path d="M1291 2913 c-19 -16 -21 -30 -23 -132 l-3 -115 -219 -37 c-270 -47 -265 -44 -249 -156 6 -43 11 -78 10 -79 -1 0 -96 -33 -212 -73 -203 -70 -245 -92 -245 -127 0 -33 274 -780 292 -796 15 -14 24 -15 39 -8 10 6 19 17 19 24 0 8 -61 184 -136 391 -74 208 -134 378 -132 380 2 1 90 32 196 68 135 47 194 63 197 54 2 -6 65 -372 140 -811 75 -440 141 -808 146 -817 5 -10 18 -20 28 -24 11 -3 167 19 346 50 180 31 332 54 338 52 5 -1 -165 -66 -378 -143 -213 -76 -391 -140 -394 -142 -4 -1 -71 179 -151 400 -79 222 -148 409 -153 416 -13 17 -42 15 -57 -3 -11 -13 13 -86 135 -428 81 -226 154 -422 161 -434 7 -12 22 -24 33 -28 12 -4 253 78 658 223 733 264 727 262 1016 262 181 0 186 1 201 22 14 20 16 118 16 859 l0 836 -175 167 -174 166 -625 0 c-579 0 -625 -1 -645 -17z m1189 -177 c0 -195 12 -206 220 -206 l130 0 0 -790 0 -790 -745 0 -745 0 -2 376 c-3 339 -5 378 -20 387 -12 8 -21 7 -32 -2 -14 -12 -16 -60 -16 -407 0 -344 2 -395 16 -408 13 -14 61 -16 367 -17 215 0 342 -4 327 -9 -32 -11 -801 -143 -806 -138 -2 2 -72 403 -155 892 -119 691 -150 889 -140 895 7 5 88 20 179 35 92 15 177 30 189 33 l23 5 2 -383 3 -384 30 0 30 0 3 513 2 512 570 0 570 0 0 -114z m260 -80 l44 -46 -112 0 -112 0 0 106 0 106 68 -60 c37 -33 87 -81 112 -106z" />
+                  <path d="M1529 2364 c-9 -11 -10 -20 -2 -32 9 -16 58 -17 568 -17 510 0 559 1 568 17 8 12 7 21 -2 32 -12 14 -74 16 -566 16 -492 0 -554 -2 -566 -16z" />
+                  <path d="M1536 2104 c-19 -19 -20 -36 -4 -52 17 -17 1109 -17 1126 0 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
+                  <path d="M1530 1835 c-16 -19 -4 -52 23 -59 29 -8 1055 -8 1084 0 27 7 39 40 23 59 -18 22 -1112 22 -1130 0z" />
+                  <path d="M1529 1564 c-9 -11 -10 -20 -2 -32 9 -16 60 -17 565 -20 597 -2 589 -3 573 48 -6 20 -11 20 -564 20 -497 0 -560 -2 -572 -16z" />
+                  <path d="M1536 1304 c-9 -8 -16 -19 -16 -24 0 -5 7 -16 16 -24 14 -14 79 -16 563 -16 412 0 550 3 559 12 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
+                </g>
+              </svg>
+            </button>
+            {/* )} */}
+            {/* {+a.Status === 9 && ( */}
+            <button
+              data-bs-toggle="modal"
+              data-bs-target="#modalAdjustBox"
+              type="button"
+              onClick={() => inventoryBoxes(a.Order_ID)}
+            >
+              <i className="mdi mdi-scale"></i>{" "}
+            </button>
+            {/* )} */}
             <button
               type="button"
               className="SvgAnchor"
@@ -674,40 +674,40 @@ const Invoice = () => {
                 <title>cash-check</title>
                 <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z" />
               </svg>
-            </button>  {/* new icon from order */}
-                   <button type="button" onClick={() => generatePdf2(a)}>
-                      {" "}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 200 80" // scalable, you can change width/height via props or CSS
-                        className="customIcon"
-                      >
-                        <rect
-                          x="5"
-                          y="5"
-                          rx="15"
-                          ry="15"
-                          width="190"
-                          height="70"
-                          fill="none"
-                          stroke="#203764" // ✅ border color
-                          strokeWidth="8" // ✅ thickness like your image
-                        />
-                        <text
-                          x="50%"
-                          y="50%"
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          fontSize="28"
-                          fontWeight="bold"
-                          fill="#203764" // ✅ text color same as border
-                          fontFamily="Arial, sans-serif"
-                        >
-                          CUSTOMS
-                        </text>
-                      </svg>
-                    </button>
-           
+            </button>{" "}
+            {/* new icon from order */}
+            {/* <button type="button" onClick={() => generatePdf2(a)}>
+              {" "}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 200 80" // scalable, you can change width/height via props or CSS
+                className="customIcon"
+              >
+                <rect
+                  x="5"
+                  y="5"
+                  rx="15"
+                  ry="15"
+                  width="190"
+                  height="70"
+                  fill="none"
+                  stroke="#203764" // ✅ border color
+                  strokeWidth="8" // ✅ thickness like your image
+                />
+                <text
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize="28"
+                  fontWeight="bold"
+                  fill="#203764" // ✅ text color same as border
+                  fontFamily="Arial, sans-serif"
+                >
+                  CUSTOMS
+                </text>
+              </svg>
+            </button>
             <button
               type="button"
               style={{
@@ -738,9 +738,8 @@ const Invoice = () => {
               onClick={() => setDeleteOrderId(a.Order_ID)}
             >
               <i className="mdi mdi-delete " />
-            </button>
-         
-           {/* new icon from order */}
+            </button> */}
+            {/* new icon from order */}
           </div>
         );
       },
@@ -998,6 +997,14 @@ const Invoice = () => {
   };
 
   const submitInvoicePayment = async () => {
+    if (!receiptID) {
+      console.error("No RID found for final submission.");
+      toast.error("Receipt ID missing. Please retry.");
+      return;
+    }
+
+    console.log("Submitting BNPaymentSubmit for RID:", receiptID);
+
     try {
       const response = await axios.post(`${API_BASE_URL}/BNPaymentSubmit`, {
         RID: receiptID, // Ensure you pass the correct receipt ID for invoice
@@ -5565,10 +5572,11 @@ const Invoice = () => {
     }
   };
 
-  const fetchReceiptData = async (Order_ID) => {
+  const fetchReceiptData = async (Order_ID, receiptID) => {
     try {
       const res = await axios.post(`${API_BASE_URL}/receiptBNIDView`, {
         IID: Order_ID,
+        RID: receiptID,
       });
       if (res.data.success) {
         setModalHead(res.data.head);
@@ -5591,17 +5599,19 @@ const Invoice = () => {
       // Step 1: Call BNPaymentStep API but with IID (Invoice ID)
       const res = await axios.post(`${API_BASE_URL}/BNPaymentStep`, {
         bn_id: "", // Not needed for invoice
-        IID: a.Order_ID, // Pass Invoice ID here
+        IID: a.ID, // Pass Invoice ID here
         USER_ID: localStorage.getItem("id"),
       });
 
       if (res?.data?.success) {
         const latestId = res.data.latestId?.LastInsertedReceiptID;
-        setReceiptID(latestId); //  Store the RID for on-change updates
-        console.log("Invoice Receipt ID:", latestId);
-
-        // Step 2: Fetch receipt data for invoice
-        fetchReceiptData(a.Order_ID);
+        if (latestId) {
+          console.log("Stored Receipt ID:", latestId);
+          setReceiptID(latestId); // <-- Store in state for modal use
+          fetchReceiptData(a.ID, latestId);
+        }
+      } else {
+        console.error("BNPaymentStep Error:", data.message);
       }
     } catch (error) {
       console.error("Error opening invoice modal:", error);
