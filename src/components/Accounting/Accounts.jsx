@@ -1361,7 +1361,7 @@ const Accounts = () => {
 
       // Convert section4_label values into header array
       const headers = [Object.values(section4Labels)];
-console.log(">>>>>>>>>>>>>>>>>>");
+      console.log(">>>>>>>>>>>>>>>>>>");
       // Convert section4_values into rows
       const rows = section4Values.map((item) => Object.values(item));
 
@@ -1388,7 +1388,15 @@ console.log(">>>>>>>>>>>>>>>>>>");
       doc.setFontSize(19);
       const purchaseOrderTitle =
         response?.data?.section1_Title?.Title || "Purchase Order";
-      doc.text(purchaseOrderTitle, 150.5, 11);
+      const pageWidth1 = doc.internal.pageSize.getWidth();
+
+      const textWidth1 = doc.getTextWidth(purchaseOrderTitle);
+
+      // Calculate X position: (page width - margin - text width)
+      const marginRight = 7;
+      const x = pageWidth1 - marginRight - textWidth1;
+
+      doc.text(purchaseOrderTitle, x, 11);
       doc.setFont("helvetica", "normal"); // Set font to bold
       doc.setFillColor(33, 56, 99);
       doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
@@ -1510,13 +1518,15 @@ console.log(">>>>>>>>>>>>>>>>>>");
         maximumFractionDigits: 0,
       });
 
-      const yTop = Math.max(startY1, startY2); // Start Y position for the tabl
+      const yTop = Math.max(startY1, y); // Start Y position for the tabl
+
+      doc.setFillColor(33, 56, 99);
+      doc.rect(7, yTop-0.5, doc.internal.pageSize.width - 15, 0.1, "FD");
       const rawTitle = response?.data?.section5_title?.Title || "";
       const titleString = rawTitle.replace(/\s+/g, " ").trim(); // remove newlines & extra spaces
+      doc.setFontSize(12);
+      doc.text(titleString, 7, yTop + 5);
 
-      doc.text(titleString, 7, yTop + 1);
-
-      doc.text(titleString, 7, yTop + 1);
       doc.autoTable({
         head: headers,
         body: rows,
@@ -1533,7 +1543,7 @@ console.log(">>>>>>>>>>>>>>>>>>");
           9: { halign: "right", font: "NotoSansThai" },
         },
         startX: 0,
-        startY: yTop + 3,
+        startY: yTop + 8,
         margin: {
           left: 7,
           right: 7,
@@ -1780,28 +1790,42 @@ console.log(">>>>>>>>>>>>>>>>>>");
         Col6: response?.data?.preStatementDetails?.Col6 || "",
         Col7: response?.data?.preStatementDetails?.Col7 || "",
       };
-      const startOffset = 65;
-      // Render section 8
-      doc.text(section8Labels.Col1, 7, tableEndY + startOffset);
-      doc.text(section8Values.Col1, 7, tableEndY + startOffset + 5);
+      const headers1 = Object.values(section8Labels);
+      const data = [Object.values(section8Values)];
 
-      doc.text(section8Labels.Col2, 49, tableEndY + startOffset);
-      doc.text(section8Values.Col2, 49, tableEndY + startOffset + 5);
-
-      doc.text(section8Labels.Col3, 75, tableEndY + startOffset);
-      doc.text(section8Values.Col3, 75, tableEndY + startOffset + 5);
-
-      doc.text(section8Labels.Col4, 101, tableEndY + startOffset);
-      doc.text(section8Values.Col4, 101, tableEndY + startOffset + 5);
-
-      doc.text(section8Labels.Col5, 127, tableEndY + startOffset);
-      doc.text(section8Values.Col5, 127, tableEndY + startOffset + 5);
-
-      doc.text(section8Labels.Col6, 153, tableEndY + startOffset);
-      doc.text(section8Values.Col6, 153, tableEndY + startOffset + 5);
-
-      doc.text(section8Labels.Col7, 179, tableEndY + startOffset);
-      doc.text(section8Values.Col7, 179, tableEndY + startOffset + 5);
+      doc.autoTable({
+        startY: tableEndY + 65, // Same as your start offset
+        head: [headers1],
+        body: data,
+        theme: "grid",
+        columnStyles: {
+          0: { halign: "center" },
+          1: { halign: "center" },
+          2: { halign: "center" },
+          3: { halign: "center" },
+          4: { halign: "center" },
+          5: { halign: "center" },
+          6: { halign: "center" },
+        },
+        startX: 0,
+        margin: {
+          left: 7,
+          right: 7,
+        },
+        styles: {
+          textColor: "#000000",
+          cellWidth: "wrap",
+          valign: "middle",
+          lineWidth: 0.01,
+          lineColor: [32, 55, 100],
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: "#000000",
+          halign: "center",
+          fontStyle: "normal",
+        },
+      });
 
       const addPageNumbers = (doc) => {
         const pageCount = doc.internal.getNumberOfPages();

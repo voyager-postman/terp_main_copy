@@ -474,9 +474,9 @@ const ReceiptCreate = () => {
 
       // Second: delete purchase
       const deleteResponse = await axios.post(
-        `${API_BASE_URL}/DeletePurchase`,
+        `${API_BASE_URL}/deleteReceipt`,
         {
-          po_id: podId,
+          ID: podId,
           user_id: localStorage.getItem("id"),
         }
       );

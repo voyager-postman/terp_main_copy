@@ -31,35 +31,7 @@ export const OrderPackagingList = () => {
       toast.error(t("genericError"));
     }
   };
-  const generateInvoice = (id, id1, id2) => {
-    axios
-      .post(`${API_BASE_URL}/GenerateInvoiceTick`, {
-        order_id: id,
-        fx_id: id1,
-        fx_rate: id2,
-        USER: localStorage.getItem("id"),
-      })
-      .then((response) => {
-        if (response?.data?.success == false) {
-          toast.warn(response.data.checkmessage, {
-            autoClose: 1000,
-            theme: "colored",
-          });
-          getOrders();
-        }
-        console.log(response);
-        if (response?.data?.success == true) {
-          toast.success(response.data.message, {
-            autoClose: 1000,
-            theme: "colored",
-          });
-          getOrders();
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+
   const columns = useMemo(
     () => [
       {
@@ -72,7 +44,7 @@ export const OrderPackagingList = () => {
       },
       {
         Header: t("consigneeName"),
-        accessor: "consignee_name",
+        accessor: "Consignee_name",
       },
       {
         Header: t("loadDate"),
@@ -109,20 +81,7 @@ export const OrderPackagingList = () => {
               </Link>
             )}
 
-            {+a.Status === 6 && (
-              <>
-                <button type="button" onClick={() => { }}></button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    generateInvoice(a.Order_ID, a.FX_ID, a.O_FX_Rate)
-                  }
-                >
-                  <i className="mdi mdi-check" />
-                </button>
-              </>
-            )}
+        
           </div>
         ),
       },

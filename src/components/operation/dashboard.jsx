@@ -1,4 +1,4 @@
- import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { API_BASE_URL } from "../../Url/Url";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
@@ -10,6 +10,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useQuery } from "react-query";
 import { useForm } from "@tanstack/react-form";
 import { ComboBox } from "../combobox";
+import DatePicker from "react-datepicker";
+import { FaCalendarAlt } from "react-icons/fa"; // Import calendar icon
+
 import { Autocomplete, TextField } from "@mui/material";
 import { useTranslation } from "react-i18next";
 const localizer = momentLocalizer(moment);
@@ -22,10 +25,15 @@ export const OperationDashboard = () => {
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [selectedLoadData, setSelectedLoadDate] = useState("");
   const [orderId, setOrderId] = useState("");
-
+  const [inputValue, setInputValue] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [startDate1, setStartDate1] = useState(null);
+  const [startDate2, setStartDate2] = useState(null);
   const [Journey, setJourney] = useState([]);
   const [notes, setNotes] = useState("");
   const [journeyId, setJourneyId] = useState(null);
+  const [consigneeId, setConsigneeId] = useState("");
+
   console.log(selectedLinerId);
   // const { data, refetch } = useQuery("getOrders");
 
@@ -34,7 +42,36 @@ export const OperationDashboard = () => {
   const handleChange = (event) => {
     setStatus(event.target.value);
   };
-
+  const CustomInput = ({ value, onClick }) => (
+    <div
+      className="custom-input"
+      onClick={onClick}
+      style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+    >
+      <input
+        type="text"
+        value={value}
+        readOnly
+        style={{
+          padding: "10px",
+          paddingLeft: "35px",
+          width: "250px",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+          marginBottom: "unset !important",
+        }}
+      />
+      <FaCalendarAlt
+        style={{
+          position: "absolute",
+          right: "10px",
+          fontSize: "18px",
+          color: "#888",
+          marginBottom: "unset !important",
+        }}
+      />
+    </div>
+  );
   const [data, setData] = useState([]);
 
   const orderData1 = () => {
@@ -76,7 +113,11 @@ export const OperationDashboard = () => {
   }, [modalIsOpen]);
 
   const { data: liner } = useQuery("getLiner");
+  const [totalDetails, setTotalDetails] = useState("");
 
+  const handleChange5 = (e) => {
+    setInputValue(e.target.value); // Update state with the input value
+  };
   const [id, setID] = useState(null);
   const dataFind = useMemo(() => {
     console.log(data);
@@ -86,49 +127,45 @@ export const OperationDashboard = () => {
   console.log(dataFind);
   const form = useForm({
     defaultValues: {
-      Liner: dataFind?.Freight_liner || "",
-      journey_number: dataFind?.Freight_journey_number || "",
-      bl: dataFind?.Freight_bl || "",
-      Load_date:
-        new Date(dataFind?.Freight_load_date || null)
-          .toISOString()
-          .split("T")[0] || "",
-      Load_time: dataFind?.Freight_load_time || "",
-      Ship_date:
-        new Date(dataFind?.Freight_ship_date || null)
-          .toISOString()
-          .split("T")[0] || "",
-      ETD: dataFind?.Freight_etd || "",
-      Arrival_date:
-        new Date(dataFind?.Freight_arrival_date || null)
-          .toISOString()
-          .split("T")[0] || "",
-      ETA: dataFind?.Freight_eta || "",
+      Liner: totalDetails?.Liner_ID || "",
+      journey_number: totalDetails?.journey_id || "",
+      Customer_ref: inputValue,
+      bl: totalDetails?.BL || "",
+      // Customer_ref: totalDetails?.Customer_ref || "",
+      Load_date: moment(startDate).format("YYYY-MM-DD"),
+      Load_time: totalDetails?.Load_time || "",
+      Ship_date: moment(startDate1).format("YYYY-MM-DD"),
+      ETD: totalDetails?.ETD || "",
+      Arrival_date: moment(startDate2).format("YYYY-MM-DD"),
+      ETA: totalDetails?.ETA || "",
     },
+
     onSubmit: async ({ value }) => {
-      if (selectedOrderId) {
+      if (totalDetails?.Order_ID) {
         try {
-          await axios.post(`${API_BASE_URL}/updateOrderFreight`, {
-            order_id: selectedOrderId,
+          await axios.post(`${API_BASE_URL}/NewupdateOrderFreight`, {
+            order_id: totalDetails?.Order_ID,
+            consignee_id: consigneeId,
             ...value,
           });
+          oneQoutationDAta();
           toast.success(t("orderUpdateSuccess"));
-          setIsOpenModal(false);
+          setInputValue("");
           orderData();
           refetch();
         } catch (e) {
           console.log(e);
-
           // toast.error("Something went wrong");
         }
       }
       closeModal();
     },
   });
+
   useEffect(() => {
-    if (selectedLinerId !== null || dataFind?.Freight_liner) {
+    if (selectedLinerId !== null || totalDetails?.Liner_ID) {
       const linerId =
-        selectedLinerId !== null ? selectedLinerId : dataFind?.Freight_liner;
+        selectedLinerId !== null ? selectedLinerId : totalDetails?.Liner_ID;
       axios
         .post(`${API_BASE_URL}/getjourneyNumber`, { liner_id: linerId })
         .then((response) => {
@@ -139,10 +176,41 @@ export const OperationDashboard = () => {
           console.error(error);
         });
     }
-  }, [selectedLinerId, dataFind?.Freight_liner]);
+  }, [selectedLinerId, totalDetails?.Liner_ID]);
   const closeModal1 = () => {
     setIsOpenModal(false);
   };
+  useEffect(() => {
+    if (totalDetails) {
+      setInputValue(totalDetails?.Customer_ref || ""); // Update inputValue when totalDetails changes
+    }
+  }, [totalDetails]);
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>", id);
+  const oneQoutationDAta = () => {
+    axios
+      .get(`${API_BASE_URL}/NewgetOrdersById`, {
+        params: {
+          order_id: id,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        setTotalDetails(response.data.data);
+        setConsigneeId(response.data.data?.Consignee_ID);
+        setStartDate(new Date(response.data.data.load_date));
+        setStartDate1(new Date(response.data.data.Ship_date));
+        setStartDate2(new Date(response.data.data.Arrival_date));
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+  useEffect(() => {
+    oneQoutationDAta();
+  }, [id]);
+  useEffect(() => {
+    oneQoutationDAta();
+  }, []);
   const openModal = (id = null) => {
     setModalIsOpen(false);
     setID(id);
@@ -151,20 +219,28 @@ export const OperationDashboard = () => {
     setIsOpenModal(true);
   };
   const handleJourneySelection = async (selectedJourneyId) => {
+    console.log(selectedJourneyId);
     const journey_id = selectedJourneyId; // assuming selectedJourneyId comes directly as the ID
-    const order_id = selectedOrderId; // Assuming 'id' is already storing the order_id you need
+    const order_id = id; // Assuming 'id' is already storing the order_id you need
+    const load_date = newDate
+      ? moment(newDate).format("YYYY-MM-DD")
+      : moment(startDate, "YYYY-MM-DD").format("YYYY-MM-DD");
+    console.log(journey_id);
+    console.log(order_id);
+
     setJourneyId(selectedJourneyId);
     try {
       // Sending a POST request to the server with journey_id and order_id
       const response = await axios.post(
-        `${API_BASE_URL}/getOrderFreightDetails`,
+        `${API_BASE_URL}/NewgetorderFreightDetails`,
         {
           journey_id,
           order_id,
+          load_date,
         }
       );
       // Logging the entire response object to see all details
-      console.log("Response from getOrderFreightDetails:", response);
+      console.log("Response from NewgetorderFreightDetails:", response);
 
       // Show success message
 
@@ -193,17 +269,19 @@ export const OperationDashboard = () => {
     } catch (error) {
       // Log the error if the request fails
       console.error("Failed to fetch freight details:", error);
-      toast.error(t("fetchFreight"));
+      toast.error(t("errorFetchingFreightDetails"));
     }
   };
+
   const handleLoadDateSelection = async (loadDate) => {
-    const journey_id = journeyId || dataFind?.Freight_journey_number; // assuming selectedJourneyId comes directly as the ID
-    const order_id = selectedOrderId; // Assuming 'id' is already storing the order_id you need
+    const journey_id = journeyId || totalDetails?.Freight_journey_number; // assuming selectedJourneyId comes directly as the ID
+    const order_id = id; // Assuming 'id' is already storing the order_id you need
     const load_date = loadDate;
+    setNewDate(load_date);
     try {
       // Sending a POST request to the server with journey_id and order_id
       const response = await axios.post(
-        `${API_BASE_URL}/getOrderFreightDetails`,
+        `${API_BASE_URL}/NewgetorderFreightDetails`,
         {
           journey_id,
           order_id,
@@ -240,9 +318,56 @@ export const OperationDashboard = () => {
     } catch (error) {
       // Log the error if the request fails
       console.error("Failed to fetch freight details:", error);
-      toast.error(t("fetchFreight"));
+      toast.error(t("errorFetchingFreightDetails"));
     }
   };
+  // const handleLoadDateSelection = async (loadDate) => {
+  //   const journey_id = journeyId || dataFind?.Freight_journey_number; // assuming selectedJourneyId comes directly as the ID
+  //   const order_id = selectedOrderId; // Assuming 'id' is already storing the order_id you need
+  //   const load_date = loadDate;
+  //   try {
+  //     // Sending a POST request to the server with journey_id and order_id
+  //     const response = await axios.post(
+  //       `${API_BASE_URL}/getOrderFreightDetails`,
+  //       {
+  //         journey_id,
+  //         order_id,
+  //         load_date,
+  //       }
+  //     );
+  //     // Logging the entire response object to see all details
+  //     console.log("Response from getOrderFreightDetails:", response);
+
+  //     // Show success message
+
+  //     // Check if data is available and update form fields
+  //     const data = response.data;
+  //     if (data) {
+  //       // Log the data object to see its structure and values
+  //       console.log("Received data:", data.data);
+
+  //       // Updating form fields with the received data
+  //       form.setFieldValue("Load_time", data.data.Load_time);
+  //       form.setFieldValue("ETD", data.data.ETD);
+  //       form.setFieldValue("ETA", data.data.ETA);
+  //       form.setFieldValue(
+  //         "Ship_date",
+  //         new Date(data.data.Freight_ship_date).toISOString().split("T")[0]
+  //       );
+  //       form.setFieldValue(
+  //         "Arrival_date",
+  //         new Date(data.data.Freight_arrival_date).toISOString().split("T")[0]
+  //       );
+  //     } else {
+  //       // Log if data is missing or undefined
+  //       console.log("No data received in response");
+  //     }
+  //   } catch (error) {
+  //     // Log the error if the request fails
+  //     console.error("Failed to fetch freight details:", error);
+  //     toast.error(t("fetchFreight"));
+  //   }
+  // };
   const handleEditClick = async (order_id) => {
     loadingModal.fire();
     try {
@@ -353,15 +478,15 @@ export const OperationDashboard = () => {
     setModalIsOpen(true);
     setSelectedOrderId(event.order_id);
     setSelectedLoadDate(event.Loading_Date);
-
+    setID(event.order_id);
     console.log("Selected order_id:", event.order_id); // Log the order_id on click
     console.log("Selected order_id:", event.Loading_Date); // Log the order_id on click
   };
   console.log(selectedOrderId);
   // Close modal
   const closeModal = () => {
-    setModalIsOpen(false);
-    setSelectedEvent(null);
+    setIsOpenModal(false);
+    setInputValue("");
   };
   return (
     <>
@@ -391,7 +516,9 @@ export const OperationDashboard = () => {
             tabIndex={0}
           >
             <div className="bg-white rounded w-full flex-col flex divide-y">
-              <div className="font-bold text-lg py-3 px-3">{t("orderPipeline")}</div>
+              <div className="font-bold text-lg py-3 px-3">
+                {t("orderPipeline")}
+              </div>
               <div className="App" style={{ padding: "8px" }}>
                 <Calendar
                   localizer={localizer}
@@ -476,7 +603,7 @@ export const OperationDashboard = () => {
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full ">
             <div className="crossArea">
               <h3>{t("editDetails")}</h3>
-              <p onClick={closeModal1}>
+              <p onClick={closeModal}>
                 <CloseIcon />
               </p>
             </div>
@@ -490,51 +617,39 @@ export const OperationDashboard = () => {
                 }}
               >
                 <div className="p-3 bottomOrderSp">
-                  <div className="form-group mb-3 autoComplete">
-                    <label>{t("liner")}</label>
+                  <div className="form-group">
+                    <label>{t("consigneeRef")}</label>
+
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={handleChange5}
+                    />
+                  </div>
+                  <div className="form-group mb-3">
+                    <label> {t("liner")}</label>
                     <form.Field
                       name="Liner"
                       children={(field) => (
-                        // <ComboBox
-                        //   options={liner?.map((v) => ({
-                        //     id: v.liner_id,
-                        //     name: v.liner_name,
-                        //   }))}
-                        //   value={field.state.value}
-                        //   onChange={(e) => {
-                        //     field.handleChange(e);
-                        //     setSelectedLinerId(e); // Assuming `e` directly is the liner_id, adjust if needed
-                        //   }}
-                        // />
-                        <Autocomplete
-                          options={liner || []} // Ensure it's an array
-                          getOptionLabel={(option) => option.liner_name} // Display name in dropdown
-                          value={
-                            liner.find(
-                              (v) => v.liner_id === field.state.value
-                            ) || null
-                          } // Match value
-                          onChange={(event, newValue) => {
-                            field.handleChange(
-                              newValue ? newValue.liner_id : ""
-                            ); // Update field value
-                            setSelectedLinerId(
-                              newValue ? newValue.liner_id : null
-                            ); // Update selected ID
+                        <ComboBox
+                          options={liner?.map((v) => ({
+                            id: v.liner_id,
+                            name: v.liner_name,
+                          }))}
+                          value={field.state.value}
+                          onChange={(e) => {
+                            // Here, `e` is expected to be the ID of the selected item if ComboBox passes it like that,
+                            // otherwise you might need to adjust how you retrieve the value
+                            field.handleChange(e);
+                            setSelectedLinerId(e); // Assuming `e` directly is the liner_id, adjust if needed
                           }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("selectLiner")}
-                              variant="outlined"
-                            />
-                          )}
                         />
                       )}
                     />
                   </div>
-                  <div className="form-group autoComplete">
+                  <div className="form-group">
                     <label>{t("journeyNumber")}</label>
+
                     <form.Field
                       name="journey_number"
                       children={(field) => (
@@ -548,13 +663,12 @@ export const OperationDashboard = () => {
                             field.handleChange(e);
                             handleJourneySelection(e);
                           }}
-                          placeholder={t("journeyNumber")}
                         />
                       )}
                     />
                   </div>
                   <div className="form-group">
-                    <label>{t("bl")}</label>
+                    <label> {t("bl")}</label>
                     <form.Field
                       name="bl"
                       children={(field) => (
@@ -570,23 +684,32 @@ export const OperationDashboard = () => {
                   <div className="flex gap-2">
                     <div className="form-group w-full">
                       <label>{t("loadDate")}</label>
-                      <form.Field
-                        name="Load_date"
-                        children={(field) => (
-                          <input
-                            type="date"
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => {
-                              field.handleChange(e.target.value);
-                              handleLoadDateSelection(e.target.value);
-                            }}
-                          />
-                        )}
-                      />
+                      <form.Field name="Load_date">
+                        {(field) => {
+                          const value = field.state.value;
+                          const isValidDate =
+                            value && !isNaN(Date.parse(value));
+
+                          return (
+                            <DatePicker
+                              selected={isValidDate ? new Date(value) : null}
+                              onChange={(date) => {
+                                const formattedDate = date
+                                  ?.toISOString()
+                                  .split("T")[0]; // yyyy-MM-dd
+                                field.handleChange(formattedDate); // Update form state
+                                handleLoadDateSelection(formattedDate); // Trigger API logic
+                              }}
+                              onBlur={field.handleBlur}
+                              dateFormat="dd/MM/yyyy"
+                              placeholderText={t("selectDate")}
+                              customInput={<CustomInput />}
+                            />
+                          );
+                        }}
+                      </form.Field>
                     </div>
-                    <div className="form-group">
+                    <div className="form-group loadTimeS">
                       <label>{t("loadTime")}</label>
                       <form.Field
                         name="Load_time"
@@ -597,7 +720,6 @@ export const OperationDashboard = () => {
                             value={field.state.value}
                             onBlur={field.handleBlur}
                             onChange={(e) => field.handleChange(e.target.value)}
-                            readOnly
                           />
                         )}
                       />
@@ -606,19 +728,29 @@ export const OperationDashboard = () => {
                   <div className="flex gap-2">
                     <div className="form-group w-full">
                       <label>{t("shipDate")}</label>
-                      <form.Field
-                        name="Ship_date"
-                        children={(field) => (
-                          <input
-                            type="date"
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            readOnly
-                          />
-                        )}
-                      />
+                      <form.Field name="Ship_date">
+                        {(field) => {
+                          const value = field.state.value;
+                          const isValidDate =
+                            value && !isNaN(Date.parse(value));
+
+                          return (
+                            <DatePicker
+                              selected={isValidDate ? new Date(value) : null}
+                              onChange={(date) => {
+                                const formattedDate = date
+                                  ?.toISOString()
+                                  .split("T")[0];
+                                field.handleChange(formattedDate);
+                              }}
+                              onBlur={field.handleBlur}
+                              dateFormat="dd/MM/yyyy"
+                              placeholderText={t("selectDate")}
+                              customInput={<CustomInput />}
+                            />
+                          );
+                        }}
+                      </form.Field>
                     </div>
                     <div className="form-group">
                       <label>{t("etd")}</label>
@@ -631,7 +763,6 @@ export const OperationDashboard = () => {
                             value={field.state.value}
                             onBlur={field.handleBlur}
                             onChange={(e) => field.handleChange(e.target.value)}
-                            readOnly
                           />
                         )}
                       />
@@ -640,19 +771,29 @@ export const OperationDashboard = () => {
                   <div className="flex gap-2">
                     <div className="form-group w-full">
                       <label>{t("arrivalDate")}</label>
-                      <form.Field
-                        name="Arrival_date"
-                        children={(field) => (
-                          <input
-                            type="date"
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            readOnly
-                          />
-                        )}
-                      />
+                      <form.Field name="Arrival_date">
+                        {(field) => {
+                          const value = field.state.value;
+                          const isValidDate =
+                            value && !isNaN(Date.parse(value));
+
+                          return (
+                            <DatePicker
+                              selected={isValidDate ? new Date(value) : null}
+                              onChange={(date) => {
+                                const formattedDate = date
+                                  ?.toISOString()
+                                  .split("T")[0];
+                                field.handleChange(formattedDate);
+                              }}
+                              onBlur={field.handleBlur}
+                              dateFormat="dd/MM/yyyy"
+                              placeholderText={t("selectDate")}
+                              customInput={<CustomInput />}
+                            />
+                          );
+                        }}
+                      </form.Field>
                     </div>
                     <div className="form-group">
                       <label>{t("eta")}</label>
@@ -665,7 +806,6 @@ export const OperationDashboard = () => {
                             value={field.state.value}
                             onBlur={field.handleBlur}
                             onChange={(e) => field.handleChange(e.target.value)}
-                            readOnly
                           />
                         )}
                       />

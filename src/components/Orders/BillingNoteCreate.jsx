@@ -160,7 +160,32 @@ const BillingNoteCreate = () => {
       getDetils(podId);
     } catch (e) {}
   };
-
+  const handleDelete = (id) => {
+    console.log(id);
+    MySwal.fire({
+      title: t("areYouSure"),
+      text: t("irreversible"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "delete",
+    }).then(async (result) => {
+      console.log(result);
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(`${API_BASE_URL}/DeleteBNDetails`, {
+            id: id,
+          });
+          console.log(response);
+          paymentTable10();
+          toast.success(t("combinedPaymentDeleteSuccess"));
+        } catch (e) {
+          toast.error(t("genericError"));
+        }
+      }
+    });
+  };
   const [state, setState] = React.useState({
     ID: from?.ID,
     vendor_id: from?.Vendor,
@@ -1608,6 +1633,7 @@ const BillingNoteCreate = () => {
                           {Object.values(tableHead).map((headLabel, index) => (
                             <th key={index}>{headLabel}</th>
                           ))}
+                          <th>Action</th> {/* extra column for actions */}
                         </tr>
                       </thead>
                       <tbody>
@@ -1618,6 +1644,14 @@ const BillingNoteCreate = () => {
                                 {row[colKey]}
                               </td>
                             ))}
+                            <td className="text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(row.ID)}
+                              >
+                                <i className="mdi mdi-delete " />
+                              </button>
+                            </td>
                           </tr>
                         ))}
                       </tbody>

@@ -140,7 +140,7 @@ const AccountDetails = () => {
                   <i className="mdi mdi-delete " />
                 </button>
 
-                {a.Credit !== "0.00" ? (
+                {/* {a.Credit !== "0.00" ? (
                   <button
                     type="button"
                     className="accountSvg"
@@ -227,8 +227,95 @@ const AccountDetails = () => {
                       </svg>
                     </div>
                   </button>
+                ) : null} */}
+                {a.RID !== null ? (
+                  <button
+                    type="button"
+                    className="accountSvg"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModalCustomization"
+                    onClick={() => handleDownloadPDF(a.RID, a)}
+                  >
+                    <div className="d-flex">
+                      <svg
+                        className="me-2"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        stroke="#000000"
+                      >
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></g>
+                        <g id="SVGRepo_iconCarrier">
+                          <path
+                            d="M3.5 10H20.5"
+                            stroke="#203764"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          ></path>
+                          <path
+                            d="M6 14H8"
+                            stroke="#203764"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          ></path>
+                          <path
+                            d="M11 14H13"
+                            stroke="#203764"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          ></path>{" "}
+                          <path
+                            d="M3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5H12H17C18.8856 5 19.8284 5 20.4142 5.58579C21 6.17157 21 7.11438 21 9V12V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H12H7C5.11438 19 4.17157 19 3.58579 18.4142C3 17.8284 3 16.8856 3 15V12V9Z"
+                            stroke="#203764"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                          ></path>{" "}
+                        </g>
+                      </svg>
+                    </div>
+                  </button>
+                ) : a.PAY_ID !== null ? (
+                  <button
+                    type="button"
+                    className="svgIconPurchase"
+                    onClick={() => handleDownloadPDFSlip(a.PAY_ID, a)}
+                  >
+                    <div>
+                      <svg
+                        fill="#203764"
+                        height="200px"
+                        width="200px"
+                        viewBox="0 0 512 512"
+                        stroke="#203764"
+                      >
+                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        ></g>
+                        <g id="SVGRepo_iconCarrier">
+                          <g>
+                            <g>
+                              <g>
+                                <path d="M502.747,160.381c-0.032,0-0.063,0.005-0.095,0.005H120.289c-5.11,0-9.253,4.142-9.253,9.253s4.143,9.253,9.253,9.253h373.205v55.518H18.506v-55.518h64.771c5.11,0,9.253-4.142,9.253-9.253s-4.143-9.253-9.253-9.253H18.506v-27.759c0-15.306,12.452-27.759,27.759-27.759h419.47c15.306,0,27.759,12.453,27.759,27.759c0,5.111,4.142,9.253,9.253,9.253s9.253-4.142,9.253-9.253c0-25.511-20.754-46.265-46.265-46.265H46.265C20.754,86.361,0,108.115,0,132.627v246.747c0,25.511,20.754,46.265,46.265,46.265h419.47c25.511,0,46.265-20.754,46.265-46.265V169.639v-0.005C512,164.523,507.858,160.381,502.747,160.381z M493.494,379.373c0,15.306-12.453,27.759-27.759,27.759H46.265c-15.307,0-27.759-12.453-27.759-27.759V252.916h474.988V379.373z"></path>
+                                <path d="M95.614,376.289c8.799,0,17.334-2.495,24.675-7.13c7.342,4.635,15.876,7.13,24.675,7.13c25.511,0,46.265-20.754,46.265-46.265s-20.754-46.265-46.265-46.265c-8.799,0-17.333,2.495-24.675,7.13c-7.341-4.635-15.876-7.13-24.675-7.13c-25.511,0-46.265,20.754-46.265,46.265S70.103,376.289,95.614,376.289z M95.614,302.265c6.837,0,13.409,2.512,18.502,7.072c3.514,3.144,8.83,3.144,12.344,0c5.094-4.56,11.666-7.072,18.504-7.072c15.307,0,27.759,12.453,27.759,27.759s-12.452,27.759-27.759,27.759c-6.837,0-13.408-2.512-18.504-7.072c-1.757-1.572-3.964-2.359-6.171-2.359s-4.416,0.787-6.172,2.359c-5.093,4.56-11.665,7.072-18.502,7.072c-15.307,0-27.759-12.453-27.759-27.759S80.307,302.265,95.614,302.265z"></path>
+                                <path d="M243.663,314.602H441.06c5.111,0,9.253-4.142,9.253-9.253c0-5.111-4.142-9.253-9.253-9.253H243.663c-5.11,0-9.253,4.142-9.253,9.253C234.41,310.461,238.553,314.602,243.663,314.602z"></path>
+                                <path d="M416.386,333.108h-74.024c-5.111,0-9.253,4.142-9.253,9.253s4.142,9.253,9.253,9.253h74.024c5.111,0,9.253-4.142,9.253-9.253S421.497,333.108,416.386,333.108z"></path>
+                                <path d="M243.663,351.614h61.687c5.111,0,9.253-4.142,9.253-9.253s-4.142-9.253-9.253-9.253h-61.687c-5.11,0-9.253,4.142-9.253,9.253S238.553,351.614,243.663,351.614z"></path>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </svg>
+                    </div>
+                  </button>
                 ) : null}
-
                 {+a.Commission == 1 && (
                   <button
                     className="svgIconPurchase"
@@ -1687,63 +1774,82 @@ const AccountDetails = () => {
     });
   };
 
-  const handleDownloadPDFSlip = async (Expense_Payment_ID, a) => {
-    console.log(Expense_Payment_ID);
+ const handleDownloadPDFSlip = async (Expense_Payment_ID, a) => {
     console.log(a);
     try {
+      const lang = localStorage.getItem("language");
+      const langValue = lang === "en" ? 1 : 2;
       const response = await axios.post(`${API_BASE_URL}/expensePaymentSlip`, {
         Expense_Payment_ID: Expense_Payment_ID,
+        lang: langValue,
       });
-      console.log(response.data.table_data);
+      console.log(response);
+      const section4Labels = response?.data?.section5_label || {};
+      const section4Values = response?.data?.section5_values || [];
+
+      // Convert section4_label values into header array
+      const headers = [Object.values(section4Labels)];
+      console.log(">>>>>>>>>>>>>>>>>>");
+      // Convert section4_values into rows
+      const rows = section4Values.map((item) => Object.values(item));
+
       const doc = new jsPDF();
       doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular);
       doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
+      // Draw the top line and center the text "Receipt"
       const imgData = logo;
       doc.addImage(imgData, "JPEG", 6, 2, 20, 20);
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
-      doc.text(`${response?.data?.companyAddress?.Line_1}`, 30, 8);
+      doc.text(`${response?.data?.Company_Address?.Line_1}`, 30, 8);
       doc.setTextColor(0, 0, 0);
-      doc.text(`${response?.data?.companyAddress?.Line_2}`, 30, 12);
-      const longTextOne = `${response?.data?.companyAddress?.Line_3}`;
+      doc.text(`${response?.data?.Company_Address?.Line_2}`, 30, 12);
+      const longTextOne = `${response?.data?.Company_Address?.Line_3}`;
       const maxWidthOne = 90;
       const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
       let startXOne = 30;
       let startYOne = 16;
       linesOne.forEach((lineOne, index) => {
-        doc.text(lineOne, startXOne, startYOne + index * 4.2);
+        doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
       });
+      doc.setFont("helvetica", "bold"); // Set font to bold
+      doc.setFontSize(19);
+      const purchaseOrderTitle =
+        response?.data?.section1_Title?.Title || "Purchase Order";
+      const pageWidth1 = doc.internal.pageSize.getWidth();
+
+      const textWidth1 = doc.getTextWidth(purchaseOrderTitle);
+
+      // Calculate X position: (page width - margin - text width)
+      const marginRight = 7;
+      const x = pageWidth1 - marginRight - textWidth1;
+
+      doc.text(purchaseOrderTitle, x, 11);
+      doc.setFont("helvetica", "normal"); // Set font to bold
       doc.setFillColor(33, 56, 99);
       doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
-      const newFormatter1 = new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 3,
-        maximumFractionDigits: 3,
-      });
-      const newFormatterZero = new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      });
-      const newFormatter5 = new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-      const text = " Expense Payment Slip";
+      doc.text(response?.data?.section2?.Col1 || "", 7, 28);
+      const poNum = response?.data?.section2?.Col2 || "";
       const pageWidth = doc.internal.pageSize.width;
-      const textWidth = doc.getTextWidth(text);
+      const textWidth = doc.getTextWidth(poNum);
       const xPosition = (pageWidth - textWidth) / 2;
-      doc.text(text, xPosition, 28);
+      doc.text(poNum, xPosition, 28);
+      // doc.text("Date: ", 169, 28);
       doc.setFillColor(33, 56, 99);
       doc.rect(7, 30, doc.internal.pageSize.width - 15, 0.5, "FD");
+      // Define variables for wrapped text
       doc.setFontSize(12);
-      const maxWidth1 = 70;
+      const maxWidth1 = 100;
       const startX1 = 7;
       let startY1 = 35;
       const lineHeight1 = 4.2;
-      const longText1_4 = `${response?.data?.vendorAddress?.Name_exp_2}`;
-      // Function to render wrapped text
       doc.setFont("NotoSansThai"); // Set the font to use
+      const longText1_4 = `${response?.data?.section3?.vc_address || ""}`;
+
+      // const longText1_3 = ``;
+      // Function to render wrapped text
       function renderWrappedText1(
         doc,
         text,
@@ -1768,146 +1874,104 @@ const AccountDetails = () => {
         maxWidth1,
         lineHeight1
       );
-      doc.setFontSize(11); // Adjust font size for the next text block
+      doc.setFontSize(11);
+      let startDate = 28;
+      doc.text(response?.data?.section2?.Col3, 169, startDate);
       doc.setFontSize(10);
+      const startX2 = 120;
+      const startY2 = 35;
+
+      const section4_label = {
+        Row1: response?.data?.section4_label?.Row1,
+        Row2: response?.data?.section4_label?.Row2,
+        Row3: response?.data?.section4_label?.Row3,
+        Row4: response?.data?.section4_label?.Row4,
+      };
+
+      const section4_values = {
+        Row1: response?.data?.section4_values?.Row1,
+        Row2: response?.data?.section4_values?.Row2,
+        Row3: response?.data?.section4_values?.Row3,
+        Row4: response?.data?.section4_values?.Row4,
+      };
+
+      // Set line height
       const lineHeight = 5;
-      const maxWidthValue = 70;
 
-      function renderLabelAndValue(
-        doc,
-        label,
-        value,
-        labelX,
-        valueX,
-        yPosition,
-        maxWidth,
-        lineHeight,
-        alignRight = false
-      ) {
-        // Render the label on the left
-        doc.text(label, labelX, yPosition);
-        const valueLines = doc.splitTextToSize(value, maxWidth);
-        valueLines.forEach((line, index) => {
-          const yOffset = index * lineHeight;
-          let finalValueX = valueX;
-          if (alignRight) {
-            const textWidth = doc.getTextWidth(line);
-            finalValueX = valueX - textWidth;
-          }
-          doc.text(line, finalValueX, yPosition + yOffset);
-        });
-        return yPosition + (valueLines.length - 1) * lineHeight;
-      }
-      let tableEndY = 30;
-      let currentY = tableEndY + 4;
-      // Right side
-      let currentYRight = tableEndY + 4;
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Bank Name:",
-        `${response?.data?.bank_details?.bank_name}`,
-        130,
-        200,
-        currentYRight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      doc.setFont("NotoSansThai"); // Set the font to use
+      // Find max label width so values align properly
+      let maxLabelWidth = 0;
+      Object.values(section4_label).forEach((label) => {
+        const width = doc.getTextWidth(label);
+        if (width > maxLabelWidth) {
+          maxLabelWidth = width;
+        }
+      });
 
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Account Name:",
-        `${response?.data?.bank_details?.bank_account}`,
-        130,
-        200,
-        currentYRight + lineHeight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Account Number:",
-        `${response?.data?.bank_details?.bank_number}`,
-        130,
-        200,
-        currentYRight + lineHeight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Paid On:",
-        new Date(
-          `${response?.data?.bank_details?.Payment_Date}`
-        ).toLocaleDateString(),
-        130,
-        200,
-        currentYRight + lineHeight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      currentYRight = renderLabelAndValue(
-        doc,
-        "Paid With:",
-        `${response?.data?.bank_details?.bankAccount_name}`,
-        130,
-        200,
-        currentYRight + lineHeight,
-        maxWidthValue,
-        lineHeight,
-        true
-      );
-      // currentYRight = renderLabelAndValue(doc, "Loss/Gain on Exchange Rate:", "2123.12312", 100, 149, currentYRight + lineHeight, maxWidthValue, lineHeight);
-      const maxY = Math.max(startY1, currentYRight);
-      const helloYPosition = maxY + 2;
-      const rows = response?.data?.table_data.map((item, index) => ({
-        index: index + 1,
-        paidAmount: item.Date
-          ? new Date(item.Date).toLocaleDateString("en-GB") // Format as DD/MM/YYYY
-          : "",
-        docAcc: item["PO Number"],
-        invNum: item.Invoice_Number,
-        unit: item.FX,
-        invAmount: newFormatter5.format(item.Total_After_Tax),
-        detbit: item["Debit Note"],
-        net: item["Net Amount"] ? newFormatter5.format(item["Net Amount"]) : "",
-      }));
+      // Add padding after label
+      const labelColumnWidth = maxLabelWidth + 10;
+
+      // Start Y position
+      let y = startY2;
+
+      // Loop through rows
+      Object.keys(section4_label).forEach((key) => {
+        const label = section4_label[key];
+        const value = section4_values[key];
+
+        // Print label
+        doc.text(label, startX2, y);
+
+        // Print value (aligned)
+        doc.text(value, startX2 + labelColumnWidth, y);
+
+        // Next line
+        y += lineHeight;
+      });
+
+      // Save PDF
+      const newFormatter1 = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      });
+      const newFormatter5 = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      const noDecimal = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+
+      const yTop = Math.max(startY1, y); // Start Y position for the tabl
+
+      doc.setFillColor(33, 56, 99);
+      doc.rect(7, yTop-0.5, doc.internal.pageSize.width - 15, 0.1, "FD");
+      const rawTitle = response?.data?.section5_title?.Title || "";
+      const titleString = rawTitle.replace(/\s+/g, " ").trim(); // remove newlines & extra spaces
+      doc.setFontSize(12);
+      doc.text(titleString, 7, yTop + 5);
 
       doc.autoTable({
-        head: [
-          [
-            "#",
-            "Date",
-            "Document Number",
-            "Invoice Number",
-            "FX",
-            "Invoice Amount",
-            "Debit Note",
-            "Net Amount",
-          ],
-        ],
-        body: rows.map((row) => [
-          row.index,
-          row.paidAmount,
-          row.docAcc,
-          row.invNum,
-          row.unit,
-          row.invAmount,
-          row.detbit,
-          row.net,
-          row.paidAmount,
-        ]),
+        head: headers,
+        body: rows,
         columnStyles: {
-          3: { halign: "center" },
-          5: { halign: "right" },
-          7: { halign: "right" },
+          0: { halign: "center" },
+          1: { halign: "left", font: "NotoSansThai", fontSize: 10 },
+          2: { halign: "right", font: "NotoSansThai" },
+          3: { halign: "right", font: "NotoSansThai" },
+          4: { halign: "center", font: "NotoSansThai" },
+          5: { halign: "right", font: "NotoSansThai" },
+          6: { halign: "right", font: "NotoSansThai" },
+          7: { halign: "right", font: "NotoSansThai" },
+          8: { halign: "right", font: "NotoSansThai" },
+          9: { halign: "right", font: "NotoSansThai" },
         },
         startX: 0,
-        startY: helloYPosition,
+        startY: yTop + 8,
         margin: {
           left: 7,
           right: 7,
@@ -1926,8 +1990,7 @@ const AccountDetails = () => {
           lineColor: "#203764",
         },
       });
-
-      const tableEndYSlip = doc.lastAutoTable.finalY;
+      const tableEndY = doc.lastAutoTable.finalY;
       // autotable end
       doc.setFontSize(10);
       // Reusable function to render right-aligned text
@@ -1949,73 +2012,249 @@ const AccountDetails = () => {
       const fixedWidth = 150;
       const rightBoundary = 202.7;
       const labelX = 145;
-      let currentYSlip = tableEndYSlip + 5;
-      const totalPayAmount = parseFloat(
-        response?.data?.total_all?.["Apayment Amount"]
-          ? response.data.total_all["Apayment Amount"].replace(/,/g, "")
-          : 0 // Default value if undefined or null
-      );
-
-      const totalAmount = parseFloat(
-        response?.data?.total_all?.Total
-          ? response.data.total_all.Total.replace(/,/g, "")
-          : 0
-      );
-
-      // Render "Total"
-      const textTotal = newFormatter5.format(totalAmount);
-
+      let currentY = tableEndY + 5;
+      const textTotal = response?.data?.section6_values?.Row1 || "";
       renderRightAlignedText(
         doc,
-        "TOTAL",
+        response?.data?.section6_label?.Row1 || "",
         textTotal,
         labelX,
         rightBoundary,
         fixedWidth,
-        currentYSlip
+        currentY
       );
-      currentYSlip += 5;
-      const textTotalVat = newFormatter5.format(
-        parseFloat(response?.data?.total_all?.VAT?.replace(/,/g, "")) || 0
-      );
-
+      currentY += 5;
+      const textTotalVat = response?.data?.section6_values?.Row2 || "";
       renderRightAlignedText(
         doc,
-        "VAT",
+        response?.data?.section6_label?.Row2 || "",
         textTotalVat,
         labelX,
         rightBoundary,
         fixedWidth,
-        currentYSlip
+        currentY
       );
-      currentYSlip += 5;
-      const textTotalWht = newFormatter5.format(
-        parseFloat(response?.data?.total_all?.WHT?.replace(/,/g, "")) || 0
-      );
-
+      currentY += 5;
+      const textTotalWht = response?.data?.section6_values?.Row3 || "";
       renderRightAlignedText(
         doc,
-        "WHT",
+        response?.data?.section6_label?.Row3 || "",
         textTotalWht,
         labelX,
         rightBoundary,
         fixedWidth,
-        currentYSlip
+        currentY
       );
-      doc.rect(145, tableEndYSlip + 16.5, 58, 0.5, "FD");
-      currentYSlip += 5.5;
-      const textTotalPay = newFormatter5.format(totalPayAmount);
-
+      doc.rect(145, tableEndY + 16.5, 60, 0.5, "FD");
+      currentY += 6;
+      const textTotalPay = response?.data?.section6_values?.Row4 || "";
       renderRightAlignedText(
         doc,
-        "Payment Amount   ",
+        response?.data?.section6_label?.Row4 || "",
         textTotalPay,
         labelX,
         rightBoundary,
         fixedWidth,
-        currentYSlip
+        currentY
       );
-      doc.rect(145, tableEndYSlip + 22, 58, 0.5, "FD");
+      currentY += 5;
+      const textRounding = response?.data?.section6_values?.Row5 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.section6_label?.Row5 || "",
+
+        textRounding,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+
+      currentY += 5;
+      const textPayable = response?.data?.section6_values?.Row6 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.section6_label?.Row6 || "",
+        textPayable,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 6;
+      const pastPayment = response?.data?.section6_values?.Row7 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.section6_label?.Row7 || "",
+        pastPayment,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const row8 = response?.data?.section6_values?.Row8 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.section6_label?.Row8 || "",
+        row8,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const row9 = response?.data?.section6_values?.Row9 || "";
+
+      renderRightAlignedText(
+        doc,
+        response?.data?.section6_label?.Row9 || "",
+        row9,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      doc.rect(145, tableEndY + 33, 58, 0.5, "FD");
+      doc.setFontSize(11);
+      doc.text(
+        response?.data?.payment_title["Payment Details"] || "",
+        7,
+        tableEndY + 25
+      );
+      doc.setFontSize(10);
+      function renderLabelAndValue(doc, label, value, labelX, valueX, y) {
+        doc.text(label, labelX, y);
+        doc.text(value, valueX, y);
+      }
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row1 || "",
+        `${
+          response?.data?.payment_values?.Result1 || ""
+            ? response?.data?.payment_values?.Result1 || ""
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 30
+      );
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row2 || "",
+        `${
+          response?.data?.payment_values?.Result2 || ""
+            ? response?.data?.payment_values?.Result2 || ""
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 35
+      );
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row3 || "",
+        `${
+          response?.data?.payment_values?.Result3 || ""
+            ? response?.data?.payment_values?.Result3 || ""
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 40
+      );
+
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row4 || "",
+        response?.data?.payment_values?.Result4 || "",
+        7,
+        40,
+        tableEndY + 45
+      );
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row5 || "",
+        response?.data?.payment_values?.Result5 || "",
+        7,
+        40,
+        tableEndY + 50
+      );
+
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row6 || "",
+        response?.data?.payment_values?.Result6 || "",
+        7,
+        40,
+        tableEndY + 55
+      );
+      // bottom part
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text(response?.data?.preStatementTitle?.Statement, 7, tableEndY + 60);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const section8Labels = {
+        Col1: response?.data?.preStatement?.Col1 || "",
+        Col2: response?.data?.preStatement?.Col2 || "",
+        Col3: response?.data?.preStatement?.Col3 || "",
+        Col4: response?.data?.preStatement?.Col4 || "",
+        Col5: response?.data?.preStatement?.Col5 || "",
+        Col6: response?.data?.preStatement?.Col6 || "",
+        Col7: response?.data?.preStatement?.Row7 || "",
+      };
+
+      // Column values (static)
+      const section8Values = {
+        Col1: response?.data?.preStatementDetails?.Col1 || "",
+        Col2: response?.data?.preStatementDetails?.Col2 || "",
+        Col3: response?.data?.preStatementDetails?.Col3 || "",
+        Col4: response?.data?.preStatementDetails?.Col4 || "",
+        Col5: response?.data?.preStatementDetails?.Col5 || "",
+        Col6: response?.data?.preStatementDetails?.Col6 || "",
+        Col7: response?.data?.preStatementDetails?.Col7 || "",
+      };
+      const headers1 = Object.values(section8Labels);
+      const data = [Object.values(section8Values)];
+
+      doc.autoTable({
+        startY: tableEndY + 65, // Same as your start offset
+        head: [headers1],
+        body: data,
+        theme: "grid",
+        columnStyles: {
+          0: { halign: "center" },
+          1: { halign: "center" },
+          2: { halign: "center" },
+          3: { halign: "center" },
+          4: { halign: "center" },
+          5: { halign: "center" },
+          6: { halign: "center" },
+        },
+        startX: 0,
+        margin: {
+          left: 7,
+          right: 7,
+        },
+        styles: {
+          textColor: "#000000",
+          cellWidth: "wrap",
+          valign: "middle",
+          lineWidth: 0.01,
+          lineColor: [32, 55, 100],
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: "#000000",
+          halign: "center",
+          fontStyle: "normal",
+        },
+      });
+
       const addPageNumbers = (doc) => {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
@@ -2025,13 +2264,11 @@ const AccountDetails = () => {
         }
       };
       addPageNumbers(doc);
-      // Output PDF as a Blob and open it in a new tab
       const pdfBlob = doc.output("blob");
-      // Upload the PDF to the server
       await uploadPDF1(pdfBlob, Expense_Payment_ID);
     } catch (error) {
       console.error("Error fetching statement:", error);
-      toast.error(t("genericError"));
+      toast.error("Something went Wrong ");
       // Handle the error as needed
     }
   };

@@ -4,7 +4,12 @@ import Barcode from "react-barcode";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../Url/Url";
+import { API_IMAGE_URL } from "../../Url/Url";
 import { Card } from "../../card";
+import logo from "../../assets/logoNew.png";
+
+import jsPDF from "jspdf";
+import NotoSansThaiRegular from "../../assets/fonts/NotoSansThai-Regular-normal";
 import { TableView } from "../table";
 import { Button, Modal } from "react-bootstrap";
 import { useQuery } from "react-query";
@@ -356,9 +361,7 @@ const CombinePayment = () => {
             <button
               type="button"
               className="SvgAnchor"
-              data-bs-toggle="modal"
-              data-bs-target="#modalCombine"
-              // onClick={() => everyDataSet(a)}
+              onClick={() => handleSubmit7(a)}
             >
               <svg
                 className="SvgQuo"
@@ -401,6 +404,577 @@ const CombinePayment = () => {
     ],
     [t]
   );
+
+  const handleSubmit7 = async (a) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/PDFCPN`, {
+        CPN: a.ID,
+        LANG: 1,
+      });
+      console.log(response);
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>");
+      const section4Labels = response?.data?.section6_label || {};
+      const section4Values = response?.data?.section6_values || [];
+      // Convert section4_label values into header array
+      const headers = [Object.values(section4Labels)];
+      // Convert section4_values into rows
+      const rows = section4Values.map((item) => Object.values(item));
+
+      const doc = new jsPDF();
+      doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular);
+      doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
+      // Draw the top line and center the text "Receipt"
+      const imgData = logo;
+      doc.addImage(imgData, "JPEG", 6, 2, 20, 20);
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${response?.data?.Company_Address?.Line_1}`, 30, 8);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${response?.data?.Company_Address?.Line_2}`, 30, 12);
+      const longTextOne = `${response?.data?.Company_Address?.Line_3}`;
+      const maxWidthOne = 90;
+      const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
+      let startXOne = 30;
+      let startYOne = 16;
+      linesOne.forEach((lineOne, index) => {
+        doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
+      });
+
+      doc.setFont("helvetica", "bold"); // Set font to bold
+      doc.setFontSize(19);
+      const purchaseOrderTitle =
+        response?.data?.section1_Title?.Title || "Combined Payment";
+      const pageWidth1 = doc.internal.pageSize.getWidth();
+
+      const textWidth1 = doc.getTextWidth(purchaseOrderTitle);
+
+      // Calculate X position: (page width - margin - text width)
+      const marginRight = 7;
+      const x = pageWidth1 - marginRight - textWidth1;
+
+      // Now draw text at top-right (y = 11 as in your code)
+      doc.text(purchaseOrderTitle, x, 11);
+      doc.setFont("helvetica", "normal"); // Set font to bold
+      doc.setFillColor(33, 56, 99);
+      doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(12);
+      doc.text(response?.data?.section2?.Col1 || "", 7, 28);
+      const poNum = response?.data?.section2?.Col2 || "";
+      const pageWidth = doc.internal.pageSize.width;
+      const textWidth = doc.getTextWidth(poNum);
+      const xPosition = (pageWidth - textWidth) / 2;
+      doc.text(poNum, xPosition, 28);
+      // doc.text("Date: ", 169, 28);
+      doc.setFillColor(33, 56, 99);
+      doc.rect(7, 30, doc.internal.pageSize.width - 15, 0.5, "FD");
+      // Define variables for wrapped text
+      doc.setFontSize(12);
+
+      const maxWidth1 = 100;
+      const startX1 = 7;
+      let startY1 = 35;
+      const lineHeight1 = 4.2;
+      doc.setFont("NotoSansThai"); // Set the font to use
+      const longText1_4 = `${response?.data?.section3?.vc_address || ""}`;
+
+      // const longText1_3 = ``;
+      // Function to render wrapped text
+      function renderWrappedText1(
+        doc,
+        text,
+        startX,
+        startY,
+        maxWidth,
+        lineHeight
+      ) {
+        const lines = doc.splitTextToSize(text, maxWidth);
+        lines.forEach((line, index) => {
+          doc.text(line, startX, startY + index * lineHeight);
+        });
+        return startY + lines.length * lineHeight;
+      }
+      // Render the wrapped text sections
+      doc.setFontSize(12);
+      startY1 = renderWrappedText1(
+        doc,
+        longText1_4,
+        startX1,
+        startY1,
+        maxWidth1,
+        lineHeight1
+      );
+      doc.setFontSize(11);
+      let startDate = 28;
+
+      doc.text(response?.data?.section2?.Col3 || "", 169, startDate);
+      doc.setFontSize(10);
+      const startX2 = 120;
+      const startY2 = 35;
+
+      const section4_label = {
+        Row1: response?.data?.section4_label?.Row1 || "",
+        Row2: response?.data?.section4_label?.Row2 || "",
+        Row3: response?.data?.section4_label?.Row3 || "",
+        Row4: response?.data?.section4_label?.Row4 || "",
+      };
+
+      const section4_values = {
+        Row1: response?.data?.section4_values?.Row1 || "",
+        Row2: response?.data?.section4_values?.Row2 || "",
+        Row3: response?.data?.section4_values?.Row3 || "",
+        Row4: response?.data?.section4_values?.Row4 || "",
+      };
+
+      // Set line height
+      const lineHeight = 5;
+      // Find max label width so values align properly
+      let maxLabelWidth = 0;
+      Object.values(section4_label).forEach((label) => {
+        const width = doc.getTextWidth(label);
+        if (width > maxLabelWidth) {
+          maxLabelWidth = width;
+        }
+      });
+
+      // Add padding after label
+      const labelColumnWidth = maxLabelWidth + 10;
+
+      // Start Y position
+      let y = startY2;
+
+      // Loop through rows
+      Object.keys(section4_label).forEach((key) => {
+        const label = section4_label[key];
+        const value = section4_values[key];
+
+        // Print label
+        doc.text(label, startX2, y);
+
+        // Print value (aligned)
+        doc.text(value, startX2 + labelColumnWidth, y);
+
+        // Next line
+        y += lineHeight;
+      });
+      const finalY = y;
+      const yTop =
+        longText1_4 && longText1_4.trim() !== ""
+          ? Math.max(startY1, finalY)
+          : finalY;
+      // Save PDF
+      const newFormatter1 = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      });
+      const newFormatter5 = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      const noDecimal = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+      doc.setFillColor(33, 56, 99);
+      doc.rect(7, yTop + 2, doc.internal.pageSize.width - 15, 0.1, "FD");
+      const rawTitle = response?.data?.section5_values?.Title || "";
+      const titleString = rawTitle.replace(/\s+/g, " ").trim(); // remove newlines & extra spaces
+      doc.setFontSize(12);
+      doc.text(titleString, 7, yTop + 6);
+
+      doc.autoTable({
+        head: headers,
+        body: rows,
+        columnStyles: {
+          0: { halign: "center" },
+          1: { halign: "left", font: "NotoSansThai", fontSize: 10 },
+          2: { halign: "right", font: "NotoSansThai" },
+          3: { halign: "right", font: "NotoSansThai" },
+          4: { halign: "center", font: "NotoSansThai" },
+          5: { halign: "right", font: "NotoSansThai" },
+          6: { halign: "right", font: "NotoSansThai" },
+          7: { halign: "right", font: "NotoSansThai" },
+          8: { halign: "right", font: "NotoSansThai" },
+          9: { halign: "right", font: "NotoSansThai" },
+        },
+        startX: 0,
+        startY: yTop + 7,
+        margin: {
+          left: 7,
+          right: 7,
+        },
+        tableWidth: "auto",
+        headStyles: {
+          fillColor: "#203764",
+          textColor: "#FFFFFF",
+          halign: "center",
+        },
+        styles: {
+          textColor: "#000000",
+          cellWidth: "wrap",
+          valign: "middle",
+          lineWidth: 0.1,
+          lineColor: "#203764",
+        },
+      });
+      const tableEndY = doc.lastAutoTable.finalY;
+      // autotable end
+      doc.setFontSize(10);
+      // Reusable function to render right-aligned text
+      function renderRightAlignedText(
+        doc,
+        label,
+        formattedText,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        y
+      ) {
+        doc.text(label, labelX, y); // Render label
+        const textWidth = doc.getTextWidth(formattedText);
+        const rightAlignedX = rightBoundary - Math.min(textWidth, fixedWidth); // Calculate the right-aligned X position
+        doc.text(formattedText, rightAlignedX, y); // Remnder the value
+      }
+      // Constants
+
+      const fixedWidth = 150;
+      const rightBoundary = 202.7;
+      const labelX = 145;
+      let currentY = tableEndY + 5;
+      const textTotal = response?.data?.total_value?.Row1 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row1 || "",
+        textTotal,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const textTotalVat = response?.data?.total_value?.Row2 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row2 || "",
+        textTotalVat,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const textTotalWht = response?.data?.total_value?.Row3 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row3 || "",
+        textTotalWht,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      doc.rect(145, tableEndY + 16.5, 60, 0.5, "FD");
+      currentY += 6;
+      const textTotalPay = response?.data?.total_value?.Row4 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row4 || "",
+        textTotalPay,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const textRounding = response?.data?.total_value?.Row5 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row5 || "",
+
+        textRounding,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+
+      currentY += 5;
+      const textPayable = response?.data?.total_value?.Row6 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row6 || "",
+        textPayable,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 6;
+      const pastPayment = response?.data?.total_value?.Row7 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row7 || "",
+        pastPayment,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+      currentY += 5;
+      const row8 = response?.data?.total_value?.Row8 || "";
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row8 || "",
+        row8,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+
+      currentY += 5;
+      const row9 = response?.data?.total_value?.Row9 || "";
+
+      renderRightAlignedText(
+        doc,
+        response?.data?.total_lable?.Row9 || "",
+        row9,
+        labelX,
+        rightBoundary,
+        fixedWidth,
+        currentY
+      );
+
+      doc.rect(145, tableEndY + 33, 58, 0.5, "FD");
+      doc.setFontSize(11);
+
+      doc.text(
+        response?.data?.payment_title["Payment Details"] || "",
+        7,
+        tableEndY + 25
+      );
+
+      doc.setFontSize(10);
+      function renderLabelAndValue(doc, label, value, labelX, valueX, y) {
+        doc.text(label, labelX, y);
+        doc.text(value, valueX, y);
+      }
+      console.log(">>>>>>>>>>>>>>>>>>>>>>");
+
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row1 || "",
+        `${
+          response?.data?.payment_values?.Result1 || ""
+            ? response?.data?.payment_values?.Result1 || ""
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 30
+      );
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row2 || "",
+        `${
+          response?.data?.payment_values?.Result2 || ""
+            ? response?.data?.payment_values?.Result2 || ""
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 35
+      );
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row3 || "",
+        `${
+          response?.data?.payment_values?.Result3 || ""
+            ? response?.data?.payment_values?.Result3 || ""
+            : ""
+        }`,
+        7,
+        40,
+        tableEndY + 40
+      );
+
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row4 || "",
+        response?.data?.payment_values?.Result4 || "",
+        7,
+        40,
+        tableEndY + 45
+      );
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row5 || "",
+        response?.data?.payment_values?.Result5 || "",
+        7,
+        40,
+        tableEndY + 50
+      );
+
+      renderLabelAndValue(
+        doc,
+        response?.data?.payment_label?.row6 || "",
+        response?.data?.payment_values?.Result6 || "",
+        7,
+        40,
+        tableEndY + 55
+      );
+      // bottom part
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      console.log(">>>>>>>>>>>>>>>>>>>>>");
+
+      doc.text(
+        response?.data?.preStatementTitle?.Statement || "",
+        7,
+        tableEndY + 60
+      );
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+
+      const section8Labels = {
+        Col1: response?.data?.preStatement?.Col1 || "",
+        Col2: response?.data?.preStatement?.Col2 || "",
+        Col3: response?.data?.preStatement?.Col3 || "",
+        Col4: response?.data?.preStatement?.Col4 || "",
+        Col5: response?.data?.preStatement?.Col5 || "",
+        Col6: response?.data?.preStatement?.Col6 || "",
+        Col7: response?.data?.preStatement?.Row7 || "",
+      };
+
+      // Column values (static)
+      const section8Values = {
+        Col1: response?.data?.preStatementDetails?.Col1 || "",
+        Col2: response?.data?.preStatementDetails?.Col2 || "",
+        Col3: response?.data?.preStatementDetails?.Col3 || "",
+        Col4: response?.data?.preStatementDetails?.Col4 || "",
+        Col5: response?.data?.preStatementDetails?.Col5 || "",
+        Col6: response?.data?.preStatementDetails?.Col6 || "",
+        Col7: response?.data?.preStatementDetails?.Col7 || "",
+      };
+      const headers1 = Object.values(section8Labels);
+      const data = [Object.values(section8Values)];
+
+      doc.autoTable({
+        startY: tableEndY + 65, // Same as your start offset
+        head: [headers1],
+        body: data,
+        theme: "grid",
+        columnStyles: {
+          0: { halign: "center" },
+          1: { halign: "center" },
+          2: { halign: "center" },
+          3: { halign: "center" },
+          4: { halign: "center" },
+          5: { halign: "center" },
+          6: { halign: "center" },
+        },
+        startX: 0,
+        margin: {
+          left: 7,
+          right: 7,
+        },
+        styles: {
+          textColor: "#000000",
+          cellWidth: "wrap",
+          valign: "middle",
+          lineWidth: 0.01,
+          lineColor: [32, 55, 100],
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: "#000000",
+          halign: "center",
+          fontStyle: "normal",
+        },
+      });
+
+      const startOffset = 65;
+      // // Render section 8
+      // doc.text(section8Labels.Col1, 7, tableEndY + startOffset);
+      // doc.text(section8Values.Col1, 7, tableEndY + startOffset + 5);
+
+      // doc.text(section8Labels.Col2, 49, tableEndY + startOffset);
+      // doc.text(section8Values.Col2, 49, tableEndY + startOffset + 5);
+
+      // doc.text(section8Labels.Col3, 75, tableEndY + startOffset);
+      // doc.text(section8Values.Col3, 75, tableEndY + startOffset + 5);
+
+      // doc.text(section8Labels.Col4, 101, tableEndY + startOffset);
+      // doc.text(section8Values.Col4, 101, tableEndY + startOffset + 5);
+
+      // doc.text(section8Labels.Col5, 127, tableEndY + startOffset);
+      // doc.text(section8Values.Col5, 127, tableEndY + startOffset + 5);
+
+      // doc.text(section8Labels.Col6, 153, tableEndY + startOffset);
+      // doc.text(section8Values.Col6, 153, tableEndY + startOffset + 5);
+
+      // doc.text(section8Labels.Col7, 179, tableEndY + startOffset);
+      // doc.text(section8Values.Col7, 179, tableEndY + startOffset + 5);
+
+      const addPageNumbers = (doc) => {
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          const pageWidth = doc.internal.pageSize.width;
+          doc.text(`${i} out of ${pageCount}`, pageWidth - 25, 3.1);
+        }
+      };
+      addPageNumbers(doc);
+
+      // Output PDF as a Blob and open it in a new tab
+      const pdfBlob = doc.output("blob");
+
+      // window.open(pdfUrl);
+      await uploadPDF5(pdfBlob, a);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
+  };
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+  };
+  const uploadPDF5 = async (pdfBlob, a) => {
+    // Generate a unique date-time string
+    const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
+
+    const formData = new FormData();
+    formData.append(
+      "document",
+      pdfBlob,
+      `${a?.CPNCODE || "default"}_Combined_payment_${dateTime}.pdf`
+    );
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
+      console.log(response);
+      if (response.data.success) {
+        console.log("PDF uploaded successfully");
+        window.open(
+          `${API_IMAGE_URL}${
+            a?.CPNCODE || "default"
+          }_Combined_payment_${dateTime}.pdf`
+        );
+      } else {
+        console.log("Failed to upload PDF");
+      }
+    } catch (error) {
+      console.error("Error uploading PDF:", error);
+    }
+  };
+
   const handlePaymentChange = (field, value) => {
     // Update state
     switch (field) {

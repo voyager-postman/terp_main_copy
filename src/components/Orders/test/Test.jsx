@@ -235,9 +235,24 @@ const Test = () => {
                       <i className="mdi mdi-note-outline" />
                     </button>
                   )}
-                  {(+a.Status_value === 4 ||
+
+                  {+a.Status_value === 6 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          generateInvoice(a.Order_ID, a.FX_ID, a.O_FX_Rate)
+                        }
+                      >
+                        <i className="mdi mdi-check" />
+                      </button>
+                    </>
+                  )}
+
+                  {/* {(+a.Status_value === 4 ||
                     +a.Status_value === 5 ||
-                    +a.Status_value >= 6) && (
+                    +a.Status_value >= 6) && ( */}
+                  {+a.Status_value === 7 && (
                     <button
                       type="button"
                       style={{
@@ -342,6 +357,38 @@ const Test = () => {
   useEffect(() => {
     oneQoutationDAta();
   }, []);
+  const generateInvoice = (id, id1, id2) => {
+    axios
+      .post(`${API_BASE_URL}/GenerateInvoiceTick`, {
+        order_id: id,
+        fx_id: id1,
+        fx_rate: id2,
+        USER: localStorage.getItem("id"),
+      })
+      .then((response) => {
+        if (response?.data?.success == false) {
+          toast.warn(response.data.checkmessage, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+          orderData()
+          oneQoutationDAta();
+
+        }
+        console.log(response);
+        if (response?.data?.success == true) {
+          toast.success(response.data.message, {
+            autoClose: 1000,
+            theme: "colored",
+          });
+          orderData()
+           oneQoutationDAta();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const handleStartDateChange = (date) => {
     console.log(date);
     setStartDate(date);
@@ -1648,26 +1695,25 @@ const Test = () => {
     const cnfFXTextNew = invoiceResponse?.data?.paymentValues?.Row3 || "";
     doc.text(cnfFXTextNew, rightAlignX - textWidthCNFFX, endY + 17);
     doc.rect(147, endY + 18, 55.5, 0.5, "FD");
- const pageWidth = doc.internal.pageSize.getWidth();
+    const pageWidth = doc.internal.pageSize.getWidth();
     const marginX = 7; // left & right margin
     const usableWidth = pageWidth - marginX * 2;
- 
+
     const notesTitle = invoiceResponse?.data?.noteLabels?.Notes;
     const notesText = invoiceResponse?.data?.noteValues?.NOTES;
- 
+
     let notesY = endY + 26;
- 
+
     if (notesText && notesText.trim() !== "") {
       doc.setDrawColor(32, 55, 100);
       doc.setLineWidth(0.2); // thickness (like “height” of the line)
       doc.line(marginX, notesY, pageWidth - marginX, notesY); // draw horizontal line
- 
+
       doc.text(notesTitle, marginX, notesY + 4);
       let splitNotes = doc.splitTextToSize(notesText, usableWidth);
       doc.text(splitNotes, marginX, notesY + 9);
     }
- 
- 
+
     //*****************************************************************************************//
 
     // Custom page number function

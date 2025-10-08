@@ -696,7 +696,7 @@ const PurchaseView = () => {
               {/* <button className="btn btn-primary" type="submit" name="signup">
                 Create
               </button> */}
-              <Link className="btn btn-danger" to={"/purchase_orders"}>
+              <Link className="btn btn-danger" to={"/reciept"}>
                 {t("close")}
               </Link>
             </div>
