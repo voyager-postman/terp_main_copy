@@ -1,0 +1,3063 @@
+ import { useForm } from "@tanstack/react-form";
+ import axios from "axios";
+ import jsPDF from "jspdf";
+ import "jspdf-autotable";
+ import { useMemo, useState, useEffect } from "react";
+ import { useQuery } from "react-query";
+ import { Link, useNavigate } from "react-router-dom";
+ import { toast } from "react-toastify";
+ import { API_BASE_URL } from "../../Url/Url";
+ import { API_IMAGE_URL } from "../../Url/Url";
+ import { Card } from "../../card";
+ import MySwal from "../../swal";
+ import { ComboBox } from "../combobox";
+ import { TableView } from "../table";
+ import logo from "../../assets/logoT.jpg";
+ import logo1 from "../../assets/logoNew.png";
+ import NotoSansThaiRegular from "../../assets/fonts/NotoSansThai-Regular-normal";
+ import Box from "@mui/material/Box";
+ import InputLabel from "@mui/material/InputLabel";
+ import MenuItem from "@mui/material/MenuItem";
+ import { Button, Modal } from "react-bootstrap";
+ import FormControl from "@mui/material/FormControl";
+ import Select from "@mui/material/Select";
+ import CloseIcon from "@mui/icons-material/Close";
+ import DatePicker from "react-datepicker";
+ import "react-datepicker/dist/react-datepicker.css";
+ import moment from "moment";
+ import { useTranslation } from "react-i18next";
+ 
+ import { FaCalendarAlt } from "react-icons/fa"; // Import calendar icon
+ const PriceCheck = () => {
+   const { t, i18n } = useTranslation("global");
+ 
+   const [isLoading, setIsLoading] = useState(false);
+ 
+   const CustomInput = ({ value, onClick }) => (
+     <div
+       className="custom-input"
+       onClick={onClick}
+       style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+     >
+       <input
+         type="text"
+         value={value}
+         readOnly
+         style={{
+           padding: "10px",
+           paddingLeft: "35px",
+           width: "250px",
+           border: "1px solid #ccc",
+           borderRadius: "5px",
+           marginBottom: "unset !important",
+         }}
+       />
+       <FaCalendarAlt
+         style={{
+           position: "absolute",
+           right: "10px",
+           fontSize: "18px",
+           color: "#888",
+           marginBottom: "unset !important",
+         }}
+       />
+     </div>
+   );
+   const loadingModal = MySwal.mixin({
+     title: "Loading...",
+     didOpen: () => {
+       MySwal.showLoading();
+     },
+     showCancelButton: false,
+     showConfirmButton: false,
+     allowOutsideClick: false,
+   });
+   const [selectedLinerId, setSelectedLinerId] = useState(null);
+   const [totalDetails, setTotalDetails] = useState("");
+   const [newDate, setNewDate] = useState("");
+   const [columns, setColumns] = useState([]);
+   const [titleData, setTitleData] = useState("");
+ 
+   const [orderId, setOrderId] = useState("");
+   const [deleteOrderId, setDeleteOrderId] = useState("");
+   const [startDate, setStartDate] = useState(null);
+   const [idData, setIdData] = useState("");
+   const [startDate1, setStartDate1] = useState(null);
+   const [startDate2, setStartDate2] = useState(null);
+   const [Journey, setJourney] = useState([]);
+   const [notes, setNotes] = useState("");
+   const [notes1, setNotes1] = useState("");
+   const [notes2, setNotes2] = useState("");
+   const [show, setShow] = useState(false);
+   const [stock, setStock] = useState("");
+   const [chargeVolume, setChargeVolume] = useState(false);
+ 
+   const handleClose = () => setShow(false);
+   const [journeyId, setJourneyId] = useState(null);
+   console.log(selectedLinerId);
+   const navigate = useNavigate();
+   // const { data, refetch } = useQuery("getOrders");
+ 
+   const handleChange5 = (e) => {
+     setInputValue(e.target.value); // Update state with the input value
+   };
+   const [status, setStatus] = useState("");
+ 
+   const handleChange = (event) => {
+     setStatus(event.target.value);
+   };
+ 
+   const [data, setData] = useState([]);
+ 
+   // const orderData = () => {
+   //   axios.get(`${API_BASE_URL}/OrderEN`).then((res) => {
+   //     console.log(res);
+   //     setData(res.data.data || []);
+   //   });
+   // };
+ 
+   const orderData = () => {
+     axios
+       .get(`${API_BASE_URL}/OrdersPricecheck`)
+       .then((res) => {
+         console.log(res);
+ 
+         const { head, data, title } = res.data;
+         setTitleData(title);
+         // Remove unwanted columns from table (Order_ID, Status_value)
+         const columnsToHide = ["Order_ID", "Status_value"];
+ 
+         // Create dynamic columns excluding hidden ones
+         const dynamicColumns = Object.keys(head)
+           .filter((key) => !columnsToHide.includes(key))
+           .map((key) => ({
+             Header: t(head[key]), // Translate header if needed
+             accessor: key,
+           }));
+ 
+         dynamicColumns.push({
+           Header: t("actions"),
+       accessor: (a) => (
+             <div className="editIcon">
+               {+a.is_deleted === 1 ? (
+                 <button
+                   type="button"
+                   data-bs-toggle="modal"
+                   data-bs-target="#exampleModal2"
+                   onClick={() => setNotes2(a.deleted_note)}
+                 >
+                   <i className="mdi mdi-eye" />
+                 </button>
+               ) : (
+                 <Link
+                   to="/order_view"
+                   state={{ from: { ...a, isReadOnly: true } }}
+                 >
+                   {/* <i className="mdi mdi-eye" /> */}
+                 </Link>
+               )}
+ 
+               {+a.is_deleted !== 1 && (
+                 <>
+                   {(+a.Status_value === 3 ||
+                     +a.Status_value === 4 ||
+                     +a.Status_value === 5 ||
+                     +a.Status_value === 6) && (
+                     <>
+                         <Link to="/update_price_check" state={{ from: { ...a } }}>
+                         <i className="mdi mdi-pencil" />
+                       </Link>
+                     </>
+                   )}
+                   {/* {(+a.Status_value === 3 ||
+                     +a.Status_value === 4 ||
+                     +a.Status_value === 5 ||
+                     +a.Status_value >= 6) && (
+                     <button type="button" onClick={() => performaOrder(a)}>
+                       {" "}
+                       <i className="fi fi-sr-square-p"></i>
+                     </button>
+                   )}
+                   {(+a.Status_value === 4 ||
+                     +a.Status_value === 5 ||
+                     +a.Status_value >= 6) && (
+                     <button type="button" onClick={() => operationPdfTest(a)}>
+                       {" "}
+                       <i class="fi fi-sr-square-o"></i>
+                     </button>
+                   )} */}
+                   {(+a.Status_value === 4 ||
+                     +a.Status_value === 5 ||
+                     +a.Status_value === 6) && (
+                     <button type="button" onClick={() => generatePdf2(a)}>
+                       {" "}
+                       <svg
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 200 80" // scalable, you can change width/height via props or CSS
+                         className="customIcon"
+                       >
+                         <rect
+                           x="5"
+                           y="5"
+                           rx="15"
+                           ry="15"
+                           width="190"
+                           height="70"
+                           fill="none"
+                           stroke="#203764" // ✅ border color
+                           strokeWidth="8" // ✅ thickness like your image
+                         />
+                         <text
+                           x="50%"
+                           y="50%"
+                           textAnchor="middle"
+                           dominantBaseline="middle"
+                           fontSize="28"
+                           fontWeight="bold"
+                           fill="#203764" // ✅ text color same as border
+                           fontFamily="Arial, sans-serif"
+                         >
+                           CUSTOMS
+                         </text>
+                       </svg>
+                     </button>
+                   )}
+                   {/* {(+a.Status_value === 4 ||
+                     +a.Status_value === 5 ||
+                     +a.Status_value === 6) && (
+                     <button
+                       type="button"
+                       data-bs-toggle="modal"
+                       data-bs-target="#exampleModal"
+                       onClick={() => inventoryBoxes(a.Order_ID)}
+                     >
+                       {" "}
+                       <i className="mdi mdi-note-outline" />
+                     </button>
+                   )} */}
+ 
+                   {+a.Status_value === 6 && (
+                     <>
+                       <button
+                         type="button"
+                         onClick={() =>
+                           generateInvoice(a.Order_ID, a.FX_ID, a.O_FX_Rate)
+                         }
+                       >
+                         <i className="mdi mdi-check" />
+                       </button>
+                     </>
+                   )}
+ 
+                   {/* {(+a.Status_value === 4 ||
+                     +a.Status_value === 5 ||
+                     +a.Status_value >= 6) && ( */}
+                   {+a.Status_value === 7 && (
+                     <button
+                       type="button"
+                       style={{
+                         width: "20px",
+                         color: "#203764",
+                         fontSize: "22px",
+                         marginTop: "10px",
+                       }}
+                       onClick={() => handleEditClick1(a.Order_ID)}
+                     >
+                       <i
+                         className="mdi mdi-content-copy"
+                         type="button"
+                         data-bs-toggle="modal"
+                         data-bs-target="#consigneeOne"
+                       />{" "}
+                     </button>
+                   )}
+                   {(+a.Status_value === 4 ||
+                     +a.Status_value === 5 ||
+                     +a.Status_value === 6) && (
+                     <button
+                       type="button"
+                       onClick={() => openModal(a.Order_ID, a.Consignee_ID)}
+                     >
+                       <i className="mdi mdi-airplane-clock" />
+                     </button>
+                   )}
+                   {/* {(+a.Status_value === 3 ||
+                     +a.Status_value === 4 ||
+                     +a.Status_value === 5 ||
+                     +a.Status_value === 6) && (
+                     <button
+                       type="button"
+                       data-bs-toggle="modal"
+                       data-bs-target="#exampleModal1"
+                       onClick={() => setDeleteOrderId(a.Order_ID)}
+                     >
+                       <i className="mdi mdi-delete " />
+                     </button>
+                   )}
+  */}
+                   {+a.Status_value === 3 && (
+                     <button type="button" onClick={() => CheckBox(a.Order_ID)}>
+                       <i
+                         className="mdi mdi-check"
+                         style={{
+                           width: "20px",
+                           color: "#203764",
+                           fontSize: "22px",
+                           marginTop: "10px",
+                         }}
+                       />
+                     </button>
+                   )}
+                 </>
+               )}
+             </div>
+           ),
+         });
+ 
+         setColumns(dynamicColumns);
+         setData(data || []);
+       })
+       .catch((err) => {
+         console.error("Error fetching quotations:", err);
+       });
+   };
+   useEffect(() => {
+     orderData();
+   }, []);
+   const handleEditClick1 = async (quotation_id) => {
+     setIdData(quotation_id);
+   };
+   const [isOpenModal, setIsOpenModal] = useState(false);
+ 
+   const { data: liner } = useQuery("getLiner");
+ 
+   const [id, setID] = useState("");
+   const [consigneeId, setConsigneeId] = useState("");
+   const oneQoutationDAta = () => {
+     axios
+       .get(`${API_BASE_URL}/NewgetOrdersById`, {
+         params: {
+           order_id: id,
+         },
+       })
+       .then((response) => {
+         console.log(response);
+         setTotalDetails(response.data.data);
+         setStartDate(new Date(response.data.data.load_date));
+         setStartDate1(new Date(response.data.data.Ship_date));
+         setStartDate2(new Date(response.data.data.Arrival_date));
+       })
+       .catch((e) => {
+         console.log(e);
+       });
+   };
+   useEffect(() => {
+     oneQoutationDAta();
+   }, [id]);
+   useEffect(() => {
+     oneQoutationDAta();
+   }, []);
+   const generateInvoice = (id, id1, id2) => {
+     axios
+       .post(`${API_BASE_URL}/GenerateInvoiceTick`, {
+         order_id: id,
+         fx_id: id1,
+         fx_rate: id2,
+         USER: localStorage.getItem("id"),
+       })
+       .then((response) => {
+         if (response?.data?.success == false) {
+           toast.warn(response.data.checkmessage, {
+             autoClose: 1000,
+             theme: "colored",
+           });
+           orderData()
+           oneQoutationDAta();
+ 
+         }
+         console.log(response);
+         if (response?.data?.success == true) {
+           toast.success(response.data.message, {
+             autoClose: 1000,
+             theme: "colored",
+           });
+           orderData()
+            oneQoutationDAta();
+         }
+       })
+       .catch((error) => {
+         console.log(error);
+       });
+   };
+   const handleStartDateChange = (date) => {
+     console.log(date);
+     setStartDate(date);
+   };
+   const handleStartDateChange1 = (date) => {
+     console.log(date);
+     setStartDate1(date);
+   };
+   const handleStartDateChange2 = (date) => {
+     console.log(date);
+     setStartDate2(date);
+   };
+ 
+   console.log(totalDetails);
+   const [inputValue, setInputValue] = useState("");
+   useEffect(() => {
+     if (totalDetails) {
+       setInputValue(totalDetails?.Customer_ref || ""); // Update inputValue when totalDetails changes
+     }
+   }, [totalDetails]);
+   const form = useForm({
+     defaultValues: {
+       Liner: totalDetails?.Liner_ID || "",
+       journey_number: totalDetails?.journey_id || "",
+       Customer_ref: inputValue,
+       bl: totalDetails?.BL || "",
+       // Customer_ref: totalDetails?.Customer_ref || "",
+       Load_date: moment(startDate).format("YYYY-MM-DD"),
+       Load_time: totalDetails?.Load_time || "",
+       Ship_date: moment(startDate1).format("YYYY-MM-DD"),
+       ETD: totalDetails?.ETD || "",
+       Arrival_date: moment(startDate2).format("YYYY-MM-DD"),
+       ETA: totalDetails?.ETA || "",
+     },
+ 
+     onSubmit: async ({ value }) => {
+       if (totalDetails?.Order_ID) {
+         try {
+           await axios.post(`${API_BASE_URL}/NewupdateOrderFreight`, {
+             order_id: totalDetails?.Order_ID,
+             consignee_id: consigneeId,
+             ...value,
+           });
+           oneQoutationDAta();
+           toast.success(t("orderUpdateSuccess"));
+           setInputValue("");
+           orderData();
+           refetch();
+         } catch (e) {
+           console.log(e);
+           // toast.error("Something went wrong");
+         }
+       }
+       closeModal();
+     },
+   });
+ 
+   console.log(form);
+   useEffect(() => {
+     if (selectedLinerId !== null || totalDetails?.Liner_ID) {
+       const linerId =
+         selectedLinerId !== null ? selectedLinerId : totalDetails?.Liner_ID;
+       axios
+         .post(`${API_BASE_URL}/getjourneyNumber`, { liner_id: linerId })
+         .then((response) => {
+           setJourney(response.data.data || []);
+           console.log(response.data.data);
+         })
+         .catch((error) => {
+           console.error(error);
+         });
+     }
+   }, [selectedLinerId, totalDetails?.Liner_ID]);
+   const closeModal = () => {
+     setIsOpenModal(false);
+     setInputValue("");
+   };
+   const openModal = (id = null, Consignee_ID) => {
+     console.log(id);
+     console.log(Consignee_ID);
+     setID(id);
+     setConsigneeId(Consignee_ID);
+ 
+     form.reset();
+     setIsOpenModal(true);
+   };
+ 
+   const CheckBox = async (id) => {
+     try {
+       await axios.post(`${API_BASE_URL}/ApproveOrder`, {
+         order_id: id,
+         user_id: localStorage.getItem("id"),
+       });
+       toast.success(t("orderApproved"));
+       orderData();
+     } catch (e) {
+       toast.error(t("tryAgain"));
+     }
+   };
+ 
+   const handleAgreedPricingChange1 = (e) => {
+     setChargeVolume(e.target.checked);
+   };
+   const handleJourneySelection = async (selectedJourneyId) => {
+     console.log(selectedJourneyId);
+     const journey_id = selectedJourneyId; // assuming selectedJourneyId comes directly as the ID
+     const order_id = id; // Assuming 'id' is already storing the order_id you need
+     const load_date = newDate
+       ? moment(newDate).format("YYYY-MM-DD")
+       : moment(startDate, "YYYY-MM-DD").format("YYYY-MM-DD");
+     console.log(journey_id);
+     console.log(order_id);
+ 
+     setJourneyId(selectedJourneyId);
+     try {
+       // Sending a POST request to the server with journey_id and order_id
+       const response = await axios.post(
+         `${API_BASE_URL}/NewgetorderFreightDetails`,
+         {
+           journey_id,
+           order_id,
+           load_date,
+         }
+       );
+       // Logging the entire response object to see all details
+       console.log("Response from NewgetorderFreightDetails:", response);
+ 
+       // Show success message
+ 
+       // Check if data is available and update form fields
+       const data = response.data;
+       if (data) {
+         // Log the data object to see its structure and values
+         console.log("Received data:", data.data);
+ 
+         // Updating form fields with the received data
+         form.setFieldValue("Load_time", data.data.Load_time);
+         form.setFieldValue("ETD", data.data.ETD);
+         form.setFieldValue("ETA", data.data.ETA);
+         form.setFieldValue(
+           "Ship_date",
+           new Date(data.data.Freight_ship_date).toISOString().split("T")[0]
+         );
+         form.setFieldValue(
+           "Arrival_date",
+           new Date(data.data.Freight_arrival_date).toISOString().split("T")[0]
+         );
+       } else {
+         // Log if data is missing or undefined
+         console.log("No data received in response");
+       }
+     } catch (error) {
+       // Log the error if the request fails
+       console.error("Failed to fetch freight details:", error);
+       toast.error(t("errorFetchingFreightDetails"));
+     }
+   };
+ 
+   const handleLoadDateSelection = async (loadDate) => {
+     const journey_id = journeyId || totalDetails?.Freight_journey_number; // assuming selectedJourneyId comes directly as the ID
+     const order_id = id; // Assuming 'id' is already storing the order_id you need
+     const load_date = loadDate;
+     setNewDate(load_date);
+     try {
+       // Sending a POST request to the server with journey_id and order_id
+       const response = await axios.post(
+         `${API_BASE_URL}/NewgetorderFreightDetails`,
+         {
+           journey_id,
+           order_id,
+           load_date,
+         }
+       );
+       // Logging the entire response object to see all details
+       console.log("Response from getOrderFreightDetails:", response);
+ 
+       // Show success message
+ 
+       // Check if data is available and update form fields
+       const data = response.data;
+       if (data) {
+         // Log the data object to see its structure and values
+         console.log("Received data:", data.data);
+ 
+         // Updating form fields with the received data
+         form.setFieldValue("Load_time", data.data.Load_time);
+         form.setFieldValue("ETD", data.data.ETD);
+         form.setFieldValue("ETA", data.data.ETA);
+         form.setFieldValue(
+           "Ship_date",
+           new Date(data.data.Freight_ship_date).toISOString().split("T")[0]
+         );
+         form.setFieldValue(
+           "Arrival_date",
+           new Date(data.data.Freight_arrival_date).toISOString().split("T")[0]
+         );
+       } else {
+         // Log if data is missing or undefined
+         console.log("No data received in response");
+       }
+     } catch (error) {
+       // Log the error if the request fails
+       console.error("Failed to fetch freight details:", error);
+       toast.error(t("errorFetchingFreightDetails"));
+     }
+   };
+   const handleEditClick = async () => {
+     loadingModal.fire();
+     try {
+       const response = await axios.post(`${API_BASE_URL}/copyOrder`, {
+         order_id: idData,
+         user: localStorage.getItem("id"),
+         Is_quotation: 0,
+         Recalculate: chargeVolume ? 1 : 0, // Convert boolean to 1 or 0
+         // Other data you may need to pass
+       });
+       console.log("API response:", response);
+       let modalElement = document.getElementById("consigneeOne");
+       let modalInstance = bootstrap.Modal.getInstance(modalElement);
+       if (modalInstance) {
+         modalInstance.hide();
+       }
+ 
+       loadingModal.close();
+       setChargeVolume(false);
+       orderData();
+       toast.success(t("orderCopySuccess"));
+       // Handle the response as needed
+     } catch (error) {
+       console.error("API call error:", error);
+       loadingModal.close();
+       toast.error(t("orderCopyFailed"));
+     }
+   };
+   const handleChange2 = (e) => {
+     setNotes(e.target.value);
+   };
+   const handleChange3 = (e) => {
+     setNotes1(e.target.value);
+   };
+   const dataSubmit = () => {
+     axios
+       .post(`${API_BASE_URL}/OrderNotes`, {
+         order_id: orderId,
+         notes: notes,
+       })
+       .then((response) => {
+         console.log(response);
+         let modalElement = document.getElementById("exampleModal");
+         let modalInstance = bootstrap.Modal.getInstance(modalElement);
+         if (modalInstance) {
+           modalInstance.hide();
+         }
+         console.log(response);
+         toast.success(t("orderNoteUpdated"), {
+           autoClose: 1000,
+           theme: "colored",
+         });
+         orderData();
+         setNotes("");
+         // Clear the quantity field after successful update
+       })
+       .catch((error) => {
+         console.log(error);
+         // toast.error("Network Error", {
+         //   autoClose: 1000,
+         //   theme: "colored",
+         // });
+       });
+   };
+   const dataSubmit1 = () => {
+     console.log(notes1);
+     axios
+       .post(`${API_BASE_URL}/NewdeleteOrder`, {
+         id: deleteOrderId,
+         user_id: localStorage.getItem("id"),
+         NOTES: notes1,
+       })
+       .then((response) => {
+         setStock(response.data.message.Message_EN);
+         setNotes1("");
+         console.log(response.data.message.Message_EN);
+         let modalElement = document.getElementById("exampleModal1");
+         let modalInstance = bootstrap.Modal.getInstance(modalElement);
+         if (modalInstance) {
+           modalInstance.hide();
+         }
+         if (response.data.success) {
+           toast.success(t("orderDeleted"), {
+             autoClose: 1000,
+             theme: "colored",
+           });
+         } else {
+           setShow(true);
+         }
+         console.log(response);
+         orderData();
+         setNotes1("");
+       })
+       .catch((error) => {
+         console.log(error);
+       });
+   };
+   const customInvoicePdf = async (a) => {
+     try {
+       let messageSet = "";
+       let pdfResponse = null;
+       // First API Call: Invoice Procedure
+       const invoiceResponse = await axios.post(
+         `${API_BASE_URL}/NewGetOrderPdfDetails`,
+         {
+           order_id: a?.Order_ID,
+         }
+       );
+       console.log(invoiceResponse);
+ 
+       // Second API Call: Fetch Order Data
+       const filterData = await axios.get(`${API_BASE_URL}/NewgetOrdersById`, {
+         params: { order_id: a?.Order_ID },
+       });
+       console.log(filterData?.data?.data);
+ 
+       // Third API Call: Fetch PDF delivery details
+       try {
+         const deliveryApi = await axios.post(
+           `${API_BASE_URL}/Newpdf_delivery_by`,
+           {
+             order_id: a?.Order_ID,
+           }
+         );
+ 
+         console.log(deliveryApi.status);
+         if (deliveryApi.data.success === true) {
+           messageSet = deliveryApi.data.message;
+         }
+       } catch (error) {
+         console.log(error);
+         if (error.response?.status === 400) {
+           messageSet = error.response.data.message;
+         }
+       }
+       console.log(messageSet);
+       // Fourth API Call: Fetch Invoice PDF Details
+       try {
+         pdfResponse = await axios.post(`${API_BASE_URL}/NeworderPdfTable`, {
+           order_id: a?.Order_ID,
+         });
+ 
+         console.log(pdfResponse);
+       } catch (error) {
+         console.log(error);
+       }
+ 
+       // Generate the PDF (if needed)
+       const doc = new jsPDF();
+       doc.setFont("helvetica"); // Default built-in font
+       doc.setFontSize(16);
+       const convertImageToBase64 = (url) => {
+         return new Promise((resolve, reject) => {
+           const img = new Image();
+           img.crossOrigin = "Anonymous";
+           img.src = url;
+           img.onload = () => {
+             const canvas = document.createElement("canvas");
+             canvas.width = img.width;
+             canvas.height = img.height;
+             const ctx = canvas.getContext("2d");
+             ctx.drawImage(img, 0, 0);
+             const dataURL = canvas.toDataURL("image/png");
+             resolve(dataURL);
+           };
+           img.onerror = (error) => reject(error);
+         });
+       };
+       const formatterThree = new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 3,
+         maximumFractionDigits: 3,
+       });
+       const formatterGross = new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 0,
+         maximumFractionDigits: 0,
+       });
+       const addLogoWithDetails = async () => {
+         const logoData = await convertImageToBase64(logo);
+         doc.addImage(logoData, "PNG", 6, 3, 20, 20); // Adjust the position and size as needed
+         // logo end
+         doc.setFontSize(10);
+         doc.setTextColor(0, 0, 0);
+         doc.text(`${invoiceResponse?.data?.Company_Address?.Line_1}`, 30, 8);
+         doc.setTextColor(0, 0, 0);
+         doc.text(`${invoiceResponse?.data?.Company_Address?.Line_2}`, 30, 12);
+         const longTextOne = `${invoiceResponse?.data?.Company_Address?.Line_3}`;
+         const maxWidthOne = 90;
+         const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
+         let startXOne = 30;
+         let startYOne = 16;
+         linesOne.forEach((lineOne, index) => {
+           doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
+         });
+         // two line
+         doc.setFillColor(32, 55, 100);
+         doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
+         doc.setTextColor(0, 0, 0);
+         doc.setFontSize(12);
+         doc.text("Packing List / Invoice", 83, 27.5);
+         doc.setFillColor(32, 55, 100);
+         doc.rect(7, 29, doc.internal.pageSize.width - 15, 0.5, "FD");
+         // order part left
+         doc.setFontSize(10);
+         doc.setTextColor(0, 0, 0);
+         const maxWidthLeft = 72; // Maximum width in pixels
+         let yLeft = 33;
+         const yIncrementLeft = 1; // Adjust this value based on your spacing requirements
+         const formatDate1 = (dateString) => {
+           if (!dateString) return "";
+           const date = new Date(dateString);
+           return date.toLocaleDateString("en-GB"); // 'en-GB' format is DD/MM/YYYY
+         };
+         const textDataLeft = [
+           {
+             label: "Order :",
+             value: `${invoiceResponse?.data?.orderResults?.Order_Number}`,
+           },
+           {
+             label: "Loading Date :",
+             value: `${formatDate1(
+               invoiceResponse?.data?.orderResults?.load_date
+             )}`,
+           },
+           {
+             label: "Shipment Ref :",
+             value: `${filterData?.data?.data?.Shipment_ref}`,
+           },
+         ];
+ 
+         textDataLeft.forEach((item) => {
+           const labelXLeft = 7;
+           const valueXLeft = 40;
+ 
+           // Split the value text if it exceeds maxWidth
+           const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+ 
+           // Print the label
+           doc.text(item.label, labelXLeft, yLeft);
+ 
+           // Print the value, split into multiple lines if needed
+           valueLinesLeft.forEach((line, index) => {
+             doc.text(line, valueXLeft, yLeft + index * 4); // Adjust y position for each line of value
+           });
+ 
+           // Increment y to move to the next section
+           yLeft += valueLinesLeft.length * 4 + yIncrementLeft; // Adjust spacing between sections
+         });
+ 
+         // Second part (right side)
+ 
+         doc.setFontSize(10);
+         doc.setTextColor(0, 0, 0);
+         const maxWidthRight = 72; // Maximum width in pixels
+         let yRight = 33;
+         const yIncrementRight = 1; // Adjust this value based on your spacing requirements
+ 
+         const textDataRight = [
+           {
+             label: "AWB/BL:",
+             value: `${invoiceResponse?.data?.freightDetailsResults?.awb}`,
+           },
+           {
+             label: "Ship Date: ",
+             value: `${formatDate1(
+               invoiceResponse?.data?.freightDetailsResults?.ship_date
+             )}`,
+           },
+           { label: "Delivery By:", value: `${messageSet}` },
+         ];
+ 
+         textDataRight.forEach((item) => {
+           const labelXRight = 100;
+           const valueXRight = 127;
+ 
+           // Split the value text if it exceeds maxWidth
+           const valueLinesRight = doc.splitTextToSize(
+             item.value,
+             maxWidthRight
+           );
+ 
+           // Print the label
+           doc.text(item.label, labelXRight, yRight);
+           valueLinesRight.forEach((line, index) => {
+             doc.text(line, valueXRight, yRight + index * 4);
+           });
+           yRight += valueLinesRight.length * 4 + yIncrementRight;
+         });
+         // invoice to
+         doc.setFontSize(12);
+         doc.text("Invoice to", 7, 48.5);
+         doc.text("Consignee Details", 100, 48.5);
+       };
+       doc.rect(7, 51, doc.internal.pageSize.width - 15, 0.5, "FD");
+       doc.setFontSize(11);
+       doc.setFillColor(32, 55, 100);
+       function renderWrappedText(
+         doc,
+         text,
+         startX,
+         startY,
+         maxWidth,
+         lineHeight
+       ) {
+         const lines = doc.splitTextToSize(text, maxWidth);
+         lines.forEach((line, index) => {
+           doc.text(line, startX, startY + index * lineHeight);
+         });
+         return startY + lines.length * lineHeight; // Return the new Y position after rendering the text
+       }
+       const commonStartY = 56; // Set common starting Y position for both blocks
+       // First set of texts (left side)
+       const maxWidth1 = 72;
+       const startX1 = 7;
+       const lineHeight1 = 4.2;
+       const longText1_1 = `${filterData?.data?.data.client_name}(${filterData?.data?.data.client_tax_number})`;
+       const longText1_2 = `${filterData?.data?.data?.client_address}`;
+       const longText1_3 = `${filterData?.data?.data?.client_email} / ${filterData?.data?.data?.client_phone}`;
+       // Render the first block of text
+       let currentY1 = commonStartY; // Use the common starting Y position
+       currentY1 = renderWrappedText(
+         doc,
+         longText1_1,
+         startX1,
+         currentY1,
+         maxWidth1,
+         lineHeight1
+       );
+       doc.setFontSize(10);
+       currentY1 = renderWrappedText(
+         doc,
+         longText1_2,
+         startX1,
+         currentY1,
+         maxWidth1,
+         lineHeight1
+       );
+       currentY1 = renderWrappedText(
+         doc,
+         longText1_3,
+         startX1,
+         currentY1,
+         maxWidth1,
+         lineHeight1
+       );
+ 
+       // Reset the starting Y position for the second block (right side) to be the same as the first block
+       const maxWidth2 = 72;
+       const startX2 = 100;
+       let currentY2 = commonStartY; // Use the same starting Y position as the first block
+       doc.setFontSize(11);
+       const longText2_1 = `${filterData?.data?.data?.consignee_name}(${filterData?.data?.data?.consignee_tax_number})`;
+       const longText2_2 = `${filterData?.data?.data?.consignee_address}`;
+       const longText2_3 = `${filterData?.data?.data?.consignee_email}/${filterData?.data?.data?.consignee_phone}`;
+       // Use the same Y position for all the text in the second block
+       currentY2 = renderWrappedText(
+         doc,
+         longText2_1,
+         startX2,
+         currentY2,
+         maxWidth2,
+         lineHeight1
+       );
+       doc.setFontSize(10);
+       currentY2 = renderWrappedText(
+         doc,
+         longText2_2,
+         startX2,
+         currentY2,
+         maxWidth2,
+         lineHeight1
+       );
+       currentY2 = renderWrappedText(
+         doc,
+         longText2_3,
+         startX2,
+         currentY2,
+         maxWidth2,
+         lineHeight1
+       );
+       const tableStartY = Math.max(currentY1, currentY2);
+ 
+       await addLogoWithDetails(); // Wait for logo and details to be added
+       //  ***************************************************************************************
+       const newFormatter1 = new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 3,
+         maximumFractionDigits: 3,
+       });
+       const newFormatter5 = new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 2,
+         maximumFractionDigits: 2,
+       });
+       const noFormatter = new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 0,
+         maximumFractionDigits: 0,
+       });
+       const fourFormatter = new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 4,
+         maximumFractionDigits: 4,
+       });
+       const { results, header } = pdfResponse?.data || {};
+       const columnKeys = Object.keys(results?.[0] || {}); // ["COL1", "COL2", ...]
+       const headerLabels = Object.values(header);
+       const bodyRows = results?.map((item) =>
+         columnKeys.map((key) => item[key])
+       );
+       // const rows = pdfResponse?.data?.results?.map((item, index) => ({
+       //   index: index + 1,
+       //   itf_th: item.itf_th, // Thai text should be correctly displayed
+       //   HS_CODE: item.HS_CODE,
+       //   qty: newFormatter1.format(item.Net_Weight),
+       //   unit: "KG",
+       //   box: noFormatter.format(item.Boxes),
+       //   fob: newFormatter5.format(item.FOB),
+       // }));
+       const startY = 83; // Start Y position for the table
+ 
+       // Draw the table
+       doc.autoTable({
+         head: [headerLabels],
+         body: bodyRows,
+         columnStyles: {
+           3: { halign: "right" }, // Right align the FOB column (index 6)
+           2: { halign: "center" }, // Right align the FOB column (index 6)
+           4: { halign: "center" }, // Right align the FOB column (index 6)
+           5: { halign: "right" }, // Right align the FOB column (index 6)
+           6: { halign: "right" }, // Right align the FOB column (index 6)
+         },
+         startX: 0, // Start the table from the left edge
+         startY: tableStartY, // Start Y position of the table
+         margin: {
+           left: 7,
+           right: 7,
+         },
+         tableWidth: "auto", // Make the table width adjust to the available space
+         headStyles: {
+           fillColor: "#203764", // Set the header background color
+           textColor: "#FFFFFF",
+           halign: "center", // Set the header text color
+         },
+         styles: {
+           textColor: "#000000", // Text color for body cells
+           cellWidth: "wrap",
+           valign: "middle",
+           lineWidth: 0.1, // Adjust the border width
+           lineColor: "#203764", // Border color
+         },
+       });
+ 
+       // Get the Y position after the table is drawn
+       const endY = doc.autoTable.previous.finalY + 1; // Adding some margin below the table
+       // doc.rect(7, endY, doc.internal.pageSize.width - 15, 0.5, "FD");
+ 
+       // Draw the text for the order part (left side)
+       doc.setFontSize(10);
+       doc.setTextColor(0, 0, 0);
+       const maxWidthLeft = 45; // Maximum width in pixels
+       let yLeft = endY + 4; // Start below the table
+       const yIncrementLeft = 1; // Adjust this value based on your spacing requirements
+ 
+       const textDataLeft = [
+         {
+           label: "Total:",
+           value: `${filterData?.data?.data?.O_Box} Boxes /${filterData?.data?.data?.O_Items} Item`,
+         },
+         {
+           label: "Total Net Weight: ",
+           value: `${formatterThree.format(filterData?.data?.data?.O_NW)}`,
+         },
+         {
+           label: "Total Gross Weight:",
+           value: ` ${formatterGross.format(filterData?.data?.data?.O_GW)}`,
+         },
+         {
+           label: "Total CBM:",
+           value: `${newFormatter1.format(filterData?.data?.data?.O_CBM)}`,
+         },
+       ];
+       textDataLeft.forEach((item) => {
+         const labelXLeft = 7;
+         const valueXLeft = 43;
+ 
+         // Split the value text if it exceeds maxWidth
+         const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+ 
+         // Print the label
+         doc.text(item.label, labelXLeft, yLeft);
+ 
+         // Print the value, split into multiple lines if needed
+         valueLinesLeft.forEach((line, index) => {
+           doc.text(line, valueXLeft, yLeft + index * 4); // Adjust y position for each line of value
+         });
+ 
+         // Increment y to move to the next section
+         yLeft += valueLinesLeft.length * 4 + yIncrementLeft; // Adjust spacing between sections
+       });
+ 
+       // Draw the text for the order part (right side)
+       doc.setFontSize(10);
+       doc.setTextColor(0, 0, 0);
+       const maxWidthRight = 40; // Maximum width in pixels
+       let yRight = endY + 4; // Start below the table
+       const yIncrementRight = 1; // Adjust this value based on your spacing requirements
+ 
+       const textDataRight = [
+         {
+           label: "Total Packages:",
+           value: `${noFormatter.format(filterData?.data?.data?.O_Box)}`,
+         },
+         {
+           label: "FOB (THB): ",
+           value: `${newFormatter5.format(filterData?.data?.data?.O_FOB)}`,
+         },
+         {
+           label: "Air Freight:",
+           value: `${noFormatter.format(filterData?.data?.data?.O_Freight)}`,
+         },
+         {
+           label: "Exchange Rate:",
+           value: `${fourFormatter.format(filterData?.data?.data?.O_FX_Rate)}`,
+         },
+       ];
+ 
+       textDataRight.forEach((item) => {
+         const labelXRight = 85;
+         const valueXRight = 117;
+ 
+         // Split the value text if it exceeds maxWidth
+         const valueLinesRight = doc.splitTextToSize(item.value, maxWidthRight);
+ 
+         // Print the label
+         doc.text(item.label, labelXRight, yRight);
+         valueLinesRight.forEach((line, index) => {
+           doc.text(line, valueXRight, yRight + index * 4);
+         });
+ 
+         yRight += valueLinesRight.length * 4 + yIncrementRight;
+       });
+       const formatter = new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 2,
+         maximumFractionDigits: 2,
+       });
+       const totalTHBText = formatter.format(filterData?.data?.data?.O_CNF);
+       const totalCurrencyText = formatter.format(
+         filterData?.data?.data?.O_CNF_FX
+       );
+ 
+       const totalTHBWidth = doc.getTextWidth(totalTHBText);
+       const totalCurrencyWidth = doc.getTextWidth(totalCurrencyText);
+ 
+       const maxWidth = 50;
+       const startX_THB = 150 + maxWidth - totalTHBWidth;
+       const startX_Currency = 150 + maxWidth - totalCurrencyWidth;
+ 
+       doc.text("Total THB", 147, endY + 4);
+       doc.text(totalTHBText, startX_THB, endY + 4);
+       doc.setFillColor(32, 55, 100);
+       doc.rect(147, endY + 6, 55.5, 0.5, "FD");
+       doc.text(
+         `Total ${invoiceResponse?.data?.currencyResults?.currency}`,
+         147,
+         endY + 11
+       );
+       doc.text(totalCurrencyText, startX_Currency, endY + 11);
+       doc.setFillColor(32, 55, 100);
+       doc.rect(147, endY + 12, 55.5, 0.5, "FD");
+ 
+       //*****************************************************************************************
+ 
+       // Custom page number function
+       const addPageNumbers = (doc) => {
+         const pageCount = doc.internal.getNumberOfPages();
+         for (let i = 1; i <= pageCount; i++) {
+           doc.setPage(i);
+           doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
+         }
+       };
+ 
+       // Add page numbers
+       addPageNumbers(doc);
+ 
+       // Generate PDF Blob
+       const pdfBlob = doc.output("blob");
+       await uploadPDF2(pdfBlob, a);
+     } catch (error) {
+       console.error("Error fetching data:", error);
+ 
+       // Handle network errors
+       toast.error("Network Error", {
+         autoClose: 1000,
+         theme: "colored",
+       });
+ 
+       // Handle API errors
+       if (error.response?.status === 400) {
+         console.error(error.response.data.message);
+       }
+     }
+   };
+   const uploadPDF2 = async (pdfBlob, a) => {
+     const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
+     const formData = new FormData();
+     formData.append(
+       "document",
+       pdfBlob,
+       `${a?.Order_Number || "default"}_Custom_${dateTime}.pdf`
+     );
+ 
+     setIsLoading(true);
+     loadingModal.fire();
+     try {
+       const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
+       console.log(response);
+       if (response.data.success) {
+         console.log("PDF uploaded successfully");
+         window.open(
+           `${API_IMAGE_URL}${a?.Order_Number}_Custom_${dateTime}.pdf`
+         );
+       } else {
+         console.log("Failed to upload PDF");
+       }
+     } catch (error) {
+       console.error("Error uploading PDF:", error);
+     } finally {
+       setIsLoading(false);
+       loadingModal.close();
+     }
+   };
+   const generatePdf2 = async (a) => {
+     console.log(a);
+     const invoiceResponse = await axios.post(
+       `${API_BASE_URL}/CustomeInvoicePdfDetails`,
+       {
+         order_id: a?.Order_ID,
+         invoice_id: a?.Invoice_id,
+       }
+     );
+ 
+     const tableData = invoiceResponse?.data?.tableRow1 || [];
+     const tableHeader = invoiceResponse?.data?.tableHeaders || {};
+ 
+     // Get keys from header in correct order (e.g., ["#", "Item", ...])
+     const orderedHeaders = Object.keys(tableHeader); // e.g. ["#", "Item", "HS CODE", ...]
+     const headRow = orderedHeaders.map((key) => tableHeader[key]); // ["#", "Item", "HS CODE", ...]
+ 
+     // Create body rows based on COL1, COL2, ... mapping to each header key
+     const dynamicBody = tableData.map((row) => {
+       return orderedHeaders.map((_, index) => row[`COL${index + 1}`] ?? "");
+     });
+     console.log(invoiceResponse.data);
+     const companyAddress = invoiceResponse?.data?.Company_Address;
+     const currency = invoiceResponse?.data?.currencyResults;
+ 
+     const noFormatter = new Intl.NumberFormat("en-US", {
+       style: "decimal",
+       minimumFractionDigits: 0,
+       maximumFractionDigits: 0,
+     });
+     const newFormatter1 = new Intl.NumberFormat("en-US", {
+       style: "decimal",
+       minimumFractionDigits: 3,
+       maximumFractionDigits: 3,
+     });
+     const fourFormatter2 = new Intl.NumberFormat("en-US", {
+       style: "decimal",
+       minimumFractionDigits: 2,
+       maximumFractionDigits: 2,
+     });
+     const fourFormatter4 = new Intl.NumberFormat("en-US", {
+       style: "decimal",
+       minimumFractionDigits: 4,
+       maximumFractionDigits: 4,
+     });
+     const formatDate1 = (dateString) => {
+       if (!dateString) return "";
+       const date = new Date(dateString);
+       return date.toLocaleDateString("en-GB"); // 'en-GB' format is DD/MM/YYYY
+     };
+     const doc = new jsPDF();
+     // Convert image to base64
+     const convertImageToBase64 = (url) => {
+       return new Promise((resolve, reject) => {
+         const img = new Image();
+         img.crossOrigin = "Anonymous";
+         img.src = url;
+         img.onload = () => {
+           const canvas = document.createElement("canvas");
+           canvas.width = img.width;
+           canvas.height = img.height;
+           const ctx = canvas.getContext("2d");
+           ctx.drawImage(img, 0, 0);
+           const dataURL = canvas.toDataURL("image/png");
+           resolve(dataURL);
+         };
+         img.onerror = (error) => reject(error);
+       });
+     };
+ 
+     // Add a logo with Proforma Address and Proforma Invoice
+     const addLogoWithDetails = async () => {
+       const logoData = await convertImageToBase64(logo);
+       doc.addImage(logoData, "PNG", 6, 3, 20, 20); // Adjust the position and size as needed
+       // logo end
+       doc.setFontSize(10);
+       doc.setTextColor(0, 0, 0);
+       doc.text(`${companyAddress?.Line_1}`, 30, 8);
+       doc.setTextColor(0, 0, 0);
+       doc.text(`${companyAddress?.Line_2}`, 30, 12);
+       const longTextOne = `${companyAddress?.Line_3}`;
+       const maxWidthOne = 90;
+       const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
+       let startXOne = 30;
+       let startYOne = 16;
+       linesOne.forEach((lineOne, index) => {
+         doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
+       });
+       // two line
+       doc.setFillColor(32, 55, 100);
+       doc.rect(7, 23, doc.internal.pageSize.width - 15, 0.5, "FD");
+       doc.setTextColor(0, 0, 0);
+       doc.setFontSize(12);
+       doc.text(invoiceResponse?.data?.invoiceHeaderLabel?.Title, 83, 27.5);
+       doc.setFillColor(32, 55, 100);
+       doc.rect(7, 29, doc.internal.pageSize.width - 15, 0.5, "FD");
+       // order part left
+       doc.setFontSize(10);
+       doc.setTextColor(0, 0, 0);
+       const maxWidthLeft = 72; // Maximum width in pixels
+       let yLeft = 33;
+       const yIncrementLeft = 1; // Adjust this value based on your spacing requirements
+ 
+       const textDataLeft = [
+         {
+           label: invoiceResponse?.data?.orderMetaLabels?.Row1 || "",
+           value: `${invoiceResponse?.data?.invoiceHeader.Result1 || ""}`,
+         },
+         {
+           label: invoiceResponse?.data?.orderMetaLabels?.Row2 || "",
+           value: invoiceResponse?.data?.invoiceHeader.Result2 || "",
+         },
+         {
+           label: invoiceResponse?.data?.orderMetaLabels?.Row3 || "",
+           value: `${invoiceResponse?.data?.invoiceHeader.Result3 || ""}`,
+         },
+         {
+           label: `${invoiceResponse?.data?.transportTypeLabel.AWB || ""}`,
+           value: invoiceResponse?.data?.transportInfo?.AWB || "",
+         },
+       ];
+ 
+       doc.text(
+         `${invoiceResponse?.data?.transportTypeLabel?.Row1 || ""}`,
+         7,
+         48
+       );
+       const transportDateRaw = invoiceResponse?.data?.transportInfo?.Row1 || "";
+       let transportDate = "";
+ 
+       if (transportDateRaw) {
+         const dateObj = new Date(transportDateRaw);
+         transportDate = dateObj
+           .toISOString()
+           .split("T")[0]
+           .split("-")
+           .reverse()
+           .join("-");
+       }
+ 
+       doc.text(transportDate, 40, 48);
+       doc.text(`${invoiceResponse?.data?.transportInfo?.Row1 || ""}`, 40, 48);
+ 
+       textDataLeft.forEach((item) => {
+         const labelXLeft = 7;
+         const valueXLeft = 40;
+         const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+         doc.text(item.label, labelXLeft, yLeft);
+ 
+         // Print the value, split into multiple lines if needed
+         valueLinesLeft.forEach((line, index) => {
+           doc.text(line, valueXLeft, yLeft + index * 4); // Adjust y position for each line of value
+         });
+         yLeft += valueLinesLeft.length * 4 + yIncrementLeft; // Adjust spacing between sections
+       });
+ 
+       // Second part (right side)
+       doc.setFontSize(10);
+       doc.setTextColor(0, 0, 0);
+       const maxWidthRight = 72; // Maximum width in pixels
+       let yRight = 33;
+       const yIncrementRight = 1; // Adjust this value based on your spacing requirements
+       console.log(">>>>>>>>");
+       const formatDate = (dateString) => {
+         if (!dateString) return ""; // handle empty or null
+         const date = new Date(dateString);
+         if (isNaN(date)) return ""; // handle invalid date
+         return date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+       };
+       const textDataRight = [
+         {
+           label: `${invoiceResponse?.data?.dateLabels.Row1 || ""}`,
+           value: formatDate(invoiceResponse?.data?.dateValues?.Result1),
+         },
+         {
+           label: `${invoiceResponse?.data?.dateLabels.Row2 || ""}`,
+           value: formatDate(invoiceResponse?.data?.dateValues?.Result2),
+         },
+         {
+           label: `${invoiceResponse?.data?.dateLabels.Row3 || ""}`,
+           value: formatDate(invoiceResponse?.data?.dateValues?.Result3),
+         },
+       ];
+       textDataRight.forEach((item) => {
+         const labelXRight = 100;
+         const valueXRight = 127;
+ 
+         // Split the value text if it exceeds maxWidth
+         const valueLinesRight = doc.splitTextToSize(item.value, maxWidthRight);
+ 
+         // Print the label
+         doc.text(item.label, labelXRight, yRight);
+         valueLinesRight.forEach((line, index) => {
+           doc.text(line, valueXRight, yRight + index * 4);
+         });
+         yRight += valueLinesRight.length * 4 + yIncrementRight;
+       });
+ 
+       // invoice to
+       doc.setFontSize(12);
+       doc.text(
+         `${invoiceResponse?.data?.clientLabel["Client Details"]}`,
+         7,
+         54
+       );
+       doc.text(
+         `${invoiceResponse?.data?.consigneeLabel["Consignee Details"]}`,
+         100,
+         54
+       );
+     };
+ 
+     doc.setFillColor(32, 55, 100);
+     doc.rect(7, 55.5, doc.internal.pageSize.width - 15, 0.5, "FD");
+     doc.setFontSize(10);
+     doc.setTextColor(0, 0, 0);
+     function renderWrappedText(
+       doc,
+       text,
+       startX,
+       startY,
+       maxWidth,
+       lineHeight
+     ) {
+       const lines = doc.splitTextToSize(text, maxWidth);
+       lines.forEach((line, index) => {
+         doc.text(line, startX, startY + index * lineHeight);
+       });
+       return startY + lines.length * lineHeight;
+     }
+ 
+     const commonStartY = 60;
+     const lineHeight = 4.2;
+     const maxWidth1 = 90;
+     const startX1 = 7;
+     const textBlock1 =
+       invoiceResponse.data?.client_address?.vc_address
+         ?.split("\n") // split by newline
+         .map((line) => line.trim()) // clean spaces
+         .filter((line) => line !== "") || []; // remove empty lines
+ 
+     let currentY1 = commonStartY;
+     doc.setFontSize(11);
+     textBlock1.forEach((text, index) => {
+       currentY1 = renderWrappedText(
+         doc,
+         text,
+         startX1,
+         currentY1,
+         maxWidth1,
+         lineHeight
+       );
+       if (index === 0) doc.setFontSize(10); // Adjust font size after the first text
+     });
+ 
+     const maxWidth2 = 90;
+     const startX2 = 100;
+ 
+     const textBlock2 =
+       invoiceResponse.data?.consignee_address?.vc_address
+         ?.split("\n") // split into lines
+         .map((line) => line.trim()) // clean spaces
+         .filter((line) => line !== "") || []; // remove empty lines
+     let currentY2 = commonStartY;
+     doc.setFontSize(11);
+     textBlock2.forEach((text, index) => {
+       currentY2 = renderWrappedText(
+         doc,
+         text,
+         startX2,
+         currentY2,
+         maxWidth2,
+         lineHeight
+       );
+       if (index === 0) doc.setFontSize(10);
+     });
+     const tableStartY = Math.max(currentY1, currentY2);
+ 
+     await addLogoWithDetails(); // Wait for logo and details to be added
+     //  ***************************************************************************************
+ 
+     const startY = 83;
+     doc.autoTable({
+       head: [headRow],
+       body: dynamicBody,
+       startX: 0,
+       columnStyles: {
+         0: { halign: "center" },
+         1: { halign: "left" },
+         2: { halign: "center" },
+         3: { halign: "right" },
+         4: { halign: "center" },
+         5: { halign: "right" },
+         6: { halign: "right" },
+       },
+       startX: 0, // Start the table from the left edge
+       startY: tableStartY, // Start Y position of the table
+       margin: {
+         left: 7,
+         right: 7,
+       },
+       tableWidth: "auto", // Make the table width adjust to the available space
+       headStyles: {
+         fillColor: "#203764", // Set the header background color
+         textColor: "#FFFFFF",
+         halign: "center", // Set the header text color
+       },
+       styles: {
+         textColor: "#000000", // Text color for body cells
+         cellWidth: "wrap",
+         valign: "middle",
+         lineWidth: 0.1, // Adjust the border width
+         lineColor: "#203764", // Border color
+       },
+     });
+     const endY = doc.autoTable.previous.finalY + 1;
+     // doc.rect(7, endY, doc.internal.pageSize.width - 15, 0.5, "FD");
+     doc.setFontSize(10);
+     doc.setTextColor(0, 0, 0);
+     const maxWidthLeft = 45;
+     let yLeft = endY + 4;
+     const yIncrementLeft = 1;
+ 
+     const textDataLeft = [
+       {
+         label: invoiceResponse?.data?.summaryLabels?.Row1 || " ",
+         value: invoiceResponse?.data?.summaryValues?.Row1 || "",
+       },
+       {
+         label: invoiceResponse?.data?.summaryLabels?.Row2 || " ",
+         value: invoiceResponse?.data?.summaryValues?.Row2 || "",
+       },
+       {
+         label: invoiceResponse?.data?.summaryLabels?.Row3 || "",
+         value: invoiceResponse?.data?.summaryValues?.Row3 || "",
+       },
+     ];
+ 
+     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", textDataLeft);
+ 
+     // Render each label/value in PDF
+     textDataLeft.forEach((item) => {
+       if (!item.label && !item.value) return; // skip empty rows
+ 
+       const labelXLeft = 7;
+       const valueXLeft = 43;
+ 
+       const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+ 
+       // Print label
+       doc.text(item.label, labelXLeft, yLeft);
+ 
+       // Print value (possibly wrapped into multiple lines)
+       valueLinesLeft.forEach((line, index) => {
+         doc.text(line, valueXLeft, yLeft + index * 4);
+       });
+ 
+       // Move Y for next section
+       yLeft += valueLinesLeft.length * 4 + yIncrementLeft;
+     });
+     // Draw the text for the order part (right side)
+     doc.setFontSize(10);
+     doc.setTextColor(0, 0, 0);
+     const maxWidthRight = 40; // Maximum width in pixels
+     let yRight = endY + 4; // Start below the table
+     const yIncrementRight = 1; // Adjust this value based on your spacing requirements
+     const textDataRight = [
+       {
+         label: invoiceResponse?.data?.weightLabels?.Row1 || " ",
+         value: invoiceResponse?.data?.weightValues?.Row1
+           ? invoiceResponse.data.weightValues.Row1
+           : "",
+       },
+       {
+         label: invoiceResponse?.data?.weightLabels?.Row2 || " ",
+         value: invoiceResponse?.data?.weightValues?.Row2
+           ? invoiceResponse?.data?.weightValues?.Row2
+           : "",
+       },
+       {
+         label: invoiceResponse?.data?.weightLabels?.Row3 || " ",
+         value: invoiceResponse?.data?.weightValues?.Row3
+           ? invoiceResponse?.data?.weightValues?.Row3
+           : "",
+       },
+     ];
+ 
+     // Draw the text for the order part (right side)
+     doc.setFontSize(10);
+     doc.setTextColor(0, 0, 0);
+ 
+     textDataRight.forEach((item) => {
+       const labelXRight = 85;
+       const valueXRight = 117;
+ 
+       // Split the value text if it exceeds maxWidth
+       const valueLinesRight = doc.splitTextToSize(item.value, maxWidthRight);
+ 
+       // Print the label
+       doc.text(item.label, labelXRight, yRight);
+       valueLinesRight.forEach((line, index) => {
+         doc.text(line, valueXRight, yRight + index * 4);
+       });
+ 
+       yRight += valueLinesRight.length * 4 + yIncrementRight;
+     });
+     const textDataRightThree = [
+       {
+         label: invoiceResponse?.data?.dummyTotalLabels?.Row1 || "",
+         value: invoiceResponse?.data?.dummyTotalCalc?.Row1
+           ? invoiceResponse.data.dummyTotalCalc.Row1
+           : "",
+       },
+       {
+         label: invoiceResponse?.data?.dummyTotalLabels?.Row2 || " ",
+         value: invoiceResponse?.data?.dummyTotalCalc?.Row2
+           ? invoiceResponse?.data?.dummyTotalCalc?.Row2
+           : "",
+       },
+       {
+         label: invoiceResponse?.data?.dummyTotalLabels?.Row3 || " ",
+         value: invoiceResponse?.data?.dummyTotalCalc?.Row3
+           ? invoiceResponse?.data?.dummyTotalCalc?.Row3
+           : "",
+       },
+     ];
+ 
+     let yRightNew = endY + 20;
+     textDataRightThree.forEach((item) => {
+       const labelXRight = 7;
+       const valueXRight = 40;
+ 
+       // Split the value text if it exceeds maxWidth
+       const valueLinesRight = doc.splitTextToSize(item.value, maxWidthRight);
+ 
+       // Print the label
+       doc.text(item.label, labelXRight, yRightNew);
+       valueLinesRight.forEach((line, index) => {
+         doc.text(line, valueXRight, yRightNew + index * 4);
+       });
+ 
+       yRightNew += valueLinesRight.length * 4 + yIncrementRight;
+     });
+ 
+     const cnfText = invoiceResponse?.data?.paymentValues?.Row1 || "";
+     const cnfFXText = invoiceResponse?.data?.paymentValues?.Row2 || "";
+     const textWidthCNF = doc.getTextWidth(cnfText);
+     const textWidthCNFFX = doc.getTextWidth(cnfFXText);
+ 
+     const rightAlignX = 200;
+     doc.text(invoiceResponse?.data?.paymentLabels?.Row1 || " ", 147, endY + 4);
+     doc.text(cnfText, rightAlignX - textWidthCNF, endY + 4);
+ 
+     // Separator line
+     doc.rect(147, endY + 6, 55.5, 0.5, "FD");
+ 
+     // Total with currency
+     doc.text(invoiceResponse?.data?.paymentLabels?.Row2 || " ", 147, endY + 11);
+ 
+     doc.text(cnfFXText, rightAlignX - textWidthCNFFX, endY + 11);
+     doc.setFillColor(32, 55, 100);
+     doc.rect(147, endY + 12, 55.5, 0.5, "FD");
+     doc.text(invoiceResponse?.data?.paymentLabels?.Row3 || " ", 147, endY + 17);
+     const cnfFXTextNew = invoiceResponse?.data?.paymentValues?.Row3 || "";
+     doc.text(cnfFXTextNew, rightAlignX - textWidthCNFFX, endY + 17);
+     doc.rect(147, endY + 18, 55.5, 0.5, "FD");
+     const pageWidth = doc.internal.pageSize.getWidth();
+     const marginX = 7; // left & right margin
+     const usableWidth = pageWidth - marginX * 2;
+ 
+     const notesTitle = invoiceResponse?.data?.noteLabels?.Notes;
+     const notesText = invoiceResponse?.data?.noteValues?.NOTES;
+ 
+     let notesY = endY + 26;
+ 
+     if (notesText && notesText.trim() !== "") {
+       doc.setDrawColor(32, 55, 100);
+       doc.setLineWidth(0.2); // thickness (like “height” of the line)
+       doc.line(marginX, notesY, pageWidth - marginX, notesY); // draw horizontal line
+ 
+       doc.text(notesTitle, marginX, notesY + 4);
+       let splitNotes = doc.splitTextToSize(notesText, usableWidth);
+       doc.text(splitNotes, marginX, notesY + 9);
+     }
+ 
+     //*****************************************************************************************//
+ 
+     // Custom page number function
+     const addPageNumbers = (doc) => {
+       const pageCount = doc.internal.getNumberOfPages();
+       for (let i = 1; i <= pageCount; i++) {
+         4, 154.51;
+         doc.setPage(i);
+         doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
+       }
+     };
+ 
+     // Add page numbers
+     addPageNumbers(doc);
+ 
+     // Open the PDF in a new tab
+ 
+     // Generate PDF Blob
+     const pdfBlob = doc.output("blob");
+ 
+     // Create a URL for the PDF Blob
+     const pdfUrl = URL.createObjectURL(pdfBlob);
+ 
+     // Open the PDF in a new window or tab
+ 
+     // Upload the PDF to the server
+ 
+     await uploadPDF5(pdfBlob, a);
+   };
+   const uploadPDF5 = async (pdfBlob, a) => {
+     // Generate a unique date-time string
+     const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
+ 
+     const formData = new FormData();
+     formData.append(
+       "document",
+       pdfBlob,
+       `${a?.Order_Number || "default"}_Custom_${dateTime}.pdf`
+     );
+ 
+     try {
+       const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
+       console.log(response);
+       if (response.data.success) {
+         console.log("PDF uploaded successfully");
+         window.open(
+           `${API_IMAGE_URL}${
+             a?.Order_Number || "default"
+           }_Custom_${dateTime}.pdf`
+         );
+       } else {
+         console.log("Failed to upload PDF");
+       }
+     } catch (error) {
+       console.error("Error uploading PDF:", error);
+     }
+   };
+   const formatDate = (dateString) => {
+     const date = new Date(dateString);
+     const day = date.getDate().toString().padStart(2, "0");
+     const month = (date.getMonth() + 1).toString().padStart(2, "0");
+     const year = date.getFullYear();
+     return `${day}-${month}-${year}`;
+   };
+   const formatterNg = new Intl.NumberFormat("en-US", {
+     style: "decimal",
+     minimumFractionDigits: 3,
+     maximumFractionDigits: 3,
+   });
+ 
+   const formatterNo = new Intl.NumberFormat("en-US", {
+     style: "decimal",
+     minimumFractionDigits: 0,
+     maximumFractionDigits: 0,
+   });
+ 
+   const formatter5 = new Intl.NumberFormat("en-US", {
+     style: "decimal",
+     minimumFractionDigits: 2,
+     maximumFractionDigits: 2,
+   });
+   const twoDecimal = new Intl.NumberFormat("en-US", {
+     style: "decimal",
+     minimumFractionDigits: 2,
+     maximumFractionDigits: 2,
+   });
+ 
+   const uploadPDF = async (pdfBlob, a) => {
+     console.log(a);
+     const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
+     const formData = new FormData();
+     formData.append(
+       "document",
+       pdfBlob,
+       `${a?.COL1 || "default"}_Proforma_${dateTime}.pdf`
+     );
+ 
+     setIsLoading(true);
+     loadingModal.fire();
+     try {
+       const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
+       console.log(response);
+       if (response.data.success) {
+         console.log("PDF uploaded successfully");
+         window.open(`${API_IMAGE_URL}${a?.COL1}_Proforma_${dateTime}.pdf`);
+       } else {
+         console.log("Failed to upload PDF");
+       }
+     } catch (error) {
+       console.error("Error uploading PDF:", error);
+     } finally {
+       setIsLoading(false);
+       loadingModal.close();
+     }
+   };
+ 
+   const operationPdfTest = async (a) => {
+     console.log(a);
+     try {
+       let messageSet = "";
+       let messageNote = "";
+       let deliveryApi = null; // Declare deliveryApi outside the try block
+       // First API Call: Invoice Procedure
+ 
+       const filterData = await axios.get(`${API_BASE_URL}/NewgetOrdersById`, {
+         params: { order_id: a?.Order_ID },
+       });
+       console.log(filterData?.data?.data);
+ 
+       // Third API Call: Fetch PDF delivery details
+       try {
+         deliveryApi = await axios.post(`${API_BASE_URL}/NewOrderPdfDetails`, {
+           order_id: a?.Order_ID,
+         });
+ 
+         console.log(deliveryApi);
+       } catch (error) {
+         console.log(error);
+       }
+       console.log(messageSet);
+       // Fourth API Call: Fetch Invoice PDF Details
+       try {
+         const pdfResponse = await axios.post(
+           `${API_BASE_URL}/Newpdf_delivery_by`,
+           {
+             Order_id: a?.Order_ID,
+           }
+         );
+         console.log(pdfResponse.status);
+         if (pdfResponse.data.success === true) {
+           messageSet = pdfResponse.data.message;
+         }
+       } catch (error) {
+         console.log(error);
+         if (error.response?.status === 400) {
+           messageNote = error.response.data.message;
+         }
+       }
+ 
+       const doc = new jsPDF();
+       doc.addFileToVFS("NotoSansThai-Regular.ttf", NotoSansThaiRegular); // NotoSansThaiRegular is the variable exported from the .js file
+       doc.addFont("NotoSansThai-Regular.ttf", "NotoSansThai", "normal");
+ 
+       // Convert image to base64
+       const convertImageToBase64 = (url) => {
+         return new Promise((resolve, reject) => {
+           const img = new Image();
+           img.crossOrigin = "Anonymous";
+           img.src = url;
+           img.onload = () => {
+             const canvas = document.createElement("canvas");
+             canvas.width = img.width;
+             canvas.height = img.height;
+             const ctx = canvas.getContext("2d");
+             ctx.drawImage(img, 0, 0);
+             const dataURL = canvas.toDataURL("image/png");
+             resolve(dataURL);
+           };
+           img.onerror = (error) => reject(error);
+         });
+       };
+ 
+       // Add a logo with Proforma Address and Proforma Invoice
+       const addLogoWithDetails = async () => {
+         const logoData = await convertImageToBase64(logo1);
+         doc.addImage(logoData, "PNG", 6, 3, 20, 20); // Adjust the position and size as needed
+         // logo end
+         doc.setFontSize(10);
+         doc.setTextColor(0, 0, 0);
+         doc.text(`${deliveryApi?.data?.Company_Address.Line_1}`, 30, 8);
+         doc.setTextColor(0, 0, 0);
+         doc.text(`${deliveryApi?.data?.Company_Address.Line_2}`, 30, 12);
+         const longTextOne = `${deliveryApi?.data?.Company_Address.Line_3}`;
+         const maxWidthOne = 59;
+         const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
+         let startXOne = 30;
+         let startYOne = 16;
+         linesOne.forEach((lineOne, index) => {
+           doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
+         });
+         // end company
+         doc.setFillColor(32, 55, 100);
+         doc.setFontSize(12);
+         doc.setTextColor(255, 255, 255);
+         doc.rect(95, 5, 107, 7, "FD");
+         doc.setFont("NotoSansThai");
+         //       doc.setFont("ThaiFont");
+         // Place text inside the rectangle
+         doc.text("Order/Load", 130, 9.5);
+         doc.setFontSize(10);
+         doc.setTextColor(0, 0, 0);
+         const maxWidthLeft = 30; // Maximum width in pixels
+         let yLeft = 16;
+         const yIncrementLeft = 1; // Adjust this value based on your spacing requirements
+ 
+         const textDataLeft = [
+           {
+             label: "Order :",
+             value: `${filterData?.data?.data?.Order_Number}`,
+           },
+           {
+             label: "TT Ref :",
+             value: `${filterData?.data?.data.Shipment_ref}`,
+           },
+           { label: " PO Number :", value: "" },
+           {
+             label: "AWB :",
+             value: `${
+               deliveryApi?.data?.result?.bl ? deliveryApi?.data?.result?.bl : ""
+             }`,
+           },
+         ];
+ 
+         textDataLeft.forEach((item) => {
+           const labelXLeft = 95;
+           const valueXLeft = 123;
+           const valueLinesLeft = doc.splitTextToSize(item.value, maxWidthLeft);
+           doc.text(item.label, labelXLeft, yLeft);
+           valueLinesLeft.forEach((line, index) => {
+             doc.text(line, valueXLeft, yLeft + index * 4); // Adjust y position for each line of value
+           });
+           yLeft += valueLinesLeft.length * 4 + yIncrementLeft; // Adjust spacing between sections
+         });
+         doc.setFontSize(10);
+         doc.setTextColor(0, 0, 0);
+         const maxWidthRight = 32; // Maximum width in pixels
+         let yRight = 16;
+         const yIncrementRight = 1; // Adjust this value based on your spacing requirements
+         function formatDate(dateString) {
+           const date = new Date(dateString);
+           const day = date.getDate();
+           const month = date.getMonth() + 1;
+           const year = date.getFullYear();
+ 
+           // Add leading zeros if needed
+           const formattedDay = day < 10 ? `0${day}` : day;
+           const formattedMonth = month < 10 ? `0${month}` : month;
+ 
+           return `${formattedDay}-${formattedMonth}-${year}`;
+         }
+         const textDataRight = [
+           {
+             label: "Date:",
+             value: `${formatDate(filterData?.data?.data.created)}`,
+           },
+           { label: "Due Date : ", value: "" },
+           {
+             label: "Ship Date :",
+             value: `${
+               deliveryApi?.data?.orderDetails[0]?.Ship_date
+                 ? deliveryApi?.data?.orderDetails[0]?.Ship_date
+                 : ""
+             }`,
+           },
+           {
+             label: "Delivery By :",
+             value: `${
+               deliveryApi?.data?.orderDetails[0]?.journey_number
+                 ? deliveryApi?.data?.orderDetails[0]?.journey_number
+                 : ""
+             }`,
+           },
+         ];
+ 
+         textDataRight.forEach((item) => {
+           const labelXRight = 155;
+           const valueXRight = 175;
+           const valueLinesRight = doc.splitTextToSize(
+             item.value,
+             maxWidthRight
+           );
+           doc.text(item.label, labelXRight, yRight);
+           valueLinesRight.forEach((line, index) => {
+             doc.text(line, valueXRight, yRight + index * 4);
+           });
+           yRight += valueLinesRight.length * 4 + yIncrementRight;
+         });
+       };
+       await addLogoWithDetails(); // Wait for logo and details to be added
+       let yTop = 33;
+       // Sample table data
+       const headers = [
+         [
+           {
+             content: "Product details",
+             colSpan: 4,
+             rowSpan: 1,
+             styles: { halign: "center" },
+           },
+           {
+             content: "Order",
+             colSpan: 3,
+             rowSpan: 1,
+             styles: { halign: "center" },
+           },
+           {
+             content: "Load",
+             colSpan: 1,
+             rowSpan: 2,
+             styles: { halign: "center" },
+           },
+         ],
+         Object.values(deliveryApi?.data?.header).map((label) => ({
+           content: label,
+           styles: { halign: "center" },
+         })),
+       ];
+       const formatterThree = new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 3,
+         maximumFractionDigits: 3,
+       });
+       console.log(deliveryApi?.data?.data);
+       const rows = (deliveryApi?.data?.data || []).map((item) => [
+         item.col1 || "",
+         item.col2 || "",
+         item.col3 || "",
+         item.col4 || "",
+         formatterThree.format(Number(item.col5 || 0)),
+         formatterThree.format(Number(item.col6 || 0)),
+         formatterNo.format(Number(item.col7 || 0)),
+       ]);
+ 
+       // Adding the table to the PDF
+       doc.autoTable({
+         head: headers,
+         body: rows, // ← FIX: just use the array directly
+         startY: yTop,
+         theme: "grid",
+         headStyles: {
+           fillColor: [32, 55, 100],
+           textColor: [255, 255, 255],
+           halign: "center",
+         },
+         styles: {
+           fontSize: 10,
+           textColor: (0, 0, 0), // Text color for body cells
+           font: "NotoSansThai",
+           valign: "middle",
+           lineWidth: 0.01, // Adjust the border width
+           lineColor: [26, 35, 126], // Border color
+         },
+         margin: {
+           left: 7,
+           right: 7,
+         },
+         tableWidth: "auto",
+         columnStyles: {
+           6: { halign: "center" },
+           5: { halign: "right" },
+         },
+         headStyles: {
+           fillColor: [32, 55, 100], // Set the header background color
+           textColor: [255, 255, 255], // Set the header text color
+         },
+       });
+       yTop = doc.autoTable.previous.finalY + 1;
+       const finalY = doc.autoTable.previous.finalY + 4;
+       //note end
+       const addPageNumbers = (doc) => {
+         const pageCount = doc.internal.getNumberOfPages();
+         for (let i = 1; i <= pageCount; i++) {
+           doc.setPage(i);
+           doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
+         }
+       };
+       // Add page numbers
+       addPageNumbers(doc);
+       const pdfBlob = doc.output("blob");
+       console.log(pdfBlob);
+       await uploadPDF1(pdfBlob, a);
+     } catch (error) {
+       console.error("Error fetching data:", error);
+ 
+       // Handle network errors
+       toast.error("Network Error", {
+         autoClose: 1000,
+         theme: "colored",
+       });
+ 
+       // Handle API errors
+       if (error.response?.status === 400) {
+         console.error(error.response.data.message);
+       }
+     }
+   };
+   const uploadPDF1 = async (pdfBlob, a) => {
+     const dateTime = `${formatDate(new Date())}_${new Date().getTime()}`;
+     const formData = new FormData();
+     formData.append(
+       "document",
+       pdfBlob,
+       `${a?.COL1 || "default"}_Operation_${dateTime}.pdf`
+     );
+ 
+     setIsLoading(true);
+     loadingModal.fire();
+     try {
+       const response = await axios.post(`${API_BASE_URL}/UploadPdf`, formData);
+       console.log(response);
+       if (response.data.success) {
+         console.log("PDF uploaded successfully");
+         window.open(`${API_IMAGE_URL}${a?.COL1}_Operation_${dateTime}.pdf`);
+       } else {
+         console.log("Failed to upload PDF");
+       }
+     } catch (error) {
+       console.error("Error uploading PDF:", error);
+     } finally {
+       setIsLoading(false);
+       loadingModal.close();
+     }
+   };
+   const inventoryBoxes = (order_id) => {
+     setOrderId(order_id);
+   };
+   const performaOrder = async (a) => {
+     try {
+       let messageSet = "";
+       let messageNote = "";
+       // First API Call: Invoice Procedure
+       const invoiceResponse = await axios.get(
+         `${API_BASE_URL}/Newquotation_proforma`,
+         {
+           params: { order_id: a?.Order_ID },
+         }
+       );
+       console.log(invoiceResponse);
+ 
+       // Second API Call: Fetch Order Data
+       const filterData = await axios.get(`${API_BASE_URL}/NewgetOrdersById`, {
+         params: { order_id: a?.Order_ID },
+       });
+       console.log(filterData?.data?.data);
+ 
+       const doc = new jsPDF();
+       const convertImageToBase64 = (url) => {
+         return new Promise((resolve, reject) => {
+           const img = new Image();
+           img.crossOrigin = "Anonymous";
+           img.src = url;
+           img.onload = () => {
+             const canvas = document.createElement("canvas");
+             canvas.width = img.width;
+             canvas.height = img.height;
+             const ctx = canvas.getContext("2d");
+             ctx.drawImage(img, 0, 0);
+             const dataURL = canvas.toDataURL("image/png");
+             resolve(dataURL);
+           };
+           img.onerror = (error) => reject(error);
+         });
+       };
+ 
+       const addLogoWithDetails = async () => {
+         const logoData = await convertImageToBase64(logo);
+         doc.addImage(logoData, "PNG", 6, 3, 20, 20); // Adjust the position and size as needed
+         // logo end
+         doc.setFontSize(12);
+         doc.setTextColor(0, 0, 0);
+         doc.text(`${invoiceResponse?.data?.Company_Address.Line_1}`, 30, 8);
+         doc.setFontSize(10);
+         doc.setTextColor(0, 0, 0);
+         doc.text(`${invoiceResponse?.data?.Company_Address.Line_2}`, 30, 12);
+         const longTextOne = `${invoiceResponse?.data?.Company_Address.Line_3}`;
+         const maxWidthOne = 90;
+         const linesOne = doc.splitTextToSize(longTextOne, maxWidthOne);
+         let startXOne = 30;
+         let startYOne = 16;
+         linesOne.forEach((lineOne, index) => {
+           doc.text(lineOne, startXOne, startYOne + index * 4.2); // Adjust the line height (10) as needed
+         });
+ 
+         doc.setFontSize(12);
+         doc.setTextColor(0, 0, 0);
+         doc.text(`Proforma Invoice`, 127, 7.5);
+         doc.setFontSize(10);
+         doc.setTextColor(0, 0, 0);
+         doc.text(
+           `${invoiceResponse.data.Section1_Labels.Row1} ${
+             invoiceResponse.data.section1_Values.Row1
+               ? invoiceResponse.data.section1_Values.Row1
+               : ""
+           }`,
+           127,
+           12
+         );
+         doc.text(
+           `${invoiceResponse.data.Section1_Labels.Row2} ${
+             invoiceResponse.data.section1_Values.Row2
+               ? invoiceResponse.data.section1_Values.Row2
+               : ""
+           }`,
+           127,
+           16.5
+         );
+         doc.text(
+           `${invoiceResponse.data.Section1_Labels.Row3} ${
+             invoiceResponse.data.section1_Values.Row3
+               ? invoiceResponse.data.section1_Values.Row3
+               : ""
+           }`,
+           127,
+           20
+         );
+         doc.text(
+           `${invoiceResponse.data.Section1_Labels.Row4} ${
+             invoiceResponse.data.section1_Values.Row4
+               ? invoiceResponse.data.section1_Values.Row4
+               : ""
+           }`,
+           127,
+           24.5
+         );
+       };
+       doc.setFillColor(32, 55, 100);
+       doc.rect(7, 27, doc.internal.pageSize.width - 15, 0.5, "FD");
+       doc.setFontSize(12);
+       doc.setTextColor(0, 0, 0);
+       doc.setFontSize(12);
+       doc.text("Invoice to", 7, 31.5);
+       doc.text("Consignee Details", 127.2, 31.5);
+       doc.setFillColor(32, 55, 100);
+       doc.setFontSize(11);
+       doc.setTextColor(0, 0, 0);
+       function renderWrappedText(
+         doc,
+         text,
+         startX,
+         startY,
+         maxWidth,
+         lineHeight
+       ) {
+         const lines = doc.splitTextToSize(text, maxWidth);
+         lines.forEach((line, index) => {
+           doc.text(line, startX, startY + index * lineHeight);
+         });
+         return startY + lines.length * lineHeight; // Return the new Y position after rendering the text
+       }
+ 
+       const commonStartY = 36.3;
+ 
+       // First set of texts (left side)
+       const maxWidth1 = 87;
+       const startX1 = 7;
+       const lineHeight1 = 4.2;
+       let currentY1 = commonStartY; // Use the common starting Y position
+ 
+       const clientAddress = invoiceResponse.data?.section2_Values || {};
+       const longTexts =
+         clientAddress.vc_address
+           ?.split("\n") // split by newline
+           .map((line) => line.trim()) // remove extra spaces
+           .filter((line) => line !== "") || []; // remove empty lines
+ 
+       longTexts.forEach((line) => {
+         currentY1 = renderWrappedText(
+           doc,
+           line,
+           startX1,
+           currentY1,
+           maxWidth1,
+           lineHeight1
+         );
+       });
+       // Reset the starting Y position for the second block (right side) to be the same as the first block
+       const maxWidth2 = 87;
+       const startX2 = 127.2;
+       let currentY2 = commonStartY; // Use the same starting Y position as the first block
+       doc.setFontSize(11);
+       const textBlock2 =
+         invoiceResponse.data?.section3_Values?.vc_address
+           ?.split("\n") // split into lines
+           .map((line) => line.trim()) // remove spaces
+           .filter((line) => line !== "") || []; // remove empty lines
+ 
+       doc.setFontSize(11);
+       textBlock2.forEach((text, index) => {
+         currentY2 = renderWrappedText(
+           doc,
+           text,
+           startX2,
+           currentY2,
+           maxWidth2,
+           lineHeight1
+         );
+         if (index === 0) doc.setFontSize(10);
+       });
+       const tableStartY = Math.max(currentY1, currentY2);
+       await addLogoWithDetails(); // Wait for logo and details to be added
+       const { orderDetails = [], header = {} } = invoiceResponse?.data || {};
+ 
+       // 1. Get column keys from the first item (e.g., "COL1", "COL2", ...)
+       const columnKeys = Object.keys(orderDetails[0] || {});
+ 
+       // 2. Get display headers from the `header` object
+       const headerLabels = Object.values(header); // ["#", "HS Code", "N.W.(KG)", ..., "Line Total"]
+ 
+       // 3. Build body rows based on orderDetails and columnKeys
+       const bodyRows = orderDetails.map((item) =>
+         columnKeys.map((key) => item[key])
+       );
+ 
+       doc.autoTable({
+         head: [headerLabels],
+         body: bodyRows,
+         startY: tableStartY,
+         headStyles: {
+           fillColor: "#203764",
+           textColor: "#FFFFFF",
+         },
+         bodyStyles: { valign: "top" },
+         styles: {
+           textColor: "#000000",
+           cellWidth: "wrap",
+           valign: "middle",
+           lineWidth: 0.1,
+           lineColor: "#203764",
+           overflow: "linebreak",
+           fontSize: 10, // Reduce font size if data is large
+           minCellHeight: 8, // Ensures rows have a minimum height
+         },
+         columnStyles: {
+           1: { halign: "center" },
+           2: { halign: "right" },
+           3: { halign: "right" },
+           5: { halign: "right" },
+           6: { halign: "center" },
+           7: { halign: "right" },
+           8: { halign: "right" },
+         },
+         margin: {
+           left: 7,
+           right: 7,
+           top: 10,
+           bottom: 10,
+         },
+         tableWidth: "auto", // Adjusts the table width to fit within the page
+         pageBreak: "auto", // Automatically adds a new page if content exceeds page height
+       });
+ 
+       const finalY = doc.autoTable.previous.finalY + 4;
+       doc.setFontSize(10);
+       doc.setTextColor(0, 0, 0);
+       doc.text(
+         `${invoiceResponse.data.section6_Labels.Row1} ${
+           invoiceResponse.data.section6_Values.Row1
+             ? invoiceResponse.data.section6_Values.Row1
+             : ""
+         }`,
+         7,
+         finalY + 1
+       );
+       doc.text(
+         `${invoiceResponse.data.section6_Labels.Row2} ${
+           invoiceResponse.data.section6_Values.Row2
+             ? invoiceResponse.data.section6_Values.Row2
+             : ""
+         }`,
+         7,
+         finalY + 5
+       );
+       doc.text(
+         `${invoiceResponse.data.section6_Labels.Row3} ${
+           invoiceResponse.data.section6_Values.Row3
+             ? invoiceResponse.data.section6_Values.Row3
+             : ""
+         }`,
+         7,
+         finalY + 9
+       );
+       doc.setFont("helvetica", "bold");
+       doc.setTextColor(0, 0, 0);
+       const PAGE_WIDTH = 210; // A4 page width in mm
+       const MARGIN = 10; // margin from the right edge
+       const label = invoiceResponse.data.section5_Labels.Row1;
+       const value = `${twoDecimal.format(
+         invoiceResponse.data.section5_Values[
+           "SUM(Order_Details.Final_price*Order_Details.QTY)"
+         ]
+       )}`;
+ 
+       const labelWidth = doc.getTextWidth(label);
+       const valueWidth = doc.getTextWidth(value);
+       const xRight = PAGE_WIDTH - MARGIN - valueWidth;
+       doc.setFont("helvetica", "normal");
+       doc.setTextColor(0, 0, 0);
+       doc.text(
+         label,
+         PAGE_WIDTH - MARGIN - labelWidth - valueWidth - 5,
+         finalY + 1
+       );
+       // Draw the value
+       doc.text(value, xRight, finalY + 1);
+       doc.rect(147, finalY + 2, 55.5, 0.5, "FD");
+       // const longText = messageNote;
+       // const textX = 7;
+       // const textY = finalY + 15;
+       // doc.setFontSize(10);
+       // doc.setTextColor(0, 0, 0);
+       // doc.text(doc.splitTextToSize(longText, 201), textX, textY);
+ 
+       // const inputX = 20; // X position of the input field
+       // const inputY = textY + 8; // Y position of the input field
+       // const inputWidth = 180; // Width of the input field
+       // const inputHeight = 10; // Height of the input field
+       // doc.setDrawColor(123, 128, 154); // Set the color of the rectangle
+       // const inputFieldValue = data?.NOTES;
+       // if (inputFieldValue && inputFieldValue.trim() !== "") {
+       //   // Add the input field value inside the rectangle
+       //   doc.rect(inputX, inputY, inputWidth, inputHeight); // Draw the rectangle
+       //   doc.text(inputFieldValue, inputX + 2, inputY + 7); // Adjust position for padding
+       // }
+ 
+       // ****************************************** note and delivery note part
+       function addTextWithPagination(doc, longText, x, y, maxWidth) {
+         const lineHeight = 5; // Adjust line height if needed
+         const pageHeight = doc.internal.pageSize.height;
+         const textLines = doc.splitTextToSize(longText, maxWidth);
+         let currentY = y;
+ 
+         for (let i = 0; i < textLines.length; i++) {
+           if (currentY + lineHeight > pageHeight) {
+             doc.addPage();
+             currentY = 10;
+           }
+ 
+           doc.text(textLines[i], x, currentY);
+           currentY += lineHeight; // Move Y position down for next line
+         }
+         return currentY;
+       }
+ 
+       // note end
+       const longText =
+         invoiceResponse.data?.section7_Values.Delivery_Terms || "";
+       const x = 7;
+       const initialY = doc.autoTable.previous.finalY + 24;
+       const maxWidth = 180;
+ 
+       let finalY1 = initialY;
+ 
+       // 🔹 Step 1: Render longText first (if exists)
+       const hasLongText = longText.trim() !== "";
+       if (hasLongText) {
+         finalY1 = addTextWithPagination(doc, longText, x, finalY1, maxWidth);
+       }
+ 
+       const inputFieldValue =
+         invoiceResponse.data?.section8_Values?.NOTES || "";
+ 
+       if (inputFieldValue && inputFieldValue.trim() !== "") {
+         const inputX = 7;
+         const inputWidth = 196;
+         const padding = 3;
+         const maxTextWidth = inputWidth - padding * 2;
+ 
+         const noteLabelY = finalY1 + 3; // Leave space after longText
+ 
+         // 🔹 Only draw line if longText was present
+         if (hasLongText) {
+           const lineY = noteLabelY - 4;
+           doc.setDrawColor(0);
+           doc.setLineWidth(0.3);
+           doc.line(inputX, lineY, inputX + inputWidth, lineY);
+         }
+ 
+         // 🔹 Render "Notes here" label
+         doc.text(
+           `${invoiceResponse.data?.section8_Labels.Notes}:`,
+           inputX,
+           noteLabelY + 2
+         );
+ 
+         // 🔹 Wrapped note text
+         const lines = doc.splitTextToSize(inputFieldValue, maxTextWidth);
+         const textY = noteLabelY + 5;
+         doc.text(lines, inputX, textY + 2);
+       }
+ 
+       // ****************************************** note and delivery note part end
+ 
+       const addPageNumbers = (doc) => {
+         const pageCount = doc.internal.getNumberOfPages();
+         for (let i = 1; i <= pageCount; i++) {
+           doc.setPage(i);
+           doc.text(`${i} out  of ${pageCount}`, 185.2, 3.1);
+         }
+       };
+ 
+       // Add page numbers
+       addPageNumbers(doc);
+       const pdfBlob = doc.output("blob");
+ 
+       // Upload the PDF to the server
+       await uploadPDF(pdfBlob, a);
+     } catch (error) {
+       console.error("Error fetching data:", error);
+ 
+       // Handle network errors
+       toast.error("Network Error", {
+         autoClose: 1000,
+         theme: "colored",
+       });
+ 
+       // Handle API errors
+       if (error.response?.status === 400) {
+         console.error(error.response.data.message);
+       }
+     }
+   };
+ 
+   const updateBankStatus = (bankID) => {
+     const request = {
+       itf_id: bankID,
+     };
+ 
+     axios
+       .post(`${API_BASE_URL}/StatusChangeItf`, request)
+       .then((response) => {
+         if (response.data.success == true) {
+           toast.success(response.data.message, {
+             autoClose: 1000,
+             theme: "colored",
+           });
+           orderData();
+           return;
+         }
+       })
+       .catch((error) => {
+         console.log(error);
+       });
+   };
+ 
+   return (
+     <>
+       <div
+         className="modal fade"
+         id="consigneeOne"
+         tabIndex={-1}
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true"
+       >
+         <div className="modal-dialog modalShipTo ">
+           <div className="modal-content">
+             <div className="modal-header">
+               <h1 className="modal-title fs-5" id="exampleModalLabel">
+                 {t("orderCopy")}
+               </h1>
+               <button
+                 type="button"
+                 className="btn-close"
+                 data-bs-dismiss="modal"
+                 aria-label="Close"
+               >
+                 <i className="mdi mdi-close"></i>
+               </button>
+             </div>
+             <div className="modal-body">
+               <label htmlFor="">{t("recalculate")}</label>
+               <br />
+               <label className="toggleSwitch large">
+                 <input
+                   type="checkbox"
+                   name="Charge_Volume"
+                   checked={chargeVolume}
+                   onChange={handleAgreedPricingChange1}
+                 />
+                 <span>
+                   <span>{t("no")}</span>
+                   <span>{t("yes")}</span>
+                 </span>
+                 <a></a>
+               </label>
+             </div>
+             <div className="modal-footer justify-content-right">
+               <button
+                 type="button"
+                 className="btn btn-primary"
+                 onClick={() => handleEditClick()}
+               >
+                 {t("copy")}
+               </button>
+             </div>
+           </div>
+         </div>
+       </div>
+       <Card
+         title={titleData?.Title}
+         endElement={
+           <button
+             type="button"
+             onClick={() => navigate("/create_Order")}
+             className="btn button btn-info"
+           >
+             {t("create")}
+           </button>
+         }
+       >
+         <Box sx={{ minWidth: 120 }} className="selectActive">
+           <FormControl fullWidth>
+             <InputLabel id="demo-simple-select-label">
+               {" "}
+               {t("status")}
+             </InputLabel>
+             <Select
+               labelId="demo-simple-select-label"
+               id="demo-simple-select"
+               value={status}
+               label="Status"
+               onChange={handleChange}
+             >
+               <MenuItem value="4">{t("all")}</MenuItem>
+               <MenuItem value="0">{t("pending")}</MenuItem>
+               <MenuItem value="1">{t("active")}</MenuItem>
+               <MenuItem value="2">{t("shipped")}</MenuItem>
+             </Select>
+           </FormControl>
+         </Box>
+         <TableView columns={columns} data={data} />
+       </Card>
+ 
+       {isOpenModal && (
+         <div
+           className="fixed inset-0 flex items-center justify-center"
+           style={{ zIndex: "9999" }}
+         >
+           <div
+             className="fixed w-screen h-screen bg-black/20"
+             onClick={closeModal}
+           />
+           <div className="bg-white rounded-lg shadow-lg max-w-md w-full ">
+             <div className="crossArea">
+               <h3>{t("editDetails")}</h3>
+               <p onClick={closeModal}>
+                 <CloseIcon />
+               </p>
+             </div>
+             <form.Provider>
+               <form
+                 className="formEan formCreate mt-0"
+                 onSubmit={(e) => {
+                   e.preventDefault();
+                   e.stopPropagation();
+                   void form.handleSubmit();
+                 }}
+               >
+                 <div className="p-3 bottomOrderSp">
+                   <div className="form-group">
+                     <label>{t("consigneeRef")}</label>
+ 
+                     <input
+                       type="text"
+                       value={inputValue}
+                       onChange={handleChange5}
+                     />
+                   </div>
+                   <div className="form-group mb-3">
+                     <label> {t("liner")}</label>
+                     <form.Field
+                       name="Liner"
+                       children={(field) => (
+                         <ComboBox
+                           options={liner?.map((v) => ({
+                             id: v.liner_id,
+                             name: v.liner_name,
+                           }))}
+                           value={field.state.value}
+                           onChange={(e) => {
+                             // Here, `e` is expected to be the ID of the selected item if ComboBox passes it like that,
+                             // otherwise you might need to adjust how you retrieve the value
+                             field.handleChange(e);
+                             setSelectedLinerId(e); // Assuming `e` directly is the liner_id, adjust if needed
+                           }}
+                         />
+                       )}
+                     />
+                   </div>
+                   <div className="form-group">
+                     <label>{t("journeyNumber")}</label>
+ 
+                     <form.Field
+                       name="journey_number"
+                       children={(field) => (
+                         <ComboBox
+                           options={Journey?.map((v) => ({
+                             id: v.ID,
+                             name: v.journey_number,
+                           }))}
+                           value={field.state.value}
+                           onChange={(e) => {
+                             field.handleChange(e);
+                             handleJourneySelection(e);
+                           }}
+                         />
+                       )}
+                     />
+                   </div>
+                   <div className="form-group">
+                     <label> {t("bl")}</label>
+                     <form.Field
+                       name="bl"
+                       children={(field) => (
+                         <input
+                           name={field.name}
+                           value={field.state.value}
+                           onBlur={field.handleBlur}
+                           onChange={(e) => field.handleChange(e.target.value)}
+                         />
+                       )}
+                     />
+                   </div>
+                   <div className="flex gap-2">
+                     <div className="form-group w-full">
+                       <label>{t("loadDate")}</label>
+                       <form.Field name="Load_date">
+                         {(field) => {
+                           const value = field.state.value;
+                           const isValidDate =
+                             value && !isNaN(Date.parse(value));
+ 
+                           return (
+                             <DatePicker
+                               selected={isValidDate ? new Date(value) : null}
+                               onChange={(date) => {
+                                 const formattedDate = date
+                                   ?.toISOString()
+                                   .split("T")[0]; // yyyy-MM-dd
+                                 field.handleChange(formattedDate); // Update form state
+                                 handleLoadDateSelection(formattedDate); // Trigger API logic
+                               }}
+                               onBlur={field.handleBlur}
+                               dateFormat="dd/MM/yyyy"
+                               placeholderText={t("selectDate")}
+                               customInput={<CustomInput />}
+                             />
+                           );
+                         }}
+                       </form.Field>
+                     </div>
+                     <div className="form-group loadTimeS">
+                       <label>{t("loadTime")}</label>
+                       <form.Field
+                         name="Load_time"
+                         children={(field) => (
+                           <input
+                             type="time"
+                             name={field.name}
+                             value={field.state.value}
+                             onBlur={field.handleBlur}
+                             onChange={(e) => field.handleChange(e.target.value)}
+                           />
+                         )}
+                       />
+                     </div>
+                   </div>
+                   <div className="flex gap-2">
+                     <div className="form-group w-full">
+                       <label>{t("shipDate")}</label>
+                       <form.Field name="Ship_date">
+                         {(field) => {
+                           const value = field.state.value;
+                           const isValidDate =
+                             value && !isNaN(Date.parse(value));
+ 
+                           return (
+                             <DatePicker
+                               selected={isValidDate ? new Date(value) : null}
+                               onChange={(date) => {
+                                 const formattedDate = date
+                                   ?.toISOString()
+                                   .split("T")[0];
+                                 field.handleChange(formattedDate);
+                               }}
+                               onBlur={field.handleBlur}
+                               dateFormat="dd/MM/yyyy"
+                               placeholderText={t("selectDate")}
+                               customInput={<CustomInput />}
+                             />
+                           );
+                         }}
+                       </form.Field>
+                     </div>
+                     <div className="form-group">
+                       <label>{t("etd")}</label>
+                       <form.Field
+                         name="ETD"
+                         children={(field) => (
+                           <input
+                             type="time"
+                             name={field.name}
+                             value={field.state.value}
+                             onBlur={field.handleBlur}
+                             onChange={(e) => field.handleChange(e.target.value)}
+                           />
+                         )}
+                       />
+                     </div>
+                   </div>
+                   <div className="flex gap-2">
+                     <div className="form-group w-full">
+                       <label>{t("arrivalDate")}</label>
+                       <form.Field name="Arrival_date">
+                         {(field) => {
+                           const value = field.state.value;
+                           const isValidDate =
+                             value && !isNaN(Date.parse(value));
+ 
+                           return (
+                             <DatePicker
+                               selected={isValidDate ? new Date(value) : null}
+                               onChange={(date) => {
+                                 const formattedDate = date
+                                   ?.toISOString()
+                                   .split("T")[0];
+                                 field.handleChange(formattedDate);
+                               }}
+                               onBlur={field.handleBlur}
+                               dateFormat="dd/MM/yyyy"
+                               placeholderText={t("selectDate")}
+                               customInput={<CustomInput />}
+                             />
+                           );
+                         }}
+                       </form.Field>
+                     </div>
+                     <div className="form-group">
+                       <label>{t("eta")}</label>
+                       <form.Field
+                         name="ETA"
+                         children={(field) => (
+                           <input
+                             type="time"
+                             name={field.name}
+                             value={field.state.value}
+                             onBlur={field.handleBlur}
+                             onChange={(e) => field.handleChange(e.target.value)}
+                           />
+                         )}
+                       />
+                     </div>
+                   </div>
+                 </div>
+                 <div className="modal-footer justify-center">
+                   <button
+                     type="submit"
+                     className="bg-black text-white px-4 py-2 rounded"
+                   >
+                     {t("save")}
+                   </button>
+                 </div>
+               </form>
+             </form.Provider>
+           </div>
+         </div>
+       )}
+       <div
+         className="modal fade"
+         id="exampleModal"
+         tabIndex={-1}
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true"
+       >
+         <div className="modal-dialog InvoiceModal ">
+           <div className="modal-content">
+             <div className="modal-header">
+               <h1 className="modal-title fs-5" id="exampleModalLabel">
+                 {t("ordersNote")}
+               </h1>
+               <button
+                 type="button"
+                 className="btn-close"
+                 data-bs-dismiss="modal"
+                 aria-label="Close"
+               />
+             </div>
+             <div className="modal-body">
+               <textarea
+                 value={notes}
+                 onChange={handleChange2}
+                 placeholder={t("typeNotes")}
+               />
+             </div>
+             <div className="modal-footer">
+               <button
+                 type="button"
+                 className="btn btn-secondary "
+                 data-bs-dismiss="modal"
+               >
+                 {t("cancel")}
+               </button>
+               <button
+                 type="button"
+                 onClick={dataSubmit}
+                 className="btn btn-primary"
+               >
+                 {t("ok")}
+               </button>
+             </div>
+           </div>
+         </div>
+       </div>
+       <div
+         className="modal fade"
+         id="exampleModal1"
+         tabIndex={-1}
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true"
+       >
+         <div className="modal-dialog   orderDelPop">
+           <div className="modal-content">
+             <div className="modal-header">
+               <button
+                 type="button"
+                 className="btn-close"
+                 data-bs-dismiss="modal"
+                 aria-label="Close"
+               >
+                 <CloseIcon />
+               </button>
+             </div>
+             <div className="modal-body">
+               <h1 className="modal-title fs-5" id="exampleModalLabel">
+                 {t("notes")}
+               </h1>
+               <textarea
+                 value={notes1}
+                 onChange={handleChange3}
+                 placeholder={t("typeNotes")}
+               />
+             </div>
+             <div className="modal-footer">
+               <button
+                 type="button"
+                 className="btn btn-secondary "
+                 data-bs-dismiss="modal"
+               >
+                 {t("cancel")}
+               </button>
+               <button
+                 type="button"
+                 onClick={dataSubmit1}
+                 className="btn btn-primary"
+               >
+                 {t("ok")}
+               </button>
+             </div>
+           </div>
+         </div>
+       </div>
+       <div
+         className="modal fade"
+         id="exampleModal2"
+         tabIndex={-1}
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true"
+       >
+         <div className="modal-dialog   orderDelPop">
+           <div className="modal-content">
+             <div className="modal-header">
+               <button
+                 type="button"
+                 className="btn-close"
+                 data-bs-dismiss="modal"
+                 aria-label="Close"
+               >
+                 <CloseIcon />
+               </button>
+             </div>
+             <div className="modal-body">
+               <h1 className="modal-title fs-5" id="exampleModalLabel">
+                 {t("notes")}
+               </h1>
+               <textarea
+                 value={notes2}
+                 onChange={handleChange3}
+                 readOnly
+                 placeholder="Type Notes Here"
+               />
+             </div>
+             <div className="modal-footer">
+               <button
+                 type="button"
+                 className="btn btn-secondary "
+                 data-bs-dismiss="modal"
+               >
+                 {t("close")}
+               </button>
+               {/* <button
+                 type="button"
+                 onClick={dataSubmit1}
+                 className="btn btn-primary"
+               >
+                 ok
+               </button> */}
+             </div>
+           </div>
+         </div>
+       </div>
+       <Modal className="modalError" show={show} onHide={handleClose}>
+         <div className="modal-content">
+           <div className="modal-header">
+             <h1 className="modal-title fs-5" id="exampleModalLabel">
+               {t("orders")}
+             </h1>
+             <button
+               style={{ color: "#fff", fontSize: "30px" }}
+               type="button"
+               onClick={() => setShow(false)}
+             >
+               <i class="mdi mdi-close"></i>
+             </button>
+           </div>
+           <div className="modal-body">
+             <div className="eanCheck errorMessage">
+               <p>{stock ? stock : "NULL"}</p>
+             </div>
+           </div>
+           <div className="modal-footer"></div>
+         </div>
+       </Modal>
+     </>
+   );
+ };
+ 
+ export default PriceCheck;
+ 

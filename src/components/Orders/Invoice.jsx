@@ -82,6 +82,7 @@ const Invoice = () => {
   const [itemDetails1, setItemDetails1] = useState(""); // Default state
   const [useAgreedPricing, setUseAgreedPricing] = useState(false);
   const [selectedInvoice1, setSelectedInvoice1] = useState("Client");
+  const [payorDropdown, setPayorDropdown] = useState([]);
   const [paymentForm, setPaymentForm] = useState({
     paymentDate: null,
     fx: "",
@@ -106,11 +107,12 @@ const Invoice = () => {
   //   }));
   // };
 
-  const handleChange5 = async (field, value) => {
+  const handleChange5 = async (field, value, extraData = {}) => {
     //  Update UI state immediately
     setPaymentForm((prev) => ({
       ...prev,
       [field]: value,
+      ...extraData, // store extra data if provided
     }));
 
     // 2Ensure receipt ID exists
@@ -133,6 +135,8 @@ const Invoice = () => {
       bankRef: "Bank_Ref",
       paymentAmount: "payment_amount",
       rounding: "Rounding",
+      Payor_ID: "Payor_ID",
+      Payor: "Payor",
     };
 
     const apiField = fieldMapping[field];
@@ -145,7 +149,9 @@ const Invoice = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           RID: receiptID,
+          IID: singlePodId?.ID,
           [apiField]: value,
+          ...extraData,
         }),
       });
 
@@ -417,17 +423,11 @@ const Invoice = () => {
         return (
           <div className="editIcon">
             <Link to=" " state={{ from: { ...a, isReadOnly: true } }}></Link>
-            {/* {(+a.Status === 7 ||
-              +a.Status === 8 ||
-              +a.Status === 9 ||
-              +a.Status === 10 ||
-              +a.Status === 11 ||
-              +a.Status === 12 ||
-              +a.Status === 13) && ( */}
-            <Link to="/invoiceview" state={{ from: { ...a } }}>
-              <i className="mdi mdi-eye" />
-            </Link>
-            {/* )} */}
+            {+a.IC1 === 1 && (
+              <Link to="/invoiceview" state={{ from: { ...a } }}>
+                <i className="mdi mdi-eye" />
+              </Link>
+            )}
             <>
               {/* {(+a.Status === 7 ||
                 +a.Status === 8 ||
@@ -437,94 +437,110 @@ const Invoice = () => {
                   <i className="mdi mdi-pencil" />
                 </Link> */}
               {/* )} */}
-              {/* {(+a.Status === 7 ||
-                +a.Status === 8 ||
-                +a.Status === 9 ||
-                +a.Status === 12) && ( */}
+              {+a.IC2 === 1 && (
+                <button type="button" onClick={() => restoreEanPackage(a.ID)}>
+                  <i className="mdi mdi-restore" />
+                </button>
+              )}
+            </>
+            {+a.IC3 === 1 && (
+              <button type="button" /* onClick={() => generatePdf2(a)} */>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 200 80" // scalable, you can change width/height via props or CSS
+                  className="customIcon"
+                >
+                  <rect
+                    x="5"
+                    y="5"
+                    rx="15"
+                    ry="15"
+                    width="190"
+                    height="70"
+                    fill="none"
+                    stroke="#203764" // ✅ border color
+                    strokeWidth="8" // ✅ thickness like your image
+                  />
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="28"
+                    fontWeight="bold"
+                    fill="#203764" // ✅ text color same as border
+                    fontFamily="Arial, sans-serif"
+                  >
+                    CUSTOMS
+                  </text>
+                </svg>
+              </button>
+            )}
+            {+a.IC4 === 1 && (
               <button
                 type="button"
-                onClick={() => restoreEanPackage(a.Order_ID)}
+                data-bs-toggle="modal"
+                onClick={() => setFilterData1(a)}
+                data-bs-target="#exampleModalCustomization"
               >
-                <i className="mdi mdi-restore" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 200 80" // scalable, you can change width/height via props or CSS
+                  className="customIcon"
+                >
+                  <rect
+                    x="5"
+                    y="5"
+                    rx="15"
+                    ry="15"
+                    width="190"
+                    height="70"
+                    fill="none"
+                    stroke="#203764" // ✅ border color
+                    strokeWidth="8" // ✅ thickness like your image
+                  />
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="28"
+                    fontWeight="bold"
+                    fill="#203764" // ✅ text color same as border
+                    fontFamily="Arial, sans-serif"
+                  >
+                    INVOICE
+                  </text>
+                </svg>
               </button>
-              {/* )} */}
-            </>
-            {/* {(+a.Status === 7 ||
-              +a.Status === 8 ||
-              +a.Status === 9 ||
-              +a.Status === 10 ||
-              +a.Status === 11) && ( */}
-            <button type="button" onClick={() => generatePdf2(a)}>
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
+            )}
+            {+a.IC5 === 1 && (
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                /*   onClick={() => setFilterData1(a)} */
+                data-bs-target="#exampleModalCustomization5"
               >
-                <title>alpha-c-box-outline</title>
-                <path d="M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5M5,5V19H19V5H5M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7Z"></path>
-              </svg>
-            </button>
-            {/* )} */}
-            {/* {(+a.Status === 7 ||
-              +a.Status === 8 ||
-              +a.Status === 9 ||
-              +a.Status === 10 ||
-              +a.Status === 11 ||
-              +a.Status === 12 ||
-              +a.Status === 13) && ( */}
-            <button
-              type="button"
-              data-bs-toggle="modal"
-              onClick={() => setFilterData1(a)}
-              data-bs-target="#exampleModalCustomization"
-            >
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <title>package-variant-closed</title>
+                  <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L10.11,5.22L16,8.61L17.96,7.5L12,4.15M6.04,7.5L12,10.85L13.96,9.75L8.08,6.35L6.04,7.5M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V9.21L13,12.58V19.29L19,15.91Z"></path>
+                </svg>
+              </button>
+            )}
+            {+a.IC6 === 1 && (
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal2"
+                /* onClick={() => quotationCopy(a.Order_ID)} */
               >
-                <title>invoice-text-check-outline</title>
-                <path d="M12 20L13.3 20.86C13.1 20.28 13 19.65 13 19C13 18.76 13 18.5 13.04 18.29L12 17.6L9 19.6L6 17.6L5 18.26V5H19V13C19.7 13 20.37 13.12 21 13.34V3H3V22L6 20L9 22L12 20M17 9V7H7V9H17M15 13V11H7V13H15M15.5 19L18.25 22L23 17.23L21.84 15.82L18.25 19.41L16.66 17.82L15.5 19Z"></path>
-              </svg>
-            </button>
-            {/* )} */}
-            {/* {(+a.Status === 7 ||
-              +a.Status === 8 ||
-              +a.Status === 9 ||
-              +a.Status === 10 ||
-              +a.Status === 11 ||
-              +a.Status === 12 ||
-              +a.Status === 13) && ( */}
-            <button
-              type="button"
-              data-bs-toggle="modal"
-              onClick={() => setFilterData1(a)}
-              data-bs-target="#exampleModalCustomization5"
-            >
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <title>package-variant-closed</title>
-                <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L10.11,5.22L16,8.61L17.96,7.5L12,4.15M6.04,7.5L12,10.85L13.96,9.75L8.08,6.35L6.04,7.5M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V9.21L13,12.58V19.29L19,15.91Z"></path>
-              </svg>
-            </button>
-            {/* )} */}
-            {/* {(+a.Status === 7 ||
-              +a.Status === 8 ||
-              +a.Status === 9 ||
-              +a.Status === 10 ||
-              +a.Status === 11) && ( */}
-            <button
-              type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#exampleModal2"
-              onClick={() => quotationCopy(a.Order_ID)}
-            >
-              <i className="mdi mdi-note-outline" />
-            </button>
-            {/* )} */}
+                <i className="mdi mdi-note-outline" />
+              </button>
+            )}
             {/* {+a.Status === 7 && ( */}
             {/* <button
                 type="button"
@@ -542,40 +558,41 @@ const Invoice = () => {
                 />
               </button> */}
             {/* )} */}
-            {/* {+a.Status === 8 && ( */}
-            <button onClick={() => quotationConfirmation8(a.Order_ID)}>
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
+            {+a.IC7 === 1 && (
+              <button onClick={() => quotationConfirmation8(a.ID)}>
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <title>truck-check-outline</title>
+                  <path d="M18 18.5C18.83 18.5 19.5 17.83 19.5 17C19.5 16.17 18.83 15.5 18 15.5C17.17 15.5 16.5 16.17 16.5 17C16.5 17.83 17.17 18.5 18 18.5M19.5 9.5H17V12H21.46L19.5 9.5M6 18.5C6.83 18.5 7.5 17.83 7.5 17C7.5 16.17 6.83 15.5 6 15.5C5.17 15.5 4.5 16.17 4.5 17C4.5 17.83 5.17 18.5 6 18.5M20 8L23 12V17H21C21 18.66 19.66 20 18 20C16.34 20 15 18.66 15 17H9C9 18.66 7.66 20 6 20C4.34 20 3 18.66 3 17H1V6C1 4.89 1.89 4 3 4H17V8H20M3 6V15H3.76C4.31 14.39 5.11 14 6 14C6.89 14 7.69 14.39 8.24 15H15V6H3M5 10.5L6.5 9L8 10.5L11.5 7L13 8.5L8 13.5L5 10.5Z" />
+                </svg>
+              </button>
+            )}
+            {+a.IC8 === 1 && (
+              <button
+                /* type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#modalClaim"
+                onClick={() => boxMinutes(a.ID, a)} */
+                onClick={() => quotationConfirmation9(a.ID)}
               >
-                <title>truck-check-outline</title>
-                <path d="M18 18.5C18.83 18.5 19.5 17.83 19.5 17C19.5 16.17 18.83 15.5 18 15.5C17.17 15.5 16.5 16.17 16.5 17C16.5 17.83 17.17 18.5 18 18.5M19.5 9.5H17V12H21.46L19.5 9.5M6 18.5C6.83 18.5 7.5 17.83 7.5 17C7.5 16.17 6.83 15.5 6 15.5C5.17 15.5 4.5 16.17 4.5 17C4.5 17.83 5.17 18.5 6 18.5M20 8L23 12V17H21C21 18.66 19.66 20 18 20C16.34 20 15 18.66 15 17H9C9 18.66 7.66 20 6 20C4.34 20 3 18.66 3 17H1V6C1 4.89 1.89 4 3 4H17V8H20M3 6V15H3.76C4.31 14.39 5.11 14 6 14C6.89 14 7.69 14.39 8.24 15H15V6H3M5 10.5L6.5 9L8 10.5L11.5 7L13 8.5L8 13.5L5 10.5Z" />
-              </svg>
-            </button>
-            {/* )} */}
-            {/* {+a.Status === 12 && ( */}
-            <button
-              type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#modalClaim"
-              onClick={() => boxMinutes(a.Order_ID, a)}
-            >
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <title>airport</title>
-                <path d="M14.97,5.92C14.83,5.41 14.3,5.1 13.79,5.24L10.39,6.15L5.95,2.03L4.72,2.36L7.38,6.95L4.19,7.8L2.93,6.82L2,7.07L3.66,9.95L14.28,7.11C14.8,6.96 15.1,6.43 14.97,5.92M21,10L20,12H15L14,10L15,9H17V7H18V9H20L21,10M22,20V22H2V20H15V13H20V20H22Z" />
-              </svg>
-            </button>
-            {/* )} */}
-            {/* {(+a.Status === 12 || +a.Status === 13) && ( */}
-            <button onClick={() => openPdf(a.document)}>
-              <i class="mdi mdi-download"></i>
-            </button>
-            {/* )} */}
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <title>airport</title>
+                  <path d="M14.97,5.92C14.83,5.41 14.3,5.1 13.79,5.24L10.39,6.15L5.95,2.03L4.72,2.36L7.38,6.95L4.19,7.8L2.93,6.82L2,7.07L3.66,9.95L14.28,7.11C14.8,6.96 15.1,6.43 14.97,5.92M21,10L20,12H15L14,10L15,9H17V7H18V9H20L21,10M22,20V22H2V20H15V13H20V20H22Z" />
+                </svg>
+              </button>
+            )}
+            {+a.IC9 === 1 && (
+              <button /* onClick={() => openPdf(a.document)} */>
+                <i class="mdi mdi-download"></i>
+              </button>
+            )}
             {/* {+a.Status === 12 && ( */}
             {/* <button
                 data-bs-toggle="modal"
@@ -593,88 +610,94 @@ const Invoice = () => {
                 </svg>
               </button> */}
             {/* )} */}
-            {/* {+a.Status === 13 && ( */}
-            <button
-              type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#modalClaim"
-              onClick={() => boxMinutes(a.Order_ID, a)}
-            >
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
+            {+a.IC10 === 1 && (
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#modalClaim"
+                onClick={() => boxMinutes(a.ID, a)}
               >
-                <title>text-box-minus</title>
-                <path d="M22,17V19H14V17H22M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z" />
-              </svg>
-            </button>
-            {/* )} */}
-            {/* {(+a.Status === 10 ||
-              +a.Status === 11 ||
-              +a.Status === 12 ||
-              +a.Status === 13) && ( */}
-            <button
-              type="button"
-              onClick={() => pdfSelectedType(a.Consignee_ID, a)}
-            >
-              <svg
-                className=" "
-                version="1.0"
-                xmlns="http://www.w3.org/2000/svg"
-                width="22px"
-                height="22px"
-                viewBox="0 0 350 350"
-                preserveAspectRatio="xMidYMid meet"
-              >
-                <g
-                  transform="translate(0.000000,344.000000) scale(0.100000,-0.100000)"
-                  fill="#203764"
-                  stroke="none"
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
                 >
-                  <path d="M1291 2913 c-19 -16 -21 -30 -23 -132 l-3 -115 -219 -37 c-270 -47 -265 -44 -249 -156 6 -43 11 -78 10 -79 -1 0 -96 -33 -212 -73 -203 -70 -245 -92 -245 -127 0 -33 274 -780 292 -796 15 -14 24 -15 39 -8 10 6 19 17 19 24 0 8 -61 184 -136 391 -74 208 -134 378 -132 380 2 1 90 32 196 68 135 47 194 63 197 54 2 -6 65 -372 140 -811 75 -440 141 -808 146 -817 5 -10 18 -20 28 -24 11 -3 167 19 346 50 180 31 332 54 338 52 5 -1 -165 -66 -378 -143 -213 -76 -391 -140 -394 -142 -4 -1 -71 179 -151 400 -79 222 -148 409 -153 416 -13 17 -42 15 -57 -3 -11 -13 13 -86 135 -428 81 -226 154 -422 161 -434 7 -12 22 -24 33 -28 12 -4 253 78 658 223 733 264 727 262 1016 262 181 0 186 1 201 22 14 20 16 118 16 859 l0 836 -175 167 -174 166 -625 0 c-579 0 -625 -1 -645 -17z m1189 -177 c0 -195 12 -206 220 -206 l130 0 0 -790 0 -790 -745 0 -745 0 -2 376 c-3 339 -5 378 -20 387 -12 8 -21 7 -32 -2 -14 -12 -16 -60 -16 -407 0 -344 2 -395 16 -408 13 -14 61 -16 367 -17 215 0 342 -4 327 -9 -32 -11 -801 -143 -806 -138 -2 2 -72 403 -155 892 -119 691 -150 889 -140 895 7 5 88 20 179 35 92 15 177 30 189 33 l23 5 2 -383 3 -384 30 0 30 0 3 513 2 512 570 0 570 0 0 -114z m260 -80 l44 -46 -112 0 -112 0 0 106 0 106 68 -60 c37 -33 87 -81 112 -106z" />
-                  <path d="M1529 2364 c-9 -11 -10 -20 -2 -32 9 -16 58 -17 568 -17 510 0 559 1 568 17 8 12 7 21 -2 32 -12 14 -74 16 -566 16 -492 0 -554 -2 -566 -16z" />
-                  <path d="M1536 2104 c-19 -19 -20 -36 -4 -52 17 -17 1109 -17 1126 0 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
-                  <path d="M1530 1835 c-16 -19 -4 -52 23 -59 29 -8 1055 -8 1084 0 27 7 39 40 23 59 -18 22 -1112 22 -1130 0z" />
-                  <path d="M1529 1564 c-9 -11 -10 -20 -2 -32 9 -16 60 -17 565 -20 597 -2 589 -3 573 48 -6 20 -11 20 -564 20 -497 0 -560 -2 -572 -16z" />
-                  <path d="M1536 1304 c-9 -8 -16 -19 -16 -24 0 -5 7 -16 16 -24 14 -14 79 -16 563 -16 412 0 550 3 559 12 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
-                </g>
-              </svg>
-            </button>
-            {/* )} */}
-            {/* {+a.Status === 9 && ( */}
-            <button
-              data-bs-toggle="modal"
-              data-bs-target="#modalAdjustBox"
-              type="button"
-              onClick={() => inventoryBoxes(a.Order_ID)}
-            >
-              <i className="mdi mdi-scale"></i>{" "}
-            </button>
-            {/* )} */}
-            <button
-              type="button"
-              className="SvgAnchor"
-              data-bs-toggle="modal"
-              data-bs-target="#modalCombine"
-              onClick={() => {
-                handleModalOpen(a);
-              }}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              <svg
-                className="SvgQuo"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
+                  <title>text-box-minus</title>
+                  <path d="M22,17V19H14V17H22M12,17V15H7V17H12M17,11H7V13H14.69C13.07,14.07 12,15.91 12,18C12,19.09 12.29,20.12 12.8,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V12.8C20.12,12.29 19.09,12 18,12L17,12.08V11M17,9V7H7V9H17Z" />
+                </svg>
+              </button>
+            )}
+            {+a.IC11 === 1 && (
+              <button
+                type="button"
+                /* onClick={() => pdfSelectedType(a.Consignee_ID, a)} */
               >
-                <title>cash-check</title>
-                <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z" />
-              </svg>
-            </button>{" "}
+                <svg
+                  className=" "
+                  version="1.0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22px"
+                  height="22px"
+                  viewBox="0 0 350 350"
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  <g
+                    transform="translate(0.000000,344.000000) scale(0.100000,-0.100000)"
+                    fill="#203764"
+                    stroke="none"
+                  >
+                    <path d="M1291 2913 c-19 -16 -21 -30 -23 -132 l-3 -115 -219 -37 c-270 -47 -265 -44 -249 -156 6 -43 11 -78 10 -79 -1 0 -96 -33 -212 -73 -203 -70 -245 -92 -245 -127 0 -33 274 -780 292 -796 15 -14 24 -15 39 -8 10 6 19 17 19 24 0 8 -61 184 -136 391 -74 208 -134 378 -132 380 2 1 90 32 196 68 135 47 194 63 197 54 2 -6 65 -372 140 -811 75 -440 141 -808 146 -817 5 -10 18 -20 28 -24 11 -3 167 19 346 50 180 31 332 54 338 52 5 -1 -165 -66 -378 -143 -213 -76 -391 -140 -394 -142 -4 -1 -71 179 -151 400 -79 222 -148 409 -153 416 -13 17 -42 15 -57 -3 -11 -13 13 -86 135 -428 81 -226 154 -422 161 -434 7 -12 22 -24 33 -28 12 -4 253 78 658 223 733 264 727 262 1016 262 181 0 186 1 201 22 14 20 16 118 16 859 l0 836 -175 167 -174 166 -625 0 c-579 0 -625 -1 -645 -17z m1189 -177 c0 -195 12 -206 220 -206 l130 0 0 -790 0 -790 -745 0 -745 0 -2 376 c-3 339 -5 378 -20 387 -12 8 -21 7 -32 -2 -14 -12 -16 -60 -16 -407 0 -344 2 -395 16 -408 13 -14 61 -16 367 -17 215 0 342 -4 327 -9 -32 -11 -801 -143 -806 -138 -2 2 -72 403 -155 892 -119 691 -150 889 -140 895 7 5 88 20 179 35 92 15 177 30 189 33 l23 5 2 -383 3 -384 30 0 30 0 3 513 2 512 570 0 570 0 0 -114z m260 -80 l44 -46 -112 0 -112 0 0 106 0 106 68 -60 c37 -33 87 -81 112 -106z" />
+                    <path d="M1529 2364 c-9 -11 -10 -20 -2 -32 9 -16 58 -17 568 -17 510 0 559 1 568 17 8 12 7 21 -2 32 -12 14 -74 16 -566 16 -492 0 -554 -2 -566 -16z" />
+                    <path d="M1536 2104 c-19 -19 -20 -36 -4 -52 17 -17 1109 -17 1126 0 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
+                    <path d="M1530 1835 c-16 -19 -4 -52 23 -59 29 -8 1055 -8 1084 0 27 7 39 40 23 59 -18 22 -1112 22 -1130 0z" />
+                    <path d="M1529 1564 c-9 -11 -10 -20 -2 -32 9 -16 60 -17 565 -20 597 -2 589 -3 573 48 -6 20 -11 20 -564 20 -497 0 -560 -2 -572 -16z" />
+                    <path d="M1536 1304 c-9 -8 -16 -19 -16 -24 0 -5 7 -16 16 -24 14 -14 79 -16 563 -16 412 0 550 3 559 12 18 18 14 46 -7 58 -13 6 -207 10 -560 10 -477 0 -541 -2 -555 -16z" />
+                  </g>
+                </svg>
+              </button>
+            )}
+            {+a.IC12 === 1 && (
+              <button
+                data-bs-toggle="modal"
+                data-bs-target="#modalAdjustBox"
+                type="button"
+                onClick={() => inventoryBoxes(a.ID)}
+              >
+                <i className="mdi mdi-scale"></i>{" "}
+              </button>
+            )}
+            {+a.IC13 === 1 && (
+              <button
+                type="button"
+                className="SvgAnchor"
+                data-bs-toggle="modal"
+                data-bs-target="#modalCombine"
+                /* onClick={() => {
+                handleModalOpen(a);
+              }} */
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <svg
+                  className="SvgQuo"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <title>cash-check</title>
+                  <path d="M3 6V18H13.32C13.1 17.33 13 16.66 13 16H7C7 14.9 6.11 14 5 14V10C6.11 10 7 9.11 7 8H17C17 9.11 17.9 10 19 10V10.06C19.67 10.06 20.34 10.18 21 10.4V6H3M12 9C10.3 9.03 9 10.3 9 12C9 13.7 10.3 14.94 12 15C12.38 15 12.77 14.92 13.14 14.77C13.41 13.67 13.86 12.63 14.97 11.61C14.85 10.28 13.59 8.97 12 9M21.63 12.27L17.76 16.17L16.41 14.8L15 16.22L17.75 19L23.03 13.68L21.63 12.27Z" />
+                </svg>
+              </button>
+            )}{" "}
+            {+a.IC14 === 1 && (
+              <button
+                className="rotateDown" /* onClick={() => openPdf(a.document)} */
+              >
+                <i class="mdi mdi-download"></i>
+              </button>
+            )}
             {/* new icon from order */}
             {/* <button type="button" onClick={() => generatePdf2(a)}>
               {" "}
@@ -857,8 +880,8 @@ const Invoice = () => {
   };
   const quotationConfirmation8 = async (Invoice_id) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/invoice-status-8-9`, {
-        order_id: Invoice_id,
+      const response = await axios.post(`${API_BASE_URL}/invoice-status-7-8`, {
+        IID: Invoice_id,
         user_id: localStorage.getItem("id"),
 
         // Other data you may need to pass
@@ -872,6 +895,25 @@ const Invoice = () => {
       toast.error(t("invoiceLoadFailed"));
     }
   };
+
+  const quotationConfirmation9 = async (Invoice_id) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/invoice-status-8-9`, {
+        IID: Invoice_id,
+        user_id: localStorage.getItem("id"),
+
+        // Other data you may need to pass
+      });
+      console.log("API response:", response);
+      allInvoiceData();
+      toast.success(t("invoiceLoaded"));
+      // Handle the response as needed
+    } catch (error) {
+      console.error("API call error:", error);
+      toast.error(t("invoiceLoadFailed"));
+    }
+  };
+
   const quotationConfirmation10 = async (Invoice_id, document) => {
     try {
       const response = await axios.post(
@@ -916,10 +958,10 @@ const Invoice = () => {
       const initialClaims = {};
 
       details.forEach((item) => {
-        initialPaidAmounts[item.Invoice_id] = item.paidAmount || "";
-        initialUnits[item.Invoice_id] = item.unit || "";
-        initialAmounts[item.Invoice_id] = item.amount || "";
-        initialClaims[item.Invoice_id] = item.claim || "";
+        initialPaidAmounts[item.ID] = item.paidAmount || "";
+        initialUnits[item.ID] = item.unit || "";
+        initialAmounts[item.ID] = item.amount || "";
+        initialClaims[item.ID] = item.claim || "";
       });
 
       setPaidAmounts(initialPaidAmounts);
@@ -966,8 +1008,8 @@ const Invoice = () => {
   };
   const uploadData = () => {
     axios
-      .post(`${API_BASE_URL}/invoice-status-9-10`, {
-        order_id: invoiceID,
+      .post(`${API_BASE_URL}/Invoice_IC12`, {
+        IID: invoiceID,
         Port_Weight: quantity,
         user_id: localStorage.getItem("id"),
       })
@@ -1123,8 +1165,9 @@ const Invoice = () => {
       if (consigneeData?.invoice_options === "invoice only") {
         // await generatePdf(consigneeData, a);
         const isConsignee = selectedInvoice === "Consignee" ? 1 : 0;
-        const invoiceResponse = await axios.post(
-          `${API_BASE_URL}/InvoicePdfDetails`,
+        const invoiceResponse = await axios
+          .post
+          /* `${API_BASE_URL}/InvoicePdfDetails`,
           {
             order_id: a?.Order_ID,
             AgreedPrice: useAgreedPricing ? 1 : 0,
@@ -1133,8 +1176,8 @@ const Invoice = () => {
             InvoiceName: isConsignee,
             ShowFXRate: exchangeRate ? 1 : 0,
             DeliveryTErms: selectedDeliveryTerm,
-          }
-        );
+          } */
+          ();
         console.log(invoiceResponse.data);
 
         const headers = invoiceResponse?.data?.tableHeaders || {};
@@ -1706,8 +1749,9 @@ const Invoice = () => {
         await uploadPDF7(pdfBlob, a);
       } else if (consigneeData?.invoice_options === "packing list only") {
         const isConsignee = selectedInvoice1 === "Consignee" ? 1 : 0;
-        const invoiceResponse = await axios.post(
-          `${API_BASE_URL}/proformaMain_Invoice`,
+        const invoiceResponse = await axios
+          .post
+          /* `${API_BASE_URL}/proformaMain_Invoice`,
           {
             order_id: a?.Order_ID,
             InvoiceName: isConsignee,
@@ -1716,8 +1760,8 @@ const Invoice = () => {
             Barcode: exchangeRate1 ? 1 : 0,
             CustomBarcode: exchangeRate2 ? 1 : 0,
             Notes: exchangeRate3 ? 1 : 0,
-          }
-        );
+          } */
+          ();
         console.log(invoiceResponse.data);
         const headers = invoiceResponse?.data?.tableHeaders || {};
         const rowsData = invoiceResponse?.data?.tableRow1 || [];
@@ -2181,8 +2225,9 @@ const Invoice = () => {
           maximumFractionDigits: 0,
         });
         const isConsignee = selectedInvoice === "Consignee" ? 1 : 0;
-        const invoiceResponse = await axios.post(
-          `${API_BASE_URL}/InvoicePdfDetails`,
+        const invoiceResponse = await axios
+          .post
+          /* `${API_BASE_URL}/InvoicePdfDetails`,
           {
             order_id: a?.Order_ID,
             AgreedPrice: useAgreedPricing ? 1 : 0,
@@ -2191,8 +2236,8 @@ const Invoice = () => {
             InvoiceName: isConsignee,
             ShowFXRate: exchangeRate ? 1 : 0,
             DeliveryTErms: selectedDeliveryTerm,
-          }
-        );
+          } */
+          ();
         console.log(invoiceResponse.data);
         const headers = invoiceResponse?.data?.tableHeaders || {};
         const rowsData = invoiceResponse?.data?.tableRow1 || [];
@@ -2640,18 +2685,19 @@ const Invoice = () => {
         doc.addPage();
 
         const isConsignee1 = selectedInvoice1 === "Consignee" ? 1 : 0;
-        const invoiceResponse1 = await axios.post(
-          `${API_BASE_URL}/proformaMain_Invoice`,
-          {
-            order_id: a?.Order_ID,
-            InvoiceName: isConsignee1,
-            CustomName: itemDetails2 ? 1 : 0,
-            SHOWGWCBM: cbm1 ? 1 : 0,
-            Barcode: exchangeRate1 ? 1 : 0,
-            CustomBarcode: exchangeRate2 ? 1 : 0,
-            Notes: exchangeRate3 ? 1 : 0,
-          }
-        );
+        const invoiceResponse1 = await axios
+          .post
+          /*  `${API_BASE_URL}/proformaMain_Invoice`,
+           {
+             order_id: a?.Order_ID,
+             InvoiceName: isConsignee1,
+             CustomName: itemDetails2 ? 1 : 0,
+             SHOWGWCBM: cbm1 ? 1 : 0,
+             Barcode: exchangeRate1 ? 1 : 0,
+             CustomBarcode: exchangeRate2 ? 1 : 0,
+             Notes: exchangeRate3 ? 1 : 0,
+           } */
+          ();
         console.log(invoiceResponse1.data);
         const headers1 = invoiceResponse1?.data?.tableHeaders || {};
         const rowsData1 = invoiceResponse1?.data?.tableRow1 || [];
@@ -3333,34 +3379,34 @@ const Invoice = () => {
   };
 
   const dataSubmit = () => {
-    axios
-      .post(`${API_BASE_URL}/InvoiceNotes`, {
-        invoice_id: invoiceID1,
-        notes: notes,
-      })
-      .then((response) => {
-        console.log(response);
-        let modalElement = document.getElementById("exampleModal2");
-        let modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-        console.log(response);
-        toast.success(t("invoiceNoteUpdated"), {
-          autoClose: 1000,
-          theme: "colored",
-        });
-        allInvoiceData();
-        setNotes("");
-        // Clear the quantity field after successful update
-      })
-      .catch((error) => {
-        console.log(error);
-        // toast.error("Network Error", {
-        //   autoClose: 1000,
-        //   theme: "colored",
-        // });
-      });
+    /*  axios
+       .post(`${API_BASE_URL}/InvoiceNotes`, {
+         invoice_id: invoiceID1,
+         notes: notes,
+       })
+       .then((response) => {
+         console.log(response);
+         let modalElement = document.getElementById("exampleModal2");
+         let modalInstance = bootstrap.Modal.getInstance(modalElement);
+         if (modalInstance) {
+           modalInstance.hide();
+         }
+         console.log(response);
+         toast.success(t("invoiceNoteUpdated"), {
+           autoClose: 1000,
+           theme: "colored",
+         });
+         allInvoiceData();
+         setNotes("");
+         // Clear the quantity field after successful update
+       })
+       .catch((error) => {
+         console.log(error);
+         // toast.error("Network Error", {
+         //   autoClose: 1000,
+         //   theme: "colored",
+         // });
+       }); */
   };
   const restoreEanPackage = (id) => {
     axios
@@ -3395,32 +3441,34 @@ const Invoice = () => {
         console.log(error);
       });
   };
-  const handlePaidAmountChange = (id_id, value) => {
-    setPaidAmounts((prev) => ({
-      ...prev,
-      [id_id]: value,
-    }));
-  };
-  const handleUnitChange = (id_id, value) => {
-    console.log("Unit changed:", id_id, value); // Debugging
-    setUnits((prev) => ({
-      ...prev,
-      [id_id]: value,
-    }));
-  };
-  const handleClaimChange = (od_id, value) => {
-    console.log("Claim changed:", od_id, value);
-    setClaims((prev) => ({
-      ...prev,
-      [od_id]: value,
-    }));
+  const handlePaidAmountChange = (index, value) => {
+    setPaidAmounts((prev) => {
+      const newArr = Array.isArray(prev) ? [...prev] : []; // fallback if prev undefined
+      newArr[index] = value ?? "";
+      return newArr;
+    });
   };
 
-  const handleAmountChange = (id_id, value) => {
-    setAmounts((prev) => ({
-      ...prev,
-      [id_id]: value,
-    }));
+  const handleUnitChange = (index, value) => {
+    setUnits((prev) => {
+      const newArr = Array.isArray(prev) ? [...prev] : [];
+      newArr[index] = value ?? "";
+      return newArr;
+    });
+  };
+  const handleClaimChange = (index, value) => {
+    setClaims((prev) => {
+      const newArr = Array.isArray(prev) ? [...prev] : [];
+      newArr[index] = value ?? "";
+      return newArr;
+    });
+  };
+  const handleAmountChange = (index, value) => {
+    setAmounts((prev) => {
+      const newArr = Array.isArray(prev) ? [...prev] : [];
+      newArr[index] = value ?? "";
+      return newArr;
+    });
   };
 
   // const summaryTable = async (Claim_id) => {
@@ -3463,12 +3511,73 @@ const Invoice = () => {
   //     // Handle error
   //   }
   // };
+  // const summaryTable = async (Claim_ID) => {
+  //   console.log("hii");
+
+  //   if (!details?.dateValues) return;
+
+  //   const dataToSubmit = details.dateValues
+  //     .filter((item) => {
+  //       const id = item["@IID"]; // changed here
+  //       return (
+  //         paidAmounts[id] &&
+  //         amounts[id] &&
+  //         units[id] &&
+  //         claims[id] &&
+  //         parseFloat(paidAmounts[id]) > 0 &&
+  //         parseFloat(amounts[id]) > 0
+  //       );
+  //     })
+  //     .map((item) => {
+  //       const id = item["@IID"]; // changed here
+  //       return {
+  //         Claim_ID: Claim_ID,
+  //         Order_ID: data1?.ID,
+  //         OD_ID: id,
+  //         Claimed_Qty: parseFloat(paidAmounts[id]),
+  //         Claimed_Unit: units[id],
+  //         Claimed_Amount: parseFloat(amounts[id]),
+  //         Claim_Reason: claims[id],
+  //         User: localStorage.getItem("id"),
+  //       };
+  //     });
+  //   console.log(dataToSubmit);
+
+  //   if (dataToSubmit.length === 0) {
+  //     console.warn("No valid data to submit");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await axios.post(`${API_BASE_URL}/AddClaimDetails`, {
+  //       datas: dataToSubmit,
+  //     });
+  //     const modalElement = document.getElementById("modalClaim");
+  //     const modalInstance = bootstrap.Modal.getInstance(modalElement);
+  //     if (modalInstance) modalInstance.hide();
+  //     // Reset fields
+  //     setInvoiceId2("");
+  //     setData1("");
+  //     setPaidAmounts({});
+  //     setUnits({});
+  //     setClaims({});
+  //     setAmounts({});
+  //     setPaymentDate(""); // if you're using a date field
+  //     console.log("AddClaimDetails response:", response);
+  //     toast.success(t("claimSubmitted"));
+  //     // Optional: show success toast or refresh data
+  //   } catch (error) {
+  //     console.error("Error in AddClaimDetails:", error);
+  //     toast.error(t("errorAddClaimDetails"));
+  //     // Optional: show error toast
+  //   }
+  // };
   const summaryTable = async (Claim_ID) => {
     if (!details?.dateValues) return;
 
     const dataToSubmit = details.dateValues
       .filter((item) => {
-        const id = item.OD_ID;
+        const id = item.ID;
         return (
           paidAmounts[id] &&
           amounts[id] &&
@@ -3479,10 +3588,10 @@ const Invoice = () => {
         );
       })
       .map((item) => {
-        const id = item.OD_ID;
+        const id = item.ID;
         return {
           Claim_ID: Claim_ID,
-          Order_ID: data1?.Order_ID,
+          Order_ID: data1?.ID,
           OD_ID: id,
           Claimed_Qty: parseFloat(paidAmounts[id]),
           Claimed_Unit: units[id],
@@ -3521,20 +3630,18 @@ const Invoice = () => {
       // Optional: show error toast
     }
   };
-
   const handleSubmit1 = async () => {
     if (!details?.dateValues) return;
 
     const selectedPaymentDetails = details.dateValues
       .filter((item) => {
-        const id = item.OD_ID;
+        const id = item.ID;
         return paidAmounts[id] || units[id] || amounts[id] || claims[id];
       })
       .map((item) => {
-        const id = item.OD_ID;
+        const id = item.ID;
         return {
           id_id: id,
-
           ITF: item.ITF_ID,
           QTY: paidAmounts[id] || 0,
           Unit: units[id] || 0,
@@ -3545,11 +3652,11 @@ const Invoice = () => {
 
     const paymentData = {
       Claim_date: paymentDate,
-      Client_ID: data1?.Client_id,
-      Consignee_ID: data1?.Consignee_ID,
-      Order_ID: data1?.Order_ID,
-      FX_ID: data1?.FX_ID,
-      FX_Rate: data1?.Daily_FX_Rate,
+      Client_ID: details?.orderMetaLabels?.Client,
+      Consignee_ID: details?.orderMetaLabels?.Consignee,
+      Order_ID: data1?.ID || invoiceID2,
+      FX_ID: details?.orderMetaLabels?.FX,
+      FX_Rate: details?.orderMetaLabels?.FX_Rate,
       User_id: localStorage.getItem("id"),
       claim_details: selectedPaymentDetails, // include filtered rows
     };
@@ -3933,18 +4040,19 @@ const Invoice = () => {
 
   const generatePdf5 = async () => {
     const isConsignee = selectedInvoice1 === "Consignee" ? 1 : 0;
-    const invoiceResponse = await axios.post(
-      `${API_BASE_URL}/proformaMain_Invoice`,
-      {
-        order_id: filterData1?.Order_ID,
-        InvoiceName: isConsignee,
-        CustomName: itemDetails2 ? 1 : 0,
-        SHOWGWCBM: cbm1 ? 1 : 0,
-        Barcode: exchangeRate1 ? 1 : 0,
-        CustomBarcode: exchangeRate2 ? 1 : 0,
-        Notes: exchangeRate3 ? 1 : 0,
-      }
-    );
+    const invoiceResponse = await axios
+      .post
+      /*  `${API_BASE_URL}/proformaMain_Invoice`,
+       {
+         order_id: filterData1?.Order_ID,
+         InvoiceName: isConsignee,
+         CustomName: itemDetails2 ? 1 : 0,
+         SHOWGWCBM: cbm1 ? 1 : 0,
+         Barcode: exchangeRate1 ? 1 : 0,
+         CustomBarcode: exchangeRate2 ? 1 : 0,
+         Notes: exchangeRate3 ? 1 : 0,
+       } */
+      ();
     console.log(invoiceResponse.data);
     const headers = invoiceResponse?.data?.tableHeaders || {};
     const rowsData = invoiceResponse?.data?.tableRow1 || [];
@@ -4426,7 +4534,7 @@ const Invoice = () => {
     const invoiceResponse = await axios.post(
       `${API_BASE_URL}/InvoicePdfDetails`,
       {
-        order_id: filterData1?.Order_ID,
+        order_id: filterData1?.ID,
         AgreedPrice: useAgreedPricing ? 1 : 0,
         CustomName: itemDetails ? 1 : 0,
         SHOWGWCBM: cbm ? 1 : 0,
@@ -4508,15 +4616,15 @@ const Invoice = () => {
       const textDataLeft = [
         {
           label: invoiceResponse?.data?.orderMetaLabels["Order : "],
-          value: `${invoiceResponse?.data?.orderMetaValues.Order_Number || ""}`,
+          value: `${invoiceResponse?.data?.orderMetaValues.OCODE || ""}`,
         },
         {
           label: invoiceResponse?.data?.orderMetaLabels["TT Ref : "],
-          value: `${invoiceResponse?.data?.orderMetaValues.Shipment_ref || ""}`,
+          value: `${invoiceResponse?.data?.orderMetaValues.TTREF || ""}`,
         },
         {
           label: invoiceResponse?.data?.orderMetaLabels["PO Number : "],
-          value: `${invoiceResponse?.data?.orderMetaValues.Customer_ref || ""}`,
+          value: `${invoiceResponse?.data?.orderMetaValues.Customer_PO || ""}`,
         },
         {
           label: invoiceResponse?.data?.transportTypeLabel.AWB,
@@ -4571,7 +4679,7 @@ const Invoice = () => {
       const textDataRight = [
         {
           label: `${invoiceResponse?.data?.dateLabels["Date : "]}`,
-          value: `${formatDate(invoiceResponse?.data?.dateValues.created)}`,
+          value: `${formatDate(invoiceResponse?.data?.dateValues.InvoiceDate)}`,
         },
         {
           label: `${invoiceResponse?.data?.dateLabels["Due Date : "]}`,
@@ -4580,8 +4688,10 @@ const Invoice = () => {
             : "",
         },
         {
-          label: `${invoiceResponse?.data?.dateLabels["Ship Date : "]}`,
-          value: `${formatDate(invoiceResponse?.data?.dateValues.Ship_date)}`,
+          label: `${invoiceResponse?.data?.dateLabels?.Ship_date}`,
+          value: `${
+            /* formatDate */ invoiceResponse?.data?.dateValues.Ship_date
+          }`,
         },
         // {
         //   label: "Delivery By :",
@@ -4645,13 +4755,7 @@ const Invoice = () => {
     const maxWidth1 = 72;
     const startX1 = 7;
     const textBlock1 = [
-      invoiceResponse.data?.client_address.client_name,
-      invoiceResponse.data?.client_address.client_tax_number,
-      invoiceResponse.data?.client_address.Address1,
-      invoiceResponse.data?.client_address.Address2,
-      invoiceResponse.data?.client_address.Address3,
-      invoiceResponse.data?.client_address.Address4,
-      invoiceResponse.data?.client_address.client_phone,
+      invoiceResponse.data?.client_address?.vc_address,
     ].filter((text) => text && text.toString().trim() !== "");
 
     let currentY1 = commonStartY;
@@ -4671,13 +4775,7 @@ const Invoice = () => {
     const maxWidth2 = 72;
     const startX2 = 106;
     const textBlock2 = [
-      invoiceResponse.data?.consignee_address.consignee_name,
-      invoiceResponse.data?.consignee_address.consignee_tax_number,
-      invoiceResponse.data?.consignee_address.Address1,
-      invoiceResponse.data?.consignee_address.Address2,
-      invoiceResponse.data?.consignee_address.Address3,
-      invoiceResponse.data?.consignee_address.Address4,
-      invoiceResponse.data?.consignee_address.consignee_email,
+      invoiceResponse.data?.consignee_address?.vc_address,
     ].filter((text) => text && text.toString().trim() !== "");
 
     let currentY2 = commonStartY;
@@ -5044,13 +5142,14 @@ const Invoice = () => {
   };
   const generatePdf2 = async (a) => {
     console.log(a);
-    const invoiceResponse = await axios.post(
-      `${API_BASE_URL}/CustomeInvoicePdfDetails`,
+    const invoiceResponse = await axios
+      .post
+      /* `${API_BASE_URL}/CustomeInvoicePdfDetails`,
       {
         order_id: a?.Order_ID,
         invoice_id: a?.Invoice_id,
-      }
-    );
+      } */
+      ();
 
     const tableData = invoiceResponse?.data?.tableRow1 || [];
     const tableHeader = invoiceResponse?.data?.tableHeaders || {};
@@ -5593,9 +5692,24 @@ const Invoice = () => {
   // };
 
   const handleModalOpen = async (a) => {
-    everyDataSet(a); // Your existing function
+    // everyDataSet(a); // Your existing function
 
     try {
+      everyDataSet(a);
+
+      const res1 = await fetch(`${API_BASE_URL}/InvoicePayorDropDown`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          IID: a.ID, // Pass BN ID from selected record
+        }),
+      });
+      const data1 = await res1.json();
+      console.log(data1);
+      console.log(data1.alldata);
+
+      // alldata
+      setPayorDropdown(data1.alldata);
       // Step 1: Call BNPaymentStep API but with IID (Invoice ID)
       const res = await axios.post(`${API_BASE_URL}/BNPaymentStep`, {
         bn_id: "", // Not needed for invoice
@@ -5646,7 +5760,7 @@ const Invoice = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                {t("adjustInvoiceWeight")}
+                {t("portWeight")}
               </h1>
               <button
                 type="button"
@@ -5659,7 +5773,7 @@ const Invoice = () => {
             </div>
             <div className="modal-body">
               <div className="form-group col-lg-12 formCreate">
-                <h6> {t("adjustInvoiceWeight")}</h6>
+                <h6> {t("portWeight")}</h6>
                 <div>
                   <input
                     type="text"
@@ -5873,54 +5987,40 @@ const Invoice = () => {
                     {details?.invoiceHeader?.["Invoice Number: "] ||
                       "Invoice Number:"}
                   </strong>
-                  <span>
-                    {details?.orderMetaLabels?.["Invoice_Number"] || "-"}
-                  </span>
+                  <span>{details?.orderMetaLabels?.Result1 || "-"}</span>
                 </div>
                 <div>
                   <strong>
                     {details?.invoiceHeader?.["Client Name: "] || "Client:"}
                   </strong>
-                  <span>
-                    {details?.orderMetaLabels?.["client_name"] || "-"}
-                  </span>
+                  <span>{details?.orderMetaLabels?.Result2 || "-"}</span>
                 </div>
                 <div>
                   <strong>
                     {details?.invoiceHeader?.["Consignee Name: "] ||
                       "Consignee:"}
                   </strong>
-                  <span>
-                    {details?.orderMetaLabels?.["Consignee_name"] || "-"}
-                  </span>
+                  <span>{details?.orderMetaLabels?.Result3 || "-"}</span>
                 </div>
                 <div>
                   <strong>
                     {details?.invoiceHeader?.["Shipment Ref: "] ||
                       "Shipment Ref:"}
                   </strong>
-                  <span>
-                    {details?.orderMetaLabels?.["Shipment_ref"] || "-"}
-                  </span>
+                  <span>{details?.orderMetaLabels?.Result4 || "-"}</span>
                 </div>
                 <div>
                   <strong>
                     {details?.invoiceHeader?.["Client PO: "] || "Client PO:"}
                   </strong>
-                  <span>
-                    {details?.orderMetaLabels?.["Customer_ref"] || "-"}
-                  </span>
+                  <span>{details?.orderMetaLabels?.Result5 || "-"}</span>
                 </div>
                 <div>
                   <strong>
                     {details?.invoiceHeader?.["Delivery Details: "] ||
                       "Delivery Details:"}
                   </strong>
-                  <span>
-                    {details?.orderMetaLabels?.[
-                      'Concat(@Airline," (",Orders.journey_number,") ",Orders.BL)'
-                    ] || "-"}
-                  </span>
+                  <span>{details?.orderMetaLabels?.Result6 || "-"}</span>
                 </div>
               </div>
 
@@ -5965,7 +6065,6 @@ const Invoice = () => {
                         )}
                     </tr>
                   </thead>
-
                   <tbody>
                     {Array.isArray(details?.dateValues) &&
                       details.dateValues.map((item, i) => (
@@ -5976,14 +6075,15 @@ const Invoice = () => {
                           <td>{item.Col4}</td>
                           <td>{item.Col5}</td>
                           <td>{item.Col6}</td>
+
                           {/* Claim Quantity */}
                           <td>
                             <div className="selectInvoiceView">
                               <select
                                 name="claims_id"
-                                value={claims[item.OD_ID] || ""}
+                                value={claims[item.ID] || ""}
                                 onChange={(e) =>
-                                  handleClaimChange(item.OD_ID, e.target.value)
+                                  handleClaimChange(item.ID, e.target.value)
                                 }
                               >
                                 <option value="" disabled>
@@ -6004,12 +6104,9 @@ const Invoice = () => {
                           <td>
                             <input
                               type="number"
-                              value={paidAmounts[item.OD_ID] || ""}
+                              value={paidAmounts[item.ID] || ""}
                               onChange={(e) =>
-                                handlePaidAmountChange(
-                                  item.OD_ID,
-                                  e.target.value
-                                )
+                                handlePaidAmountChange(item.ID, e.target.value)
                               }
                             />
                           </td>
@@ -6019,9 +6116,9 @@ const Invoice = () => {
                             <div className="selectInvoiceView">
                               <select
                                 name="unit_id"
-                                value={units[item.OD_ID] || ""}
+                                value={units[item.ID] || ""}
                                 onChange={(e) =>
-                                  handleUnitChange(item.OD_ID, e.target.value)
+                                  handleUnitChange(item.ID, e.target.value)
                                 }
                               >
                                 <option value="" disabled>
@@ -6040,9 +6137,9 @@ const Invoice = () => {
                           <td>
                             <input
                               type="number"
-                              value={amounts[item.OD_ID] || ""}
+                              value={amounts[item.ID] || ""}
                               onChange={(e) =>
-                                handleAmountChange(item.OD_ID, e.target.value)
+                                handleAmountChange(item.ID, e.target.value)
                               }
                             />
                           </td>
@@ -6504,6 +6601,39 @@ const Invoice = () => {
               <div className="row">
                 <div className="col-lg-9">
                   <div className="row g-3">
+                    <div className=" col-xl-3 col-lg-3 col-md-4">
+                      <div className="parentFormPayment autoComplete">
+                        <p>{t("Payor")}</p>
+                        <Autocomplete
+                          disablePortal
+                          options={payorDropdown || []}
+                          value={
+                            (payorDropdown || []).find(
+                              (p) => p.Client === paymentForm.payor_id
+                            ) || null
+                          }
+                          getOptionLabel={(option) => option.name || ""}
+                          onChange={(e, newValue) => {
+                            setPaymentForm((prev) => ({
+                              ...prev,
+                              payor_id: newValue?.Client || "",
+                              Payor: newValue?.name || "",
+                            }));
+
+                            handleChange5("Payor_ID", newValue?.Client || "", {
+                              Payor: newValue?.name || "",
+                            });
+                          }}
+                          sx={{ width: 300 }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder={t("Select Payor")}
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
                     <div className=" col-xl-3 col-lg-3 col-md-6">
                       <div className="parentFormPayment">
                         <p> {t("paymentDate")}</p>
